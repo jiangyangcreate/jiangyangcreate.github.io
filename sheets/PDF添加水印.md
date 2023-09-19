@@ -16,6 +16,7 @@ tags: [python]
   |- 你要添加水印的文件3.pdf
 |- 水印文件
   |- 水印.pdf
+|- 水印版物料
 '''
 import os
 from PyPDF2 import PdfFileWriter, PdfFileReader
