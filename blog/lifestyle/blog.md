@@ -1,7 +1,7 @@
 ---
 slug: /blog
 title: 博客：我是如何写博客的
-date: 2023-08-30
+date: 2020-12-30
 authors: jiangmiemie
 tags: [blog, tutorial]
 keywords: [blog, tutorial]
