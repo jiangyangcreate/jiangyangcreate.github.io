@@ -1,5 +1,5 @@
 ---
-tags: [python]
+tags: [python,pdf]
 ---
 ``` python
 import os
