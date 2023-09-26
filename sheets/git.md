@@ -6,6 +6,12 @@ git tag -l | xargs git tag -d #删除所有本地分支
 git fetch origin --prune #从远程拉取所有信息
 git branch -a --contains Tag_V1.0.0 # 看看哪个分支包含这个tag/commit
 
+git log # 查看你要回到的那个版本
+git reset --hard HEAD^ # 回退到上个版本
+git reset --hard commit_id # 退到/进到 指定commit_id
+git push origin HEAD --force #将本地的修改提交到远程
+
+
 #查询远程tags的命令如下：
 git ls-remote --tags origin
 
