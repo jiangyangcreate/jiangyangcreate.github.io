@@ -8,13 +8,15 @@ tags: [bookmark]
 
 ### 每天必看
 
-[Gmail：谷歌邮箱](https://mail.google.com/mail/u/0/#inbox)
-
 [GitHub：代码开源社区](https://github.com/notifications)
+
+[Gmail：谷歌邮箱](https://mail.google.com/mail/u/0/#inbox)
 
 [网道：全栈互联网开发文档](https://wangdoc.com/)
 
 ### 智能工具
+
+[爱设计：AI从word里设计PPT](https://www.isheji.com/ppt-editor/?tid=325285&mode=1&source=ai)
 
 [Google 翻译：用户最多的翻译](https://translate.google.com.hk/?hl=zh-CN&sourceid=cnhp)
 
@@ -50,6 +52,8 @@ tags: [bookmark]
 
 [webapp：HTML 转 Markdown](https://lwebapp.com/zh/html-to-markdown)
 
+[JPG转SVG ：在线可保留彩色通道](https://jpg2svg.com/zh/)
+
 ### 资源站
 
 [互联网档案馆：免费和可借阅书籍、电影、音乐和时光机的数字图书馆](https://archive.org/)
@@ -61,6 +65,8 @@ tags: [bookmark]
 [Pixabay：高质量图片](https://pixabay.com/)
 
 [yandex：新一代搜索引擎](https://yandex.com/)
+
+[unDraw ：可修改颜色的插画库](https://undraw.co/illustrations)
 
 ### 网络测试
 
@@ -82,27 +88,31 @@ tags: [bookmark]
 
 [Bluetooth Internals：网页端蓝牙调试](chrome://bluetooth-internals/#devices/a0:e6:f8:7f:67:ff)
 
-## 编程电子书
+### 单片机
 
-### Python
+[Sipeed Wiki：MaixPy 常见问题解答](https://wiki.sipeed.com/soft/maixpy/en/others/maixpy_faq.html)
+
+### 编程电子书
+
+#### Python
 
 [3.10](https://docs.python.org/zh-cn/3/)
 
 [PyPI](https://pypi.org/)
 
-### 前端
+#### 前端
 
 [MDN](https://developer.mozilla.org/zh-CN/)
 
 [TypeScript](https://www.typescriptlang.org/docs/handbook/2/everyday-types.html)
 
-### 后端
+#### 后端
 
 [Django](https://docs.djangoproject.com/en/4.1/contents/)
 
 [djangoproject](https://forum.djangoproject.com/c/projects/11)
 
-### 爬虫
+#### 爬虫
 
 [Appium](https://appium.github.io/appium/docs/en/2.0/)
 
@@ -110,16 +120,34 @@ tags: [bookmark]
 
 [Chromium](https://peter.sh/experiments/chromium-command-line-switches/)
 
-### 数据库
+#### 数据库
 
 [Redis 命令](https://redis.readthedocs.io/en/stable/commands.html)
 
-### 分布式
+#### 分布式
 
 [节点 | Kubernetes](https://kubernetes.io/zh-cn/docs/concepts/architecture/nodes/)
 
-### 机器学习
+#### 机器学习
 
 [PyTorch](https://pytorch.org/get-started/locally/)
 
 [pandas文档](https://pandas.pydata.org/docs/reference/index.html)
+
+### 证明能力
+
+[Google 的编程竞赛：可以拿到Googleoffer](https://codingcompetitions.withgoogle.com/)
+
+[freecodecamp：可以给简历添光](https://www.freecodecamp.org/)
+
+### 网站搭建
+
+[Docusaurus ：快速构建你的站点](https://docusaurus.io/zh-CN/)
+
+### 常看博客
+
+[阮一峰的网络日志：每周更新开发者周刊](https://www.ruanyifeng.com/blog/weekly/)
+
+[崔庆才的博客：Python爬虫案例](https://scrape.center/)
+
+[看雪学苑：网络安全教学社区](https://www.kanxue.com/)
