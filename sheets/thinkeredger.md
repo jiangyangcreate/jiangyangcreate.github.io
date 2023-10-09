@@ -42,7 +42,7 @@ TIP：Flash工具-命令行（Windows、Linux）和图形化的刷机工具是AB
 - 如果烧录了非指定系统，该单片机可能烧毁或无法工作，可以使用跳针来恢复刷机模式检测看能否继续使用。
 - 工作温度：0℃ ~ 60℃，冬季请避免在室外使用，可能和ipad一样停止工作。
 
-## 进阶
+## 进阶烧录系统流程
 
 如果你需要大规模的铺货,需要默认安装一批自定义的内容。那么应该怎么办？
 
@@ -50,5 +50,127 @@ TIP：Flash工具-命令行（Windows、Linux）和图形化的刷机工具是AB
 
 ### 镜像格式的区别
 
-- ISO文件通常来自光盘镜像，例如Windows安装光盘的ISO镜像文件。
-- 而IMG文件可以来自多种渠道，例如从移动设备制造商下载的Android操作系统镜像文件，或者是从虚拟机软件中制作的虚拟机磁盘镜像文件。IMG格式是ISO的严格超集，ISO文件是IMG文件的一种特例。
+- *.iso 是一种光盘的存档文件，被设计用于光盘存档，符合ISO 9660等光盘规范；
+- *.img 是一种文件归档格式，被设计用于数字存储、传输、以及整片 磁盘/光盘 内容的复制；
+- *.img 兼容 *.iso （*.iso 是*.img 的特例）
+
+### 烧录
+
+下载`balenaEtcher`
+选择封装好的镜像
+点击烧录
+
+## SSH连接
+
+账户与密码默认都是`linaro`
+
+## 基础配置
+
+### 1.更新源文件
+
+中国区的使用者推荐使用阿里云的镜像源，源其实就是指向一个仓库的网址。
+1.备份
+
+``` bash
+sudo mv /etc/apt/sources.list /etc/apt/sources.list.bak
+```
+
+2.编辑源
+
+``` bash
+sudo vim /etc/apt/sources.list
+```
+
+vim内容如下，`a`是进入编辑模式、`esc`是退出编辑模式，`:`是指令模式，`wq!`是保存指令
+
+完整的操作就是：
+
+- `a`是进入编辑模式
+- 删除旧内容，粘贴新内容。
+- `esc`退出编辑模式
+- `:wq!`回车确认
+
+``` bash
+deb http://mirrors.aliyun.com/debian/ buster main non-free contrib
+deb http://mirrors.aliyun.com/debian/ buster-updates main non-free contrib
+deb http://mirrors.aliyun.com/debian/ buster-backports main non-free contrib
+deb http://mirrors.aliyun.com/debian-security/ buster/updates main non-free contrib
+deb-src http://mirrors.aliyun.com/debian/ buster main non-free contrib
+deb-src http://mirrors.aliyun.com/debian/ buster-updates main non-free contrib
+deb-src http://mirrors.aliyun.com/debian/ buster-backports main non-free contrib
+deb-src http://mirrors.aliyun.com/debian-security/ buster/updates main non-free contrib
+```
+
+3.更新并下载源
+
+``` bash
+sudo apt-get update
+sudo apt-get upgrade
+```
+
+参考链接：
+<https://www.cnblogs.com/liqi175/p/16788629.html>
+
+### 2.安装中文
+
+1.安装 locales 软件包
+
+``` bash
+apt-get install locales
+```
+
+2.配置 locales 软件包
+
+``` bash
+dpkg-reconfigure locales
+```
+
+参考下方说明在界面中钩选上 `zh_CN.UTF-8 UTF-8`并确认
+
+- `空格键`是选择
+- `回车`代表确认并进入下一步
+- `↑↓`上下移动光标
+
+![图片](/2023/debiancn2.png)
+
+系统默认的区域选择刚刚下载的 `zh_CN.UTF-8 UTF-8`，回车OK
+
+![图片](/2023/debiancn1.png)
+
+重启后即大功告成~
+
+### 配置中文输入法
+
+``` bash
+# 安装im-config框架
+sudo apt-get install im-config
+# 安装开源输入法fcitx框架
+sudo apt-get install fcitx
+# 安装fcitx框架下的拼音输入法
+sudo apt-get install fcitx pinyin
+# 如果缺少组件或遇到报错可以用这条命令修复
+sudo apt --fix-broken install
+# 安装ui框架
+sudo apt install fcitx-ui-classic
+# 安装配置文件，增加中文输入模式
+sudo apt install fcitx-config-gtk
+```
+
+全部安装完成后
+
+在开始菜单找到`fcitx`进入输入法配置界面
+
+点击`-`号移除所有的输入法（让系统重新读取）
+
+点击`+`号，然后弹出“添加输入法”的窗口，先选择中文键盘(第一个输入法为非激活状态)，后选择拼音输入法
+
+点击全局配置，点击显示高级选项，开启跨程序即可保持输入法持续被激活。
+
+### 安装软件
+
+在终端打开文件所在位置后，安装执行`sudo dpkg -i 包名`。以vscode为例,
+
+``` bash
+cd home/Desktop
+sudo dpkg -i code_1.83.0-1696349969_arm64.deb
+```
