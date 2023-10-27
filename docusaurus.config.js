@@ -73,17 +73,17 @@ const config = {
     ],
   ],
   plugins: [
-    // [
-    //   "@docusaurus/plugin-content-docs",
-    //   {
-    //     id: "docs",
-    //     path: "docs",
-    //     routeBasePath: "docs",
-    //     sidebarPath: require.resolve("./sidebars.js"),
-    //     editUrl:
-    //       'https://github.com/jiangmiemie/blog/blob/master',
-    //   },
-    // ],
+    [
+      "@docusaurus/plugin-content-docs",
+      {
+        id: "course",
+        path: "course",
+        routeBasePath: "course",
+        sidebarPath: require.resolve("./sidebars.js"),
+        editUrl:
+          'https://github.com/jiangmiemie/blog/blob/master',
+      },
+    ],
     [
       "@docusaurus/plugin-content-docs",
       {
