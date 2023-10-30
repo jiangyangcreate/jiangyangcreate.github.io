@@ -154,6 +154,11 @@ const config = {
             label: '博客',
           },
           {
+            to: "/course",
+            position: 'left',
+            label: 'python',
+          },
+          {
             position: 'left',
             label: '碎片',
             items: [
