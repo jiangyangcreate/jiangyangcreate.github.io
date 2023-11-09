@@ -76,17 +76,6 @@ const config = {
     [
       "@docusaurus/plugin-content-docs",
       {
-        id: "course",
-        path: "course",
-        routeBasePath: "course",
-        sidebarPath: require.resolve("./sidebars.js"),
-        editUrl:
-          'https://github.com/jiangmiemie/blog/blob/master',
-      },
-    ],
-    [
-      "@docusaurus/plugin-content-docs",
-      {
         id: "read",
         path: "read",
         routeBasePath: "read",
@@ -152,11 +141,6 @@ const config = {
             to: "/blog",
             position: 'left',
             label: '博客',
-          },
-          {
-            to: "/course",
-            position: 'left',
-            label: 'python',
           },
           {
             position: 'left',
