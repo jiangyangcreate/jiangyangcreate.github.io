@@ -1,3 +1,9 @@
+---
+sidebar_position: 1
+title: 版本协作管理概述
+---
+
+
 # 版本协作管理
 
 Git是一个版本控制工具，既可以通过图形化的方式操作，也可以通过命令行来完成。
@@ -27,3 +33,4 @@ Github Action是一种工作流，是CI/CD最常用的工具
 工作流在存储库的目录中定义.github/workflows，存储库可以有多个工作流，每个工作流可以执行一组不同的任务。例如，您可以有一个工作流来构建和测试拉取请求，另一个工作流在每次创建发布时部署您的应用程序，还有另一个工作流在每次有人打开新问题时添加标签。
 
 [GitHub Actions documentation](https://docs.github.com/en/actions)
+ions)

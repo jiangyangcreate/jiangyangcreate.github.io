@@ -1,3 +1,8 @@
+---
+sidebar_position: 1
+title: 编程外的基础概述
+---
+
 # 编程外的基础
 
 常识涵盖编程学习过程中可能遇到的知识，如YAML、Markdown等。
@@ -36,3 +41,4 @@ Terminals, 也称为命令行或控制台，使我们能够在我们的计算机
 [网道bash教程](https://wangdoc.com/bash/intro)是开源的bash文档，教科书式的篇章划分能帮助学习者系统的了解终端命令。
 
 [tldr](https://tldr.inbrowser.app/)是社区维护的命令行工具帮助页面合集，支持在线查询终端命令，有不同平台选择，支持不同语言显示
+��示

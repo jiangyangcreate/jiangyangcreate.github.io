@@ -1,3 +1,7 @@
+---
+sidebar_position: 1
+title: 消息队列概述
+---
 
 # 消息队列
 
@@ -370,3 +374,4 @@ Flink里面有对应的每种不同机制的保证，提供Exactly-Once保障（
   * 防止Kafka的速度过快，占用整个服务器（broker）的所有IO资源
 
 ## RabbitMQ
+bitMQ

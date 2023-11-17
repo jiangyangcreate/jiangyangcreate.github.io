@@ -17,6 +17,6 @@
 
 如果你想基于这个模式构建你自己的站点，可以尝试
 
-`nmp install`下载所需的依赖包
+`npm install`下载所需的依赖包
 
-`nmp run start`启动站点
+`npm run start`启动站点

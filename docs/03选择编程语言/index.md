@@ -1,3 +1,8 @@
+---
+sidebar_position: 1
+title: 选择编程语言概述
+---
+
 # 选择编程语言
 
 不同的编程语言对程序员来说就像不同的工具。下面是一些开发人员的工作和他们使用的主要编程语言：
@@ -65,3 +70,4 @@ Python的一些值得注意的特点：
 [freecodecamp](https://www.freecodecamp.org/):课程配套练习，完成本教程，申请认证
 
 [Python3 Doc](https://docs.python.org/zh-cn/3/):官方的 Python 文档，所有教程的起点和终点。
+��。

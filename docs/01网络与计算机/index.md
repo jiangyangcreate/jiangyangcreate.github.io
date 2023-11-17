@@ -1,7 +1,9 @@
 ---
 slug: /
 sidebar_position: 1
+title: 网络与计算机概述
 ---
+
 
 # 网络与计算机
 
@@ -50,3 +52,4 @@ C语言是用于与计算机交流的高级语言之一。它是中国主要大�
 计算机网络是中国计算机研究生考试的科目之一。它讲解了计算机网络的基本概念和原理，计算机网络的结构和典型的网络协议，以及网络系统的分析、设计和应用。
 
 <iframe src="https://player.bilibili.com/player.html?aid=70228743&bvid=BV19E411D78Q&cid=121579556&page=1&danmaku=0" allowfullscreen="allowfullscreen" width="100%" height="500" scrolling="no" frameborder="0" sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"></iframe>
+rame>
