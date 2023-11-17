@@ -1,5 +1,6 @@
 ---
-tags: [git]
+tags: [git,备忘录]
+title: Git备忘录
 ---
 ``` bash
 git tag -l | xargs git tag -d #删除所有本地分支

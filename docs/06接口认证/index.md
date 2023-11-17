@@ -32,7 +32,7 @@ EST API 几乎可以使用任何编程语言进行开发，并支持多种数据
 
 Web Authentication API（也称作 WebAuthn）使用asymmetric (public-key) cryptography （非对称加密）替代密码或 SMS 短信在网站上注册、登录、second-factor authentication（双因素验证）。 解决了 phishing（钓鱼）、data breaches（数据破坏）、SMS 文本攻击、其它双因素验证等重大安全问题，同时显著提高了易用性（因为用户不必管理许多越来越复杂的密码）。
 
-许多网站已实现用户注册账号，登录已有账号的页面， WebAuthn 作为这些页面的替代和补充。类似其他形式的 Credential Management API（凭据管理 API)。Web Authentication API 有两个对应于注册和登录的基本方法：
+许多网站已实现用户注册账号，登录已有账号的页面， WebAuthn 作为这些页面的替代和补充。类似其他形式的 Credential Management API（凭据管理 API）。Web Authentication API 有两个对应于注册和登录的基本方法：
 
 - navigator.credentials.create() - 当使用 publicKey 选项时，创建一个新的凭据，无论是用于注册新账号还是将新的非对称密钥凭据与已有的账号关联。
 - navigator.credentials.get() - 当使用 publicKey 选项时，使用一组现有的凭据进行身份验证服务，无论是用于用户登录还是双因素验证中的一步。
@@ -126,4 +126,4 @@ print(result.data['hello']) # "Hello World"
 ```
 
 GraphQL 同样支持 Relay, Django, SQLAlchemy,  Google App Engine.
-gine.
+

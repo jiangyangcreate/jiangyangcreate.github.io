@@ -1,10 +1,24 @@
 ---
-tags: [tensorflow,demo]
+tags: [tensorflow,js]
+title: Js操作tensorflow
 ---
 
-一个基于tensorflow的实时的调用摄像头的KNN分类器，可以在网页端运行。
+
+## KNN分类器
+
+一个基于tensorflow的实时的调用摄像头的，可以在网页端运行。
 
 新建`.html`并将下方代码复制进去，用浏览器打开即可。
+
+请在联网环境下用先进的浏览器打开
+
+1. 等待模型加载（加载完成后会提示使用摄像头）
+
+2. 点击Add A则获取当前摄像头截图加入A训练集
+
+3. 以此类推添加B、C训练集
+
+4. 观察屏幕输出的预测结果
 
 ``` html
 
@@ -24,15 +38,6 @@ tags: [tensorflow,demo]
         <button id="class-a">Add A</button>
         <button id="class-b">Add B</button>
         <button id="class-c">Add C</button>
-
-        <!-- Load index.js after the content of the page -->
-        <p>一个实时的调用摄像头的KNN分类器</p>
-        <p>请在联网环境下用先进的浏览器打开</p>
-        <p>1.等待模型加载（加载完成后会提示使用摄像头）</p>
-        <p>2.点击Add A则获取当前摄像头截图加入A训练集</p>
-        <p>3.以此类推</p>
-        <p>4.观察屏幕输出的预测结果</p>
-        <p>底层由tensorflow编写</p>
     </div>
     <script>
         const classifier = knnClassifier.create();

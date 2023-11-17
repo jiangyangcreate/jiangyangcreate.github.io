@@ -1,8 +1,44 @@
 ---
 tags: [python,pyecharts]
+title: Python操作pyecharts
 ---
+
+## 绘制柱状堆叠图
+
 ``` python
 
+'''
+绘制柱状堆叠图
+'''
+
+from pyecharts import options as opts#导入模块
+from pyecharts.charts import Bar
+
+x_attr = ["2018", "2019", "2020", "2021"] #x轴
+data1 = [2.691, 4.282, 12.88, 11.43] #第1季度
+data2 = [9.157, 9.028, 11.46,9.507]#第2季度
+data3 = [4.282, 9.484, 11.91, 16.97]#第3季度
+data4 = [16.72, 22.46,26.85, 0]#第4季度
+
+bar=(
+    Bar()
+        .add_xaxis(x_attr) #设置x轴
+        .add_yaxis("第1季度", data1, stack="stack1") #叠加Y轴：数据名称、数据、是否叠加
+        .add_yaxis("第2季度", data2, stack="stack1") #叠加Y轴：数据名称、数据、是否叠加
+        .add_yaxis("第3季度", data3, stack="stack1") #叠加Y轴：数据名称、数据、是否叠加
+        .add_yaxis("第4季度", data4, stack="stack1") #叠加Y轴：数据名称、数据、是否叠加
+        .set_series_opts(label_opts=opts.LabelOpts(is_show=False)) #是否直接显示数值：否
+        .set_global_opts(title_opts=opts.TitleOpts(title="宁德时代扣非净利润季度报表", 
+        subtitle="2017-2021年"))#主标题，副标题
+    )
+
+bar.render_notebook()
+
+```
+
+## 绘制优雅的双轴折线图
+
+``` python
 '''
 pyecharts绘制优雅的双轴折线图
 '''
@@ -11,15 +47,17 @@ import pyecharts.options as opts  #导入模块
 from pyecharts.charts import Line #导入模块
 
 # 设置坐标轴
+
 x_data = ["1999-1", "1999-2", "2000", "2003", "2009", "2010", "2020"]
 y_data = [820, 932, 1901, 934, 1290, 330, 1320]
 y2_data = [0.1, 0.1, 0.3, 0.5, 0.1, 0.1, 0.1]
 
 # 设外层括号是为了让代码可以换行不报错，看起来更美观
+
 line = (
     Line()      #定义图表类型为折线Line
     .set_global_opts(  #固定参数，设置全局属性
-        tooltip_opts=opts.TooltipOpts(is_show=False), 
+        tooltip_opts=opts.TooltipOpts(is_show=False),
         #这句的意思是： 提示框设置(是否展示 = 否)
 
         # 坐标轴类型。可选：
@@ -53,7 +91,7 @@ line = (
     .extend_axis(
         yaxis=opts.AxisOpts(axislabel_opts=opts.LabelOpts(formatter="{value}")))
 )
-#画第2条线，参数重复，不再多讲啦-
+# 画第2条线，参数重复，不再多讲啦-
 line2 =(Line()
     .add_xaxis(x_data)
     .add_yaxis("换手率",y2_data, yaxis_index=1))

@@ -1,6 +1,9 @@
 ---
-tags: [python,pdf]
+tags: [python,office]
+title: Python操作PDF
 ---
+
+## 拆合PDF
 
 ``` python
 
@@ -177,18 +180,17 @@ def insert_pdf(pdf1, pdf2, insert_num, merged_name, password1=None, password2=No
     m_pdf.write(open(merged_name, "wb"))
 
 
-# def auto_input(): #合并PDF为一份
-#     result_pdf= PdfFileMerger() #新建实例对象
-#     for pdf in os.listdir(path):  #遍历文件夹
-#         with open (pdf,'rb') as fp:  # 打开要合并的子PDF
-#             pdf_reder = PdfFileReader(fp)  #读取PDF内容
-#             if pdf_reder.isEncrypted:   # 判断是否被加密
-#                 print(f'忽略加密文件：{pdf}')  # 如果加密则跳过，并打印忽略加密文件
-#                 continue
-#             result_pdf.append(pdf_reder,import_bookmarks = True) # 将刚刚读取到的PDF内容追加到实例对象内
-
-#     result_pdf.write(result_name) # 写入保存
-#     result_pdf.close()    # 关闭程序
+def auto_input(path,result_name): #合并PDF为一份
+    result_pdf= PdfFileMerger() #新建实例对象
+    for pdf in os.listdir(path):  #遍历文件夹
+        with open (pdf,'rb') as fp:  # 打开要合并的子PDF
+            pdf_reder = PdfFileReader(fp)  #读取PDF内容
+            if pdf_reder.isEncrypted:   # 判断是否被加密
+                print(f'忽略加密文件：{pdf}')  # 如果加密则跳过，并打印忽略加密文件
+                continue
+            result_pdf.append(pdf_reder,import_bookmarks = True) # 将刚刚读取到的PDF内容追加到实例对象内
+    result_pdf.write(result_name) # 写入保存
+    result_pdf.close()    # 关闭程序
 
 
 if __name__ == "__main__":
@@ -202,11 +204,198 @@ if __name__ == "__main__":
     # split_by_pages('ex1.pdf', 5)
 
     # 按拆分后的文件数拆分
-    split_by_num("执裁表.pdf", 2)
+    split_by_num("示例.pdf", 2)
 
     # 合并PDF文件
     # merger_pdf(['ex1.pdf', 'ex2.pdf'], 'merger.pdf')
 
     # 插入PDF至指定位置
     # insert_pdf('ex1.pdf', 'ex2.pdf', 10, 'pdf12.pdf')
+```
+
+## PDF添加水印
+
+``` python
+'''
+- 准备添加水印的物料放置于同级「初始物料」文件夹内
+- 准备好的水印文件放置于同级「水印文件」文件夹内（仅限1张水印文件）
+- 若修改了水印文件，需要将最后一行调用create_watermark函数的watermark参数进行调整
+
+文件结构如下
+|- 此py文件
+|- 初始物料
+  |- 你要添加水印的文件.pdf
+  |- 你要添加水印的文件2.pdf
+  |- 你要添加水印的文件3.pdf
+|- 水印文件
+  |- 水印.pdf
+|- 水印版物料
+'''
+import os
+from PyPDF2 import PdfFileWriter, PdfFileReader
+
+# 添加水印功能的函数
+
+
+def create_watermark(input_pdf, output_pdf, watermark):
+    # 获取水印
+    watermark_obj = PdfFileReader(watermark, strict=False)
+    watermark_page = watermark_obj.getPage(0)
+
+    # 创建读取对象和写入对象
+    pdf_reader = PdfFileReader(input_pdf, strict=False)
+    pdf_writer = PdfFileWriter()
+
+    # 给所有页面添加水印，并新建pdf文件
+    for page in range(pdf_reader.getNumPages()):
+        page = pdf_reader.getPage(page)
+        page.mergePage(watermark_page)
+        pdf_writer.addPage(page)
+
+    with open(output_pdf, 'wb') as out:
+        pdf_writer.write(out)
+
+
+if __name__ == '__main__':
+    # 筛选pdf物料，并执行添加水印功能的函数
+    # 代码中的文件路径均使用相对路径，因此在运行时需要注意文件当前层级，以免运行出错
+    pdf_file_path = './初始物料'
+    pdf_files = os.listdir(pdf_file_path)
+    for pdf_file in pdf_files:
+        if pdf_file[-3:] == 'pdf':
+            input_pdf = pdf_file_path + '/' + pdf_file
+            output_pdf = './水印版物料/'+pdf_file[0:-3]+'pdf'
+            create_watermark(
+                input_pdf=input_pdf, output_pdf=output_pdf, watermark='./水印文件/编程水印.pdf')
+
+```
+
+## PDF转WORD
+
+``` python
+from pdf2docx import Converter
+pdf_file = input('请输入pdf文件路径:')
+docx_file = input('请输入转换后的word文件的路径:')
+cv = Converter(pdf_file)# 实例化 Converter 类并传入pdf文件的路径
+cv.convert(docx_file, start=0, end=None)# 调用 convert 方法转换为 word文件,start参数为起始页,end为终止页
+cv.close()
+
+#纯文字+图片的PDF识别效果最好，超链接等其他格式将不被保留
+```
+
+## 万物转PDF
+
+``` python
+import os
+from pathlib import Path
+from win32com.client import Dispatch, gencache, DispatchEx
+import win32com.client
+# 定义类
+
+
+class PDFConverter:
+    def __init__(self, pathname):
+        self._handle_postfix = ['doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx']
+        self._filename_list = list()
+        self._export_folder = os.path.join(os.path.abspath('.'), outpath)
+        if not os.path.exists(self._export_folder):
+            os.mkdir(self._export_folder)
+        self._enumerate_filename(pathname)
+
+    def _enumerate_filename(self, pathname):
+        full_pathname = os.path.abspath(pathname)
+        if os.path.isfile(full_pathname):
+            if self._is_legal_postfix(full_pathname):
+                self._filename_list.append(full_pathname)
+            else:
+                raise TypeError('文件 {} 后缀名不合法！仅支持如下文件类型：{}。'.format(
+                    pathname, '、'.join(self._handle_postfix)))
+        elif os.path.isdir(full_pathname):
+            for relpath, _, files in os.walk(full_pathname):
+                for name in files:
+                    filename = os.path.join(full_pathname, relpath, name)
+                    if self._is_legal_postfix(filename):
+                        self._filename_list.append(os.path.join(filename))
+        else:
+            raise TypeError('文件/文件夹 {} 不存在或不合法！'.format(pathname))
+
+    def _is_legal_postfix(self, filename):
+        return filename.split('.')[-1].lower() in self._handle_postfix and not os.path.basename(filename).startswith('~')
+
+    def run_conver(self):
+        '''
+        进行批量处理，根据后缀名调用函数执行转换
+        '''
+        print('需要转换的文件数：', len(self._filename_list))
+        for filename in self._filename_list:
+            postfix = filename.split('.')[-1].lower()
+            funcCall = getattr(self, postfix)
+            print('原文件：', filename)
+            funcCall(filename)
+        print('转换完成！')
+
+    def doc(self, filename):
+        '''
+        doc 和 docx 文件转换
+        '''
+        name = os.path.basename(filename).split('.')[0] + '.pdf'
+        word = Dispatch('Word.Application')
+        doc = word.Documents.Open(filename)
+        pdf_file = os.path.join(self._export_folder, name)
+        doc.SaveAs(pdf_file, FileFormat=17)
+        doc.Close()
+        word.Quit()
+
+    def docx(self, filename):
+        self.doc(filename)
+
+    def xls(self, filename):
+        '''
+        xls 和 xlsx 文件转换
+        '''
+        name = os.path.basename(filename).split('.')[0] + '.pdf'
+        exportfile = os.path.join(self._export_folder, name)
+        xlApp = DispatchEx("Excel.Application")
+        xlApp.Visible = False
+        xlApp.DisplayAlerts = 0
+        books = xlApp.Workbooks.Open(filename, False)
+        books.ExportAsFixedFormat(0, exportfile)
+        books.Close(False)
+        print('保存 PDF 文件：', exportfile)
+        xlApp.Quit()
+
+    def xlsx(self, filename):
+        self.xls(filename)
+
+    def ppt(self,filename):
+        """
+        PPT文件导出为pdf格式
+        :param filename: PPT文件的名称
+        :param output_filename: 导出的pdf文件的名称
+        :return:
+        """
+        name = os.path.basename(filename).split('.')[0] + '.pdf'
+        exportfile = os.path.join(self._export_folder, name)
+        ppt_app = win32com.client.Dispatch('PowerPoint.Application')
+        ppt = ppt_app.Presentations.Open(filename)
+        ppt.SaveAs(exportfile, 32)
+        print('保存 PDF 文件：', exportfile)
+        ppt_app.Quit()
+
+    def pptx(self, filename):
+        self.ppt(filename)
+
+
+def main(In_Path):
+    my_file = Path(In_Path)
+    if my_file.is_dir():  # 判断是否为文件夹
+        pathname = os.path.join(os.path.abspath('.'), In_Path)
+    else:
+        pathname = In_Path  # 单个文件的转换
+    pdfConverter = PDFConverter(pathname)
+    pdfConverter.run_conver()
+
+if __name__ == "__main__":
+    outpath = '转化后'
+    main(input('输入你要转化的文件或文件夹路径'))
 ```

@@ -1,5 +1,6 @@
 ---
 tags: [python,题库]
+title: Python题库
 ---
 
 # 自建题库

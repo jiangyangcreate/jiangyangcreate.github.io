@@ -70,4 +70,3 @@ Python的一些值得注意的特点：
 [freecodecamp](https://www.freecodecamp.org/):课程配套练习，完成本教程，申请认证
 
 [Python3 Doc](https://docs.python.org/zh-cn/3/):官方的 Python 文档，所有教程的起点和终点。
-��。

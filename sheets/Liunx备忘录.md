@@ -1,5 +1,5 @@
 ---
-tags: [linux]
+tags: [linux,备忘录]
 ---
 查看端口号占用情况
 

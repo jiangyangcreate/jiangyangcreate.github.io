@@ -19,5 +19,4 @@ title: 机器学习概述
 
 神经网络的学习通常是Pytorch或者tensorflow，这两个框架都是非常优秀的框架，作为一个专业学习神经网络的人员来说，学习曲线陡峭并不是一个问题，何况我们已经有了Sklearn作为基础。二者对比文章不计其数，我的选择是推荐tensorflow。
 
-tensorflow的官网教程可称得上是模范教程第一梯队，它的教程从基础到高级都有涉及，而且每个教程都有对应的代码，可以直接运行。网址是[https://www.tensorflow.org/tutorials](https://www.tensorflow.org/tutorials)。
-s)。
+tensorflow的官网教程可称得上是模范教程第一梯队，它的教程从基础到高级都有涉及，而且每个教程都有对应的代码，可以直接运行。网址是[https://www.tensorflow.org/tutorials](https://www.tensorflow.org/tutorials)

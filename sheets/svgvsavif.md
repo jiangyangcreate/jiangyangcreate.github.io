@@ -1,5 +1,6 @@
 ---
 tags: [技术调研]
+title: SVG vs AVIF
 ---
 # SVG vs AVIF
 
