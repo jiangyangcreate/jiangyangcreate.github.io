@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
 ```python
 import docx
-import nos
+import os
 
 def change_forward(word_path, result_path):
     '''
@@ -59,8 +59,8 @@ def change_forward(word_path, result_path):
     for section in doc.sections:
         # 交替宽高
         section.page_width,section.page_height = section.page_height ,section.page_width
-    # 保存为新文件，结尾为X.docx
-    doc.save(os.path.join(result_path,word_path.replace('.docx','X.docx'))) 
+    # 保存为新文件
+    doc.save(os.path.join(result_path,word_path)) 
  
 if __name__ == '__main__':
 

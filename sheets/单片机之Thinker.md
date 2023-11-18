@@ -2,7 +2,7 @@
 tags: [单片机,thinker]
 title: 单片机之Thinker
 ---
-[thinker edge R](https://tinker-board.asus.com/product/tinker-edge-r.html) 是华硕的一款单片机产品,适用于 AI 应用的单板计算机。
+[thinker-edge-R](https://tinker-board.asus.com/product/tinker-edge-r.html) 是华硕的一款单片机产品,适用于 AI 应用的单板计算机。
 
 - 支持Linux（Debian 9 ，最新版支持Debian 10）和安卓系统（9）。
 - 处理器ARM架构最多6核。
