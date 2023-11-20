@@ -266,6 +266,22 @@ while i<10: #控制行，1到9
 
 ```
 
+## 字典排序
+
+### 描述
+
+将字典数组按字典的某个key排序
+
+### 题解
+
+```python
+# 方法1：
+sorted(d.cop(),key = lambda i:i[k])
+
+# 方法2：
+heappush(h,(i[k],i)) for i in d
+```
+
 ## 冒泡排序
 
 ### 描述
@@ -284,6 +300,58 @@ for a in range(len(list1)):
         if list1[a] < list1[b]:  #如果m大于了n
            list1[a] ,list1[b] =  list1[b],list1[a]#交换位置
 print(list1)
+```
+
+## 快速排序
+
+### 描述
+
+快速排序（Quicksort）是对冒泡排序的一种改进算法。
+
+该算法的实现基本可分为以下几步：
+
+在数组中选一个基准数（通常为数组第一个）。
+将数组中小于基准数的数据移到基准数左边，大于基准数的移到右边
+对于基准数左、右两边的数组，不断重复以上两个过程，直到每个子集只有一个元素，即为全部有序。
+
+请你编写它的实现代码。
+
+### 题解
+
+```python
+def partition(arr, low: int, high: int):
+    pivot, j = arr[low], low  # 获取底部元素与 对应的初始下标
+
+    for i in range(low + 1, high + 1):  # 从第2个元素开始，到最后一个元素
+        if arr[i] <= pivot:  # 如果这个元素，小于第1个元素
+            j += 1  # 初始下标+1
+            arr[j], arr[i] = arr[i], arr[j]  # 把这个小元素和标的元素换位置
+    arr[low], arr[j] = arr[j], arr[low]  # arr[low]是等于自己的，现在把他挪到中间位置
+    return j  # 返回这个中间位置
+
+
+def quick_sort_between(arr, low: int, high: int):
+    if high-low <= 1:  # 递归结束条件
+        return
+
+    m = partition(arr, low, high)
+    quick_sort_between(arr, low, m - 1) # 二分后自我调用，直到递归结束条件触发
+    quick_sort_between(arr, m + 1, high)
+
+
+def quick_sort(arr):
+    """
+    快速排序(in-place)
+    :param arr: 待排序的List
+    :return: 快速排序是就地排序(in-place)
+    """
+    quick_sort_between(arr, 0, len(arr)-1)  # arr[0] - arr[len(arr)-1]
+
+# 测试数据
+if __name__ == '__main__':
+    arr = [17, 56, 71, 38, 61, 62, 48, 28, 57, 42, 10, 21, 12, 90]  # 长度为10
+    quick_sort(arr)
+    print("快速排序结果：", arr)
 ```
 
 ## 抽奇数
