@@ -2,6 +2,7 @@
 sidebar_position: 1
 title: Python基础
 ---
+
 ## Python的历史和发展
 
 Python 国内用户多读作“派桑”。
@@ -20,7 +21,7 @@ Python 语言的发展历史可以分为三个时期:
 - Python 2.x: 2000 年发布,这是 Python 语言的中期版本,它在 1.x 的基础上增加了函数、模块、类等高级语法,但是保留了 1.x 版本的许多不合理的语法,所以 Python 2.x 版本有“坑人”的嫌疑。
 - Python 3.x: 2008 年发布,这是 Python 语言的最新版本,它在 2.x 的基础上修复了许多已知的问题,并且还简化了语法,使得 Python 语言更加优雅。但是,由于 Python 3.x 不兼容 Python 2.x,导致 Python 2.x 的程序不能直接运行在 Python 3.x 上,所以 Python 3.x 的普及进程比较缓慢。
 
-#### Python 的优缺点
+### Python 的优缺点
 
 Python 语言的优点:
 
@@ -36,7 +37,7 @@ Python 语言的缺点:
 - 运行速度慢: Python 语言的运行速度相比 C 语言、C++ 语言稍慢。
 - 代码不能加密: Python 语言的源代码不能加密,如果发布的话,任何人都可以破解你的程序。
 
-#### Python 的应用领域
+### Python 的应用领域
 
 Python 语言的应用领域非常广泛,主要有以下几个方面:
 
@@ -47,7 +48,7 @@ Python 语言的应用领域非常广泛,主要有以下几个方面:
 - 系统运维: Python 语言可以使用 Paramiko、Fabric、SaltStack、Ansible 等工具来进行系统运维。
 - 金融量化: Python 语言可以使用 PyAlgoTrade、Pybacktest、Zipline 等工具来进行金融量化投资。
 
-#### Python 的发展前景
+### Python 的发展前景
 
 Python 语言是目前最流行的编程语言之一,在 2018 年 8 月份,IEEE 发布了 2018 年 8 月编程语言排行榜,Python 语言排名第一,这是 Python 语言第一次登上榜首。Python 语言的发展前景非常广阔,Python 语言在人工智能、云计算、科学运算、Web 开发、网络爬虫、系统运维、图形 GUI、金融量化投资等众多领域都有着广泛的应用,Python 语言的发展前景非常广阔。
 
