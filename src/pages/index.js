@@ -10,7 +10,7 @@ function MyHero() {
     <div className={styles.myHeroContainer}>
       <div className={styles.leftContainer}>
         <h1 className={styles.leftContainer_h1}>
-          Ready to Code.
+          import this
         </h1>
         <p className={styles.leftContainer_p}>
           优美优于丑陋，明了优于隐晦<br />
@@ -21,6 +21,9 @@ function MyHero() {
           错误绝不能悄悄忽略，除非它明确需要如此。<br />
           面对不确定性，拒绝妄加猜测。<br />
           任何问题应有一种，且最好只有一种，显而易见的解决方法。<br />
+          做优于不做，然而不假思索还不如不做。<br />
+          很难解释的，必然是坏方法。<br />
+          很好解释的，可能是好方法。<br />
         </p>
         <div className={styles.buttonContainer}>
         </div>
