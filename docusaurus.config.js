@@ -71,8 +71,8 @@ const config = {
             createFeedItems: async (params) => {
               const { blogPosts, defaultCreateFeedItems, ...rest } = params;
               return defaultCreateFeedItems({
-                // keep only the 10 most recent blog posts in the feed
-                blogPosts: blogPosts.filter((item, index) => index < 10),
+                // keep only the 999 most recent blog posts in the feed
+                blogPosts: blogPosts.filter((item, index) => index < 999),
                 ...rest,
               });
             },
