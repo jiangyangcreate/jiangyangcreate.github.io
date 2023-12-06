@@ -735,68 +735,69 @@ p.color_percent()
 ### 题解
 
 ```python
+# 导入核心模块
+from sklearn.datasets import load_sample_image
+from sklearn.cluster import KMeans
+
+# 导入辅助模块
 import numpy as np
 import matplotlib.pyplot as plt
-from sklearn.cluster import KMeans
 from sklearn.metrics import pairwise_distances_argmin
-from sklearn.datasets import load_sample_image
 from sklearn.utils import shuffle
-from time import time
 
-n_colors = 64
-
-# Load the Summer Palace photo
+# 载入图片
 china = load_sample_image("china.jpg")
 
-# Convert to floats instead of the default 8 bits integer coding. Dividing by
-# 255 is important so that plt.imshow behaves works well on float data (need to
-# be in the range [0-1])
-china = np.array(china, dtype=np.float64) / 255
+# print(type(china)) # <class 'numpy.ndarray'>
+# print(china.shape) # (427, 640, 3)
 
-# Load Image and transform to a 2D numpy array.
-w, h, d = original_shape = tuple(china.shape)
-assert d == 3
-image_array = np.reshape(china, (w * h, d))
-
-print("Fitting model on a small sub-sample of the data")
-t0 = time()
-image_array_sample = shuffle(image_array, random_state=0)[:1000]
-kmeans = KMeans(n_clusters=n_colors, random_state=0).fit(image_array_sample)
-print("done in %0.3fs." % (time() - t0))
-
-# Get labels for all points
-print("Predicting color indices on the full image (k-means)")
-t0 = time()
-labels = kmeans.predict(image_array)
-print("done in %0.3fs." % (time() - t0))
-
-
-codebook_random = shuffle(image_array, random_state=0)[:n_colors]
-print("Predicting color indices on the full image (random)")
-t0 = time()
-labels_random = pairwise_distances_argmin(codebook_random,
-                                          image_array,
-                                          axis=0)
-print("done in %0.3fs." % (time() - t0))
-
-
-def recreate_image(codebook, labels, w, h):
-    """Recreate the (compressed) image from the code book & labels"""
-    d = codebook.shape[1]
-    image = np.zeros((w, h, d))
-    label_idx = 0
-    for i in range(w):
-        for j in range(h):
-            image[i][j] = codebook[labels[label_idx]]
-            label_idx += 1
-    return image
-
-# Display all results, alongside original image
+# 查看原图
 plt.figure(1)
 plt.clf()
 plt.axis('off')
 plt.title('Original image (96,615 colors)')
 plt.imshow(china)
+
+# 设定K值
+n_colors = 64
+
+# 训练数据
+kmeans = KMeans(n_clusters=n_colors, random_state=0)
+
+# 处理数据
+china = np.array(china, dtype=np.float64) / 255 
+# print(china.shape) # (427, 640, 3)
+# print(china) # 把数据变成0-1的区间内，方便训练
+w, h, d = original_shape = tuple(china.shape) # (427, 640, 3)
+# assert d == 3 # 断言,可不写
+image_array = np.reshape(china, (w * h, d))
+# print(image_array.shape) # (273280, 3)
+# print(image_array) # 把数据变成一行一行的
+# 打乱数据
+image_array_sample = shuffle(image_array, random_state=0)[:1000] # 可以变，但是要小于273280
+
+# 得到训练好的模型
+kmeans.fit(image_array_sample)
+
+labels = kmeans.predict(image_array)
+# 得到了每个像素点的标签，也就是每个像素点属于哪个类别（0-63）
+# print(labels)
+
+# 重构图片
+def recreate_image(codebook, labels, w, h):
+    """从codebook和labels标签重新创建（压缩）图像"""
+    # 写法一，简单但需要理解reshape和数组的用法
+    # -1 表示自动计算维度 -- 计算出来的结果是 3
+    return codebook[labels].reshape(w, h, -1)
+    # 写法二，复杂但便于理解
+    # d = codebook.shape[1]
+    # image = np.zeros((w, h, d))# 427, 640, 3
+    # label_idx = 0
+    # for i in range(w):
+    #     for j in range(h):
+    #         image[i][j] = codebook[labels[label_idx]]
+    #         label_idx += 1
+    # return image
 
 plt.figure(2)
 plt.clf()
@@ -804,10 +805,193 @@ plt.axis('off')
 plt.title('Quantized image (64 colors, K-Means)')
 plt.imshow(recreate_image(kmeans.cluster_centers_, labels, w, h))
 
+'''随机取'''
+# 打乱数据后取前64个数据
+codebook_random = shuffle(image_array, random_state=0)[:n_colors]
+# 计算一个点和一组点之间的最小距离
+labels_random = pairwise_distances_argmin(codebook_random,
+                                          image_array,
+                                          axis=0)
 plt.figure(3)
 plt.clf()
 plt.axis('off')
 plt.title('Quantized image (64 colors, Random)')
 plt.imshow(recreate_image(codebook_random, labels_random, w, h))
-
 ```
+
+## 内网直播
+
+### 描述
+
+现在的直播软件大多需要联网，但是在某些场景下互联网受限，仅有内网的情况下，如何实现直播呢？
+
+已知falsk可以推送视频流，cv2可以捕获屏幕，将两者结合起来，实现内网直播功能，可以在局域网内通过浏览器观看屏幕共享。
+
+理论存在，实践是最好的检验，现在请你来实现这个功能。
+
+### 题解
+
+```python
+import os
+from importlib import import_module
+from flask import Flask, render_template, Response,render_template_string
+
+
+from io import BytesIO
+import cv2
+from PIL import ImageGrab, Image
+import time
+import threading
+try:
+    from greenlet import getcurrent as get_ident
+except ImportError:
+    try:
+        from thread import get_ident
+    except ImportError:
+        from _thread import get_ident
+
+
+class CameraEvent(object):
+    def __init__(self):
+        self.events = {}
+
+    def wait(self):
+        ident = get_ident()
+        if ident not in self.events:
+            self.events[ident] = [threading.Event(), time.time()]
+        return self.events[ident][0].wait()
+
+    def set(self):
+        now = time.time()
+        remove = None
+        for ident, event in self.events.items():
+            if not event[0].isSet():
+                event[0].set()
+                event[1] = now
+            else:
+                if now - event[1] > 5:
+                    remove = ident
+        if remove:
+            del self.events[remove]
+
+    def clear(self):
+        self.events[get_ident()][0].clear()
+
+
+class BaseCamera(object):
+    thread = None
+    frame = None
+    last_access = 0
+    event = CameraEvent()
+
+    def __init__(self):
+        if BaseCamera.thread is None:
+            BaseCamera.last_access = time.time()
+
+            BaseCamera.thread = threading.Thread(target=self._thread)
+            BaseCamera.thread.start()
+
+            while self.get_frame() is None:
+                time.sleep(0)
+
+    def get_frame(self):
+        BaseCamera.last_access = time.time()
+
+        BaseCamera.event.wait()
+        BaseCamera.event.clear()
+
+        return BaseCamera.frame
+
+    @staticmethod
+    def frames():
+        raise RuntimeError('Must be implemented by subclasses.')
+
+    @classmethod
+    def _thread(cls):
+        print('Starting camera thread.')
+        frames_iterator = cls.frames()
+        for frame in frames_iterator:
+            BaseCamera.frame = frame
+            BaseCamera.event.set()
+            time.sleep(0)
+            if time.time() - BaseCamera.last_access > 10:
+                frames_iterator.close()
+                print('Stopping camera thread due to inactivity.')
+                break
+        BaseCamera.thread = None
+
+
+
+class Camera(BaseCamera):
+    video_source = 0
+
+    @staticmethod
+    def set_video_source(source):
+        Camera.video_source = source
+
+    @staticmethod
+    def frames():
+        camera = cv2.VideoCapture(Camera.video_source)
+        if not camera.isOpened():
+            raise RuntimeError('Error')
+
+        while True:
+            image = ImageGrab.grab()  # 获取屏幕数据
+            # w, h = image.size
+            image = image.resize((1366, 750), Image.ANTIALIAS)  # 图片缩放
+            output_buffer = BytesIO()  # 创建二进制对象
+            image.save(output_buffer, format='JPEG', quality=100)  # quality提升图片分辨率
+            frame = output_buffer.getvalue()  # 获取二进制数据
+            yield frame  # 生成器返回一张图片的二进制数据
+
+
+
+
+
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def index():
+    """
+    视图函数
+    :return:
+    """
+    return render_template_string('''<html>
+
+<head>
+    <title>屏幕共享</title>
+</head>
+
+<body>
+    <h4>屏幕共享</h4>
+    <img src="{{ url_for('video_feed') }}">
+</body>
+
+</html>''')
+
+
+def gen(camera):
+    """
+    流媒体发生器
+    """
+    while True:
+        frame = camera.get_frame()
+
+        yield (b'--frame\r\n'
+               b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+@app.route('/video_feed')
+def video_feed():
+    """流媒体数据"""
+    return Response(gen(Camera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+if __name__ == '__main__':
+    ip_host = '127.0.0.1'# 本机ip地址
+    ip_host2 = '0.0.0.0'# 内网ip地址
+    app.run(threaded=True, host=ip_host2, port=80)
+````
