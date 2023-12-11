@@ -8,10 +8,13 @@
 错误绝不能悄悄忽略，除非它明确需要如此。
 面对不确定性，拒绝妄加猜测。
 任何问题应有一种，且最好只有一种，显而易见的解决方法。
+做优于不做，然而不假思索还不如不做。
+很难解释的，必然是坏方法。
+很好解释的，可能是好方法。
 
 以上节选自《Python之禅》
 
-基于这样的设计理念，我做了这样的一个小而美的个人博客站点：点击查看[网站分析](https://pagespeed.web.dev/analysis/https-jiangmiemie-com/mswqk1a4cr?form_factor=desktop)
+基于这样的设计理念，我做了这样的一个小而美的个人博客站点：点击查看[网站分析](https://pagespeed.web.dev/)
 
 ## 快速重现
 
@@ -20,3 +23,16 @@
 `npm install`下载所需的依赖包
 
 `npm run start`启动站点
+
+### 配置
+
+当然这里面有一些配置是需要你自己修改的，譬如：
+
+- `docusaurus.config.js`中所有指向的站点
+
+- `docusaurus.config.js`中的`
+      algolia: {
+        appId: '****',
+        apiKey: '****',
+        indexName: '****',
+      },`需要自己申请获得对应信息，[点击申请](https://docsearch.algolia.com/apply/)。通常需要1周左右的时间。

@@ -123,6 +123,11 @@ const config = {
           content: 'blog, javascript, python',
         },
       ],
+      algolia: {
+        appId: '****',
+        apiKey: '****',
+        indexName: '****',
+      },
       navbar: {
         title: '首页',
         hideOnScroll: true,
@@ -134,6 +139,11 @@ const config = {
           //   position: 'left',
           //   label: 'Start',
           // },
+          {
+            href: 'https://github.com/jiangmiemie',
+            className: 'github',
+            position: 'right',
+          },
           {
             to: "/docs",
             position: 'left',
