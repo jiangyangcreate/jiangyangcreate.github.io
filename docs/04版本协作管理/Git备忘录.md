@@ -10,7 +10,7 @@ git branch -a --contains Tag_V1.0.0 # 看看哪个分支包含这个tag/commit
 # 分支
 git branch -a # 查看远程分支
 git branch # 查看本地分支
-get branch newBranch # 创建本地分支
+git branch newBranch # 创建本地分支
 git checkout newBranch # 切换到本地分支
 git checkout -b newBranch  # 创建并切换到分支
 
