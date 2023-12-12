@@ -135,7 +135,7 @@ numpy
 matplotlib
 pandas
 scikit-learn
-torch
+tensorflow
 ```
 
 ### 安装Vscode
