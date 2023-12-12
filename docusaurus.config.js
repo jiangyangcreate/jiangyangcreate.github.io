@@ -125,7 +125,7 @@ const config = {
       ],
       algolia: {
         appId: 'B8DUWB4CMX',
-        apiKey: '9f574a41e1cacffcb7b7abb66f3a22f1',
+        apiKey: '36cbcb8eb4d417b32200be7e427d68fd',
         indexName: 'jiangmiemie',
       },
       navbar: {
