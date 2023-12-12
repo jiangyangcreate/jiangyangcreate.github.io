@@ -124,9 +124,9 @@ const config = {
         },
       ],
       algolia: {
-        appId: '****',
-        apiKey: '****',
-        indexName: '****',
+        appId: '86T9X481OH',
+        apiKey: '71b94230f849d7774a7e73cca9be284a',
+        indexName: 'jiangmiemie',
       },
       navbar: {
         title: '首页',
