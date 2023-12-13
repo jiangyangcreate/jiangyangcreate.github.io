@@ -3564,7 +3564,7 @@ if __name__ == '__main__':
     print(p.map(f, [(1,1), (2,2), (3,3)])) # take in data
     p.close() # close pool
   
-## [1, 4, 9]
+# [1, 4, 9]
 ```
 
 我们来完成1~100000000求和的计算密集型任务，循环解决，暂时也不考虑列表切片操作花费的时间，只是把做运算和合并运算结果的时间统计出来。
@@ -3655,7 +3655,7 @@ if __name__ == '__main__':
 
 使用多进程后由于获得了更多的CPU执行时间以及更好的利用了CPU的多核特性，明显的减少了程序的执行时间，而且计算量越大效果越明显。
 
-#### 线程
+### 线程
 
 线程是系统调度资源的最小单位（CPU通过计时器来切换线程）
 
@@ -3675,7 +3675,7 @@ Python的标准库提供了两个模块：_thread和threading，_thread是低级
 
 [threading](https://docs.python.org/zh-cn/3.10/library/threading.html?highlight=threading#module-threading):Threading Multiprocessing Module Code Documentation
 
-### 多线程
+#### 多线程
 
 ```python
 
