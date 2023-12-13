@@ -1,704 +1,1582 @@
 ---
-sidebar_position: 2
-title: Python高级
+sidebar_position: 1
+title: Python
 ---
 
+### Python简介与环境安装
 
-## 面向对象编程
+Python 国内用户多读作“派桑”。
 
-面向对象编程——Object Oriented Programming，简称OOP，是一种程序设计思想。OOP把对象作为程序的基本单元，一个对象包含了数据和操作数据的函数。
+在生活中,人们使用汉语、英语、法语、德语、日语等不同的语言跟不同国家的人进行交流。在使用计算机时,人们不能直接使用英语等人类的语言和计算机交流,而是使用编程语言(Programming Language)将人们的想法编写成程序,再通过执行程序控制计算机去解决各种问题。在计算机世界有着数量众多的编程语言,Python 就是其中一种简单易学的编程语言。在实际应用中,Python 被广泛用于人工智能、云计算、科学运算、Web 开发、网络爬虫、系统运维、图形 GUI、金融量化投资等众多领域。
 
-在Python中，所有数据类型都可以视为对象，当然也可以自定义对象。自定义的对象数据类型就是面向对象中的类（Class）的概念。
+Python 是由 Guido van Rossum 在 1989 年圣诞节期间,为了打发无聊的圣诞节而编写的一个编程语言。现在,全世界差不多有 600 多种编程语言,但流行的编程语言也就那么 20 多种。Python 是最流行的编程语言之一,它的名字叫做 Python,是因为 Guido van Rossum 是一个 BBC 的喜剧节目——Monty Python's Flying Circus 的爱好者。
 
-### 类（Class）和实例（Instance）
+Python 语言的设计哲学是“优雅”、“明确”、“简单”。Python 开发者的哲学是“用一种方法,最好是只有一种方法来做一件事”。为了实现这一哲学,Python 语言致力于让自然语言的语法结构更加清晰明确。Python 语言的这一特点,使得学习 Python 语言非常容易,甚至对于没有编程经验的初学者也能很快上手开发程序。
 
-面向对象的设计思想是从自然界中来的，因为在自然界中，类（Class）和实例（Instance）的概念是很自然的。Class是一种抽象概念，比如我们定义的Class——Student，是指学生这个概念，而实例（Instance）则是一个个具体的Student，比如，张三和李四是两个具体的Student。
+Python 语言的发展历史可以分为三个时期:
 
-所以，面向对象的设计思想是抽象出Class，根据Class创建Instance。
+- Python 1.x: 1994 年发布,这是 Python 语言的早期版本,它包括整数、浮点数、复数、字符串、列表、元组、字典等基本数据类型,以及 if、while、for 等控制语句,但没有函数、模块、类等高级语法。
+- Python 2.x: 2000 年发布,这是 Python 语言的中期版本,它在 1.x 的基础上增加了函数、模块、类等高级语法,但是保留了 1.x 版本的许多不合理的语法,所以 Python 2.x 版本有“坑人”的嫌疑。
+- Python 3.x: 2008 年发布,这是 Python 语言的最新版本,它在 2.x 的基础上修复了许多已知的问题,并且还简化了语法,使得 Python 语言更加优雅。但是,由于 Python 3.x 不兼容 Python 2.x,导致 Python 2.x 的程序不能直接运行在 Python 3.x 上,所以 Python 3.x 的普及进程比较缓慢。
 
-面向对象的抽象程度又比函数要高，因为一个Class既包含数据，又包含操作数据的方法。
+Python 语言的应用领域非常广泛,主要有以下几个方面:
 
-### 创建类
+- 网络爬虫: Python 语言可以模拟浏览器,并且可以使用正则表达式、Beautiful Soup 等工具来提取网页中的信息。
+- 数据分析: Python 语言可以使用 NumPy、SciPy、Pandas、Matplotlib 等工具来进行数据分析。
+- 人工智能: Python 语言可以使用 TensorFlow、PyTorch、Keras 等工具来进行人工智能开发。
+- Web 开发: Python 语言可以使用 Django、Flask 等框架来进行 Web 开发。
+- 系统运维: Python 语言可以使用 Paramiko、Fabric、SaltStack、Ansible 等工具来进行系统运维。
+- 金融量化: Python 语言可以使用 PyAlgoTrade、Pybacktest、Zipline 等工具来进行金融量化投资。
 
-#### 类的特殊方法
+Python 语言是目前最流行的编程语言之一,在 2018 年 8 月份,IEEE 发布了 2018 年 8 月编程语言排行榜,Python 语言排名第一,这是 Python 语言第一次登上榜首。Python 语言的发展前景非常广阔,Python 语言在人工智能、云计算、科学运算、Web 开发、网络爬虫、系统运维、图形 GUI、金融量化投资等众多领域都有着广泛的应用,Python 语言的发展前景非常广阔。
 
-Python 使用 __ 开头的名字来定义特殊的方法和属性，它们有：
+Python 语言的优点:
+
+- 简单易学: Python 语言较简单,与其他语言相比,Python 语言更容易上手。
+- 免费开源: Python 是免费的开源软件,可以自由地发布。
+- 高层语言: Python 语言是高层语言,不需要关心底层的硬件。
+- 可移植性: Python 语言可以在多种平台上运行,如 Windows、Linux、Mac OS 等。
+- 可扩展性: Python 语言支持 C、C++ 等其他语言扩展。
+- 可嵌入性: Python 语言可以嵌入到 C、C++ 等其他语言中。
+
+Python 语言的缺点:
+
+- 运行速度慢: Python 语言的运行速度相比 C 语言、C++ 语言稍慢。
+- 代码不能加密: Python 语言的源代码不能加密,如果发布的话,任何人都可以破解你的程序。
+
+#### 安装Python
+
+[Python官网下载网址](https://www.python.org/downloads/)
+
+- 本教程使用的是Python3.11
+
+安装过程全部勾选。
+
+- 下载好的Python是一个（编程）语言包
+
+如果我们安装了中文语言包，那么我们的系统就可以识别与显示中文。
+如果我们安装了Python语言包，那么我们的系统就可以识别与运行Python程序。
+
+#### pip
+
+在部分系统预装版中，`python`名为`python3`，`pip`为`pip3`
+
+Python安装完成后，pip也会自动安装完成。
+
+后续代码示例以`python`和`pip`为例
+
+#### 更新
+
+- `python -m pip install --upgrade pip`
+- `python -m pip install  -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip`
+
+#### 换源
+
+- Windows/ MacOS系统临时使用： `pip install -i https://pypi.tuna.tsinghua.edu.cn/simple {包名}`
+
+- Windows永久使用：
+
+第一步: 在C:\Users\Administrator 目录下 创建pip文件夹
+
+第二步：在第一步创建的文件夹下（C:\Users\Administrator\pip）创建pip.ini文件
+
+第三步：记事本编辑保存pip.ini文件内容为以下部分：
 
 ```
-__init__()
-__repr__()
-__str__()
-__call__()
-__iter__()
-__add__()
-__sub__()
-__mul__()
-__rmul__()
-__class__
-__name__
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple/
+[install]
+trusted-host = pypi.tuna.tsinghua.edu.cn
 ```
 
-构造方法 `__init__()`
+- MAC永久使用：
 
-在产生对象之后，我们可以向对象中添加属性。
-事实上，还可以通过构造方法，在构造对象的时候直接添加属性：
+```
+cd ~
+mkdir .pip
+cd .pip
+vi pip.conf
+```
+
+写入以下内容
+
+```
+[global]
+index-url = https://pypi.tuna.tsinghua.edu.cn/simple/
+[install]
+trusted-host = pypi.tuna.tsinghua.edu.cn
+```
+
+#### 批量下载
+
+注意执行本条命令时，需要在requirements.txt文件所在的目录下执行。
+
+- `pip install -r requirements.txt`
+
+- `pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt`
+
+requirements.txt参考内容
+
+```bash
+opencv-python
+opencv-contrib-python
+imageio
+scipy
+pillow
+numpy
+matplotlib
+pandas
+scikit-learn
+tensorflow
+```
+
+#### Vscode安装
+
+[Vscdoe官网下载网址](https://code.visualstudio.com/download)
+
+- VSCode（Visual Studio Code）是一款通用跨平台的编辑器
+
+它不会运行程序，它需要安装相应的语言包才能运行程序。它可以编辑任何语言的程序，支持几乎所有主流的开发语言的语法高亮、智能代码补全等。安装过程全部勾选。
+
+- 注意与Visual Studio区别
+
+Visual Studio是一个集成的开发环境。
+
+#### Vscode安装插件
+
+Vscode左侧菜单通常为：文件、搜索、源代码管理、调试、应用商店等等（不同版本显示不同）
+
+逐一打开，找到应用商店，在其中搜索插件名称即可下载。推荐下载插件：
+
+- 简体中文包：包名：`Chinese (Simplified) Language Pack for Visual Studio Code`
+- Python包：包名：`Python`
+
+#### 拓展：Vscode的个性化设置
+
+- 主题颜色
+
+在设置中点击主题颜色，可以选择自己喜欢的主题颜色。推荐主题颜色为`深色+`
+
+- 保存时代码自动格式化
+
+安装成功后可以在Vscode的设置中搜索`format on save`，勾选即可。
+
+测试：在Vscode中新建一个xxx.py文件，输入以下内容：
 
 ```python
-class Clothes(object):
-    """
-    init_demo
-    """
-
-    def __init__(self, color="green"):
-        self.color = color
-
-
-my_clothes = Clothes()
-my_clothes.color
+print("hello world")
 ```
 
-传入有参数的值：
+运行方式1：点击右上角的三角形运行按钮
+
+运行方式2.在编辑器中输入`python xxx.py`运行
+
+运行方式3：在编辑器中输入`python -m xxx.py`运行
+
+可以看到输出结果为`hello world`。
+
+python xxx.py和python -m xxx.py是两种加载py文件的方式:
+1叫做直接运行
+2把模块当作脚本来启动(注意：但是__name__的值为'main' )
+
+#### vscode使用技巧
+
+跳转到定义： 使用 F12 快捷键或者右键选择 "Go to Definition" 可以跳转到光标所在符号的定义处。
+
+格式化代码：使用 Alt + Shift + F 快捷键来格式化整个文件。
+
+多行编辑： 使用 Alt + Shift + I 来进行多行编辑。
+
+断点调试： 使用 F5 启动调试器，可以设置断点、单步执行、查看变量等。
+
+### 变量与数据类型
+
+#### 变量
+
+变量是一个盒子用于存放数据，变量名是盒子的名字，数据是盒子里面的东西。
+
+语法示例：
+
+变量名 = 数据
+
+变量名 = 变量名2 = 变量名3 = 数据
+
+变量名1, 变量名2, 变量名3 = 数据1, 数据2, 数据3
+
+变量名1 = 数据1, 变量名2 = 数据2, 变量名3 = 数据3
+
+#### Python变量命名规则
+
+1. 变量名只能包含字母、数字和下划线。变量名可以字母或下划线打头，但不能以数字打头，例如，可将变量命名为message_1，但不能将其命名为1_message。
+
+2. 变量名不能包含空格，但可使用下划线来分隔其中的单词。例如，变量名greeting_message可行，但变量名greeting message会引发错误。
+
+3. 不要将Python关键字和函数名用作变量名，即不要使用Python保留用于特殊用途的单词，如print。
+
+4. 变量名应既简短又具有描述性。例如，name比n好，student_name比s_n好，name_length比length_of_persons_name好。
+
+5. 慎用小写字母l和大写字母O，因为它们可能被人错看成数字1和0。
+
+#### 数据类型
+
+Python的最基础的**独立数据类型**有：
+
+1. 整数：Python可以处理任意大小的整数，当然包括负整数，在程序中的表示方法和数学上的写法一模一样，例如：1，100，-8080，0，等等。
+
+2. 浮点数：浮点数也就是小数，因为浮点数也可能表示为科学计数法（如1.23e9，或者12.3e8），所以，浮点数运算结果也可能有误差。
+
+3. 字符串：字符串是以单引号'或双引号"括起来的任意文本，比如'abc'，"xyz"等等。字符串还有一些特殊字符，可以通过转义字符\来表示，比如：
+
+    - \n表示换行
+    - \t表示制表符
+    - \\表示的字符就是\
+    - \u表示Unicode编码
+    - \U表示Unicode编码
+    - \x表示十六进制数
+    - \0表示八进制数
+
+4. 布尔值：布尔值和布尔代数的表示完全一致，一个布尔值只有True、False两种值，要么是True，要么是False，在Python中，可以直接用True、False表示布尔值（请注意大小写），也可以通过布尔运算计算出来：
+
+    - and运算是与运算，只有所有都为True，and运算结果才是True
+    - or运算是或运算，只要其中有一个为True，or运算结果就是True
+    - not运算是非运算，它是一个单目运算符，把True变成False，False变成True
+
+5. 空值：空值是Python里一个特殊的值，用None表示。None不能理解为0，因为0是有意义的，而None是一个特殊的空值。
+
+#### 介绍字符串的索引
 
 ```python
-your_clothes = Clothes('orange')
-your_clothes.color
-```
-
-表示方法 `__repr__() 和 __str__()`:
-
-```python
-class Clothes(object):
-    """
-    repr and str demo
-    """
-
-    def __init__(self, color="green"):
-        self.color = color
-
-    def __str__(self):
-        "This is a string to print."
-        return ("a {} clothes".format(self.color))
-
-    def __repr__(self):
-        "This string recreates the object."
-        return ("{}(color='{}')".format(self.__class__.__name__, self.color))
-```
-
-`__str__()` 是使用 print 函数显示的结果,类似java中的toString：
-
-```python
-my_clothes = Clothes()
-print(my_clothes)
-```
-
-`__repr__()` 返回的是不使用 print 方法的结果:
-
-```python
-my_clothes
-```
-
-```python
-print(my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color)
-```
-
-```python
-my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color
-```
-
-#### 类的属性
-
-只读属性：
-
-```python
-class Clothes(object):
-    def __init__(self, price):
-        self.price = price
-
-    # 这样 discount_price 就变成属性了
-    @property
-    def discount_price(self):
-        return self.price * 0.8
-```
-
-这里 discount_price 就是一个只读不写的属性了（注意是属性不是方法）,
-而price是可读写的属性：
-
-```python
-my_clothes = Clothes(100)
-print(my_clothes.discount_price)  # 80.0
-```
-
-可以修改price属性来改变discount_price：
-
-```python
-my_clothes.price = 200
-print(my_clothes.discount_price)  # 160.0
-```
-
-my_clothes.discount_price()会报错，因为 my_clothes.discount_price 是属性，不是方法；
-
-my_clothes.discount_price=100 也会报错，因为只读。
-
-对于 @property 生成的只读属性，我们可以使用相应的 @attr.setter 修饰符来使得这个属性变成可写的：
-
-```python
-class Clothes(object):
-    def __init__(self, price):
-        self.price = price
-
-    # 这样就变成属性了
-    @property
-    def discount_price(self):
-        return self.price * 0.8
-
-    @discount_price.setter
-    def discount_price(self, new_price):
-        self.price = new_price * 1.25
-```
-
-测试一下：
-
-```python
-my_clothes = Clothes(100)
-print(my_clothes.discount_price)
-
-my_clothes.price = 200
-print(my_clothes.discount_price)
-```
-
-修改 discount_price 属性：
-
-```python
-my_clothes.discount_price = 180
-print(my_clothes.price)
-print(my_clothes.discount_price)
-```
-
-一个等价的替代如下，用方法：
-
-```python
-class Clothes(object):
-    def __init__(self, price):
-        self.price = price
-
-    def get_discount_price(self):
-        return self.price * 0.8
-
-    def set_discount_price(self, new_price):
-        self.price = new_price * 1.25
-
-    discount_price = property(get_discount_price, set_discount_price)
-
-```
-
-```python
-my_clothes = Clothes(100)
-print(my_clothes.discount_price)
-
-my_clothes.price = 200
-print(my_clothes.discount_price)
-
-my_clothes.discount_price = 180
-print(my_clothes.price)
-print(my_clothes.discount_price)
-```
-
-### 继承
-
-类定义的基本形式：
-
-```python
-class ClassName(ParentClass):
-    """class docstring"""
-    def method(self):
-        return
-```
-
-里面的 ParentClass 就是用来继承的。
-
-```python
-class Clothes(object):
-    def __init__(self, color="green"):
-        self.color = color
-
-    def out_print(self):
-        return self.__class__.__name__, self.color
-```
-
-```python
-my_clothes = Clothes()
-my_clothes.color
-```
-
-```python
-my_clothes.out_print()
-```
-
-定义一个子类，继承父类的所有方法:
-
-```python
-class NikeClothes(Clothes):
-    def change_color(self):
-        if self.color == "green":
-            self.color = "red"
-```
-
-继承父类的所有方法：
-
-```python
-your_clothes = NikeClothes()
-your_clothes.color
-```
-
-```python
-your_clothes.out_print()
-```
-
-但有自己的方法：
-
-```python
-your_clothes.change_color()
-your_clothes.color
-```
-
-如果想对父类的方法进行修改，只需要在子类中重定义这个类即可：
-
-```python
-class AdidasClothes(Clothes):
-    def change_color(self):
-        if self.color == "green":
-            self.color = "black"
-
-    def out_print(self):
-        self.change_color()
-        return self.__class__.__name__, self.color
-
-
-him_clothes = AdidasClothes()
-print(him_clothes.color)
-
-him_clothes.change_color()
-print(him_clothes.color)
-print(him_clothes.out_print())
-```
-
-#### super() 函数
-
-super(CurrentClassName, instance)
-
-返回该类实例对应的父类对象。
-
-刚才 AdidasClothes可以改写为：
-
-```python
-class NewAdidasClothes(Clothes):
-    def change_color(self):
-        if self.color == "green":
-            self.color = "black"
-
-    def out_print(self):
-        self.change_color()
-        print(super(NewAdidasClothes, self).out_print())
-
-her_clothes = NewAdidasClothes()
-print(her_clothes.color)
-
-her_clothes.out_print()
-```
-
-#### __new__() 方法
-
-__new__()用来创建一个实例，它至少有一个参数cls，代表当前类。默认情况下__new__()会创建当前类的实例，该方法也可以被重载，重载后也可以创建其他类的实例。
-
-```python
-class Fun(object):
-    def __init__(self, fun):
-        self.fun = fun
- 
-    def __new__(cls, *args, **kwargs):
-        return object.__new__(Fun)
- 
-if __name__ == '__main__':
-    f = Fun.__new__(Fun)
-    print(type(f))
-```
-
-__new__()方法只是创建实例，此时拿到的实例并不能正常使用。一个实例需要被__init__()方法初始化后才可以被正常使用。也就是说，正常场景下，我们生成一个类的实例，Python先调用该类的__new()__方法创建一个实例，然后再调用__init__()方法初始化该实例。__new()__方法存在于object方法中，通常情况下不需要被重载。
-
-可以使用__new__方法创建出其它类的实例。在这种场景下，__new__方法创建后会调用对应类的__init__方法完成初始化：
-
-```python
-class Fun(object):
-    def __init__(self, fun):
-        self.fun = fun
- 
-    def __new__(cls, *args, **kwargs):
-        return Demo(*args, **kwargs)
- 
- 
-class Demo(object):
-    def __init__(self, d):
-        self.demo = d
- 
- 
-if __name__ == '__main__':
-    f = Fun(1)
-    print("type f:", type(f))
-    print("f.demo:", f.demo)
-```
-
-可以看出，f不是Fun类的一个实例，而是Demo类的一个实例，拥有Demo类的字段。因为Fun类的__new__方法创建的是一个Demo类实例，而非Fun类本身。因此Fun.__new__方法在return后调用了Demo.__init__方法，以完成该实例的初始化。
-
-### 接口
-
-接口的调用：
-
-```python
-class Clothes(object):
-    def __init__(self, color="green"):
-        self.color = color
-
-    def out(self):
-        print("father.")
-
-
-class NikeClothes(Clothes):
-    def out(self):
-        self.color = "brown"
-        super(NikeClothes, self).out()
-
-
-class AdidasClothes(object):
-    def out(self):
-        print("adidas.")
-
-```
-
-因为三个类都实现了 out() 方法，因此可以这样使用：
-
-```python
-objects = [Clothes(), NikeClothes(), AdidasClothes()]
-for obj in objects:
-    obj.out()
-```
-
-### 类方法
-
-类方法包括以下几种：
-
-1. special 方法和属性，即以 __ 开头和结尾的方法和属性
-2. 私有方法和属性，以 _ 开头，不过不是真正私有，而是可以调用的，
-但是不会被代码自动完成所记录（即 Tab 键之后不会显示）
-3. 共有的方法和属性
-
-以 `__` 开头不以 `__` 结尾的属性是更加特殊的方法，调用方式也不同：
-
-```python
-class MyDemoClass(object):
-    def __init__(self):
-        print("special.")
-
-    def _get_name(self):
-        print("_get_name is private method.")
-
-    def get_value(self):
-        print("get_value is public method.")
-
-    def __get_type(self):
-        print("__get_type is really special method.")
+# 字符串的索引
+s = 'good morning'
+# 查看类型 
+print(type(s))
+s[0]  # g
 ```
 
 ```python
-demo = MyDemoClass()
+s[-2]  # n
+```
+
+#### 切分操作
+
+分片用来从序列中提取出想要的子序列，其用法为：
+
+var[lower:upper:step]
+
+其范围包括 lower ，但不包括 upper ，即 [lower, upper)，
+step 表示取值间隔大小，如果没有默认为1。
+
+```python
+s[-3:]  # ing
+```
+
+```python
+s[:-3]  # good morn
+```
+
+```python
+s[:]  # good morning
+```
+
+其他切分操作，练习：step
+
+```python
+print(s[::2])  # go onn
+print(s[::-1])  # gninrom doog
+print(s[:100])
+```
+
+### 运算符
+
+Python的运算符需要掌握如下知识点：
+
+1. 算术运算符
+
+2. 比较（关系）运算符
+
+3. 赋值运算符
+
+4. 逻辑运算符
+
+5. 位运算符
+
+6. 成员运算符
+
+7. 身份运算符
+
+8. 运算符优先级
+
+#### 算术运算符
+
+| 运算符 | 描述 | 实例 |
+| --- | --- | --- |
+| + | 加 - 两个对象相加 | a + b 输出结果 30 |
+| - | 减 - 得到负数或是一个数减去另一个数 | a - b 输出结果 -10 |
+| * | 乘 - 两个数相乘或是返回一个被重复若干次的字符串 | a * b 输出结果 200 |
+| / | 除 - x除以y | b / a 输出结果 2 |
+| % | 取模 - 返回除法的余数 | b % a 输出结果 0 |
+| ** | 幂 - 返回x的y次幂 | a**b 为10的20次方， 输出结果 100000000000000000000 |
+
+#### 比较（关系）运算符
+
+| 运算符 | 描述 | 实例 |
+| --- | --- | --- |
+| == | 等于 - 比较对象是否相等 | (a == b) 返回 False。 |
+| != | 不等于 - 比较两个对象是否不相等 | (a != b) 返回 true. |
+| **<** **>** | 不等于 - 比较两个对象是否不相等 | (a **<** **>** b) 返回 true。这个运算符类似 != 。 |
+| > | 大于 - 返回x是否大于y | (a > b) 返回 False。 |
+| < | 小于 - 返回x是否小于y。所有比较运算符返回1表示真，返回0表示假。这分别与特殊的变量True和False等价。注意，这些变量名的大写。 | (a < b) 返回 true。 |
+| >= | 大于等于 - 返回x是否大于等于y。 | (a >= b) 返回 False。 |
+| <= | 小于等于 - 返回x是否小于等于y。 | (a <= b) 返回 true。 |
+
+#### 赋值运算符
+
+| 运算符 | 描述 | 实例 |
+| --- | --- | --- |
+| = | 简单的赋值运算符 | c = a + b 将 a + b 的运算结果赋值为 c |
+| += | 加法赋值运算符 | c += a 等效于 c = c + a |
+| -= | 减法赋值运算符 | c -= a 等效于 c = c - a |
+| *= | 乘法赋值运算符 | c *= a 等效于 c = c* a |
+| /= | 除法赋值运算符 | c /= a 等效于 c = c / a |
+| %= | 取模赋值运算符 | c %= a 等效于 c = c % a |
+| **= | 幂赋值运算符 | c **= a 等效于 c = c** a |
+| //= | 取整除赋值运算符 | c //= a 等效于 c = c // a |
+
+#### 逻辑运算符
+
+| 运算符 | 逻辑表达式 | 描述 | 实例 |
+| --- | --- | --- | --- |
+| and | x and y | 布尔"与" - 如果 x 为 False，x and y 返回 False，否则它返回 y 的计算值。 | (a and b) 返回 20。 |
+| or | x or y | 布尔"或" - 如果 x 是非 0，它返回 x 的值，否则它返回 y 的计算值。 | (a or b) 返回 10。 |
+| not | not x | 布尔"非" - 如果 x 为 True，返回 False 。如果 x 为 False，它返回 True。 | not(a and b) 返回 False |
+
+#### 位运算符
+
+| 运算符 | 描述 | 实例 |
+| --- | --- | --- |
+| & | 按位与运算符 | a & b 输出结果 12 ，二进制解释： 0000 1100 |
+| \| | 按位或运算符 | a \| b 输出结果 61 ，二进制解释： 0011 1101 |
+| ^ | 按位异或运算符 | a ^ b 输出结果 49 ，二进制解释： 0011 0001 |
+| ~ | 按位取反运算符 | ~a 输出结果 -61 ，二进制解释： 1100 0011 ，在一个有符号二进制数的补码形式。 |
+| << | 左移动运算符 | a << 2 输出结果 240 ，二进制解释： 1111 0000 |
+| >> | 右移动运算符 | a >> 2 输出结果 15 ，二进制解释： 0000 1111 |
+
+#### 成员运算符
+
+| 运算符 | 描述 | 实例 |
+| --- | --- | --- |
+| in | 如果在指定的序列中找到值返回 True，否则返回 False。 | x 在 y 序列中 , 如果 x 在 y 序列中返回 True。 |
+| not in | 如果在指定的序列中没有找到值返回 True，否则返回 False。 | x 不在 y 序列中 , 如果 x 不在 y 序列中返回 True。 |
+
+#### 身份运算符
+
+| 运算符 | 描述 | 实例 |
+| --- | --- | --- |
+| is | is 是判断两个标识符是不是引用自一个对象 | x is y, 类似 id(x) == id(y) , 如果引用的是同一个对象则返回 True，否则返回 False |
+| is not | is not 是判断两个标识符是不是引用自不同对象 | x is not y ， 类似 id(a) != id(b)。如果引用的不是同一个对象则返回结果 True，否则返回 False。 |
+
+#### 运算符优先级
+
+| 运算符 | 描述 |
+| --- | --- |
+| ** | 指数 (最高优先级) |
+| ~ + - | 按位翻转, 一元加号和减号 (最后两个的方法名为 +@ 和 -@) |
+| * / % // | 乘，除，取模和取整除 |
+| + - | 加法减法 |
+| >> << | 右移，左移运算符 |
+| & | 位 'AND' |
+| ^ \| | 位运算符 |
+| <= < > >= | 比较运算符 |
+| **<** **>** == != | 等于运算符 |
+| = %= /= //= -= += *= **= | 赋值运算符 |
+| is is not | 身份运算符 |
+| in not in | 成员运算符 |
+| not or and | 逻辑运算符 |
+
+### 列表
+
+介绍列表的方法及示例演示其使用，包括：长度、修改列表、取值、排序
+
+#### 创建列表
+
+```python
+empty_list = list()
+print(empty_list)  # 同 empty_list = []
+
+'''
+[]是解析后的list，所以[]比list()更快
+'''
+```
+
+查看列表长度：
+
+```python
+# len 查看列表长度
+a = [1, 2, 3]
+b = [2, 3, 'hello']
+c = a + b
+print(c)  # [1, 2, 3, 2, 3, u'hello']
+```
+
+```python
+len(c)
+```
+
+Python字符串可以和列表可以方便扩展：
+
+```python
+d = b * 2
+print(d)  # [2, 3, u'hello', 2, 3, u'hello']
+```
+
+```python
+d[-1]
+```
+
+#### 修改列表
+
+```python
+print(a)
+a[0] = 100
+a
+```
+
+这种赋值也适用于分片，例如，将列表的第2，3两个元素换掉：
+
+```python
+a[1:3] = [200, 300]
+print(a)
+```
+
+事实上，对于连续的分片（即步长为 1 ），Python采用的是整段替换的方法，两者的元素个数并不需要相同，
+
+```python
+# 例如，将 [11,12] 替换为 [1,2,3,4]：
+a = [10, 11, 12, 13, 14]
+a[1:3] = [1, 2, 3, 4]
+print(a)  # [10, 1, 2, 3, 4, 13, 14]
+```
+
+用这种方法来删除列表中一个连续的分片：
+
+```python
+a = [10, 1, 2, 11, 12]
+print(a[1:3])
+a[1:3] = []
+print(a)
+```
+
+对于不连续（间隔step不为1）的片段进行修改时，两者的元素数目必须一致：
+
+```python
+a = [10, 11, 12, 13, 14]
+a[::2] = [1, 2, 3]
+print(a)  # [1, 11, 2, 13, 3]
+```
+
+Python提供了删除列表中元素的方法 'del':
+
+```python
+a = [100, 'a', 'b', 200]
+del a[0]
+print(a)  # [u'a', u'b', 200]
+```
+
+```python
+# 删除间隔的元素：
+a = ['a', 1, 'b', 2, 'c']
+del a[::2]
+print(a)  # [1, 2]
+```
+
+用 in 来看某个元素是否在某个序列（不仅仅是列表）中，
+用not in来判断是否不在某个序列中。
+
+```python
+a = [1, 2, 3, 4, 5]
+print(1 in a)
+print(1 not in a)
+
+# 也可以作用于字符串：
+s = 'hello world'
+print("'he' in s : ", 'he' in s)  # True
+print("'world' not in s : ", 'world' not in s)  # False
+```
+
+列表中可以包含各种对象，甚至可以包含列表：
+
+```python
+a = [1, 2, 'six', [3, 4]]
+print(a[3])  # [3,4]
+# a[3]是列表，可以对它再进行索引：
+print(a[3][1])  # 4
+```
+
+#### 列表方法
+
+```python
+# 列表中某个元素个数
+a = [1, 1, 2, 3, 4, 5]
+print(len(a))  # 总个数：6
+# 元素1出现的个数
+print(a.count(1))  # 2
+# l.index(ob) 返回列表中元素 ob 第一次出现的索引位置，如果 ob 不在 l 中会报错。
+print(a.index(1))  # 0
+```
+
+#### 列表添加元素
+
+```python
+# 向列表添加单个元素
+# a.append(ob) 将元素 ob 添加到列表 a 的最后。
+a = [1, 1, 2, 3, 4, 5]
+a.append(10)
+print(a)  # [1, 1, 2, 3, 4, 5, 10]
+
+# append每次只添加一个元素，并不会因为这个元素是序列而将其展开：
+a.append([11, 12])
+print(a)  # [1, 1, 2, 3, 4, 5, 10, [11, 12]]
 
 ```
 
 ```python
-demo.get_value()
-demo._get_name()
-demo._MyDemoClass__get_type()
+# 向列表添加序列
+# l.extend(lst) 将序列 lst 的元素依次添加到列表 l 的最后，作用相当于 l += lst。
+a = [1, 2, 3, 4]
+a.extend([6, 7, 1])
+print(a)  # [1, 2, 3, 4, 6, 7, 1]
+
+# 插入元素
+# l.insert(idx, ob) 在索引 idx 处插入 ob ，之后的元素依次后移。
+a = [1, 2, 3, 4]
+# 在索引 3 插入 'a'
+a.insert(3, 'a')
+print(a)  # [1, 2, 3, u'a', 4]
+a
 ```
 
-## 文件和异常
-
-### 文件
-
-#### 写文件
-
-我们使用 open 函数的写入模式来写文件：
+#### 移除元素
 
 ```python
-f = open('test.txt', 'w')
-f.write('hello world.')
-f.close()
+# l.remove(ob) 会将列表中第一个出现的 ob 删除，如果 ob 不在 l 中会报错。
+a = [1, 1, 2, 3, 4]
+# 移除第一个1
+a.remove(1)
+print(a)  # [1, 2, 3, 4]
+
+# 弹出元素
+# l.pop(idx) 会将索引 idx 处的元素删除，并返回这个元素。
+a = [1, 2, 3, 4]
+b = a.pop(0)  # 1
+print('pop:', b, ' ;result:', a)
 ```
 
-```python
-print(open('test.txt').read())
-```
-
-使用 w 模式时，如果文件不存在会被创建
-
-除了写入模式，还有追加模式 a
-
-读写模式w+
+#### 排序
 
 ```python
-f = open('test.txt', 'w+')
-f.write('hello world. morning.')
-f.seek(3)
-print(f.read())  # hello world.
-f.close()
-```
-
-#### 读文件
-
-使用 open 函数 来读文件，使用文件名的字符串作为输入参数：
-
-默认打开文件是 ‘r’ 读模式
-
-```python
-f = open("test.txt")
-
-# 默认以读的方式打开文件，如果文件不存在会报错。
-# 可以使用 read 方法来读入文件中的所有内容：
-text = f.read()
-print(text)
-```
-
-按照行读入内容，readlines 方法返回一个列表，每个元素代表文件中每一行的内容：
-
-```python
-f = open("test.txt")
-lines = f.readlines()
-print(lines)
-f.close()
+# l.sort() 会将列表中的元素按照一定的规则排序：
+a = [10, 1, 11, 13, 11, 2]
+a.sort()
+print(a)  # [1, 2, 10, 11, 11, 13]
 ```
 
 ```python
-# 事实上，我们可以将 f 放在一个循环中，得到它每一行的内容：
-f = open('test.txt')
-for line in f:
-    print(line)
-f.close()
+# 如果不想改变原来列表中的值，可以使用 sorted 函数：
+a = [10, 1, 11, 13, 11, 2]
+b = sorted(a)
+print(a)  # [10, 1, 11, 13, 11, 2]
+print(b)  # [1, 2, 10, 11, 11, 13]
+
+# 列表反向
+# list.reverse() 会将列表中的元素从后向前排列。
+a = [1, 2, 3, 4, 5, 6]
+a.reverse()
+print(a)  # [6, 5, 4, 3, 2, 1]
 ```
 
-#### 上下文管理器
-
 ```python
-with open('my_file.txt', 'w') as fp:
-    data = fp.write("Hello world")
+# 如果不想改变原来列表中的值，可以使用这样的方法：
+a = [1, 2, 3, 4, 5, 6]
+b = a[::-1]
+print(a)
+print(b)
+a
 ```
 
-这等效于下面的代码，但是要更简便：
+如果不清楚用法，可以查看帮助： help(a.sort)
 
 ```python
-fp = open('my_file.txt', 'w')
+a=[1,2,3]
+help(a.sort)
+```
+
+显示帮助：
+
+```python
+# Signature: a.sort(*, key=None, reverse=False)
+# Docstring:
+# Sort the list in ascending order and return None.
+#
+# The sort is in-place (i.e. the list itself is modified) and stable (i.e. the
+# order of two equal elements is maintained).
+#
+# If a key function is given, apply it once to each list item and sort them,
+# ascending or descending, according to their function values.
+#
+# The reverse flag can be set to sort in descending order.
+# Type:      builtin_function_or_method
+```
+
+#### 列表推导式
+
+循环可以用来生成列表：
+
+```python
+values = [2, 2, 3]
+squares = []
+for x in values:
+    squares.append(x ** 2)
+print(squares)  # [4, 4, 9]
+```
+
+列表推导式可以使用更简单的方法来创建这个列表：
+
+```python
+values = [3, 8, 10, 14]
+squares = [x ** 2 for x in values]
+print(squares)  # [9, 64, 100, 196]
+```
+
+可以加入条件筛选，在上面的例子中，
+
+假如只想保留列表中不大于8的数的平方：
+
+```python
+squares = [x ** 2 for x in values if x <= 10]
+print(squares)  # [9, 64, 100]
+```
+
+平方的结果不大于100的：
+
+```python
+squares = [x ** 2 for x in values if x ** 2 <= 80]
+print(squares)  # [9, 64]
+```
+
+使用推导式生成集合和字典：
+
+```python
+values = [10, 21, 4, 7, 12]
+square_set = {x ** 2 for x in values if x <= 10}
+
+print(square_set)  # set([16, 49, 100])
+```
+
+```python
+square_dict = {x: x ** 2 for x in values if x <= 10}
+print(square_dict)  # {10: 100, 4: 16, 7: 49}
+```
+
+计算上面例子中生成的列表中所有元素的和：
+
+```python
+total = sum([x ** 2 for x in values if x < 10])
+total  # 65
+```
+
+但是，Python会生成这个列表，然后在将它放到垃圾回收机制中（因为没有变量指向它），
+
+这毫无疑问是种浪费。
+
+为了解决这种问题，与range()类似，Python使用产生式表达式来解决这个问题：
+
+```python
+total = sum(x ** 2 for x in values if x < 10)
+total  # 65
+```
+
+与上面相比，只是去掉了括号，但这里并不会一次性的生成这个列表。
+
+```python
+import time
+
+# 比较一下两者的用时：
+x = range(1000000)
+t1 = time.time()
+
+total = sum([x ** 3 for x in values if x < 10])
+print("list speed: ", time.time() - t1)
+```
+
+```python
+t2 = time.time()
+total = sum(x ** 3 for x in values if x < 10)
+print("comprehension speed:", time.time() - t2)
+```
+
+ipython 下可以输入:
+
+```python
+x = range(1000000)
+%timeit total = sum([i**2 for i in x])
+%timeit total = sum(i**2 for i in x)
+```
+
+#### 列表vs字符串
+
+列表是可变的（Mutable）
+
+```python
+a = [1, 2, 3, 4]
+a[0] = 100
+a.insert(3, 200)
+a  # [100, 2, 3, 200, 4]
+```
+
+字符串是不可变的（Immutable）:
+
+```python
+s = "hello world"
+
+# 通过索引改变会报错
+s[0] = 'k'
+```
+
+```python
+s.insert(3, 'm')
+```
+
+字符串方法只是返回一个新字符串，并不改变原来的值：
+
+```python
+print(s.replace('world', 'Mars'))  # hello Mars
+print(s)  # hello world
+
+# 如果想改变字符串的值，可以用重新赋值的方法：
+s = s.replace('world', 'YunYun')
+print(s)  # hello YunYun
+```
+
+### 元组
+
+与列表相似，元组tuple也是个有序序列，但是元组是不可变的，用()生成。
+
+```python
+a = (10, 11, 12, 13, 14)
+print(a)
+
+# 可以索引，切片：
+c = a[0]
+print(c)
+
+c = a[1:3]
+print(c)  # (11, 12)
+c
+```
+
+单个元素的元组生成
+
+采用下列方式定义只有一个元素的元组：
+
+```python
+a = (10,)
+print(a)
+print(type(a))  # <type 'tuple'>
+```
+
+```python
+a = [1, 2, 3]
+b = tuple(a)
+print(b)  # (1, 2, 3)
+```
+
+由于元组是不可变的，所以只能有一些不可变的方法，
+
+例如计算元素个数 count 和元素位置 index ，用法与列表一样。
+
+```python
+c = a.count(1)
+print(c)  # 1
+
+c = a.index(3)
+print(c)  # 索引位置为：2
+```
+
+#### TIP
+
+1. 可变数据类型: list, dictionary, set, numpy array, user defined objects
+2. 不可变数据类型: integer, float, long, complex, string, tuple, frozenset，强调下 tuple 是不可变的
+
+### 字典
+
+字典 dictionary ，在一些编程语言中也称为 hash ， map ，
+是一种由键值对组成的数据结构。
+
+```python
+a = {}
+print(type(a))  # <type 'dict'>
+a = dict()
+print(type(a))
+```
+
+#### 操作dict
+
+```python
+# 插入键值
+a['f'] = 'num 1'
+a['s'] = 'num 2'
+print(a)  # {u's': u'num 2', u'f': u'num 1'}
+```
+
+```python
+# 查看键值
+print(a['s'])  # num 2
+```
+
+```python
+# 更新
+a['f'] = 'num 3'
+print(a)  # {u's': u'num 2', u'f': u'num 3'}
+```
+
+```python
+# 初始化字典
+a = {'first': 'num 1', 'second': 'num 2', 3: 'num 3'}
+print(a['first'])  # num 1
+print(a[3])  # num 3
+```
+
+Python中不能用支持用数字索引按顺序查看字典中的值，
+而且数字本身也有可能成为键值，这样会引起混淆:
+
+a[0] 会报错
+
+```python
 try:
-    # do stuff with f
-    data = fp.write("Hello world")
-finally:
-    fp.close()
+    print(a[0])
+except KeyError as e:
+    print('error:', e)
+#a[0]
 ```
 
-#### 自定义上下文管理器
-
-比如可以这样定义一个简单的上下文管理器：
+#### dict的应用示例
 
 ```python
-class ContextManager(object):
-    def __enter__(self):
-        print("Entering")
+# 定义四个字典
+e1 = {'mag': 0.05, 'width': 20}
+e2 = {'mag': 0.04, 'width': 25}
+e3 = {'mag': 0.05, 'width': 80}
+e4 = {'mag': 0.03, 'width': 30}
 
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-
-
-with ContextManager():
-    print("inside operate")
-```
-
-#### __enter__ 的返回值
-
-如果在 __enter__ 方法下添加了返回值，
-
-那么我们可以使用 as 把这个返回值传给某个参数：
-
-```python
-class ContextManager2(object):
-    def __enter__(self):
-        print("Entering")
-        return "my value"
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-
-
-with ContextManager2() as val:
-    print(val)
-
-```
-
-一个通常的做法是将 __enter__ 的返回值设为这个上下文管理器对象本身，
-文件对象就是这样做的.
-
-```python
-class ContextManager3(object):
-    def __enter__(self):
-        print("Entering")
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-
-```
-
-#### 错误处理
-
-上下文管理器对象将错误处理交给 __exit__ 进行，可以将错误类型，
-错误值和 traceback 等内容作为参数传递给 __exit__ 函数：
-
-```python
-class ContextManager4(object):
-    def __enter__(self):
-        print("Entering")
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-        if exc_type is not None:
-            print("  Exception:", exc_value)
-            return True  # 不想让错误抛出，只需要将 __exit__ 的返回值设为 True
-
-
-with ContextManager4():
-    print(1 / 0)
-
+# 以字典作为值传入新的字典
+events = {500: e1, 760: e2, 3001: e3, 4180: e4}
+# {760: {u'width': 25, u'mag': 0.04},
+# 3001: {u'width': 80, u'mag': 0.05},
+# 500: {u'width': 20, u'mag': 0.05},
+# 4180: {u'width': 30, u'mag': 0.03}}
+print(events)
 ```
 
 ```python
-import os
-os.remove('my_file.txt')
+# 另一个例子
+people = [
+    {'first': 'Sam', 'last': 'Malone', 'name': 35},
+    {'first': 'Woody', 'last': 'Boyd', 'name': 21},
+    {'first': 'Norm', 'last': 'Peterson', 'name': 34},
+    {'first': 'Diane', 'last': 'Chambers', 'name': 33}
+]
+# [{'first': 'Sam', 'last': 'Malone', 'name': 35},
+#  {'first': 'Woody', 'last': 'Boyd', 'name': 21},
+#  {'first': 'Norm', 'last': 'Peterson', 'name': 34},
+#  {'first': 'Diane', 'last': 'Chambers', 'name': 33}]
+print(people)
 ```
 
-#### 二进制文件
-
-二进制读写模式 b：
+使用 dict 初始化字典：
 
 ```python
-import os
+# 除了通常的定义方式，还可以通过 dict() 转化来生成字典：
+my_dict = dict([('name', 'lili'),
+                ('sex', 'female'),
+                ('age', 32),
+                ('address', 'beijing')])
+# {u'age': 32,
+# u'address': u'beijing',
+# u'name': u'lili',
+# u'sex': u'female'}
+print(my_dict)
+```
 
-f = open('binary.bin', 'wb')
-f.write(os.urandom(10))
-f.close()
+利用索引直接更新键值对：
+
+```python
+my_dict['age'] += 1
+print(my_dict)  # u'age': 33
+```
+
+dict可以使用元组作为键值：
+
+```python
+# 例如，可以用元组做键来表示从第一个城市飞往第二个城市航班数的多少：
+connections = {}
+connections[('New York', 'Seattle')] = 100
+connections[('Austin', 'New York')] = 200
+connections[('New York', 'Austin')] = 400
+connections
 ```
 
 ```python
-f = open('binary.bin', 'rb')
-print(repr(f.read()))
-f.close()
+# 元组是有序的，
+# 因此 ('New York', 'Austin') 和 ('Austin', 'New York') 是两个不同的键：
+print(connections[('Austin', 'New York')])  # 200
+print(connections[('New York', 'Austin')])  # 400
 ```
 
-#### with 方法
+#### 字典方法
 
-事实上，Python提供了更安全的方法，当 with 块的内容结束后，
-Python会自动调用它的close 方法，确保读写的安全：
+get 方法 : d.get(key, default = None)
 
-```python
-with open('new_file.txt', 'w') as f:
-    for i in range(3000):
-        x = 1.0 / (i - 1000)
-        f.write('hello world: ' + str(i) + '\n')
-```
-
-与 try/exception/finally 效果相同，但更简单。
-
-查看文件写的结果，虽然触发error，但已经写的内容是成功的。
+之前已经见过，用索引可以找到一个键对应的值，
+但是当字典中没有这个键的时候，Python会报错
 
 ```python
-!tail new_file.txt
-```
+a = {'first': 'num 1', 'second': 'num 2'}
+# error:
+# print(a['third'])
 
-```python
-!wc -l new_file.txt
+# get 返回字典中键 key 对应的值，
+# 如果没有这个键，返回 default 指定的值（默认是 None ）。
+print(a.get('third'))  # None
 ```
 
 ```python
-# 删除文件：
-import os
-os.remove('test.txt')
-os.remove('binary.bin')
-os.remove('new_file.txt')
+# 指定默认值参数：
+b = a.get("three", "num 0")
+b  # num 0
 ```
 
-### 异常
+#### pop 方法删除元素
 
-#### try & except 块
+pop 方法可以用来弹出字典中某个键对应的值，同时也可以指定默认参数：
 
-捕捉不同的错误类型，尝试在下面输入框输入：-1，1，2，q
+d.pop(key, default = None)
 
 ```python
-import math
+a = {'first': 'num 1', 'second': 'num 2'}
+c = a.pop('first')
+print(c)  # num 1
+print(a)  # {u'second': u'num 2'}
+```
 
-while True:
-    try:
-        text = input('>')
-        if text[0] == 'q':
-            break
-        x = float(text)
-        y = 1 / math.log10(x)
-        print("1/log10({0}) = {1}".format(x, y))
-    except ValueError:
-        print("value must bigger than 0")
-    except ZeroDivisionError:
-        print("the value must not be 1")
+```python
+# 弹出不存在的键值：
+d = a.pop("third", 'not exist')
+print(d)  # not exist
+```
+
+```python
+# 与列表一样，del 函数可以用来删除字典中特定的键值对，例如：
+a = {'first': 'num 1', 'second': 'num 2'}
+del a["first"]
+print(a)  # {u'second': u'num 2'}
+```
+
+#### update方法更新字典
+
+之前已经知道，可以通过索引来插入、修改单个键值对，
+但是如果想对多个键值对进行操作，这种方法就显得比较麻烦，好在有 update 方法：
+
+```python
+my_dict = dict([('name', 'lili'),
+                ('sex', 'female'),
+                ('age', 32),
+                ('address', 'beijing')])
+# 把 ‘lili' 改成 'lucy'，同时插入 'single' 到 'marriage'
+dict_update = {'name': 'lucy', 'marriage': 'single'}
+my_dict.update(dict_update)
+print(my_dict)
+```
+
+```python
+import pprint
+# {u'marriage': u'single',
+# u'name': u'lucy',
+# u'address': u'beijing',
+# u'age': 32,
+# u'sex': u'female'}
+pprint.pprint(my_dict)  # 华丽丽的显示方式
+```
+
+```python
+my_dict # ipython的dict显示跟pprint的格式一样华丽
+```
+
+通过关键词 `in` 查询字典中是否有该键：
+
+```python
+barn = {'cows': 1, 'dogs': 5, 'cats': 3}
+# in 可以用来判断字典中是否有某个特定的键：
+print('chickens' in barn)  # False
+print('cows' in barn)  # True
+```
+
+#### keys 方法，values 方法和items 方法
+
+- `d.keys()` 返回一个由所有键组成的列表；
+- `d.values()` 返回一个由所有值组成的列表；
+- `d.items()` 返回一个由所有键值对元组组成的列表；
+
+```python
+print(barn.keys())  # [u'cows', u'cats', u'dogs']
+print(barn.values())  # [1, 3, 5]
+print(barn.items())  # [(u'cows', 1), (u'cats', 3), (u'dogs', 5)]
+```
+
+```python
+for key, val in barn.items():
+    print(key, val)
+    # cows 1
+    # cats 3
+    # dogs 5
+```
+
+### 集合
+
+列表和字符串都是一种有序序列，而集合 set 是一种无序的序列。
+
+因为集合是无序的，所以当集合中存在两个同样的元素的时候，只会保存其中的一个（唯一性）；
+同时为了确保其中不包含同样的元素，集合中放入的元素只能是不可变的对象（确定性）。
+
+#### 创建集合
+
+```python
+# 可以用set()函数来显示的生成空集合：
+a = set()
+print(a)
+print(type(a))
+```
+
+```python
+# 使用一个列表来初始化一个集合：
+a = set([1, 2, 3, 1])
+a  # 集合会自动去除重复元素 1。
+```
+
+```python
+# 集合中的元素是用大括号{}包含起来的，这意味着可以用{}的形式来创建集合：
+a = {1, 2, 3, 1}
+print(a)  # {1, 2, 3}
+```
+
+```python
+# 但是创建空集合的时候只能用set来创建，因为在Python中{}创建的是一个空的字典：
+s = {}
+print(type(s))  # <type 'dict'>
+```
+
+#### 集合操作
+
+```python
+a = {1, 2, 3, 4}
+b = {2, 3, 4, 5}
+```
+
+##### 并
+
+两个集合的并，返回包含两个集合所有元素的集合（去除重复）。
+可以用方法 a.union(b) 或者操作 a | b 实现。
+
+```python
+c = a.union(b)
+print(c)  # {1, 2, 3, 4, 5, 6}
+
+# 操作 a | b 实现
+d = a | b
+print(c)
+```
+
+```python
+c == d
+```
+
+##### 交
+
+两个集合的交，返回包含两个集合共有元素的集合。
+
+可以用方法 a.intersection(b) 或者操作 a & b 实现。
+
+```python
+c = a.intersection(b)
+print(c)  # set([2, 3, 4])
+
+d = a & b
+print(d)
+
+c == d
+```
+
+##### 差
+
+a 和 b 的差集，返回只在 a 不在 b 的元素组成的集合。
+
+可以用方法 a.difference(b) 或者操作 a - b 实现。
+
+```python
+c = a.difference(b)
+print(c)  # set([1])
+d = a - b
+print(d)
+```
+
+##### 对称差
+
+a 和b 的对称差集，返回在 a 或在 b 中，但是不同时在 a 和 b 中的元素组成的集合。
+
+可以用方法 a.symmetric_difference(b) 或者操作 a ^ b 实现（异或操作符）。
+
+```python
+c = a.symmetric_difference(b)
+print(c)  # set([1, 5])
+
+d = a ^ b
+print(d)
+```
+
+##### 包含关系
+
+要判断 b 是不是 a 的子集，可以用 b.issubset(a) 方法，
+或者更简单的用操作 b <= a ：
+
+```python
+a = {1, 2, 3}
+b = {1, 2}
+
+c = b.issubset(a)
+print(c)  # True
+
+d = (b <= a)
+print(d)
+```
+
+也可以用 a.issuperset(b) 或者 a >= b 来判断：
+
+```python
+print(a >= b)
+```
+
+方法只能用来测试子集，但是操作符可以用来判断真子集：
+
+```python
+print(a < a)  # False
+print(a <= a)  # True
+```
+
+#### 集合方法
+
+##### add 方法向集合添加单个元素
+
+跟列表的 append 方法类似，用来向集合添加单个元素。
+
+s.add(a) 将元素 a 加入集合 s 中。
+
+```python
+s = {1, 3, 4}
+s.add(4)
+print(s)  # set([1, 3, 4])
+
+s.add(5)
+print(s)  # set([1, 3, 4, 5])
+```
+
+##### update 方法向集合添加多个元素
+
+跟列表的extend方法类似，用来向集合添加多个元素。
+
+s.update(seq)
+
+```python
+s.update([10, 11, 12])
+print(s)  # set([1, 3, 4, 5, 10, 11, 12])
+```
+
+```python
+# remove 方法移除单个元素
+s = {1, 3, 4}
+s.remove(1)
+print(s)  # set([3, 4])
+```
+
+##### pop 方法弹出元素
+
+由于集合没有顺序，不能像列表一样按照位置弹出元素，
+
+所以 pop 方法删除并返回集合中任意一个元素，如果集合中没有元素会报错。
+
+```python
+s = {1, 3, 4}
+d = s.pop()
+print(s, d)
+```
+
+```python
+# discard 方法作用与 remove 一样
+s = {1, 3, 4}
+s.discard(3)
+print(s)  # set([1, 4])
+```
+
+##### difference_update方法
+
+a.difference_update(b) 从a中去除所有属于b的元素：
+
+```python
+a = {1, 2, 3, 4}
+b = {2, 3, 4, 5}
+a.difference_update(b)
+print(a)  # set([1])
+```
+
+### 条件语句
+
+```python
+a = 62
+print("exam score check:")
+if a >= 60:
+    print("student pass")
+elif a == 0:
+    print("student 0: not pass")
+else:
+    print("student not pass")
+```
+
+可以使用 and ， or , not 等关键词结合多个判断条件：
+
+```python
+a = 10
+b = -5
+print(a > 0 and b < 0)  # True
+print(not a > 0)  # False
+print(a < 0 or b < 0)  # True
+```
+
+#### 一个例子
+
+```python
+year = 1900
+if year % 400 == 0:
+    print("This is a leap year!")
+# 两个条件都满足才执行
+elif year % 4 == 0 and year % 100 != 0:
+    print("This is a leap year!")
+else:
+    print("This is not a leap year.")
+# This is not a leap year.
+```
+
+#### 判断列表
+
+```python
+my_list = [1, 2]
+# 判断一个列表是否为空。
+if len(my_list) > 0:
+    print("the first element is: ", my_list[0])
+else:
+    print("no element.")
 
 ```
 
-#### 自定义异常
+### 循环
 
-异常是标准库中的类，这意味着我们可以自定义异常类：
-
-尝试在文本输入框输入：k，start，q
+#### for循环
 
 ```python
-class CommandError(ValueError):
-    print("bad command operation. must input 'start', 'stop', 'pause'")
+# for 循环
+total = 0
+for i in range(100000):
+    total += i
+print(total)  # 4999950000
+```
+
+#### while 循环
+
+```python
+while <condition>:
+     <statesments>
     
-
-
-valid_commands = {'start', 'stop', 'pause'}
-while True:
-    command = input('>')
-    if command == 'q':
-        break
-    try:
-        if command.lower() not in valid_commands:
-            raise CommandError('Invalid command: %s' % command)
-        print('input command:', command)
-    except CommandError:
-        print("bad command string: %s" % command)
-
 ```
 
-#### finally
-
-try/catch 块还有一个可选的关键词 finally。
-
-不管 try 块有没有异常， finally 块的内容总是会被执行，
-而且会在抛出异常前执行，因此可以用来作为安全保证，
-
-比如文件操作时，常在finally关闭文件。
+Python会循环执行**statesments**，直到**condition**不满足为止。
 
 ```python
-try:
-    print(1 / 0)
-except ZeroDivisionError:
-    print('divide by 0.')
-finally:
-    print('finally was called.')
+i = 0
+total = 0
+while i <= 100:
+    total += i
+    i += 1
+print(total)  # 5050
 ```
 
-## 高级函数和装饰器
+举个例子，通过while遍历集合：
+
+```python
+# 空容器会被当成False，因此可以用while循环读取容器的所有元素
+plays = set(['Hamlet', 'Mac', 'King'])
+while plays:
+    play = plays.pop()
+    print('Perform', play)
+```
+
+#### continue 语句
+
+遇到 continue 的时候，程序会返回到循环的最开始重新执行。
+
+```python
+values = [7, 6, 4, 7, 19, 2, 1]
+for i in values:
+    if i % 2 != 0:
+        # 忽略奇数
+        continue
+    print(i)
+# 6
+# 4
+# 2
+```
+
+#### break 语句
+
+遇到 break 的时候，程序会跳出循环，不管循环条件是不是满足
+
+```python
+command_list = ['start',
+                '1',
+                '2',
+                '3',
+                '4',
+                'stop',
+                'restart',
+                '5',
+                '6']
+while command_list:
+    command = command_list.pop(0)
+    if command == 'stop':
+        break
+    print(command)
+# start
+# 1
+# 2
+# 3
+# 4
+
+```
+
+### 函数
+
+为了减少重复，函数登场。
+
+#### 定义函数
+
+在Python中可以使用 def 关键字来定义函数，程序中函数的参数就相当于是数学上说的函数的自变量，可以通过 return 关键字来返回一个值，这相当于数学上说的函数的因变量。
+
+```python
+def add(a, b):
+    """
+    add two nums
+    :param a: first num
+    :param b: second num
+    :return: result
+    """
+    c = a + b
+    return c
+```
+
+#### 使用函数
+
+使用函数时，只需要将参数换成特定的值传给函数。
+
+```python
+# Python并没有限定参数的类型，因此可以使用不同的参数类型：
+print(add(2, 3))
+
+print(add('foo', 'bar'))  # foobar
+```
+
+传入参数时，Python提供了两种选项，
+
+第一种是上面使用的按照位置传入参数，
+
+另一种则是使用关键词模式，显式地指定参数的值：
+
+```python
+add(a=2, b=3)
+```
+
+```python
+add(b='morning', a='good')
+```
+
+```python
+add(2, b=3)  # 5
+```
+
+#### 设定默认参数
+
+```python
+def quad(x, a=1, b=0, c=0):
+    return a * x * x + b * x + c
+```
+
+```python
+quad(2.0)
+```
+
+```python
+quad(2.0, b=3)
+```
+
+#### 接收不定参数
+
+使用如下方法，可以使函数接受不定数目的参数,类似java的..多个参数：
+
+```python
+def add(x, *args):
+    total = x
+    for arg in args:
+        total += arg
+    return total
+```
+
+*args 表示参数数目不定，可以看成一个元组，
+
+把第一个参数后面的参数当作元组中的元素。
+
+```python
+print(add(1, 2, 3, 4, 5))  # 15
+print(add(1, 2))  # 3
+```
+
+#### 使用关键词传入参数
+
+```python
+def add(x, **kwargs):
+    total = x
+    for arg, val in kwargs.items():
+        print("adding ", arg)
+        total += val
+    return total
+```
+
+**kwargs 表示参数数目不定，相当于一个字典，关键词和值对应于键值对。
+
+```python
+add(1, a=2, b=3)  # 6
+```
+
+```python
+# 可以接收任意数目的位置参数和键值对参数：
+def fun1(*args, **kwargs):
+    print(args, kwargs)
+    
+fun1(2, 3, a="bar", b=10)  # (2, 3) {'a': u'bar', 'b': 10}
+```
+
+#### 返回多个值
+
+```python
+# 函数可以返回多个值：
+def to_val(x, y):
+    r = (x ** 2 + y ** 2) ** 0.5
+    total = x + y
+    return r, total
+```
+
+```python
+a, b = to_val(3, 4)
+print(a, b)  # 5.0 7
+```
+
+```python
+# 事实上，Python将返回的两个值变成了元组：
+print(to_val(3, 4))  # (5.0, 7)
+```
+
+```python
+# 列表也有相似的功能,可以用来赋值：
+a, b, c = [1, 2, 3]
+print(a, b, c)
+```
+
+```python
+# 可以将参数用元组传入：
+def add(a, b):
+    return a + b
+
+c = (2, 3)
+print(add(*c))  # 5
+# 这里的*必须要。
+```
+
+```python
+# 还可以用字典传入参数哦：
+d = {'a': 2, 'b': 5}
+print(add(**d))  # 7
+```
+
+#### map 方法生成序列
+
+map函数
+
+map() 会根据提供的函数对指定序列做映射。
+
+map(aFun, aSeq)
+
+```python
+def sqr(x):
+    return x ** 2
+```
+
+```python
+a = [2, 3, 4]
+result = map(sqr, a)  # [4,9,16]
+type(result)
+```
+
+```python
+# map返回的是个迭代器对象, 可以转化为list显示
+
+list(result)
+```
+
+事实上，根据函数参数的多少，map 可以接受多组序列，
+将其对应的元素作为参数传入函数：
+
+```python
+def add(a, b):
+    return a + b
+
+a = [2, 3, 4]
+list(map(sqr, a))  # [4,9,16]
+```
+
+```python
+a = (2, 3, 4)
+b = [10, 11, 15]
+list(map(add, a, b))  # [12, 14, 19]
+```
+
+#### reduce
+
+reduce() 函数会对参数序列中元素进行累积。
+
+```python
+from functools import reduce
+
+def add(x, y) :            # 两数相加
+    return x + y
+sum1 = reduce(add, [1,2,3,4,5])   # 计算列表和：1+2+3+4+5
+sum2 = reduce(lambda x, y: x+y, [1,2,3,4,5])  # 使用 lambda 匿名函数
+print(sum1)
+print(sum2)
+```
 
 ### 高级函数
 
@@ -922,7 +1800,848 @@ print([fib(i) for i in range(10)])
 
 ```
 
-### 装饰器：Decorator
+### 模块
+
+用模块管理函数，Python中每个文件就代表了一个模块（module），
+
+Python会将所有 .py 结尾的文件认定为Python代码文件。
+
+在使用函数的时候我们通过import关键字导入指定的模块：
+
+`module1.py`
+
+```python
+def foo():
+    print('hello, world!')
+
+```
+
+`module2.py`
+
+```python
+def foo():
+    print('goodbye, world!')
+```
+
+`test.py`
+
+```python
+from module1 import foo
+
+# 输出hello, world!
+foo()
+
+from module2 import foo
+
+# 输出goodbye, world!
+foo()
+```
+
+#### **name** 属性
+
+有时候我们想将一个 .py 文件既当作脚本，又能当作模块用，
+这个时候可以使用 **name** 这个属性。
+
+```python
+PI = 3.14
+
+
+def get_sum(lst):
+    """
+    Sum the values in the list
+    :param lst:
+    :return:
+    """
+    total = 0
+    for v in lst:
+        total = total + v
+    return total
+
+```
+
+上文保存为ex.py
+
+```python
+with open('ex.py', 'w') as f:
+    f.write("""
+PI = 3.14
+def get_sum(lst):
+    total = 0
+    for v in lst:
+        total = total + v
+    return total
+    """)
+```
+
+使用 ! 调用shell命令：
+
+```python
+!cat ex.py
+```
+
+可以从ex模块中导入函数get_sum和变量：
+
+```python
+from ex import PI, get_sum
+
+print(PI)  # 3.14
+print(get_sum([2, 3]))  # 5
+
+# 可以使用 * 导入所有变量, 不提倡，因为可能覆盖一些已有的函数
+```
+
+```python
+# 删除文件：
+import os
+
+os.remove('ex.py')
+```
+
+#### 模块导入顺序
+
+通常情况下，当使用 import 语句导入模块后，Python 会按照以下顺序查找指定的模块文件：
+
+> 前目录，即当前执行的程序文件所在目录下查找；
+
+> 到 PYTHONPATH（环境变量）下的每个目录中查找；
+
+> 到 Python 默认的安装目录下查找。
+
+以上所有涉及到的目录，都保存在标准模块 sys 的 sys.path 变量中，通过此变量我们可以看到指定程序文件支持查找的所有目录。换句话说，如果要导入的模块没有存储在 sys.path 显示的目录中，那么导入该模块并运行程序时，Python 解释器就会抛出 ModuleNotFoundError（未找到模块）异常。
+
+解决“Python找不到指定模块”的方法有 3 种，分别是：
+
+> 向 sys.path 中临时添加模块文件存储位置的完整路径；
+
+> 将模块放在 sys.path 变量中已包含的模块加载路径中；
+
+> 设置 path 系统环境变量。
+
+#### 垃圾回收机制
+
+如果持续不断加载数据，调用函数模块，计算机的内存会溢出，Python的垃圾回收机制。是计数机制，当一个对象的引用数为0时，它就会被垃圾回收机制回收。
+
+```python
+import sys
+# 生以下四种情况的时候，该对象的引用计数器+1
+a= 999 # 对象被创建  
+b=a   # 对象被引用 
+def func(a):
+    return
+func(a)   # 对象被作为参数,传到函数中
+List=[a,"a","b",2]   # 对象作为一个元素，存储在容器中   
+sys.getrefcount(a)
+# python系统内部很多地方都在使用一些常用的对象，这些对象在python解释器启动时就被创建出来。
+
+#发生以下四种情况时，该对象的引用计数器**-1**
+
+#该对象的别名被显式销毁时    
+del a
+#该对象的引别名被赋予新的对象，   
+a = 999
+#个对象离开它的作用域，例如 func函数执行完毕时，函数里面的局部变量的引用计数器就会减一（但是全局变量不会）
+#该元素从容器中删除时，或者容器被销毁时。
+b = a  # 当前计数器为2
+del b # 删除变量b：b对应的对象的引用计数器-1   （此时计数器为1）
+del a # 删除变量a：a对应的对象的引用计数器-1    (此时引用计数器为0)
+
+# 当引用计数器为0 时，意味着没有人再使用这个对象，这个对象就变成垃圾，垃圾回收。
+# 回收：1.对象从refchain的链表移除。
+#.将对象进行销毁，内存归还给操作系统，可用内存就增加。
+sys.getrefcount(a)
+```
+
+### 面向对象编程
+
+面向对象编程——Object Oriented Programming，简称OOP，是一种程序设计思想。OOP把对象作为程序的基本单元，一个对象包含了数据和操作数据的函数。
+
+在Python中，所有数据类型都可以视为对象，当然也可以自定义对象。自定义的对象数据类型就是面向对象中的类（Class）的概念。
+
+面向对象的设计思想是从自然界中来的，因为在自然界中，类（Class）和实例（Instance）的概念是很自然的。Class是一种抽象概念，比如我们定义的Class——Student，是指学生这个概念，而实例（Instance）则是一个个具体的Student，比如，张三和李四是两个具体的Student。
+
+所以，面向对象的设计思想是抽象出Class，根据Class创建Instance。
+
+面向对象的抽象程度又比函数要高，因为一个Class既包含数据，又包含操作数据的方法。
+
+#### 创建类
+
+##### 类的特殊方法
+
+Python 使用 __ 开头的名字来定义特殊的方法和属性，它们有：
+
+```
+__init__()
+__repr__()
+__str__()
+__call__()
+__iter__()
+__add__()
+__sub__()
+__mul__()
+__rmul__()
+__class__
+__name__
+```
+
+构造方法 `__init__()`
+
+在产生对象之后，我们可以向对象中添加属性。
+事实上，还可以通过构造方法，在构造对象的时候直接添加属性：
+
+```python
+class Clothes(object):
+    """
+    init_demo
+    """
+
+    def __init__(self, color="green"):
+        self.color = color
+
+
+my_clothes = Clothes()
+my_clothes.color
+```
+
+传入有参数的值：
+
+```python
+your_clothes = Clothes('orange')
+your_clothes.color
+```
+
+表示方法 `__repr__() 和 __str__()`:
+
+```python
+class Clothes(object):
+    """
+    repr and str demo
+    """
+
+    def __init__(self, color="green"):
+        self.color = color
+
+    def __str__(self):
+        "This is a string to print."
+        return ("a {} clothes".format(self.color))
+
+    def __repr__(self):
+        "This string recreates the object."
+        return ("{}(color='{}')".format(self.__class__.__name__, self.color))
+```
+
+`__str__()` 是使用 print 函数显示的结果,类似java中的toString：
+
+```python
+my_clothes = Clothes()
+print(my_clothes)
+```
+
+`__repr__()` 返回的是不使用 print 方法的结果:
+
+```python
+my_clothes
+```
+
+```python
+print(my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color)
+```
+
+```python
+my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color
+```
+
+##### 类的属性
+
+只读属性：
+
+```python
+class Clothes(object):
+    def __init__(self, price):
+        self.price = price
+
+    # 这样 discount_price 就变成属性了
+    @property
+    def discount_price(self):
+        return self.price * 0.8
+```
+
+这里 discount_price 就是一个只读不写的属性了（注意是属性不是方法）,
+而price是可读写的属性：
+
+```python
+my_clothes = Clothes(100)
+print(my_clothes.discount_price)  # 80.0
+```
+
+可以修改price属性来改变discount_price：
+
+```python
+my_clothes.price = 200
+print(my_clothes.discount_price)  # 160.0
+```
+
+my_clothes.discount_price()会报错，因为 my_clothes.discount_price 是属性，不是方法；
+
+my_clothes.discount_price=100 也会报错，因为只读。
+
+对于 @property 生成的只读属性，我们可以使用相应的 @attr.setter 修饰符来使得这个属性变成可写的：
+
+```python
+class Clothes(object):
+    def __init__(self, price):
+        self.price = price
+
+    # 这样就变成属性了
+    @property
+    def discount_price(self):
+        return self.price * 0.8
+
+    @discount_price.setter
+    def discount_price(self, new_price):
+        self.price = new_price * 1.25
+```
+
+测试一下：
+
+```python
+my_clothes = Clothes(100)
+print(my_clothes.discount_price)
+
+my_clothes.price = 200
+print(my_clothes.discount_price)
+```
+
+修改 discount_price 属性：
+
+```python
+my_clothes.discount_price = 180
+print(my_clothes.price)
+print(my_clothes.discount_price)
+```
+
+一个等价的替代如下，用方法：
+
+```python
+class Clothes(object):
+    def __init__(self, price):
+        self.price = price
+
+    def get_discount_price(self):
+        return self.price * 0.8
+
+    def set_discount_price(self, new_price):
+        self.price = new_price * 1.25
+
+    discount_price = property(get_discount_price, set_discount_price)
+
+```
+
+```python
+my_clothes = Clothes(100)
+print(my_clothes.discount_price)
+
+my_clothes.price = 200
+print(my_clothes.discount_price)
+
+my_clothes.discount_price = 180
+print(my_clothes.price)
+print(my_clothes.discount_price)
+```
+
+#### 继承
+
+类定义的基本形式：
+
+```python
+class ClassName(ParentClass):
+    """class docstring"""
+    def method(self):
+        return
+```
+
+里面的 ParentClass 就是用来继承的。
+
+```python
+class Clothes(object):
+    def __init__(self, color="green"):
+        self.color = color
+
+    def out_print(self):
+        return self.__class__.__name__, self.color
+```
+
+```python
+my_clothes = Clothes()
+my_clothes.color
+```
+
+```python
+my_clothes.out_print()
+```
+
+定义一个子类，继承父类的所有方法:
+
+```python
+class NikeClothes(Clothes):
+    def change_color(self):
+        if self.color == "green":
+            self.color = "red"
+```
+
+继承父类的所有方法：
+
+```python
+your_clothes = NikeClothes()
+your_clothes.color
+```
+
+```python
+your_clothes.out_print()
+```
+
+但有自己的方法：
+
+```python
+your_clothes.change_color()
+your_clothes.color
+```
+
+如果想对父类的方法进行修改，只需要在子类中重定义这个类即可：
+
+```python
+class AdidasClothes(Clothes):
+    def change_color(self):
+        if self.color == "green":
+            self.color = "black"
+
+    def out_print(self):
+        self.change_color()
+        return self.__class__.__name__, self.color
+
+
+him_clothes = AdidasClothes()
+print(him_clothes.color)
+
+him_clothes.change_color()
+print(him_clothes.color)
+print(him_clothes.out_print())
+```
+
+#### super() 函数
+
+super(CurrentClassName, instance)
+
+返回该类实例对应的父类对象。
+
+刚才 AdidasClothes可以改写为：
+
+```python
+class NewAdidasClothes(Clothes):
+    def change_color(self):
+        if self.color == "green":
+            self.color = "black"
+
+    def out_print(self):
+        self.change_color()
+        print(super(NewAdidasClothes, self).out_print())
+
+her_clothes = NewAdidasClothes()
+print(her_clothes.color)
+
+her_clothes.out_print()
+```
+
+#### **new**() 方法
+
+**new**()用来创建一个实例，它至少有一个参数cls，代表当前类。默认情况下__new__()会创建当前类的实例，该方法也可以被重载，重载后也可以创建其他类的实例。
+
+```python
+class Fun(object):
+    def __init__(self, fun):
+        self.fun = fun
+ 
+    def __new__(cls, *args, **kwargs):
+        return object.__new__(Fun)
+ 
+if __name__ == '__main__':
+    f = Fun.__new__(Fun)
+    print(type(f))
+```
+
+**new**()方法只是创建实例，此时拿到的实例并不能正常使用。一个实例需要被__init__()方法初始化后才可以被正常使用。也就是说，正常场景下，我们生成一个类的实例，Python先调用该类的__new()**方法创建一个实例，然后再调用__init**()方法初始化该实例。__new()__方法存在于object方法中，通常情况下不需要被重载。
+
+可以使用__new__方法创建出其它类的实例。在这种场景下，__new__方法创建后会调用对应类的__init__方法完成初始化：
+
+```python
+class Fun(object):
+    def __init__(self, fun):
+        self.fun = fun
+ 
+    def __new__(cls, *args, **kwargs):
+        return Demo(*args, **kwargs)
+ 
+ 
+class Demo(object):
+    def __init__(self, d):
+        self.demo = d
+ 
+ 
+if __name__ == '__main__':
+    f = Fun(1)
+    print("type f:", type(f))
+    print("f.demo:", f.demo)
+```
+
+可以看出，f不是Fun类的一个实例，而是Demo类的一个实例，拥有Demo类的字段。因为Fun类的__new__方法创建的是一个Demo类实例，而非Fun类本身。因此Fun.__new__方法在return后调用了Demo.__init__方法，以完成该实例的初始化。
+
+#### 接口
+
+接口的调用：
+
+```python
+class Clothes(object):
+    def __init__(self, color="green"):
+        self.color = color
+
+    def out(self):
+        print("father.")
+
+
+class NikeClothes(Clothes):
+    def out(self):
+        self.color = "brown"
+        super(NikeClothes, self).out()
+
+
+class AdidasClothes(object):
+    def out(self):
+        print("adidas.")
+
+```
+
+因为三个类都实现了 out() 方法，因此可以这样使用：
+
+```python
+objects = [Clothes(), NikeClothes(), AdidasClothes()]
+for obj in objects:
+    obj.out()
+```
+
+#### 类方法
+
+类方法包括以下几种：
+
+1. special 方法和属性，即以 __ 开头和结尾的方法和属性
+2. 私有方法和属性，以 _ 开头，不过不是真正私有，而是可以调用的，
+但是不会被代码自动完成所记录（即 Tab 键之后不会显示）
+3. 共有的方法和属性
+
+以 `__` 开头不以 `__` 结尾的属性是更加特殊的方法，调用方式也不同：
+
+```python
+class MyDemoClass(object):
+    def __init__(self):
+        print("special.")
+
+    def _get_name(self):
+        print("_get_name is private method.")
+
+    def get_value(self):
+        print("get_value is public method.")
+
+    def __get_type(self):
+        print("__get_type is really special method.")
+```
+
+```python
+demo = MyDemoClass()
+
+```
+
+```python
+demo.get_value()
+demo._get_name()
+demo._MyDemoClass__get_type()
+```
+
+### 文件
+
+#### 写文件
+
+我们使用 open 函数的写入模式来写文件：
+
+```python
+f = open('test.txt', 'w')
+f.write('hello world.')
+f.close()
+```
+
+```python
+print(open('test.txt').read())
+```
+
+使用 w 模式时，如果文件不存在会被创建
+
+除了写入模式，还有追加模式 a
+
+读写模式w+
+
+```python
+f = open('test.txt', 'w+')
+f.write('hello world. morning.')
+f.seek(3)
+print(f.read())  # hello world.
+f.close()
+```
+
+#### 读文件
+
+使用 open 函数 来读文件，使用文件名的字符串作为输入参数：
+
+默认打开文件是 ‘r’ 读模式
+
+```python
+f = open("test.txt")
+
+# 默认以读的方式打开文件，如果文件不存在会报错。
+# 可以使用 read 方法来读入文件中的所有内容：
+text = f.read()
+print(text)
+```
+
+按照行读入内容，readlines 方法返回一个列表，每个元素代表文件中每一行的内容：
+
+```python
+f = open("test.txt")
+lines = f.readlines()
+print(lines)
+f.close()
+```
+
+```python
+# 事实上，我们可以将 f 放在一个循环中，得到它每一行的内容：
+f = open('test.txt')
+for line in f:
+    print(line)
+f.close()
+```
+
+#### 上下文管理器
+
+```python
+with open('my_file.txt', 'w') as fp:
+    data = fp.write("Hello world")
+```
+
+这等效于下面的代码，但是要更简便：
+
+```python
+fp = open('my_file.txt', 'w')
+try:
+    # do stuff with f
+    data = fp.write("Hello world")
+finally:
+    fp.close()
+```
+
+#### 自定义上下文管理器
+
+比如可以这样定义一个简单的上下文管理器：
+
+```python
+class ContextManager(object):
+    def __enter__(self):
+        print("Entering")
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+
+with ContextManager():
+    print("inside operate")
+```
+
+#### **enter** 的返回值
+
+如果在 **enter** 方法下添加了返回值，
+
+那么我们可以使用 as 把这个返回值传给某个参数：
+
+```python
+class ContextManager2(object):
+    def __enter__(self):
+        print("Entering")
+        return "my value"
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+
+with ContextManager2() as val:
+    print(val)
+
+```
+
+一个通常的做法是将 **enter** 的返回值设为这个上下文管理器对象本身，
+文件对象就是这样做的.
+
+```python
+class ContextManager3(object):
+    def __enter__(self):
+        print("Entering")
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+```
+
+#### 错误处理
+
+上下文管理器对象将错误处理交给 **exit** 进行，可以将错误类型，
+错误值和 traceback 等内容作为参数传递给 **exit** 函数：
+
+```python
+class ContextManager4(object):
+    def __enter__(self):
+        print("Entering")
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+        if exc_type is not None:
+            print("  Exception:", exc_value)
+            return True  # 不想让错误抛出，只需要将 __exit__ 的返回值设为 True
+
+
+with ContextManager4():
+    print(1 / 0)
+
+```
+
+```python
+import os
+os.remove('my_file.txt')
+```
+
+#### 二进制文件
+
+二进制读写模式 b：
+
+```python
+import os
+
+f = open('binary.bin', 'wb')
+f.write(os.urandom(10))
+f.close()
+```
+
+```python
+f = open('binary.bin', 'rb')
+print(repr(f.read()))
+f.close()
+```
+
+#### with 方法
+
+事实上，Python提供了更安全的方法，当 with 块的内容结束后，
+Python会自动调用它的close 方法，确保读写的安全：
+
+```python
+with open('new_file.txt', 'w') as f:
+    for i in range(3000):
+        x = 1.0 / (i - 1000)
+        f.write('hello world: ' + str(i) + '\n')
+```
+
+与 try/exception/finally 效果相同，但更简单。
+
+查看文件写的结果，虽然触发error，但已经写的内容是成功的。
+
+```python
+!tail new_file.txt
+```
+
+```python
+!wc -l new_file.txt
+```
+
+```python
+# 删除文件：
+import os
+os.remove('test.txt')
+os.remove('binary.bin')
+os.remove('new_file.txt')
+```
+
+### 异常
+
+#### try & except 块
+
+捕捉不同的错误类型，尝试在下面输入框输入：-1，1，2，q
+
+```python
+import math
+
+while True:
+    try:
+        text = input('>')
+        if text[0] == 'q':
+            break
+        x = float(text)
+        y = 1 / math.log10(x)
+        print("1/log10({0}) = {1}".format(x, y))
+    except ValueError:
+        print("value must bigger than 0")
+    except ZeroDivisionError:
+        print("the value must not be 1")
+
+```
+
+#### 自定义异常
+
+异常是标准库中的类，这意味着我们可以自定义异常类：
+
+尝试在文本输入框输入：k，start，q
+
+```python
+class CommandError(ValueError):
+    print("bad command operation. must input 'start', 'stop', 'pause'")
+    
+
+
+valid_commands = {'start', 'stop', 'pause'}
+while True:
+    command = input('>')
+    if command == 'q':
+        break
+    try:
+        if command.lower() not in valid_commands:
+            raise CommandError('Invalid command: %s' % command)
+        print('input command:', command)
+    except CommandError:
+        print("bad command string: %s" % command)
+
+```
+
+#### finally
+
+try/catch 块还有一个可选的关键词 finally。
+
+不管 try 块有没有异常， finally 块的内容总是会被执行，
+而且会在抛出异常前执行，因此可以用来作为安全保证，
+
+比如文件操作时，常在finally关闭文件。
+
+```python
+try:
+    print(1 / 0)
+except ZeroDivisionError:
+    print('divide by 0.')
+finally:
+    print('finally was called.')
+```
+
+### 装饰器
 
 如果你有一批变量想统一按一个规则处理，并且需要缩减代码，你需要函数。
 
@@ -1355,8 +3074,6 @@ except RuntimeError as e:
     print('run time err.')
 ```
 
-## 生成器和迭代器
-
 ### 迭代器
 
 迭代是Python最强大的功能之一，是访问集合元素的一种方式。
@@ -1471,7 +3188,7 @@ for x in Collatz(5):
 
 ```
 
-不过迭代器对象存在状态，__有问题__：
+不过迭代器对象存在状态，**有问题**：
 
 ```python
 i = Collatz(5)
@@ -1697,9 +3414,7 @@ print(list(g2(5)))
 
 返回值的不同：__new__方法会返回一个创建的实例,而__init__什么都不返回
 
-### 闭包
-
-#### 闭包作用
+#### 闭包
 
 闭包可以用在许多地方。它的最大用处有两个：
 
@@ -1772,7 +3487,7 @@ print(p())
 print(name)
 ```
 
-### 单例模式
+#### 单例模式
 
 单例模式就是确保一个类只有一个实例.当你希望整个系统中,某个类只有一个实例时,单例模式就派上了用场.
 
@@ -1817,8 +3532,6 @@ s2 = Single()
 print(id(s1))
 print(id(s2))
 ```
-
-## 进程、线程和协程
 
 ### 进程
 
@@ -2147,15 +3860,15 @@ test()
 
 在Python创建协程时，task是future的子类，所以task继承了future的属性和方法。几乎没有不同。
 
-## Python库的使用
+### Python内置库的使用
 
 库、包、模块的包含关系为：多个模块组成为包、多个包组成为库。
 
 在实际开发中不做严格区分。
 
-### 内置库os
+Python标准库：Python内置的库，不需要安装，直接导入即可使用。
 
-Python的内置os模块，是与操作系统进行交互的模块，主要有如下功能：
+以Python的内置os模块为例，是与操作系统进行交互的模块，主要有如下功能：
 
 #### 文件路径操作
 

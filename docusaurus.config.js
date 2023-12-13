@@ -139,11 +139,7 @@ const config = {
           //   position: 'left',
           //   label: 'Start',
           // },
-          {
-            href: 'https://github.com/jiangmiemie',
-            className: 'github',
-            position: 'right',
-          },
+
           {
             to: "/docs",
             position: 'left',
@@ -177,6 +173,11 @@ const config = {
                 to: "/sheets/tags",
               },
             ]
+          },
+          {
+            href: 'https://github.com/jiangmiemie',
+            className: 'github',
+            position: 'right',
           },
         ],
       },
