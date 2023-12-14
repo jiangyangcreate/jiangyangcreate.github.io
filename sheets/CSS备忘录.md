@@ -22,11 +22,11 @@ title: CSS备忘录
 
 :: 前缀 表示伪元素（::before ）
 
-[伪类和伪元素说明](https://developer.mozilla.org/zh-CN/docs/Learn/CSS/Building_blocks/Selectors/Pseudo-classes_and_pseudo-elements)
+`[伪类和伪元素说明](https://developer.mozilla.org/zh-CN/docs/Learn/CSS/Building_blocks/Selectors/Pseudo-classes_and_pseudo-elements)`
 
 ## 结构
 
 盒模型主要定义四个区域，从内到外：内容(content)、内边距填充物(padding)、边框(border)和外边距(margin)。
 
 按钮、日期等输入类的样式，都是input标签下使用不同属性得到的
-<https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input>
+[https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input](https://developer.mozilla.org/zh-CN/docs/Web/HTML/Element/input)

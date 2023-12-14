@@ -5,7 +5,7 @@ title: Python分发程序
 
 ## 封装程序为可执行文件
 
-官方文档：<https://www.pyinstaller.org/>
+官方文档：[https://www.pyinstaller.org/](https://www.pyinstaller.org/)
 
 命令行：
 
@@ -22,7 +22,7 @@ pyinstaller -F -i app.ico app.py --add-data="C:\mediapipe\modules;mediapipe/modu
 
 ## 构建包
 
-Python构建包的官方文档：<https://packaging.python.org/tutorials/packaging-projects/>
+Python构建包的官方文档：[https://packaging.python.org/tutorials/packaging-projects/](https://packaging.python.org/tutorials/packaging-projects/)
 
 ``` bash
 配置pyproject.toml、setup.py、LICENSE、README.md

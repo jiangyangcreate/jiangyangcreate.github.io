@@ -111,8 +111,7 @@ deb-src http://mirrors.aliyun.com/debian-security/ buster/updates main non-free 
 sudo apt-get update
 ```
 
-参考链接：
-<https://www.cnblogs.com/liqi175/p/16788629.html>
+参考链接：[https://www.cnblogs.com/liqi175/p/16788629.html](https://www.cnblogs.com/liqi175/p/16788629.html)
 
 ### 2.安装中文
 

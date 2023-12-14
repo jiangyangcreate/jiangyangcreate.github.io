@@ -1,8 +1,10 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const lightCodeTheme = require('prism-react-renderer').themes.github;
+const darkCodeTheme = require('prism-react-renderer').themes.dracula;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -49,6 +51,9 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          path: "docs",
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [rehypeKatex],
           routeBasePath: 'docs',
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
@@ -59,6 +64,8 @@ const config = {
 
         blog: {
           path: "blog",
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [rehypeKatex],
           routeBasePath: "blog",
           showReadingTime: true,
           postsPerPage: 'ALL',
@@ -90,6 +97,8 @@ const config = {
       {
         id: "read",
         path: "read",
+        remarkPlugins: [remarkMath],
+        rehypePlugins: [rehypeKatex],
         routeBasePath: "read",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl:
@@ -101,12 +110,23 @@ const config = {
       {
         id: "sheets",
         path: "sheets",
+        remarkPlugins: [remarkMath],
+        rehypePlugins: [rehypeKatex],
         routeBasePath: "sheets",
         sidebarPath: require.resolve("./sidebars.js"),
         editUrl:
           'https://github.com/jiangmiemie/blog/blob/master',
       },
     ],
+  ],
+  stylesheets: [
+    {
+      href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
+      type: 'text/css',
+      integrity:
+        'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
+      crossorigin: 'anonymous',
+    },
   ],
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
