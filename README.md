@@ -38,3 +38,5 @@
       },`需要自己申请获得对应信息，[点击申请](https://docsearch.algolia.com/apply/)。通常需要2天左右的时间。
 
 - 更多配置或自动抓取设置，可参见[https://crawler.algolia.com/admin/crawlers/](https://crawler.algolia.com/admin/crawlers/)
+
+- 如需更新插件，请使用`npm update`
