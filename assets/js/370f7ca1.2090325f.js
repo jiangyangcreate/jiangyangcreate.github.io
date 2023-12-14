@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkjiangmiemie=self.webpackChunkjiangmiemie||[]).push([[5031],{9366:e=>{e.exports=JSON.parse('{"label":"\u68a6","permalink":"/blog/tags/\u68a6","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
