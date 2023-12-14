@@ -11,7 +11,7 @@ const config = {
   title: 'Jiangmiemie',
   tagline: '真实的记录自己，比获得他人的认同感更重要',
   favicon: 'img/favicon.ico',
-
+  trailingSlash: true,
   // Set the production url of your site here
   url: 'https://jiangmiemie.com',
   // Set the /<baseUrl>/ pathname under which your site is served
