@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://jiangmiemie.com/blog</id>
-    <title>Jiangmiemie Blog</title>
+    <title>jiangmiemie Blog</title>
     <updated>2023-12-30T00:00:00.000Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://jiangmiemie.com/blog"/>
-    <subtitle>Jiangmiemie Blog</subtitle>
+    <subtitle>jiangmiemie Blog</subtitle>
     <icon>https://jiangmiemie.com/img/favicon.ico</icon>
     <rights>Copyright © 2023 jiangmiemie</rights>
     <entry>

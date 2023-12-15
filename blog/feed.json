@@ -1,8 +1,8 @@
 {
     "version": "https://jsonfeed.org/version/1",
-    "title": "Jiangmiemie Blog",
+    "title": "jiangmiemie Blog",
     "home_page_url": "https://jiangmiemie.com/blog",
-    "description": "Jiangmiemie Blog",
+    "description": "jiangmiemie Blog",
     "items": [
         {
             "id": "https://jiangmiemie.com/blog/travellings2023",
