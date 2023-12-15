@@ -1,8 +1,11 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
+
+// 导入公式渲染模块remark-math和rehype-katex
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 
+// 设置明暗模式
 const lightCodeTheme = require('prism-react-renderer').themes.github;
 const darkCodeTheme = require('prism-react-renderer').themes.dracula;
 
@@ -11,24 +14,16 @@ const config = {
   title: 'Jiangmiemie',
   tagline: '真实的记录自己，比获得他人的认同感更重要',
   favicon: 'img/favicon.ico',
-  trailingSlash: true,
-  // Set the production url of your site here
   url: 'https://jiangmiemie.com',
-  // Set the /<baseUrl>/ pathname under which your site is served
-  // For GitHub pages deployment, it is often '/<projectName>/'
   baseUrl: '/',
-
-  // GitHub pages deployment config.
-  // If you aren't using GitHub pages, you don't need these.
   organizationName: 'jiangmiemie', // Usually your GitHub org/user name.
-  projectName: 'DocusaurusBlog', // Usually your repo name.
+  projectName: 'blog', // Usually your repo name.
   deploymentBranch: 'gh-pages',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
+  // set trailingSlash: true 可以让 algolia 抓取更完整
+  trailingSlash: true,
 
-  // Even if you don't use internalization, you can use this field to set useful
-  // metadata like html lang. For example, if your site is Chinese, you may want
-  // to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'zh-Hans',
     locales: ['zh-Hans'],
@@ -64,6 +59,7 @@ const config = {
 
         blog: {
           path: "blog",
+          blogPostComponent: '@theme/BlogPostPage',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
           routeBasePath: "blog",
@@ -89,6 +85,42 @@ const config = {
           customCss: require.resolve('./src/css/custom.css'),
         },
       }),
+      
+    ],
+    [
+      '@docusaurus/plugin-pwa',
+      {
+        debug: true,
+        offlineModeActivationStrategies: [
+          'appInstalled',
+          'standalone',
+          'queryString',
+        ],
+        pwaHead: [
+          {
+            tagName: 'link',
+            rel: 'icon',
+            href: '/img/docusaurus.png',
+          },
+          {
+            tagName: 'link',
+            rel: 'manifest',
+            href: '/manifest.json', // your PWA manifest
+          },
+          {
+            tagName: 'meta',
+            name: 'theme-color',
+            content: 'rgb(37, 194, 160)',
+          },
+        ],
+      },
+    ],
+    [
+      '@docusaurus/plugin-google-gtag',
+      {
+        trackingID: 'G-4GF73PJ1H7',
+        anonymizeIP: true,
+      },
     ],
   ],
   plugins: [
@@ -119,15 +151,7 @@ const config = {
       },
     ],
   ],
-  stylesheets: [
-    {
-      href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
-      type: 'text/css',
-      integrity:
-        'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
-      crossorigin: 'anonymous',
-    },
-  ],
+
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
@@ -143,32 +167,30 @@ const config = {
           content: 'blog, javascript, python',
         },
       ],
+      //全局索引插件
       algolia: {
         appId: 'B8DUWB4CMX',
         apiKey: '36cbcb8eb4d417b32200be7e427d68fd',
         indexName: 'jiangmiemie',
+      },
+      //评论插件
+      giscus: {
+        repo: 'jiangmiemie/blog',
+        repoId: 'R_kgDOKVhfrw',
+        category: 'General',
+        categoryId: 'DIC_kwDOKVhfr84CbuxE',
+        theme: 'light',
+        darkTheme: 'dark',
       },
       navbar: {
         title: '首页',
         hideOnScroll: true,
 
         items: [
-          // {
-          //   type: 'docSidebar',
-          //   sidebarId: 'tutorialSidebar',
-          //   position: 'left',
-          //   label: 'Start',
-          // },
-
           {
             to: "/docs",
             position: 'left',
             label: '全栈',
-          },
-          {
-            to: "/project",
-            position: 'left',
-            label: '项目',
           },
           {
             to: "/read",
@@ -179,6 +201,11 @@ const config = {
             to: "/blog",
             position: 'left',
             label: '博客',
+          },
+          {
+            to: "/message",
+            position: 'left',
+            label: '留言',
           },
           {
             position: 'left',
@@ -194,14 +221,9 @@ const config = {
               },
             ]
           },
-          {
-            href: 'https://github.com/jiangmiemie',
-            className: 'github',
-            position: 'right',
-          },
         ],
       },
-
+      //自定义配置底部的版权说明与SVG图超链接
       footer: {
         style: 'light',
         copyright: `
@@ -291,20 +313,32 @@ const config = {
           </div> 
         `,
       },
+      //配置标准的明暗主题
       prism: {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
         defaultLanguage: "markdown",
       },
+      // 告示条
       announcementBar: {
         id: 'support_us',
         content:
           '🚀 如果你觉得还不错, 就给一个<a target="_blank" rel="noopener noreferrer" href="https://github.com/jiangmiemie/blog"  aria-label="star on github "> star </a>吧 ~',
         backgroundColor: '#fafbfc',
         textColor: '#091E42',
-        isCloseable: false,
+        isCloseable: true,//允许用户关闭
       },
     }),
+  //用于与katex配合获得更好的公式渲染效果
+  stylesheets: [
+    {
+      href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
+      type: 'text/css',
+      integrity:
+        'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
+      crossorigin: 'anonymous',
+    },
+  ],
 };
 
 module.exports = config;

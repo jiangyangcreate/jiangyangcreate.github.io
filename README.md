@@ -16,40 +16,32 @@
 
 基于这样的设计理念，我做了这样的一个小而美的个人博客站点：点击查看[网站分析](https://pagespeed.web.dev/)
 
-## 优点
+## 框架
 
-- 长期维护，基于docusaurus构建，定期维护。
-- 增减有度，没有盲目添加国际化、多版本等不易使用的功能。
-- 公式插件，支持latex语法。让你写数学公式更加方便。
-- 代码插件，支持多种语言的代码高亮。让你的代码更加美观。
-- 全局搜索，支持站内搜索。让你快速找到你想要的内容。
-- 黑白模式，支持黑白模式切换。让你的眼睛更加舒适。
+基于[Docusaurus 3.0](https://docusaurus.io/)构建的个人博客站点，部分语法与Docusaurus 2.0不兼容，需要注意。
+
+灵感来源于[Docusaurus Site Showcase](https://docusaurus.io/showcase)，选取了其中有意思的设计，进行了一些修改，最终完成了这个站点。以下是一切功能的取舍:
+
+### 保留
+
+- 明暗模式，可以在页面右上角切换。
+- announcementBar公告栏，可以在首页设置一个公告。
+- katex公式插件，支持latex语法。让你写数学公式更加方便。
+- algolia全局搜索，支持站内搜索。让你快速找到你想要的内容。
+- giscus，可以在指定页面下方评论，支持github账号登录。让你与作者交流。
+- googlegtag谷歌分析，可以查看你的网站访问情况。
+- pwa，支持离线访问。安装后，让你在没有网络的飞机上也能浏览本站。
+- rss，支持博客的rss订阅。访问[RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
+
+### 舍弃
+
+- i8n 只做导航栏的中英文切换不够优雅，全文双语又没有足够的精力。
+- versioning 没有足够的精力
 
 ## 快速重现
 
-如果你想基于这个模式构建你自己的站点
-
-确保 "node": ">=18.0"
-
-命令行:
+`npm update`更新插件
 
 `npm install`下载所需的依赖包
 
 `npm run start`启动站点
-
-### 配置
-
-当然这里面有一些配置是需要你自己修改的，譬如：
-
-- `docusaurus.config.js`中所有指向的站点
-
-- `docusaurus.config.js`中的`
-      algolia: {
-        appId: '****',
-        apiKey: '****',
-        indexName: '****',
-      },`需要自己申请获得对应信息，[点击申请](https://docsearch.algolia.com/apply/)。通常需要2天左右的时间。
-
-- 更多配置或自动抓取设置，可参见[https://crawler.algolia.com/admin/crawlers/](https://crawler.algolia.com/admin/crawlers/)
-
-- 如需更新插件，请使用`npm update`
