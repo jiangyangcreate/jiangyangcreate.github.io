@@ -9,14 +9,22 @@ import rehypeKatex from 'rehype-katex';
 const lightCodeTheme = require('prism-react-renderer').themes.github;
 const darkCodeTheme = require('prism-react-renderer').themes.dracula;
 
+// 用户自定义
+const websitename = 'jiangmiemie';
+const websiteurl = 'https://jiangmiemie.com';
+const githuburl = 'https://github.com/jiangmiemie';
+const githuborgurl = 'https://github.com/jiangmiemie/blog';
+const editUrl = 'https://github.com/jiangmiemie/blog/blob/master';
+const email = 'jiangyangcreate@gmail.com';
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Jiangmiemie',
+  title: websitename,
   tagline: '真实的记录自己，比获得他人的认同感更重要',
   favicon: 'img/favicon.ico',
-  url: 'https://jiangmiemie.com',
+  url: websiteurl ,
   baseUrl: '/',
-  organizationName: 'jiangmiemie', // Usually your GitHub org/user name.
+  organizationName: websitename, // Usually your GitHub org/user name.
   projectName: 'blog', // Usually your repo name.
   deploymentBranch: 'gh-pages',
   onBrokenLinks: 'throw',
@@ -53,8 +61,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:
-            'https://github.com/jiangmiemie/blog/blob/master',
+          editUrl:editUrl,
         },
 
         blog: {
@@ -66,11 +73,10 @@ const config = {
           showReadingTime: true,
           postsPerPage: 'ALL',
           blogSidebarCount: 'ALL',
-          editUrl:
-            'https://github.com/jiangmiemie/blog/blob/master',
+          editUrl:editUrl,
           feedOptions: {
             type: 'all',
-            copyright: `Copyright © ${new Date().getFullYear()} jiangmiemie`,
+            copyright: `Copyright © ${new Date().getFullYear()} ${websitename}`,
             createFeedItems: async (params) => {
               const { blogPosts, defaultCreateFeedItems, ...rest } = params;
               return defaultCreateFeedItems({
@@ -134,8 +140,7 @@ const config = {
         rehypePlugins: [rehypeKatex],
         routeBasePath: "read",
         sidebarPath: require.resolve("./sidebars.js"),
-        editUrl:
-          'https://github.com/jiangmiemie/blog/blob/master',
+        editUrl:editUrl,
       },
     ],
     [
@@ -147,8 +152,7 @@ const config = {
         rehypePlugins: [rehypeKatex],
         routeBasePath: "sheets",
         sidebarPath: require.resolve("./sidebars.js"),
-        editUrl:
-          'https://github.com/jiangmiemie/blog/blob/master',
+        editUrl:editUrl,
       },
     ],
   ],
@@ -157,11 +161,11 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.jpg',
+      image: 'img/docusaurus-social-card.png',
       metadata: [
         {
           name: 'keywords',
-          content: 'jiangmiemie',
+          content: websitename,
         },
         {
           name: 'keywords',
@@ -172,11 +176,11 @@ const config = {
       algolia: {
         appId: 'B8DUWB4CMX',
         apiKey: '36cbcb8eb4d417b32200be7e427d68fd',
-        indexName: 'jiangmiemie',
+        indexName: websitename,
       },
       //评论插件
       giscus: {
-        repo: 'jiangmiemie/blog',
+        repo: `${websitename}/blog`,
         repoId: 'R_kgDOKVhfrw',
         category: 'General',
         categoryId: 'DIC_kwDOKVhfr84CbuxE',
@@ -233,10 +237,10 @@ const config = {
               <a href="https://web.archive.org/web/20230609185132/https://creativecommons.org/licenses/by-nc-sa/4.0/">
                 <strong>CC BY-NC-SA 4.0 </strong>
               </a> 
-              <br> 2020-${new Date().getFullYear()}  ©  jiangmiemie
+              <br> 2020-${new Date().getFullYear()}  ©  ${websitename}
             </div>
             <p class="logoxs">
-            <a class="logox" target="_blank" rel="noopener noreferrer" href="https://github.com/jiangmiemie" aria-label="go to my github">
+            <a class="logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
             <svg version="1.0" xmlns="http://www.w3.org/2000/svg" clip-path="inset(0% round 15px)" width="30px" height="30px" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
               <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
               fill="#000000" stroke="none">
@@ -300,7 +304,7 @@ const config = {
               </svg>
             </a>
 
-           <a class="logox" target="_blank" rel="noopener noreferrer" href="mailto:jiangyangcreate@gmail.com" aria-label="go to send email">
+           <a class="logox" target="_blank" rel="noopener noreferrer" href="mailto:${email}" aria-label="go to send email">
             <svg version="1.0" xmlns="http://www.w3.org/2000/svg"
             clip-path="inset(0% round 15px)" width="30px" height="30px" viewBox="0 0 1024.000000 1024.000000"
             preserveAspectRatio="xMidYMid meet">
@@ -324,7 +328,7 @@ const config = {
       announcementBar: {
         id: 'support_us',
         content:
-          '🚀 如果你觉得还不错, 就给一个<a target="_blank" rel="noopener noreferrer" href="https://github.com/jiangmiemie/blog"  aria-label="star on github "> star </a>吧 ~',
+        `🚀 如果你觉得还不错, 就给一个<a target="_blank" rel="noopener noreferrer" href="${githuborgurl}"  aria-label="star on github "> star </a>吧 ~`,
         backgroundColor: '#fafbfc',
         textColor: '#091E42',
         isCloseable: true,//允许用户关闭
