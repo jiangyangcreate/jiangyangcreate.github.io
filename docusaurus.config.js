@@ -84,9 +84,11 @@ const config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-      }),
-      
-    ],
+      }), 
+    ]
+  ],
+  plugins: [
+    //pwa
     [
       '@docusaurus/plugin-pwa',
       {
@@ -115,6 +117,7 @@ const config = {
         ],
       },
     ],
+    //谷歌分析框架
     [
       '@docusaurus/plugin-google-gtag',
       {
@@ -122,8 +125,6 @@ const config = {
         anonymizeIP: true,
       },
     ],
-  ],
-  plugins: [
     [
       "@docusaurus/plugin-content-docs",
       {
