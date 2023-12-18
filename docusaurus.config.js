@@ -10,13 +10,15 @@ const lightCodeTheme = require('prism-react-renderer').themes.github;
 const darkCodeTheme = require('prism-react-renderer').themes.dracula;
 
 // 用户自定义
+const email = 'jiangyangcreate@gmail.com';
 const websitename = 'jiangmiemie';
 const websiteurl = 'https://jiangmiemie.com';
-const githuburl = 'https://github.com/jiangyangcreate';
-const githuborgurl = 'https://github.com/jiangyangcreate/jiangyangcreate.github.io';
-const editUrl = `${githuborgurl}/blob/main`;
-const email = 'jiangyangcreate@gmail.com';
+const githubusername = 'jiangyangcreate';
+const githubuserRepository = 'jiangyangcreate.github.io';
 
+const githuburl = `https://github.com/${githubusername}`;
+const githuborgurl = `https://github.com/${githubusername}/${githubuserRepository}`;
+const editUrl = `${githuborgurl}/blob/main`;
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: websitename,
@@ -180,10 +182,10 @@ const config = {
       },
       //评论插件
       giscus: {
-        repo: `${websitename}/blog`,
+        repo: `${githubusername}/${githubuserRepository}`,
         repoId: 'R_kgDOKVhfrw',
-        category: 'General',
-        categoryId: 'DIC_kwDOKVhfr84CbuxE',
+        category: 'Announcements',
+        categoryId: 'DIC_kwDOKVhfr84CbuxD',
         theme: 'light',
         darkTheme: 'dark',
       },
