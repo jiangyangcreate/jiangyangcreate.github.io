@@ -12,9 +12,9 @@ const darkCodeTheme = require('prism-react-renderer').themes.dracula;
 // 用户自定义
 const websitename = 'jiangmiemie';
 const websiteurl = 'https://jiangmiemie.com';
-const githuburl = 'https://github.com/jiangmiemie';
-const githuborgurl = 'https://github.com/jiangmiemie/blog';
-const editUrl = 'https://github.com/jiangmiemie/blog/blob/master';
+const githuburl = 'https://github.com/jiangyangcreate';
+const githuborgurl = 'https://github.com/jiangyangcreate/jiangyangcreate.github.io';
+const editUrl = `${githuborgurl}/blob/main`;
 const email = 'jiangyangcreate@gmail.com';
 
 /** @type {import('@docusaurus/types').Config} */
