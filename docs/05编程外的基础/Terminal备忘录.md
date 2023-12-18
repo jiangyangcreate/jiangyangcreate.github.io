@@ -1,6 +1,6 @@
 ---
-sidebar_position: 2
-title: Terminal命令备忘录
+sidebar_position: 4
+title: Terminal备忘录
 ---
 查看端口号占用情况
 

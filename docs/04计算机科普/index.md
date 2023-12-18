@@ -1,13 +1,9 @@
 ---
-slug: /
-sidebar_position: 1
-title: 网络与计算机概述
+sidebar_position: 0
+title: 计算机科普
 ---
 
-
-# 网络与计算机
-
-本章是根据中国和美国的大学课程编写的。它旨在帮助完成计算机的基本知识：互联网的工作原理、计算机的发展历史、C语言、数据结构、操作系统、计算机网络和计算机组成原理。
+本章是根据中国和美国的大学课程编写的。它旨在帮助完成计算机的基本知识：互联网的工作原理、计算机的发展历史、数据结构、操作系统、计算机网络和计算机组成原理。
 
 ## 互联网如何运作
 
@@ -22,12 +18,6 @@ title: 网络与计算机概述
 在40集的节目中，卡丽-安妮-菲尔宾教你计算机科学! 本课程基于大学的入门材料以及计算机科学原理指南。
 
 <iframe src="https://www.youtube.com/embed/tpIctyqH29Q?list=PL8dPuuaLjXtNlUrzyH5r6jN9ulIgZBpdo" width="100%" height="360" frameborder="no" scrolling="no" allowfullscreen="allowfullscreen"> </iframe>
-
-## C
-
-C语言是用于与计算机交流的高级语言之一。它是中国主要大学计算机学院的必修课程，也是最适合了解编程的语言。
-
-<iframe src="//player.bilibili.com/player.html?aid=988760039&bvid=BV1Y44y1U7gY&cid=924878325&page=1&danmaku=0"  allowfullscreen="allowfullscreen" width="100%" height="500" scrolling="no" frameborder="0" sandbox="allow-top-navigation allow-same-origin allow-forms allow-scripts"></iframe>
 
 ## 数据结构
 
