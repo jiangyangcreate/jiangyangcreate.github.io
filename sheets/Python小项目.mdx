@@ -995,3 +995,216 @@ if __name__ == '__main__':
     ip_host2 = '0.0.0.0'# 内网ip地址
     app.run(threaded=True, host=ip_host2, port=80)
 ````
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## 实时分类器
+
+### 描述
+
+KNN算法先记录所有已知数据，再利用一个距离函数，找出已知数据中距离未知事件最近的K组数据，最后按照这K组数据里最常见的类别预测该事件。可以解决分类问题。
+
+请编写一段程序读取用户的摄像头，让用户通过按键或点击的方式实时训练并查看当前摄像头的预测结果。
+
+### 题解
+
+<Tabs>
+  <TabItem value="JS" label="JS" default>
+
+新建`.html`并将下方代码复制进去，在联网环境下用先进的浏览器打开。
+
+1. 等待模型加载（加载完成后会提示使用摄像头）
+
+2. 点击Add A则获取当前摄像头截图加入A训练集
+
+3. 以此类推添加B、C训练集
+
+4. 观察屏幕输出的预测结果
+
+``` html
+
+<html><head>
+    <!-- Load the latest version of TensorFlow.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/knn-classifier"></script>
+</head>
+
+<body>
+    <div style="text-align:center">
+        <div id="console"></div>
+        <!-- Add an image that we will use to test -->
+        <video autoplay="" playsinline="" muted="" id="webcam" width="224" height="224"></video>
+        <br>
+        <button id="class-a">Add A</button>
+        <button id="class-b">Add B</button>
+        <button id="class-c">Add C</button>
+    </div>
+    <script>
+        const classifier = knnClassifier.create();
+        const webcamElement = document.getElementById('webcam');
+
+        async function app() {
+            console.log('Loading mobilenet..');
+
+            // Load the model.
+            net = await mobilenet.load();
+            console.log('Successfully loaded model');
+
+            // Create an object from Tensorflow.js data API which could capture image
+            // from the web camera as Tensor.
+            const webcam = await tf.data.webcam(webcamElement);
+
+            // Reads an image from the webcam and associates it with a specific class
+            // index.
+            const addExample = async classId => {
+                // Capture an image from the web camera.
+                const img = await webcam.capture();
+
+                // Get the intermediate activation of MobileNet 'conv_preds' and pass that
+                // to the KNN classifier.
+                const activation = net.infer(img, true);
+
+                // Pass the intermediate activation to the classifier.
+                classifier.addExample(activation, classId);
+
+                // Dispose the tensor to release the memory.
+                img.dispose();
+            };
+
+            // When clicking a button, add an example for that class.
+            document.getElementById('class-a').addEventListener('click', () => addExample(0));
+            document.getElementById('class-b').addEventListener('click', () => addExample(1));
+            document.getElementById('class-c').addEventListener('click', () => addExample(2));
+
+            while (true) {
+                if (classifier.getNumClasses() > 0) {
+                    const img = await webcam.capture();
+
+                    // Get the activation from mobilenet from the webcam.
+                    const activation = net.infer(img, 'conv_preds');
+                    // Get the most likely class and confidence from the classifier module.
+                    const result = await classifier.predictClass(activation);
+
+                    const classes = ['A', 'B', 'C'];
+                    document.getElementById('console').innerText = `
+    prediction: ${classes[result.label]}\n
+    probability: ${result.confidences[result.label]}
+    `;
+
+                    // Dispose the tensor to release the memory.
+                    img.dispose();
+                }
+
+                await tf.nextFrame();
+            }
+        }
+
+        app();
+    </script>
+
+
+</body></html>
+
+```
+
+  </TabItem>
+  <TabItem value="Python" label="Python">
+
+新建`.py`并将下方代码复制进去，确保已经安装好了下方的模块库。
+
+```bash
+pip install opencv-python
+pip install tensorflow
+```
+
+1. 等待模型加载（加载完成后会弹出摄像头）
+
+2. 按下键盘的A则获取当前摄像头截图加入A训练集
+
+3. 以此类推添加B、C训练集
+
+4. 观察屏幕输出的预测结果
+
+```python
+import cv2
+import tensorflow as tf
+from tensorflow.keras.applications import MobileNet
+from tensorflow.keras.preprocessing import image
+from tensorflow.keras.applications.mobilenet import preprocess_input
+from tensorflow.keras.models import Model
+import numpy as np
+
+
+class KNNClassifier:
+    def __init__(self):
+        self.examples = {"A": [], "B": [], "C": []}
+
+    def add_example(self, activation, class_id):
+        self.examples[class_id].append(activation)
+
+    def predict_class(self, activation):
+        distances = {}
+        for class_id, examples in self.examples.items():
+            distances[class_id] = np.mean(
+                [np.linalg.norm(act - activation) for act in examples]
+            )
+
+        predicted_class = min(distances, key=distances.get)
+        confidence = 1 / (1 + distances[predicted_class])
+        return predicted_class, confidence
+
+
+def main():
+    classifier = KNNClassifier()
+    webcam = cv2.VideoCapture(0)
+
+    print("Loading MobileNet...")
+    # Load the MobileNet model.
+    base_model = tf.keras.applications.MobileNet(weights="imagenet")
+    model = Model(
+        inputs=base_model.input, outputs=base_model.get_layer("conv_preds").output
+    )
+
+    print("Successfully loaded model")
+
+    classes = ["A", "B", "C"]
+
+    while True:
+        ret, frame = webcam.read()
+        frame = cv2.resize(frame, (224, 224))
+        img = image.img_to_array(frame)
+        img = np.expand_dims(img, axis=0)
+        img = preprocess_input(img)
+
+        activation = model.predict(img)
+
+        key = cv2.waitKey(1)
+        if key == ord("a"):
+            classifier.add_example(activation, "A")
+        elif key == ord("b"):
+            classifier.add_example(activation, "B")
+        elif key == ord("c"):
+            classifier.add_example(activation, "C")
+
+        if len(classifier.examples["A"]) > 0:
+            predicted_class, confidence = classifier.predict_class(activation)
+            print(f"Prediction: {predicted_class}, Confidence: {confidence}")
+
+        cv2.imshow("Webcam", frame)
+
+        if key == 27:  # ESC key to break from the loop
+            break
+
+    webcam.release()
+    cv2.destroyAllWindows()
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
+  </TabItem>
+</Tabs>
