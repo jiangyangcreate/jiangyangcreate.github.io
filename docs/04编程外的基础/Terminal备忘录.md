@@ -16,6 +16,11 @@ lsof -i:端口号
 kill -9 $(lsof -i tcp:6022 -t)
 ```
 
+后台运行程序(以fast_api.py为例)
+``` bash
+nohup python3 fast_api.py &
+```
+
 查看内存/显示系统当前进程信息
 
 ``` bash

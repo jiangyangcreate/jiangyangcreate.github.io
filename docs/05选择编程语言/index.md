@@ -1,5 +1,4 @@
 ---
-slug: /
 sidebar_position: 1
 title: 选择编程语言概述
 ---

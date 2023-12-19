@@ -5,7 +5,7 @@ title: 编程外的基础概述
 
 # 编程外的基础
 
-常识涵盖编程学习过程中可能遇到的知识，如Markdown、YAML、Terminal、Git等。
+常识涵盖编程学习过程中可能遇到的知识，如Markdown、YAML、Terminal、Git等。即便不学习编程，这部分知识也可以帮助你更好的使用一些程序员创造的工具。
 
 ## Markdown
 
@@ -19,13 +19,19 @@ Markdown 语法丰富，但大部分不完整，缺乏有效的长期示例。 �
 
 ## YAML
 
-YAML Ain't Markup Language（但它确实看起来像）
+Yet Another Markup Language（仍是一种标记语言）
 
 YAML在github/docker等程序员工具被广泛用于定义配置文件，非常简单也很有必要学习。
+
+YAML 的配置文件后缀为 .yml，如：abc.yml
 
 ### How to learn YAML
 
 YAML很简单，还在更新中，查看最新的官方文档即可:[yaml](https://yaml.org/)
+
+测试自己的yaml文件是否正确，可以使用[online-yaml-tools](https://onlineyamltools.com/validate-yaml)
+
+将yaml文件转换为json文件，可以使用[https://nodeca.github.io/js-yaml/](https://nodeca.github.io/js-yaml/)
 
 ## Terminal
 
