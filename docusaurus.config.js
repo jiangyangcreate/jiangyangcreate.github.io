@@ -24,7 +24,7 @@ const config = {
   title: websitename,
   tagline: '真实的记录自己，比获得他人的认同感更重要',
   favicon: 'img/favicon.ico',
-  url: websiteurl ,
+  url: websiteurl,
   baseUrl: '/',
   organizationName: websitename, // Usually your GitHub org/user name.
   projectName: 'blog', // Usually your repo name.
@@ -63,7 +63,7 @@ const config = {
           sidebarPath: require.resolve('./sidebars.js'),
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl:editUrl,
+          editUrl: editUrl,
         },
 
         blog: {
@@ -75,7 +75,7 @@ const config = {
           showReadingTime: true,
           postsPerPage: 'ALL',
           blogSidebarCount: 'ALL',
-          editUrl:editUrl,
+          editUrl: editUrl,
           feedOptions: {
             type: 'all',
             copyright: `Copyright © ${new Date().getFullYear()} ${websitename}`,
@@ -92,7 +92,7 @@ const config = {
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
-      }), 
+      }),
     ]
   ],
   plugins: [
@@ -125,14 +125,15 @@ const config = {
         ],
       },
     ],
-    //谷歌分析框架
-    [
-      '@docusaurus/plugin-google-gtag',
-      {
-        trackingID: 'G-4GF73PJ1H7',
-        anonymizeIP: true,
-      },
-    ],
+    //谷歌分析框架:2023年12月实测会影响国内访问速度
+    //后续情况可能有所变动，取消下方代码注释即可正常访问
+    // [
+    //   '@docusaurus/plugin-google-gtag',
+    //   {
+    //     trackingID: 'G-4GF73PJ1H7',
+    //     anonymizeIP: true,
+    //   },
+    // ],
     [
       "@docusaurus/plugin-content-docs",
       {
@@ -142,7 +143,7 @@ const config = {
         rehypePlugins: [rehypeKatex],
         routeBasePath: "read",
         sidebarPath: require.resolve("./sidebars.js"),
-        editUrl:editUrl,
+        editUrl: editUrl,
       },
     ],
     [
@@ -154,7 +155,7 @@ const config = {
         rehypePlugins: [rehypeKatex],
         routeBasePath: "sheets",
         sidebarPath: require.resolve("./sidebars.js"),
-        editUrl:editUrl,
+        editUrl: editUrl,
       },
     ],
   ],
@@ -328,9 +329,9 @@ const config = {
       },
       // 告示条
       announcementBar: {
-        id: 'support_us',
+        id: 'support',
         content:
-        `🚀 如果你觉得还不错, 就给一个<a target="_blank" rel="noopener noreferrer" href="${githuborgurl}"  aria-label="star on github "> star </a>吧 ~`,
+          `🚀 如果你觉得还不错, 就给一个<a target="_blank" rel="noopener noreferrer" href="${githuborgurl}"  aria-label="star on github "> star </a>吧 ~`,
         backgroundColor: '#fafbfc',
         textColor: '#091E42',
         isCloseable: true,//允许用户关闭
