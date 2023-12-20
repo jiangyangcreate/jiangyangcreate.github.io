@@ -3,21 +3,20 @@ sidebar_position: 1
 title: 计算机科普
 ---
 
-本章是根据中国和美国的大学课程编写的。它旨在帮助完成计算机的基本知识：互联网的工作原理、计算机的发展历史、数据结构、操作系统、计算机网络和计算机组成原理。
+本章是根据中国和美国的大学课程编写的。它旨在帮助初学者完成计算机的基本知识。
 
-## 互联网如何运作
 
-由TCP/IP的发明者Vint Cerf、Tumblr的创始人David Karp解释HTTP和HTML、来自微软、Google的工程师解释SSL和网络安全。
+## 入门课程
 
-经过两年的制作，这一系列的短视频解释了互联网的工作原理。
+在40集的节目中，carrie anne philbin教你计算机科学! 本课程基于大学的入门材料以及计算机科学原理指南。
+
+<iframe src="https://www.youtube.com/embed/tpIctyqH29Q?list=PL8dPuuaLjXtNlUrzyH5r6jN9ulIgZBpdo" width="100%" height="360" frameborder="no" scrolling="no" allowfullscreen="allowfullscreen"> </iframe>
+
+
+由TCP/IP的发明者Vint Cerf、Tumblr的创始人David Karp解释HTTP和HTML、来自微软、Google的工程师解释SSL和网络安全。经过两年的制作，这一系列的短视频解释了互联网的工作原理。
 
 <iframe  src="https://www.youtube.com/embed/Dxcc6ycZ73M?list=PLzdnOPI1iJNfMRZm5DDxco3UdsFegvuB7" width="100%" height="360" frameborder="no" scrolling="no" allowfullscreen="allowfullscreen"> </iframe>
 
-## 计算机科学
-
-在40集的节目中，卡丽-安妮-菲尔宾教你计算机科学! 本课程基于大学的入门材料以及计算机科学原理指南。
-
-<iframe src="https://www.youtube.com/embed/tpIctyqH29Q?list=PL8dPuuaLjXtNlUrzyH5r6jN9ulIgZBpdo" width="100%" height="360" frameborder="no" scrolling="no" allowfullscreen="allowfullscreen"> </iframe>
 
 ## 数据结构
 
