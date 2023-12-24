@@ -1,5 +1,5 @@
 ---
-tags: [python,题库]
+tags: [python,testing]
 title: Python笔试
 ---
 

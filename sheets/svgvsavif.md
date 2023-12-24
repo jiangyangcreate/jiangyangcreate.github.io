@@ -1,5 +1,5 @@
 ---
-tags: [技术调研]
+tags: [technology comparison]
 title: SVG vs AVIF
 ---
 # SVG vs AVIF

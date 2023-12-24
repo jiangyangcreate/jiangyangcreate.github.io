@@ -204,29 +204,22 @@ const config = {
             label: '读书',
           },
           {
-            to: "/blog",
+            to: "/blog/archive",
+            // to: "/blog/tags",
+            // to: "/blog",
             position: 'left',
             label: '博客',
           },
           {
+            to: "/sheets/tags",
             position: 'left',
             label: '碎片',
-            items: [
-              {
-                label: "按顺序查看",
-                to: "/sheets",
-              },
-              {
-                label: "按标签查看",
-                to: "/sheets/tags",
-              },
-            ]
           },
           // 中英文切换导航
-          // {
-          //   type: 'localeDropdown',
-          //   position: 'right',
-          // },
+          {
+            type: 'localeDropdown',
+            position: 'right',
+          },
         ],
       },
       //自定义配置底部的版权说明与SVG图超链接
