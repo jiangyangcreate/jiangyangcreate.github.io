@@ -34,19 +34,17 @@ const config = {
   // set trailingSlash: true 可以让 algolia 抓取更完整
   trailingSlash: true,
 
+  // 国际化
   i18n: {
-    defaultLocale: 'zh-Hans',
-    locales: ['zh-Hans'],
-    path: 'i18n',
+    defaultLocale: 'zh-CN',
+    locales: ['en', 'zh-CN'],
     localeConfigs: {
-      zh: {
-        label: '中文',
-        direction: 'ltr',
-        htmlLang: '	zh-Hans',
-        calendar: 'gregory',
-        path: 'zh-Hans',
+      en: {
+        htmlLang: 'en-GB',
       },
-
+      zh:{
+        htmlLang:'zh-CN',
+      }
     },
   },
 
@@ -228,6 +226,10 @@ const config = {
                 to: "/sheets/tags",
               },
             ]
+          },
+          {
+            type: 'localeDropdown',
+            position: 'right',
           },
         ],
       },
