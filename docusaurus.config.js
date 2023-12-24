@@ -209,11 +209,6 @@ const config = {
             label: '博客',
           },
           {
-            to: "/message",
-            position: 'left',
-            label: '留言',
-          },
-          {
             position: 'left',
             label: '碎片',
             items: [

@@ -1,55 +1,57 @@
-[中文](README.md) | [English](READMEen.md)
+[English](README.md) | [中文](README_zh.md)
 
-## 设计理念
+## Design Philosophy
 
-优美优于丑陋，明了优于隐晦
+Beauty is better than ugliness, clarity is better than obscurity.
 
-简单优于复杂，复杂优于繁杂
+Simplicity is better than complexity, complexity is better than complication.
 
-扁平优于嵌套，稀疏优于稠密
+Flat is better than nested, sparse is better than dense.
 
-可读性很重要！
+Readability counts!
 
-特例亦不可违背原则，即使实用比纯粹更优。
+Special cases are not special enough to break the rules, though practicality beats purity.
 
-错误绝不能悄悄忽略，除非它明确需要如此。
+Errors should never pass silently, unless explicitly silenced.
 
-面对不确定性，拒绝妄加猜测。
+In the face of uncertainty, refuse the temptation to guess.
 
-任何问题应有一种，且最好只有一种，显而易见的解决方法。
+There should be one-- and preferably only one --obvious way to do it.
 
-做优于不做，然而不假思索还不如不做。
+Although that way may not be obvious at first unless you're Dutch.
 
-很难解释的，必然是坏方法。
+Now is better than never, although never is often better than *right* now.
 
-很好解释的，可能是好方法。
+If the implementation is hard to explain, it's a bad idea.
 
-以上节选自《Python之禅》
+If the implementation is easy to explain, it may be a good idea.
 
-基于这样的设计理念，我做了这样的一个小而美的个人博客站点：点击查看[网站分析](https://pagespeed.web.dev/)
+The above is an excerpt from "The Zen of Python."
 
-## 框架
+Based on such design principles, I created a small and beautiful personal blog site. Click to view the [website analysis](https://pagespeed.web.dev/).
 
-基于最新的[Docusaurus 3.0.1](https://docusaurus.io/)构建的个人博客站点，部分语法与Docusaurus 2.0不兼容。
+## Framework
 
-灵感来源于[Docusaurus Site Showcase](https://docusaurus.io/showcase)，选取了其中有意思的设计，进行了一些修改，最终完成了这个站点。
+Built on the latest [Docusaurus 3.0.1](https://docusaurus.io/), the personal blog site is partially incompatible with Docusaurus 2.0.
 
-为了方便大家修改，自定义内容尽可能的前置在了`docusaurus.config.js`中。
+Inspired by the [Docusaurus Site Showcase](https://docusaurus.io/showcase), I selected interesting designs, made some modifications, and ultimately completed this site.
 
-- 明暗模式，可以在页面右上角切换。
-- announcementBar公告栏，可以在首页设置一个公告。
-- katex公式插件，支持latex语法。让你写数学公式更加方便。
-- pwa，支持离线访问。安装并离线缓存，可让你在没有网络的飞机上也能浏览本站。
-- rss，支持博客的rss订阅。访问[RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
-- algolia全局搜索，支持站内搜索。让你快速找到你想要的内容。
-- giscus，可以在指定页面下方评论，支持github账号登录。让你与作者交流。
-- googlegtag谷歌分析，可以查看你的网站访问情况。
-- i8n 基于Crowdin插件自动翻译。
+To facilitate customization, as much custom content as possible is placed in `docusaurus.config.js`.
 
-## 快速重现
+- Light and dark mode switchable in the upper right corner of the page.
+- Announcement bar on the homepage for announcements.
+- KaTeX formula plugin for LaTeX syntax support, making it easier to write mathematical formulas.
+- PWA support for offline access, allowing you to browse the site even without an internet connection.
+- RSS support for blog subscription. Subscribe to the [RSS feed](https://jiangmiemie.com/blog/rss.xml).
+- Algolia global search for quick content retrieval within the site.
+- Giscus for comments at the bottom of specified pages, supporting GitHub account login for communication with the author.
+- Google Analytics using Google Tag Manager to view website traffic.
+- i18n for automatic translation based on the Crowdin plugin.
 
-`npm update`更新插件
+## Quick Reproduction
 
-`npm install`下载所需的依赖包
+`npm update` to update plugins.
 
-`npm run start`启动站点
+`npm install` to download necessary dependencies.
+
+`npm run start` to launch the site.
