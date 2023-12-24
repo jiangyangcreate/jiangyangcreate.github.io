@@ -222,10 +222,11 @@ const config = {
               },
             ]
           },
-          {
-            type: 'localeDropdown',
-            position: 'right',
-          },
+          // 中英文切换导航
+          // {
+          //   type: 'localeDropdown',
+          //   position: 'right',
+          // },
         ],
       },
       //自定义配置底部的版权说明与SVG图超链接

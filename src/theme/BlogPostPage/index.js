@@ -1,12 +1,8 @@
 import React from 'react'
-import Layout from '@theme/Layout'
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
 import { useThemeConfig, useColorMode } from '@docusaurus/theme-common';
 import BrowserOnly from '@docusaurus/BrowserOnly';
 import Giscus from '@giscus/react';
-import styles from './index.module.css';
-const { Props } = require('@theme/BlogPostPage');
-
 import clsx from 'clsx';
 import {
   HtmlClassNameProvider,
@@ -22,6 +18,7 @@ import BlogPostPaginator from '@theme/BlogPostPaginator';
 import BlogPostPageMetadata from '@theme/BlogPostPage/Metadata';
 import BackToTopButton from '@theme/BackToTopButton';
 import TOC from '@theme/TOC';
+const { Props } = require('@theme/BlogPostPage');
 
 const defaultConfig = {
   id: 'comments',
