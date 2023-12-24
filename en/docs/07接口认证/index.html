@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en-GB" dir="ltr" class="docs-wrapper plugin-docs plugin-id-default docs-version-current docs-doc-page docs-doc-id-07接口认证/index" data-has-hydrated="false">
+<head>
+<meta charset="UTF-8">
+<meta name="generator" content="Docusaurus v3.0.1">
+<title data-rh="true">接口认证概述 | jiangmiemie</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://jiangmiemie.com/en/img/docusaurus-social-card.png"><meta data-rh="true" name="twitter:image" content="https://jiangmiemie.com/en/img/docusaurus-social-card.png"><meta data-rh="true" property="og:url" content="https://jiangmiemie.com/en/docs/07接口认证/"><meta data-rh="true" property="og:locale" content="en_GB"><meta data-rh="true" property="og:locale:alternate" content="zh_CN"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="keywords" content="jiangmiemie"><meta data-rh="true" name="keywords" content="blog, javascript, python"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-default-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-default-current"><meta data-rh="true" property="og:title" content="接口认证概述 | jiangmiemie"><meta data-rh="true" name="description" content="API（应用程序编程接口）是一组规则，用于定义应用程序或设备如何相互连接和通信。"><meta data-rh="true" property="og:description" content="API（应用程序编程接口）是一组规则，用于定义应用程序或设备如何相互连接和通信。"><link data-rh="true" rel="icon" href="/en/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://jiangmiemie.com/en/docs/07接口认证/"><link data-rh="true" rel="alternate" href="https://jiangmiemie.com/en/docs/07接口认证/" hreflang="en-GB"><link data-rh="true" rel="alternate" href="https://jiangmiemie.com/docs/07接口认证/" hreflang="zh-CN"><link data-rh="true" rel="alternate" href="https://jiangmiemie.com/docs/07接口认证/" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://B8DUWB4CMX-dsn.algolia.net" crossorigin="anonymous"><link rel="alternate" type="application/rss+xml" href="/en/blog/rss.xml" title="jiangmiemie RSS Feed">
+<link rel="alternate" type="application/atom+xml" href="/en/blog/atom.xml" title="jiangmiemie Atom Feed">
+<link rel="alternate" type="application/json" href="/en/blog/feed.json" title="jiangmiemie JSON Feed">
+
+
+
+<link rel="search" type="application/opensearchdescription+xml" title="jiangmiemie" href="/en/opensearch.xml">
+<link rel="icon" href="/en/img/docusaurus.png">
+<link rel="manifest" href="/en/manifest.json">
+<meta name="theme-color" content="rgb(37, 194, 160)">
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css" integrity="sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM" crossorigin="anonymous"><link rel="stylesheet" href="/en/assets/css/styles.c3456731.css">
+<script src="/en/assets/js/runtime~main.e07f328e.js" defer="defer"></script>
+<script src="/en/assets/js/main.60bb2e15.js" defer="defer"></script>
+</head>
+<body class="navigation-with-keyboard">
+<script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return localStorage.getItem("theme")}catch(t){}}();t(null!==e?e:"light")}(),function(){try{const a=new URLSearchParams(window.location.search).entries();for(var[t,e]of a)if(t.startsWith("docusaurus-data-")){var n=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(n,e)}}catch(t){}}(),document.documentElement.setAttribute("data-announcement-bar-initially-dismissed",function(){try{return"true"===localStorage.getItem("docusaurus.announcement.dismiss")}catch(t){}return!1}())</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><div class="announcementBar_mb4j" style="background-color:#fafbfc;color:#091E42" role="banner"><div class="announcementBarPlaceholder_vyr4"></div><div class="content_knG7 announcementBarContent_xLdY">🚀 如果你觉得还不错, 就给一个<a target="_blank" rel="noopener noreferrer" href="https://github.com/jiangyangcreate/jiangyangcreate.github.io" aria-label="star on github "> star </a>吧 ~</div><button type="button" aria-label="Close" class="clean-btn close closeButton_CVFx announcementBarClose_gvF7"><svg viewBox="0 0 15 15" width="14" height="14"><g stroke="currentColor" stroke-width="3.1"><path d="M.75.75l13.5 13.5M14.25.75L.75 14.25"></path></g></svg></button></div><nav aria-label="Main" class="navbar navbar--fixed-top navbarHideable_m1mJ"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/en/"><b class="navbar__title text--truncate">首页</b></a><a aria-current="page" class="navbar__item navbar__link navbar__link--active" href="/en/docs/">全栈</a><a class="navbar__item navbar__link" href="/en/read/">读书</a><a class="navbar__item navbar__link" href="/en/blog/">博客</a><a class="navbar__item navbar__link" href="/en/message/">留言</a><div class="navbar__item dropdown dropdown--hoverable"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link">碎片</a><ul class="dropdown__menu"><li><a class="dropdown__link" href="/en/sheets/">按顺序查看</a></li><li><a class="dropdown__link" href="/en/sheets/tags/">按标签查看</a></li></ul></div></div><div class="navbar__items navbar__items--right"><div class="navbar__item dropdown dropdown--hoverable dropdown--right"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" class="iconLanguage_nlXk"><path fill="currentColor" d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v1.99h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"></path></svg>English</a><ul class="dropdown__menu"><li><a href="/en/docs/07接口认证/" target="_self" rel="noopener noreferrer" class="dropdown__link dropdown__link--active" lang="en-GB">English</a></li><li><a href="/docs/07接口认证/" target="_self" rel="noopener noreferrer" class="dropdown__link" lang="zh-CN">中文（中国）</a></li></ul></div><div class="toggle_vylO colorModeToggle_DEke"><button class="clean-btn toggleButton_gllP toggleButtonDisabled_aARS" type="button" disabled="" title="Switch between dark and light mode (currently light mode)" aria-label="Switch between dark and light mode (currently light mode)" aria-live="polite"><svg viewBox="0 0 24 24" width="24" height="24" class="lightToggleIcon_pyhR"><path fill="currentColor" d="M12,9c1.65,0,3,1.35,3,3s-1.35,3-3,3s-3-1.35-3-3S10.35,9,12,9 M12,7c-2.76,0-5,2.24-5,5s2.24,5,5,5s5-2.24,5-5 S14.76,7,12,7L12,7z M2,13l2,0c0.55,0,1-0.45,1-1s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S1.45,13,2,13z M20,13l2,0c0.55,0,1-0.45,1-1 s-0.45-1-1-1l-2,0c-0.55,0-1,0.45-1,1S19.45,13,20,13z M11,2v2c0,0.55,0.45,1,1,1s1-0.45,1-1V2c0-0.55-0.45-1-1-1S11,1.45,11,2z M11,20v2c0,0.55,0.45,1,1,1s1-0.45,1-1v-2c0-0.55-0.45-1-1-1C11.45,19,11,19.45,11,20z M5.99,4.58c-0.39-0.39-1.03-0.39-1.41,0 c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0s0.39-1.03,0-1.41L5.99,4.58z M18.36,16.95 c-0.39-0.39-1.03-0.39-1.41,0c-0.39,0.39-0.39,1.03,0,1.41l1.06,1.06c0.39,0.39,1.03,0.39,1.41,0c0.39-0.39,0.39-1.03,0-1.41 L18.36,16.95z M19.42,5.99c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06c-0.39,0.39-0.39,1.03,0,1.41 s1.03,0.39,1.41,0L19.42,5.99z M7.05,18.36c0.39-0.39,0.39-1.03,0-1.41c-0.39-0.39-1.03-0.39-1.41,0l-1.06,1.06 c-0.39,0.39-0.39,1.03,0,1.41s1.03,0.39,1.41,0L7.05,18.36z"></path></svg><svg viewBox="0 0 24 24" width="24" height="24" class="darkToggleIcon_wfgR"><path fill="currentColor" d="M9.37,5.51C9.19,6.15,9.1,6.82,9.1,7.5c0,4.08,3.32,7.4,7.4,7.4c0.68,0,1.35-0.09,1.99-0.27C17.45,17.19,14.93,19,12,19 c-3.86,0-7-3.14-7-7C5,9.07,6.81,6.55,9.37,5.51z M12,3c-4.97,0-9,4.03-9,9s4.03,9,9,9s9-4.03,9-9c0-0.46-0.04-0.92-0.1-1.36 c-0.98,1.37-2.58,2.26-4.4,2.26c-2.98,0-5.4-2.42-5.4-5.4c0-1.81,0.89-3.42,2.26-4.4C12.92,3.04,12.46,3,12,3L12,3z"></path></svg></button></div><div class="navbarSearchContainer_Bca1"><button type="button" class="DocSearch DocSearch-Button" aria-label="Search"><span class="DocSearch-Button-Container"><svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 20 20"><path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="DocSearch-Button-Placeholder">Search</span></span><span class="DocSearch-Button-Keys"></span></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd sidebarWithHideableNavbar_wUlq"><a tabindex="-1" class="sidebarLogo_isFc" href="/en/"><b>首页</b></a><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG menuWithAnnouncementBar_GW3s"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/">高等数学概述</a><button aria-label="Expand sidebar category &#x27;高等数学概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/03计算机科普/">计算机科普概述</a><button aria-label="Expand sidebar category &#x27;计算机科普概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/04编程外的基础/">编程外的基础概述</a><button aria-label="Expand sidebar category &#x27;编程外的基础概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/05选择编程语言/">选择编程语言概述</a><button aria-label="Expand sidebar category &#x27;选择编程语言概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/06不同的数据库/">不同的数据库概述</a><button aria-label="Expand sidebar category &#x27;不同的数据库概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible menu__list-item-collapsible--active"><a class="menu__link menu__link--sublist menu__link--active" aria-current="page" aria-expanded="true" href="/en/docs/07接口认证/">接口认证概述</a><button aria-label="Collapse sidebar category &#x27;接口认证概述&#x27;" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/en/docs/07接口认证/GraphQL/">GraphQL</a></li><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link" tabindex="0" href="/en/docs/07接口认证/RESTAPI/">RESTAPI</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/08逆向测试/">逆向测试概述</a><button aria-label="Expand sidebar category &#x27;逆向测试概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/09消息队列/">消息队列概述</a><button aria-label="Expand sidebar category &#x27;消息队列概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/10虚拟容器/">虚拟容器概述</a><button aria-label="Expand sidebar category &#x27;虚拟容器概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/11网络服务/">网络服务概述</a><button aria-label="Expand sidebar category &#x27;网络服务概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/12机器学习/">机器学习概述</a><button aria-label="Expand sidebar category &#x27;机器学习概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/en/docs/13单片机/">单片机概述</a><button aria-label="Expand sidebar category &#x27;单片机概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs" itemscope="" itemtype="https://schema.org/BreadcrumbList"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/en/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link" itemprop="name">接口认证概述</span><meta itemprop="position" content="1"></li></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><h1>接口认证</h1>
+<p>API（应用程序编程接口）是一组规则，用于定义应用程序或设备如何相互连接和通信。</p>
+<h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="rest">REST<a href="#rest" class="hash-link" aria-label="Direct link to REST" title="Direct link to REST">​</a></h2>
+<p>REST API 是符合 REST（表述性状态转移）架构样式设计原则的 API。 因此，REST API 有时被称为 RESTful API。</p>
+<p>EST API 几乎可以使用任何编程语言进行开发，并支持多种数据格式。 唯一的要求是它们要符合以下六个 REST 设计原则 - 也称为架构约束：</p>
+<ul>
+<li>统一接口。 无论请求来自何处，对同一资源发出的所有 API 请求都应该看起来相同。 REST API 应确保同一条数据（例如用户的姓名或电子邮件地址）仅属于一个统一资源标识符 (URI)。 资源不应过大，但应包含客户可能需要的每一条信息。</li>
+<li>客户端/服务器解耦。 在 REST API 设计中，客户端和服务器应用程序必须彼此完全独立。 客户端应用程序只需知道所请求资源的 URI 即可； 它不能以任何其他方式与服务器应用程序交互。 同样，除了通过 HTTP 将客户端应用程序传递到所请求的数据外，服务器应用程序不应修改客户端应用程序。</li>
+<li>无状态。 REST API 是无状态的，这意味着每个请求都需要包含处理它所需的全部信息。 换句话说，REST API 不需要任何服务器端会话。 不允许服务器应用程序存储与客户端请求相关的任何数据。</li>
+<li>可缓存性。 如果可能，资源应该可以在客户端或服务器端缓存。 服务器响应还需要包含有关是否允许对交付的资源进行缓存的信息。 目标是提高客户端的性能，同时增强服务器端的可扩展性。</li>
+<li>分层系统架构。 在 REST API 中，调用和响应都会经过多个不同的层。 根据经验，请不要将客户端和服务器应用程序直接相互连接。 通信环路中可能包含多个不同的中介服务器。 需要设计 REST API，让客户端和服务器都无法判断它是与最终应用程序还是中介服务器进行通信。</li>
+<li>按需编码（可选）。 REST API 通常发送静态资源，但在某些情况下，响应也可以包含可执行代码（例如 Java 小程序）。 在这些情况下，代码只应按需运行。</li>
+</ul>
+<blockquote>
+<p>REST API 通过 HTTP 请求进行通信，以便执行标准数据库功能，例如在资源中创建、读取、更新和删除记录（这些操作也称为 CRUD）。 例如，REST API 可使用 GET 请求检索记录、使用 POST 请求创建记录、使用 PUT 请求更新记录以及使用 DELETE 请求删除记录。 可以在 API 调用中使用所有 HTTP 方法。 精心设计的 REST API 类似于在具有内置 HTTP 功能的 Web 浏览器中运行的 Web 站点。
+任何特定时刻或时间戳的资源状态称为资源表示。 几乎可以采用任何格式将该信息传递到客户端，包括 JavaScript 对象表示法 (JSON)、HTML、XLT、Python、PHP 或纯文本。 JSON 非常受欢迎，因为它可以被人类和机器读取，而且与编程语言无关。
+在 REST API 调用中，请求头和参数也很重要，因为它们包含重要的标识信息，例如元数据、授权、统一资源标识符 (URI)、缓存、cookie 等。 在精心设计的 REST API 中会使用请求头、响应头和常规 HTTP 状态码。</p>
+</blockquote>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="认证">认证<a href="#认证" class="hash-link" aria-label="Direct link to 认证" title="Direct link to 认证">​</a></h3>
+<blockquote>
+<p>提到认证必然绕不开密码学</p>
+</blockquote>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="web-authentication-概念和用例">Web authentication 概念和用例<a href="#web-authentication-概念和用例" class="hash-link" aria-label="Direct link to Web authentication 概念和用例" title="Direct link to Web authentication 概念和用例">​</a></h4>
+<p>Web Authentication API（也称作 WebAuthn）使用asymmetric (public-key) cryptography （非对称加密）替代密码或 SMS 短信在网站上注册、登录、second-factor authentication（双因素验证）。 解决了 phishing（钓鱼）、data breaches（数据破坏）、SMS 文本攻击、其它双因素验证等重大安全问题，同时显著提高了易用性（因为用户不必管理许多越来越复杂的密码）。</p>
+<p>许多网站已实现用户注册账号，登录已有账号的页面， WebAuthn 作为这些页面的替代和补充。类似其他形式的 Credential Management API（凭据管理 API）。Web Authentication API 有两个对应于注册和登录的基本方法：</p>
+<ul>
+<li>navigator.credentials.create() - 当使用 publicKey 选项时，创建一个新的凭据，无论是用于注册新账号还是将新的非对称密钥凭据与已有的账号关联。</li>
+<li>navigator.credentials.get() - 当使用 publicKey 选项时，使用一组现有的凭据进行身份验证服务，无论是用于用户登录还是双因素验证中的一步。</li>
+</ul>
+<p>请注意： create() 和 get() 都需要在 Secure Context（安全上下文）中执行（例如 - 使用 https 连接，或是使用 localhost），当浏览器不是在安全环境下时它们将不可用。</p>
+<p>在基础实现中，create() 和 get() 会从服  务器接收一个大随机数，称为&quot;challenge&quot;。&quot;challenge&quot;将由私钥签名并返回给服务器。这可以服务器证明用户拥有身份验证所需要的私钥，与此同时没有任何密码在网络上被传输。</p>
+<p>为了了解 create() 和 get() 方法在实际中的使用，我们需要理解它们位于浏览器之外的两个部分之间：</p>
+<ol>
+<li>服务器 - WebAuthn API 旨在在服务器（也称为服务或依赖方）上注册新的凭据，以供稍后在同一服务器上使用相同的凭据对用户进行身份验证。</li>
+<li>认证器 - 凭据将被创建并存储于被称为认证器的设备中。这是认证过程中的一个新概念：使用密码进行身份验证时，密码存储在用户的大脑中而不需要其他设备；使用 WebAuthn 进行身份验证时，密码则被存储在认证器中的密钥对替代。认证器可以被嵌入到操作系统中（例如 Windows Hello），也可以是 USB 或蓝牙安全密钥等物理令牌。</li>
+</ol>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="注册registration">注册（Registration）<a href="#注册registration" class="hash-link" aria-label="Direct link to 注册（Registration）" title="Direct link to 注册（Registration）">​</a></h4>
+<p>一个典型的注册过程包括如图 1 所示的六个步骤，这些在稍后会进一步描述。这是一个注册过程的概览，所需数据已经被简化。</p>
+<p><img loading="lazy" alt="image.png" src="/en/assets/images/image-17aa32febed04efcbe50a65b2fac4def-02c800bb42ccb4e6fefc5d3ba3f772b5.png" width="1118" height="546" class="img_ev3q"></p>
+<ol start="0">
+<li>应用程序请求注册 - 应用程序发出注册请求。这个请求的协议和格式不在 WebAuthn 标准的范围内。</li>
+<li>服务器发送挑战、用户信息和依赖方信息 - 服务器将挑战、用户信息和依赖方信息发送回应用程序。在这里，协议和格式不在 WebAuthn 标准的范围内。通常，这可以是基于 HTTPS 连接的 REST（可能会使用 XMLHttpRequest 或 Fetch）API。不过只要在安全连接中，也可以使用 SOAP、RFC 2549 或几乎任何其他协议。从服务器接收到的参数将传递给 create() ，大部分情况下只需很少修改甚至不需要做任何修改。create() 会返回一个Promise，并返回包含 AuthenticatorAttestationResponse (en-US) 的 PublicKeyCredential (en-US)。需要注意的是挑战必须是随机的 buffer（至少 16 字节），并且必须在服务器上生成以确保安全。</li>
+<li>浏览器向认证器调用 authenticatorMakeCredential() - 在浏览器内部，浏览器将验证参数并用默认值补全缺少的参数，然后这些参数会变为 AuthenticatorResponse.clientDataJSON。其中最重要的参数之一是 origin，它是 clientData 的一部分，同时服务器将能在稍后验证它。调用 create() 的参数与 clientDataJSON 的 SHA-256 哈希一起传递到身份验证器（只有哈希被发送是因为与认证器的连接可能是低带宽的 NFC 或蓝牙连接，之后认证器只需对哈希签名以确保它不会被篡改）。</li>
+<li>认证器创建新的密钥对和证明 - 在进行下一步之前，认证器通常会以某种形式要求用户确认，如输入 PIN，使用指纹，进行虹膜扫描等，以证明用户在场并同意注册。之后，认证器将创建一个新的非对称密钥对，并安全地存储私钥以供将来验证使用。公钥则将成为证明的一部分，被在制作过程中烧录于认证器内的私钥进行签名。这个私钥会具有可以被验证的证书链。</li>
+<li>认证器将数据返回浏览器 - 新的公钥、全局唯一的凭证 ID 和其他的证明数据会被返回到浏览器，成为 attestationObject。</li>
+<li>浏览器生成最终的数据，应用程序将响应发送到服务器 - create() 的 Promise 会返回一个 PublicKeyCredential (en-US)，其中包含全局唯一的证书 ID PublicKeyCredential.rawId (en-US)  和包含 AuthenticatorResponse.clientDataJSON 的响应 AuthenticatorAttestationResponse (en-US)。你可以使用任何你喜欢的格式和协议将 PublicKeyCredential (en-US) 发送回服务器（注意 ArrayBuffer 类型的属性需要使用 base64 或类似编码方式进行编码）</li>
+<li>服务器验证数据并完成注册 - 最后，服务器需要执行一系列检查以确保注册完成且数据未被篡改。步骤包括：</li>
+</ol>
+<ul>
+<li>验证接收到的挑战与发送的挑战相同</li>
+<li>确保 origin 与预期的一致</li>
+<li>使用对应认证器型号的证书链验证 clientDataHash 的签名和证明</li>
+</ul>
+<p>验证步骤的完整列表可以在 WebAuthn 规范中找到。一旦验证成功，服务器将会把新的公钥与用户帐户相关联以供将来用户希望使用公钥进行身份验证时使用。</p>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="验证authentication">验证（Authentication）<a href="#验证authentication" class="hash-link" aria-label="Direct link to 验证（Authentication）" title="Direct link to 验证（Authentication）">​</a></h4>
+<p>用户在 WebAuthn 中注册完成之后就可以使用 WebAuthn 进行身份验证（或者说登录）。验证流程与注册相似，图 2 所示的验证流程也与图 1 相似。不过，注册和验证之间的主要区别在于：</p>
+<ol>
+<li>验证不需要用户或信赖方信息；</li>
+<li>验证使用之前生成的密钥对创建一个断言，而不是使用在认证器在制造过程中烧录的密钥对创建证明。和上文一样，下面的验证流程图只是一个概况，并非详细描述。</li>
+</ol>
+<p><img loading="lazy" alt="image.png" src="/en/assets/images/image-e01383eea3144b69ba6bcab4736a30f2-240f93897356e4ef449a93b4c8b7af32.png" width="1067" height="527" class="img_ev3q"></p>
+<ol start="0">
+<li>应用程序请求身份验证- 应用程序发出初始身份验证请求。此请求的协议和格式超出了 WebAuthn 的范围。</li>
+<li>服务器发送质询- 服务器发送  质询 JavaScript 程序。与服务器通信的协议未指定，不在 WebAuthn 的范围内。通常，服务器通信将是基于https 的REST （可能使用XMLHttpRequest或Fetch），但它们也可以是SOAP、RFC 2549或几乎任何其他协议，前提是该协议是安全的。从服务器接收到的参数将被传递给get()调用，通常只需要很少或不需要修改。 请注意，挑战是随机信息的大缓冲区（例如 - 超过 100 个字节）是绝对关键的，并且必须在服务器上生成它以确保身份验证过程的安全性。</li>
+<li>浏览器在 Authenticator 上调用 authenticationatorGetCredential() - 在内部，浏览器将验证参数并填写任何默认值，这些默认值将变为AuthenticatorResponse.clientDataJSON. 最重要的参数之一是来源，它记录为 clientData 的一部分，以便服务器稍后可以验证来源。create() 调用的参数与 clientDataJSON 的 SHA-256 哈希一起传递给验证器（仅发送一个哈希，因为到验证器的链接可能是低带宽 NFC 或蓝牙链接，并且验证器是只是要签署哈希以确保它不会被篡改）。</li>
+<li>Authenticator 创建断言- 身份验证器找到与依赖方 ID 匹配的此服务的凭据，并提示用户同意身份验证。假设这两个步骤都成功，身份验证器将通过在注册调用期间使用为此帐户生成的私钥签署 clientDataHash 和authenticatorData 来创建新断言。</li>
+<li>Authenticator 将数据返回到浏览器 - 验证器将authenticatorData 和断言签名返回给浏览器。</li>
+<li>浏览器创建最终数据，应用程序向服务器发送响应- 浏览器将Promise 解析为 (  PublicKeyCredential en-US)，其中 PublicKeyCredential.response (en-US)包含 AuthenticatorAssertionResponse (en-US)。由 JavaScript 应用程序使用其选择的任何协议和格式将此数据传输回服务器。</li>
+<li>服务器验证并完成身份验证 - 在收到身份验证请求的结果后，服务器执行响应验证，例如：</li>
+</ol>
+<ul>
+<li>使用在注册请求期间存储的公钥来验证身份验证者的签名。</li>
+<li>确保验证者签名的质询与服务器生成的质询相匹配。</li>
+<li>检查依赖方 ID 是否是此服务的预期 ID。</li>
+</ul>
+<p>验证断言的完整步骤列表可以在 WebAuthn 规范中找到。假设验证成功，服务器将注意到用户现在已通过身份验证。这超出了 WebAuthn 规范的范围，但一种选择是为用户会话删除一个新的 cookie。</p>
+<h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="graphql">Graphql<a href="#graphql" class="hash-link" aria-label="Direct link to Graphql" title="Direct link to Graphql">​</a></h2>
+<p>graphql 是一种用于 API 的查询语言，对你的 API 中的数据提供了一套易于理解的完整描述，使得客户端能够准确地获得它需要的数据，减少数据的冗余。</p>
+<p><img loading="lazy" alt="image-1657519260384" src="/en/assets/images/image-1657519260384-ce86c8c025fef7962a9a8d43f1563ae4.png" width="685" height="297" class="img_ev3q"></p>
+<p>在下图中，系统中的所有入口点（REST、GraphQL 和 RPC）都将使用相同的验证、授权和错误处理规则进行处理。</p>
+<p><img loading="lazy" alt="image-1657519556322" src="/en/assets/images/image-1657519556322-7dccf3948e40e94580f84330da6ee4a6.png" width="594" height="558" class="img_ev3q"></p>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="怎么使用-graphql">怎么使用 Graphql？<a href="#怎么使用-graphql" class="hash-link" aria-label="Direct link to 怎么使用 Graphql？" title="Direct link to 怎么使用 Graphql？">​</a></h3>
+<p>安装对应的模块</p>
+<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">pip install graphene</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">pip install strawberry-graphql</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">pip install ariadne</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>在py文件中可以运行这个简单的示例</p>
+<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">import graphene</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">class Query(graphene.ObjectType):</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  hello = graphene.String(name=graphene.String(default_value=&quot;World&quot;))</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">  def resolve_hello(self, info, name):</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">    return &#x27;Hello &#x27; + name</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">schema = graphene.Schema(query=Query)</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">result = schema.execute(&#x27;{ hello }&#x27;)</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">print(result.data[&#x27;hello&#x27;]) # &quot;Hello World&quot;</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>GraphQL 同样支持 Relay, Django, SQLAlchemy,  Google App Engine.</p></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"><a href="https://github.com/jiangyangcreate/jiangyangcreate.github.io/blob/main/docs/07接口认证/index.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vwxv"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/en/docs/06不同的数据库/内存数据库/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">内存数据库</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/en/docs/07接口认证/GraphQL/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">GraphQL</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#rest" class="table-of-contents__link toc-highlight">REST</a><ul><li><a href="#认证" class="table-of-contents__link toc-highlight">认证</a></li></ul></li><li><a href="#graphql" class="table-of-contents__link toc-highlight">Graphql</a><ul><li><a href="#怎么使用-graphql" class="table-of-contents__link toc-highlight">怎么使用 Graphql？</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">
+          <div class="footerx">
+            <div align="left">
+              <a href="https://web.archive.org/web/20230609185132/https://creativecommons.org/licenses/by-nc-sa/4.0/">
+                <strong>CC BY-NC-SA 4.0 </strong>
+              </a> 
+              <br> 2020-2023  ©  jiangmiemie
+            </div>
+            <p class="logoxs">
+            <a class="logox" target="_blank" rel="noopener noreferrer" href="https://github.com/jiangyangcreate" aria-label="go to my github">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" clip-path="inset(0% round 15px)" width="30px" height="30px" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
+              <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+              <path d="M2384 5060 c-1012 -69 -1891 -738 -2235 -1703 -53 -146 -102 -349
+              -125 -512 -23 -157 -25 -496 -5 -655 102 -816 575 -1526 1287 -1932 164 -94
+              418 -200 483 -202 51 -1 94 20 116 57 18 30 19 50 16 267 -1 129 -3 236 -4
+              236 -1 1 -38 -4 -82 -12 -263 -43 -497 16 -646 165 -58 58 -76 86 -134 206
+              -94 196 -149 271 -255 348 -78 56 -120 98 -120 119 0 50 121 67 217 30 125
+              -47 208 -119 299 -258 126 -191 284 -276 485 -261 77 6 233 49 245 68 3 6 13
+              38 20 71 19 80 68 181 110 228 40 45 44 42 -86 60 -103 14 -282 60 -368 94
+              -362 143 -571 410 -649 829 -25 134 -25 463 0 567 36 149 103 285 195 398 l43
+              53 -15 47 c-52 161 -46 370 16 564 20 61 24 67 54 73 107 20 352 -68 576 -206
+              l98 -61 87 20 c204 47 298 57 553 57 256 0 349 -10 553 -57 l88 -20 77 48
+              c153 96 304 167 407 193 85 21 159 31 191 25 28 -5 33 -12 52 -72 57 -178 67
+              -404 23 -542 l-21 -65 20 -25 c98 -121 175 -269 212 -409 26 -98 36 -348 19
+              -488 -74 -608 -407 -935 -1041 -1023 -120 -16 -118 -15 -83 -53 46 -48 90
+              -134 115 -223 20 -74 22 -106 27 -529 7 -492 5 -482 66 -507 47 -20 102 -13
+              200 26 348 135 622 311 884 569 417 410 679 942 752 1527 20 159 18 498 -5
+              655 -173 1219 -1151 2131 -2373 2215 -161 11 -175 11 -339 0z"/>
+              </g>
+            </svg></a>
+
+          <a class="logox" target="_blank" rel="noopener noreferrer" href="https://www.travellings.cn/go.html" aria-label="go to next website random">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" clip-path="inset(0% round 15px)" width="30px" height="30px" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
+              <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="#000000" stroke="none">
+              <path d="M0 2560 l0 -2560 2560 0 2560 0 0 2560 0 2560 -2560 0 -2560 0 0
+              -2560z m3545 1505 c147 -31 283 -132 346 -257 45 -90 51 -110 58 -231 l6 -108
+              200 -4 c610 -12 898 -162 825 -427 -16 -57 -102 -178 -173 -244 -211 -198
+              -590 -420 -1016 -598 -74 -31 -136 -58 -138 -60 -2 -1 9 -30 24 -62 39 -83 39
+              -167 0 -246 -127 -258 -484 -226 -563 51 -9 31 -17 57 -19 59 -1 1 -87 -22
+              -192 -52 -548 -157 -1131 -266 -1560 -292 -87 -5 -113 -10 -113 -21 0 -23 64
+              -116 105 -152 22 -19 69 -48 105 -65 l65 -31 999 -3 c892 -2 1006 -1 1055 14
+              140 40 258 164 291 306 5 24 10 129 10 234 l0 190 38 19 c20 11 40 21 44 23 5
+              2 8 -103 8 -232 0 -213 -2 -243 -21 -299 -52 -155 -161 -268 -315 -324 -52
+              -18 -97 -26 -181 -30 -62 -3 -113 -8 -113 -10 0 -3 25 -32 55 -66 54 -60 66
+              -92 43 -115 -29 -29 -56 -13 -144 88 l-89 100 -665 0 -665 0 -88 -100 c-88
+              -101 -116 -117 -145 -88 -23 23 -11 54 47 119 l60 66 -112 6 c-172 8 -274 53
+              -383 168 -28 30 -65 84 -83 120 l-32 66 -197 6 c-391 12 -626 76 -737 199
+              -110 122 -72 272 115 458 133 132 311 256 562 391 98 53 402 199 414 199 2 0
+              4 -22 4 -48 l0 -49 -232 -116 c-332 -166 -538 -300 -676 -440 -87 -89 -107
+              -114 -132 -169 -44 -96 -16 -160 95 -219 127 -68 334 -106 590 -109 77 -1 148
+              -1 158 -1 16 1 17 19 17 222 l0 220 43 -25 42 -25 6 -193 c3 -106 7 -195 7
+              -197 2 -4 177 7 240 15 l43 6 -37 37 c-60 60 -88 125 -88 206 0 39 5 87 13
+              108 22 65 84 132 152 166 201 101 430 -42 433 -269 0 -54 -5 -77 -29 -126 -17
+              -32 -31 -62 -33 -65 -2 -4 55 4 125 16 321 58 688 147 991 241 l112 35 25 48
+              c45 91 130 142 245 149 63 4 85 1 128 -18 l52 -23 126 52 c692 285 1171 624
+              1201 849 20 157 -320 270 -792 260 l-150 -3 -5 -182 -5 -183 -42 26 -43 25 0
+              282 c0 298 -5 339 -49 425 -29 57 -91 123 -149 161 -101 64 -56 62 -1158 59
+              l-1000 -3 -76 -38 c-130 -64 -209 -174 -228 -317 -5 -41 -10 -187 -10 -325 l0
+              -250 -40 -22 c-21 -13 -41 -23 -44 -23 -10 0 -6 616 4 671 34 182 204 353 393
+              394 96 21 1943 21 2042 0z m77 -395 c20 -6 48 -24 62 -41 23 -27 26 -40 26
+              -106 l0 -75 43 4 42 3 0 -45 c0 -45 0 -45 -40 -50 l-40 -5 -5 -395 c-5 -433
+              -5 -431 -65 -456 -52 -21 -853 -21 -895 1 -62 32 -60 9 -60 580 l0 520 23 28
+              c12 16 38 32 57 37 52 12 808 12 852 0z m-1286 -34 l34 -34 0 -196 c0 -108 4
+              -196 9 -196 4 0 60 13 122 30 63 16 115 30 117 30 1 0 2 -22 2 -49 l0 -49
+              -125 -32 -125 -33 0 -269 c0 -233 -2 -272 -16 -294 -36 -54 -39 -54 -496 -54
+              -401 0 -425 1 -455 20 -17 10 -37 28 -43 40 -13 23 -16 229 -12 719 l2 333 34
+              34 34 34 442 0 442 0 34 -34z"/>
+              </g>
+              </svg>
+            </a>
+
+           <a class="logox" target="_blank" rel="noopener noreferrer" href="mailto:jiangyangcreate@gmail.com" aria-label="go to send email">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" clip-path="inset(0% round 15px)" width="30px" height="30px" viewBox="0 0 1024.000000 1024.000000" preserveAspectRatio="xMidYMid meet">
+            <g><path style="opacity:0.996" fill="#ea4335" d="M 243.5,420.5 C 189.523,379.185 135.857,337.518 82.5,295.5C 140.987,183.298 229.487,104.632 348,59.5C 432.42,30.213 518.587,23.713 606.5,40C 693.576,57.6997 769.243,96.6997 833.5,157C 787.833,202.667 742.167,248.333 696.5,294C 695.5,294.667 694.5,294.667 693.5,294C 642.378,246.775 581.711,222.942 511.5,222.5C 407.283,227.337 327.117,273.337 271,360.5C 259.938,379.624 250.771,399.624 243.5,420.5 Z"/></g>
+            <g><path style="opacity:0.996" fill="#fabb05" d="M 82.5,295.5 C 135.857,337.518 189.523,379.185 243.5,420.5C 223.5,481.168 223.5,541.835 243.5,602.5C 189.523,643.815 135.857,685.482 82.5,727.5C 31.7513,624.612 18.5846,516.945 43,404.5C 51.5465,366.35 64.7132,330.016 82.5,295.5 Z"/></g>
+            <g><path style="opacity:0.998" fill="#4285f3" d="M 829.5,876.5 C 777.833,835.833 726.167,795.167 674.5,754.5C 725.318,718.61 756.985,669.944 769.5,608.5C 683.503,607.5 597.503,607.167 511.5,607.5C 511.5,546.167 511.5,484.833 511.5,423.5C 662.5,423.5 813.5,423.5 964.5,423.5C 979.017,509.532 974.517,594.532 951,678.5C 928.206,755.703 887.706,821.703 829.5,876.5 Z"/></g>
+            <g><path style="opacity:0.997" fill="#34a853" d="M 243.5,602.5 C 274.71,690.744 334.043,751.577 421.5,785C 487.78,805.861 553.78,804.861 619.5,782C 638.723,774.388 657.056,765.222 674.5,754.5C 726.167,795.167 777.833,835.833 829.5,876.5C 762.129,936.339 683.462,972.839 593.5,986C 437.233,1008.45 300.566,967.451 183.5,863C 141.888,823.583 108.222,778.416 82.5,727.5C 135.857,685.482 189.523,643.815 243.5,602.5 Z"/></g>
+            </svg>
+           </a>
+            </p>
+          </div> 
+        </div></div></div></footer></div>
+</body>
+</html>
