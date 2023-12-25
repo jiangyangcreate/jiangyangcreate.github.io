@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkjiangmiemie=self.webpackChunkjiangmiemie||[]).push([[3151],{9040:e=>{e.exports=JSON.parse('{"label":"\u65c5\u884c","permalink":"/blog/tags/\u65c5\u884c","allTagsPath":"/blog/tags","count":3,"unlisted":false}')}}]);
