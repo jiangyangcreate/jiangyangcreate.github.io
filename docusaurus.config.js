@@ -212,15 +212,16 @@ const config = {
             label: '博客',
           },
           {
+            to: "/gallery",
+            position: 'left',
+            label: '相册',
+          },
+          {
             to: "/sheets",
             position: 'left',
             label: '碎片',
           },
-          {
-            to: "/Gallery",
-            position: 'left',
-            label: '相册',
-          },
+
           // 中英文切换导航
           {
             type: 'localeDropdown',
@@ -237,7 +238,7 @@ const config = {
               <a href="https://web.archive.org/web/20230609185132/https://creativecommons.org/licenses/by-nc-sa/4.0/">
                 <strong>CC BY-NC-SA 4.0 </strong>
               </a> 
-              <br> 2020-${new Date().getFullYear()}  ©  ${websitename}
+              <br> 2019-${new Date().getFullYear()}  ©  ${websitename}
             </div>
             <p class="logoxs">
             <a class="logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">

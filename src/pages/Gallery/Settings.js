@@ -67,12 +67,12 @@ export function useSettings() {
 }
 
 export default function Settings({ children }) {
-  const [layout, setLayout] = useState("rows");
+  const [layout, setLayout] = useState("masonry");
   const [count, setCount] = useState(photos.length);
   const [targetRowHeight, setTargetRowHeight] = useState(300);
   const [columns, setColumns] = useState(5);
-  const [spacing, setSpacing] = useState(30);
-  const [padding, setPadding] = useState(10);
+  const [spacing, setSpacing] = useState(10);
+  const [padding, setPadding] = useState(5);
   const [width, setWidth] = useState(100);
 
   useLayoutEffect(() => {
