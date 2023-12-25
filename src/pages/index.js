@@ -14,7 +14,7 @@ function MyHero() {
         </h1>
         <p className={styles.leftContainer_p}>
         
-        <Translate>优美优于丑陋，明了优于隐晦</Translate><br />
+        <Translate id="homepage.philosophy.one">优美优于丑陋，明了优于隐晦</Translate><br />
         <Translate>简单优于复杂，复杂优于繁杂</Translate><br />
         <Translate>扁平优于嵌套，稀疏优于稠密</Translate><br />
         <Translate>可读性很重要！</Translate><br />
@@ -45,23 +45,6 @@ export default function Home() {
       title={siteConfig.title}
     >
       <MyHero />
-      {/* <div class={styles.footers} >
-        <div class={styles.footer} >
-          <div>
-            <a href="https://web.archive.org/web/20230609185132/https://creativecommons.org/licenses/by-nc-sa/4.0/"><h4>CC BY-NC-SA 4.0</h4></a>
-            <span> 2020 年至今 © jiangmiemie</span>
-          </div>
-          <div>
-            <a target="_blank" rel="noopener noreferrer" href="https://github.com/jiangmiemie"><svg src={git} class={styles.footerlogo} alt="github" /></a>
-            <a target="_blank" rel="noopener noreferrer" href="mailto:jiangyangcreate@gmail.com"><svg src={email} class={styles.footerlogo} alt="email" /></a>
-            <a target="_blank" rel="noopener noreferrer" href="https://www.travellings.cn/go.html"><svg src={travellings} class={styles.footerlogo} alt="travellings" /></a>
-          </div>
-
-                      <span>
-
-            </span>
-        </div>
-      </div> */}
     </Layout>
   )
 }

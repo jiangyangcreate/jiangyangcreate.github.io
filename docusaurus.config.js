@@ -54,18 +54,19 @@ const config = {
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {
+          id: "docs",
           path: "docs",
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
           routeBasePath: 'docs',
           sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
           editUrl: editUrl,
         },
 
         blog: {
+          id:  "blog",
           path: "blog",
+          //修改博文插件，追加评论模块
           blogPostComponent: '@theme/BlogPostPage',
           remarkPlugins: [remarkMath],
           rehypePlugins: [rehypeKatex],
