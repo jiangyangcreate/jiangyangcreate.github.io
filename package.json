@@ -21,12 +21,18 @@
     "@docusaurus/preset-classic": "^3.0.1",
     "@giscus/react": "^2.3.0",
     "@mdx-js/react": "^3.0.0",
+    "@mui/material": "^5.15.1",
     "clsx": "^1.2.1",
     "prism-react-renderer": "^2.1.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-photo-album": "^2.3.0",
     "rehype-katex": "^7.0.0",
-    "remark-math": "^6.0.0"
+    "remark-math": "^6.0.0",
+    "@emotion/cache": "^11.11.0",
+    "@emotion/react": "^11.11.1",
+    "@emotion/server": "^11.11.0",
+    "@emotion/styled": "^11.11.0"
   },
   "devDependencies": {
     "@docusaurus/module-type-aliases": "3.0.0",

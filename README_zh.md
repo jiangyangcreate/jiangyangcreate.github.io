@@ -45,6 +45,7 @@
 - giscus，可以在指定页面下方评论，支持github账号登录。让你与作者交流。
 - googlegtag谷歌分析，可以查看你的网站访问情况。
 - i8n 基于Crowdin插件自动翻译。
+- react-photo-album 一个相册插件，可以在指定页面下方展示相册。
 
 ## 快速重现
 

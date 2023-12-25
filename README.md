@@ -57,6 +57,7 @@ To facilitate customization, as much custom content as possible is placed in `do
 - Giscus for comments at the bottom of specified pages, supporting GitHub account login for communication with the author.
 - Google Analytics using Google Tag Manager to view website traffic.
 - i18n for automatic translation based on the Crowdin plugin.
+- "react-photo-album" is a photo album plugin that can display albums at the bottom of a specified page.
 
 ## Quick Reproduction
 

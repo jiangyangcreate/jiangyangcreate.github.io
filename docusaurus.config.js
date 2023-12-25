@@ -197,7 +197,7 @@ const config = {
           {
             to: "/docs",
             position: 'left',
-            label: '全栈',
+            label: '知识库',
           },
           {
             to: "/read",
@@ -212,9 +212,14 @@ const config = {
             label: '博客',
           },
           {
-            to: "/sheets/tags",
+            to: "/sheets",
             position: 'left',
             label: '碎片',
+          },
+          {
+            to: "/Gallery",
+            position: 'left',
+            label: '相册',
           },
           // 中英文切换导航
           {

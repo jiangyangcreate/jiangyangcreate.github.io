@@ -819,8 +819,6 @@ plt.title('Quantized image (64 colors, Random)')
 plt.imshow(recreate_image(codebook_random, labels_random, w, h))
 ```
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
 ## 实时分类器
 
@@ -832,8 +830,7 @@ KNN算法先记录所有已知数据，再利用一个距离函数，找出已�
 
 ### 题解
 
-<Tabs>
-  <TabItem value="JS" label="JS" default>
+#### JS
 
 新建`.html`并将下方代码复制进去，在联网环境下用先进的浏览器打开。
 
@@ -932,8 +929,7 @@ KNN算法先记录所有已知数据，再利用一个距离函数，找出已�
 
 ```
 
-  </TabItem>
-  <TabItem value="Python" label="Python">
+#### Python
 
 新建`.py`并将下方代码复制进去，确保已经安装好了下方的模块库。
 
@@ -1028,6 +1024,3 @@ if __name__ == "__main__":
     main()
 
 ```
-
-  </TabItem>
-</Tabs>
