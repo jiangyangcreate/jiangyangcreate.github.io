@@ -2,25 +2,35 @@
 
 ## Design Philosophy
 
-Beauty is better than ugliness, clarity is better than obscurity.
+Beautiful is better than ugly.
 
-Simplicity is better than complexity, complexity is better than complication.
+Explicit is better than implicit.
 
-Flat is better than nested, sparse is better than dense.
+Simple is better than complex.
 
-Readability counts!
+Complex is better than complicated.
 
-Special cases are not special enough to break the rules, though practicality beats purity.
+Flat is better than nested.
 
-Errors should never pass silently, unless explicitly silenced.
+Sparse is better than dense.
 
-In the face of uncertainty, refuse the temptation to guess.
+Readability counts.
+
+Special cases aren't special enough to break the rules.
+
+Although practicality beats purity.
+
+Errors should never pass silently.
+
+Unless explicitly silenced.
+
+In the face of ambiguity, refuse the temptation to guess.
 
 There should be one-- and preferably only one --obvious way to do it.
 
-Although that way may not be obvious at first unless you're Dutch.
+Now is better than never.
 
-Now is better than never, although never is often better than *right* now.
+Although never is often better than *right* now.
 
 If the implementation is hard to explain, it's a bad idea.
 
