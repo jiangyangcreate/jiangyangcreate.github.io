@@ -3,12 +3,11 @@ import { PhotoAlbum ,LayoutType, Photo } from "react-photo-album";
 import Layout from '@theme/Layout';
 import React, { useState, useMemo, createContext, useContext, useEffect } from "react";
 import Lightbox from "yet-another-react-lightbox";
-import "yet-another-react-lightbox/styles.css";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
-import "yet-another-react-lightbox/plugins/thumbnails.css";
+import Captions from "yet-another-react-lightbox/plugins/captions";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
 import Slider from "@mui/material/Slider";
@@ -16,21 +15,24 @@ import MenuItem from "@mui/material/MenuItem";
 import TextField from "@mui/material/TextField";
 import InputLabel from "@mui/material/InputLabel";
 import FormControl from "@mui/material/FormControl";
+import "yet-another-react-lightbox/styles.css";
+import "yet-another-react-lightbox/plugins/thumbnails.css";
+import "yet-another-react-lightbox/plugins/captions.css";
 
-
+//定义图片路径
 const unsplashLink = (id, width, height) =>
   `/gallery/${id}-${width}-${height}.jpg`;
-
+//定义相册图片
 const unsplashPhotos = [
-  {'id': '2021071', 'width': 1934, 'height': 2579} ,
-  {'id': '2021072', 'width': 1080, 'height': 1077} ,
-  {'id': '2021073', 'width': 4032, 'height': 3024} ,
-  {'id': '2021074', 'width': 4032, 'height': 3024} ,
-  {'id': '2021075', 'width': 3464, 'height': 3464} ,
-  {'id': '2021076', 'width': 4524, 'height': 2112} ,
-  {'id': '2021077', 'width': 1920, 'height': 923} ,
-  {'id': '2021078', 'width': 5792, 'height': 4344} ,
-  {'id': '2021079', 'width': 1440, 'height': 1080} ,
+  {'id': '2021071', 'width': 1934, 'height': 2579,'title':'深圳','description':'深圳的夏天'} ,
+  {'id': '2021072', 'width': 1080, 'height': 1077,'title':'深圳','description':'塘朗山的花'} ,
+  {'id': '2021073', 'width': 4032, 'height': 3024,'title':'深圳','description':'塘朗山的山顶'} ,
+  {'id': '2021074', 'width': 4032, 'height': 3024,'title':'深圳','description':'塘朗山的亭子'} ,
+  {'id': '2021075', 'width': 3464, 'height': 3464,'title':'深圳','description':'塘朗山的栈道'} ,
+  {'id': '2021076', 'width': 4524, 'height': 2112,'title':'广州','description':'东宝大厦的双彩虹'} ,
+  {'id': '2021077', 'width': 1920, 'height': 923,'title':'深圳','description':'深圳的主干道'} ,
+  {'id': '2021078', 'width': 5792, 'height': 4344,'title':'上海','description':'上海的鱼鳞云'} ,
+  {'id': '2021079', 'width': 1440, 'height': 1080,'title':'深圳','description':'南山区的堡垒云'} ,
   {'id': '2022081', 'width': 1422, 'height': 799} ,
   {'id': '2022082', 'width': 2738, 'height': 1280} ,
   {'id': '2022083', 'width': 1664, 'height': 935} ,
@@ -71,6 +73,19 @@ const unsplashPhotos = [
   {'id': 'Shanghai_Wildlife_Park7', 'width': 2160, 'height': 6069} ,  
   {'id': 'Shanghai_Wildlife_Park8', 'width': 2160, 'height': 4856} , 
 ];
+
+
+// 使用 Set 进行自动去重，自动添加一个全选选项
+const uniqueTitlesSet = new Set(unsplashPhotos.map(photo => photo.title)).add('全选');
+
+// 提取相册标签
+const extractedData = Array.from(uniqueTitlesSet).map(title => ({
+  value: title || '其他', // 如果 title 不存在，使用 '其他'
+  title: title || '其他',
+}));
+
+
+
 // const breakpoints = [17280,8640,4320,2160,1080, 640, 384, 256, 128, 96, 64, 48];
 
 // const photos = unsplashPhotos.map((photo) => ({
@@ -91,6 +106,9 @@ const photos = unsplashPhotos.map((photo) => ({
   src: unsplashLink(photo.id, photo.width, photo.height),
   width: photo.width,
   height: photo.height,
+  title:photo.title,
+  //描述中自动添加相片大小
+  description:(photo.description || '') + `\n${photo.width} x ${photo.height}`,
 }));
 
 
@@ -153,14 +171,16 @@ export function useSettings() {
 function Settings({ children }) {
   const [layout, setLayout] = useState("masonry");
   const [count, setCount] = useState(photos.length);
-  const [targetRowHeight, setTargetRowHeight] = useState(300);
+  const [targetRowHeight, setTargetRowHeight] = useState(200);
   const [columns, setColumns] = useState(5);
-  const [spacing, setSpacing] = useState(10);
-  const [padding, setPadding] = useState(5);
+  const [spacing, setSpacing] = useState(30);
+  const [padding, setPadding] = useState(30);
   const [width, setWidth] = useState(100);
+  const [tag, settag] = useState('其他');
 
   useLayoutEffect(() => {
     const viewportSize = window.innerWidth;
+    //如果要更改默认设置，在这里设定
     setColumns(viewportSize < 480 ? 2 : viewportSize < 900 ? 3 : 5);
     setSpacing(viewportSize < 480 ? 10 : viewportSize < 900 ? 20 : 30);
     setPadding(viewportSize < 480 ? 10 : viewportSize < 900 ? 20 : 30);
@@ -169,7 +189,8 @@ function Settings({ children }) {
 
   const settings = useMemo(
     () => ({
-      photos: photos.slice(0, count),
+      // 如果选了其他，则筛选所有undefined和null,否则按tag筛选
+      photos:(tag === '其他') ? photos.filter(photo => photo.title === undefined || photo.title === null).slice(0, count) : (tag === '全选') ? photos.slice(0, count) : photos.filter(photo => photo.title === tag).slice(0, count),
       layout,
       targetRowHeight,
       columns,
@@ -177,7 +198,7 @@ function Settings({ children }) {
       padding,
       width,
     }),
-    [layout, count, targetRowHeight, columns, spacing, padding, width],
+    [layout, count, targetRowHeight, columns, spacing, padding, width,tag],
   );
 
   return (
@@ -257,6 +278,25 @@ function Settings({ children }) {
               onChange={(_, value) => setWidth(value)}
             />
           </Filter>
+
+          <Filter>
+            <TextField
+              select
+              fullWidth
+              label="Tag"
+              variant="standard"
+              margin="none"
+              value={tag}
+              onChange={(event) => settag(event.target.value)}
+            >
+              {extractedData.map(({ value, title }) => (
+                <MenuItem key={value} value={value}>
+                  {title}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Filter>
+
         </Grid>
       </Paper>
 
@@ -308,7 +348,7 @@ function Playground() {
       index={index}
       close={() => setIndex(-1)}
       // enable optional lightbox plugins
-      plugins={[Fullscreen, Slideshow, Thumbnails, Zoom]}
+      plugins={[Fullscreen, Slideshow, Thumbnails, Zoom,Captions]}
     />
     </Box>
 
