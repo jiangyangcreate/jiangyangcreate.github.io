@@ -176,7 +176,7 @@ function Settings({ children }) {
   const [spacing, setSpacing] = useState(30);
   const [padding, setPadding] = useState(30);
   const [width, setWidth] = useState(100);
-  const [tag, settag] = useState('其他');
+  const [tag, settag] = useState('深圳');
 
   useLayoutEffect(() => {
     const viewportSize = window.innerWidth;
