@@ -18,7 +18,6 @@ import BlogPostPaginator from '@theme/BlogPostPaginator';
 import BlogPostPageMetadata from '@theme/BlogPostPage/Metadata';
 import BackToTopButton from '@theme/BackToTopButton';
 import TOC from '@theme/TOC';
-const { Props } = require('@theme/BlogPostPage');
 
 const defaultConfig = {
   id: 'comments',
