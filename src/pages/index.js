@@ -25,10 +25,9 @@ function MyHero() {
         <Translate id="homepage.philosophy.ten">很难解释的，必然是坏方法。</Translate><br />
         <Translate id="homepage.philosophy.eleven">很好解释的，可能是好方法。</Translate><br />
         </p>
-        <div className={styles.buttonContainer}>
-        </div>
       </div>
       <div className={styles.rightContainer}>
+        <img src="/img/deskimg.png" alt='HeroImg' />
       </div>
     </div>
   )
