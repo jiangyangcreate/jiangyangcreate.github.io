@@ -57,7 +57,7 @@ div[class^='announcementBar_'] {
 }
 
 .logox {
-  padding: 5px;
+  padding: 0.05rem;
   text-decoration: none !important;
 }
 
