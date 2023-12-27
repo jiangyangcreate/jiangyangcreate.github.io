@@ -23,19 +23,19 @@
   margin: 0;
   padding: 0;
   flex-direction: row;
-  background-color: #ffffff;
   width: 100%;
   height: 100%;
   overflow: hidden;
   padding: 2.5rem 6rem;
-  background: linear-gradient(to right, #EBEDF0, #A4A6A8);
+  justify-content: center;
+  align-items: center;
 }
 
 .leftContainer {
   padding: 3rem 0 0 1rem;
   font-size: 40px;
   flex: 2;
-  font-family: '宋体', 'Microsoft YaHei', sans-serif; /* 中文字体 */
+  font-family:'Microsoft YaHei', '宋体',sans-serif; /* 中文字体 */
 }
 
 body:lang(en-GB).leftContainer {
@@ -58,12 +58,26 @@ body:lang(en-GB).leftContainer {
 }
 
 .leftContainer_h1 {
-  color: rgb(58, 58, 58);
-  font-size: 4rem;
+  color:rgba(255, 255, 255,0.5);
+  font-size: 5.2rem;
+  font-family:  Arial,'Helvetica Neue', sans-serif; /* 英文字体 */
+  background:url("/gallery/202308173-1664-935.jpg") 50% 50%;
+  background-size:cover;
+  -webkit-background-clip:text;
+  transition:1s linear;
+  white-space: nowrap;
+  cursor: default;
+}
+
+.leftContainer_h1:hover {
+  background:url("/gallery/2022083-1664-935.jpg") 50% 50%;
+  background-size:cover;
+  color:transparent;
+  -webkit-background-clip:text;
+  white-space: nowrap;
 }
 
 .leftContainer_p {
-  color: #565451;
   font-size: 1.2rem;
 }
 
@@ -88,3 +102,4 @@ body:lang(en-GB).leftContainer {
     flex-direction: row;
   }
 }
+
