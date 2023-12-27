@@ -18,7 +18,6 @@
   justify-content: center;
 }
 
-
 .myHeroContainer {
   display: flex;
   margin: 0;
@@ -26,8 +25,10 @@
   flex-direction: row;
   background-color: #ffffff;
   width: 100%;
+  height: 100%;
   overflow: hidden;
   padding: 2.5rem 6rem;
+  background: linear-gradient(to right, #EBEDF0, #A4A6A8);
 }
 
 .leftContainer {

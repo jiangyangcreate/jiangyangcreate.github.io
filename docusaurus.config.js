@@ -197,7 +197,7 @@ const config = {
           {
             to: "/docs",
             position: 'left',
-            label: '知识库',
+            label: '技术',
           },
           {
             to: "/read",
@@ -221,12 +221,16 @@ const config = {
             position: 'left',
             label: '碎片',
           },
-
+          {
+            type: 'search',
+            position: 'right',
+          },
           // 中英文切换导航
           {
             type: 'localeDropdown',
             position: 'right',
           },
+
         ],
       },
       //自定义配置底部的版权说明与SVG图超链接
@@ -240,34 +244,23 @@ const config = {
               </a> 
               <br> 2019-${new Date().getFullYear()}  ©  ${websitename}
             </div>
-            <p class="logoxs">
-            <a class="logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
-            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" clip-path="inset(0% round 15px)" width="30px" height="30px" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
-              <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-              fill="#000000" stroke="none">
-              <path d="M2384 5060 c-1012 -69 -1891 -738 -2235 -1703 -53 -146 -102 -349
-              -125 -512 -23 -157 -25 -496 -5 -655 102 -816 575 -1526 1287 -1932 164 -94
-              418 -200 483 -202 51 -1 94 20 116 57 18 30 19 50 16 267 -1 129 -3 236 -4
-              236 -1 1 -38 -4 -82 -12 -263 -43 -497 16 -646 165 -58 58 -76 86 -134 206
-              -94 196 -149 271 -255 348 -78 56 -120 98 -120 119 0 50 121 67 217 30 125
-              -47 208 -119 299 -258 126 -191 284 -276 485 -261 77 6 233 49 245 68 3 6 13
-              38 20 71 19 80 68 181 110 228 40 45 44 42 -86 60 -103 14 -282 60 -368 94
-              -362 143 -571 410 -649 829 -25 134 -25 463 0 567 36 149 103 285 195 398 l43
-              53 -15 47 c-52 161 -46 370 16 564 20 61 24 67 54 73 107 20 352 -68 576 -206
-              l98 -61 87 20 c204 47 298 57 553 57 256 0 349 -10 553 -57 l88 -20 77 48
-              c153 96 304 167 407 193 85 21 159 31 191 25 28 -5 33 -12 52 -72 57 -178 67
-              -404 23 -542 l-21 -65 20 -25 c98 -121 175 -269 212 -409 26 -98 36 -348 19
-              -488 -74 -608 -407 -935 -1041 -1023 -120 -16 -118 -15 -83 -53 46 -48 90
-              -134 115 -223 20 -74 22 -106 27 -529 7 -492 5 -482 66 -507 47 -20 102 -13
-              200 26 348 135 622 311 884 569 417 410 679 942 752 1527 20 159 18 498 -5
-              655 -173 1219 -1151 2131 -2373 2215 -161 11 -175 11 -339 0z"/>
-              </g>
-            </svg></a>
 
-          <a  class="logox" target="_blank" rel="noopener noreferrer" href="https://www.travellings.cn/go.html" aria-label="go to next website random">
-            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" clip-path="inset(0% round 15px)" width="30px" height="30px" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
+            <p class="logoxs">
+
+            <a  class="logox" target="_blank" rel="noopener noreferrer" href="https://jiangmiemie.com/blog/rss.xml" aria-label="go to next website random">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" id="rss" width="30px" height="30px" ><g fill="url(#grad0)"><circle cx="3" cy="13" r="2"></circle>
+            <path d="M1 5.667v2.667A6.674 6.674 0 0 1 7.667 15h2.666c0-5.146-4.187-9.333-9.333-9.333z"></path><path d="M1 1v2.667C7.25 3.667 12.334 8.75 12.334 15H15C15 7.28 8.72 1 1 1z"></path></g></svg>
+            </a>
+
+            <a  class="logox" target="_blank" rel="noopener noreferrer" href="https://www.travellings.cn/go.html" aria-label="go to next website random">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" clip-path="inset(0% round 16px)" width="30px" height="30px" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
               <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-              fill="#000000" stroke="none">
+              fill="url(#grad0)" stroke="none">
+              <linearGradient id="grad0" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color: #FF0000; stop-opacity: 1" />
+              <stop offset="50%" style="stop-color: #ac4ccc; stop-opacity: 1" />
+              <stop offset="100%" style="stop-color: #4285F3; stop-opacity: 1" />
+              </linearGradient>
               <path d="M0 2560 l0 -2560 2560 0 2560 0 0 2560 0 2560 -2560 0 -2560 0 0
               -2560z m3545 1505 c147 -31 283 -132 346 -257 45 -90 51 -110 58 -231 l6 -108
               200 -4 c610 -12 898 -162 825 -427 -16 -57 -102 -178 -173 -244 -211 -198
@@ -304,6 +297,34 @@ const config = {
               </g>
               </svg>
             </a>
+
+            <a class="logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
+            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" clip-path="inset(0% round 16px)" width="30px" height="30px" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
+              <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
+              fill="url(#grad1)" stroke="none">
+              <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color: #4ca2cd; stop-opacity: 1" />
+              <stop offset="50%" style="stop-color: #ac4ccc; stop-opacity: 1" />
+              <stop offset="100%" style="stop-color: #ff6c2c; stop-opacity: 1" />
+              </linearGradient>
+              <path d="M2384 5060 c-1012 -69 -1891 -738 -2235 -1703 -53 -146 -102 -349
+              -125 -512 -23 -157 -25 -496 -5 -655 102 -816 575 -1526 1287 -1932 164 -94
+              418 -200 483 -202 51 -1 94 20 116 57 18 30 19 50 16 267 -1 129 -3 236 -4
+              236 -1 1 -38 -4 -82 -12 -263 -43 -497 16 -646 165 -58 58 -76 86 -134 206
+              -94 196 -149 271 -255 348 -78 56 -120 98 -120 119 0 50 121 67 217 30 125
+              -47 208 -119 299 -258 126 -191 284 -276 485 -261 77 6 233 49 245 68 3 6 13
+              38 20 71 19 80 68 181 110 228 40 45 44 42 -86 60 -103 14 -282 60 -368 94
+              -362 143 -571 410 -649 829 -25 134 -25 463 0 567 36 149 103 285 195 398 l43
+              53 -15 47 c-52 161 -46 370 16 564 20 61 24 67 54 73 107 20 352 -68 576 -206
+              l98 -61 87 20 c204 47 298 57 553 57 256 0 349 -10 553 -57 l88 -20 77 48
+              c153 96 304 167 407 193 85 21 159 31 191 25 28 -5 33 -12 52 -72 57 -178 67
+              -404 23 -542 l-21 -65 20 -25 c98 -121 175 -269 212 -409 26 -98 36 -348 19
+              -488 -74 -608 -407 -935 -1041 -1023 -120 -16 -118 -15 -83 -53 46 -48 90
+              -134 115 -223 20 -74 22 -106 27 -529 7 -492 5 -482 66 -507 47 -20 102 -13
+              200 26 348 135 622 311 884 569 417 410 679 942 752 1527 20 159 18 498 -5
+              655 -173 1219 -1151 2131 -2373 2215 -161 11 -175 11 -339 0z"/>
+              </g>
+            </svg></a>
 
            <a class="logox" target="_blank" rel="noopener noreferrer" href="mailto:${email}" aria-label="go to send email">
             <svg version="1.0" xmlns="http://www.w3.org/2000/svg"

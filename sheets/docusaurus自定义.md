@@ -22,3 +22,9 @@ title: docusaurus自定义
 ### giscus
 
 获取giscus的`repo`和`repoID`，填入`docusaurus.config.js`中的`giscus`字段。
+
+### album
+
+使用react-photo-album插件自定义相册。
+
+支持多种布局、按标签筛选、点击单独查看、显示图片大小与描述、显示前后预览、图片放大、缩小等功能。`src\pages\gallery\index.js`中的`photos`字段为相册图片，可按需自定义。

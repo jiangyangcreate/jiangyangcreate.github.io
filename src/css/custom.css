@@ -58,6 +58,7 @@ div[class^='announcementBar_'] {
 
 .logox {
   padding: 5px;
+  text-decoration: none !important;
 }
 
 [data-theme='light'] .DocSearch {
