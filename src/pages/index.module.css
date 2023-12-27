@@ -35,7 +35,16 @@
   padding: 3rem 0 0 1rem;
   font-size: 40px;
   flex: 2;
+  font-family: '宋体', 'Microsoft YaHei', sans-serif; /* 中文字体 */
 }
+
+body:lang(en-GB).leftContainer {
+  padding: 3rem 0 0 1rem;
+  font-size: 40px;
+  flex: 2;
+  font-family: 'Helvetica Neue', Arial, sans-serif; /* 英文字体 */
+}
+
 
 .rightContainer {
   /* width: 70%; */
@@ -57,6 +66,7 @@
   color: #565451;
   font-size: 1.2rem;
 }
+
 
 .buttonContainer {
   display: flex;

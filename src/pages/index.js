@@ -13,7 +13,6 @@ function MyHero() {
           import this
         </h1>
         <p className={styles.leftContainer_p}>
-        
         <Translate id="homepage.philosophy.one">优美优于丑陋，明了优于隐晦</Translate><br />
         <Translate id="homepage.philosophy.two">简单优于复杂，复杂优于繁杂</Translate><br />
         <Translate id="homepage.philosophy.three">扁平优于嵌套，稀疏优于稠密</Translate><br />
@@ -25,8 +24,11 @@ function MyHero() {
         <Translate id="homepage.philosophy.nine">做优于不做，然而不假思索还不如不做。</Translate><br />
         <Translate id="homepage.philosophy.ten">很难解释的，必然是坏方法。</Translate><br />
         <Translate id="homepage.philosophy.eleven">很好解释的，可能是好方法。</Translate><br />
-
         </p>
+        <div className={styles.buttonContainer}>
+        </div>
+      </div>
+      <div className={styles.rightContainer}>
       </div>
     </div>
   )
