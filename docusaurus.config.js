@@ -164,6 +164,10 @@ const config = {
     ({
       // Replace with your project's social card
       image: 'img/docusaurus-social-card.png',
+      // 为亮色和暗色模式指定图表的主题
+      // mermaid: {
+      //   theme: {light: 'neutral', dark: 'forest'},
+      // },
       metadata: [
         {
           name: 'keywords',
@@ -254,7 +258,7 @@ const config = {
 
             <p class="logoxs">
 
-            <a  class="logox" target="_blank" rel="noopener noreferrer" href="https://jiangmiemie.com/blog/rss.xml" aria-label="go to next website random">
+            <a  class="logox" target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="go to next website random">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" id="rss" width="30px" height="30px" ><g fill="url(#grad0)"><circle cx="3" cy="13" r="2"></circle>
             <path d="M1 5.667v2.667A6.674 6.674 0 0 1 7.667 15h2.666c0-5.146-4.187-9.333-9.333-9.333z"></path><path d="M1 1v2.667C7.25 3.667 12.334 8.75 12.334 15H15C15 7.28 8.72 1 1 1z"></path></g></svg>
             </a>
@@ -373,6 +377,11 @@ const config = {
       crossorigin: 'anonymous',
     },
   ],
+  // 开启markdown的mermaid功能
+  themes: ['@docusaurus/theme-mermaid'],
+  markdown: {
+    mermaid: true,
+  },
 };
 
 module.exports = config;
