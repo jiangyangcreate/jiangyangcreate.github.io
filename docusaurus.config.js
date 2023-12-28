@@ -197,9 +197,9 @@ const config = {
             label: '读书',
           },
           {
-            to: "/blog/archive",
+            //to: "/blog/archive",
             // to: "/blog/tags",
-            // to: "/blog",
+            to: "/blog",
             position: 'left',
             label: '博文',
           },
@@ -207,6 +207,11 @@ const config = {
             to: "/gallery",
             position: 'left',
             label: '相簿',
+          },
+          {
+            to: "/showcase",
+            position: 'left',
+            label: '个案',
           },
           // 搜索框
           {
