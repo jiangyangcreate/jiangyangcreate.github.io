@@ -15,22 +15,22 @@ const Users = [
   website: 'https://jiangmiemie.com/',
   source: 'https://github.com/jiangyangcreate/jiangyangcreate.github.io',
 },
-// {
-//   title: 'AI-Speaker',
-//   description: 'It is not my plan , just love it',
-//   preview: '/showcase/aispeaker.png',
-//   website: 'https://ai-speaker.com/',
-//   source: 'https://github.com/sviete/AIS-WWW',
-// },
+{
+  title: 'mini-leetcode',
+  description: 'It is mini-leetcode',
+  preview: '/showcase/mini-leetcode.png',
+  website: 'https://jiangmiemie.com/minileetcode/',
+  source: 'https://github.com/jiangyangcreate/minileetcode',
+},
 ];
 
 function ShowcaseCard({ user }) {
   return (
     React.createElement('li', { key: user.title, className: 'card shadow--md' },
-      React.createElement('div', { className: clsx('card__image', styles.showcaseCardImage) },
+      React.createElement('div', { className: clsx('card__image', styles.showcaseCardImage) , style: { height: '50%' } },
         React.createElement('img', { src: user.preview, alt: user.title })
       ),
-      React.createElement('div', { className: 'card__body', style: { height: '50%' } },
+      React.createElement('div', { className: 'card__body', style: { backgroundColor: 'white' } },
         React.createElement('div', { className: clsx(styles.showcaseCardHeader) },
           React.createElement(Heading, { as: 'h4', className: styles.showcaseCardTitle },
             React.createElement(Link, { href: user.website, className: styles.showcaseCardLink },
@@ -40,11 +40,9 @@ function ShowcaseCard({ user }) {
           React.createElement(Link, {
             href: user.source,
             className: clsx('button button--secondary', styles.showcaseCardSrcBtn)
-          },
-            'source' 
-          )
+          },'source' )
         ),
-        React.createElement('p', { className: styles.showcaseCardBody }, user.description)
+        React.createElement('p', { className: styles.showcaseCardBody }, user.description )
       ),
     )
   );
