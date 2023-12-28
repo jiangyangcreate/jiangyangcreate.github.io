@@ -145,18 +145,6 @@ const config = {
         editUrl: editUrl,
       },
     ],
-    [
-      "@docusaurus/plugin-content-docs",
-      {
-        id: "sheets",
-        path: "sheets",
-        remarkPlugins: [remarkMath],
-        rehypePlugins: [rehypeKatex],
-        routeBasePath: "sheets",
-        sidebarPath: require.resolve("./sidebars.js"),
-        editUrl: editUrl,
-      },
-    ],
   ],
 
   themeConfig:
@@ -213,17 +201,12 @@ const config = {
             // to: "/blog/tags",
             // to: "/blog",
             position: 'left',
-            label: '博客',
+            label: '博文',
           },
           {
             to: "/gallery",
             position: 'left',
-            label: '相册',
-          },
-          {
-            to: "/sheets",
-            position: 'left',
-            label: '碎片',
+            label: '相簿',
           },
           // 搜索框
           {

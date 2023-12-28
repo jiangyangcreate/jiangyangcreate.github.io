@@ -59,6 +59,66 @@ To facilitate customization, as much custom content as possible is placed in `do
 - i18n for automatic translation based on the Crowdin plugin.
 - "react-photo-album" is a photo album plugin that can display albums at the bottom of a specified page.
 
+<details>
+
+### Google Analytics
+
+Obtain the Google Analytics code and insert it into the `googleAnalytics` field in `docusaurus.config.js`.
+
+### Global Search
+
+Obtain the Algolia `Application ID` and `Search-Only API Key`, and insert them into the `algolia` field in `docusaurus.config.js`.
+
+Add the search box:
+
+```javascript
+navbar: {
+  title: 'Home',
+  hideOnScroll: true,
+  items: [
+    // Search box
+    {
+      type: 'search',
+      position: 'right',
+    },
+  ]
+},
+```
+
+### Giscus
+
+Utilize the Giscus plugin.
+
+Obtain the Giscus `repo` and `repoID`, and insert them into the `giscus` field in `docusaurus.config.js`.
+
+Basic usage, for example: customizing the comment board:
+
+```jsx
+import Giscus from '@giscus/react';
+
+function Comment() {
+  return (
+    <BrowserOnly fallback={<div>Loading Comments...</div>}>
+      {() => <Giscus {...giscus} />}
+    </BrowserOnly>
+  );
+}
+```
+
+If you want comments on each post, add `<Giscus />` in `src\theme\BlogPostPage`. Simply copy and paste the `src\theme\BlogPostPage` folder.
+
+### Album
+
+Customize the photo album using the react-photo-album plugin.
+
+Supports multiple layouts, tag filtering, individual viewing on click, display of image size and description, preview of next and previous images, zooming in and out of images, and more. The `photos` field in `src\pages\gallery\index.js` contains the album images and can be customized as needed.
+
+### Bilingual (Chinese and English)
+
+Obtain the Crowdin `Project ID` and `API Key`, and insert them into the `crowdin` field in `docusaurus.config.js`.
+
+</details>
+
 ## Quick Reproduction
 
 `npm update` to update plugins.
