@@ -40,9 +40,9 @@ function ShowcaseCard({ user }) {
           React.createElement(Link, {
             href: user.source,
             className: clsx('button button--secondary', styles.showcaseCardSrcBtn)
-          },'source' )
+          },'source' ),
+          React.createElement('p', { className: styles.showcaseCardBody }, user.description )
         ),
-        React.createElement('p', { className: styles.showcaseCardBody }, user.description )
       ),
     )
   );
@@ -51,7 +51,7 @@ function ShowcaseCard({ user }) {
 
 function ShowcaseCards() {
   return (
-    React.createElement('section', { className: 'margin-top--lg margin-bottom--xl' },
+    React.createElement('section', { className: 'margin-top--lg margin-bottom--xl' , style: { padding: '0 10px' } },
             React.createElement('ul', { className: clsx('container', 'clean-list', styles.showcaseList) },
             Users.map((user) =>
                 React.createElement(ShowcaseCard, { key: user.title, user: user })
