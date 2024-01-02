@@ -220,7 +220,7 @@ const config = {
       
       colorMode: {
         defaultMode: 'dark',//定义首次访问的颜色
-        disableSwitch: true,//隐藏明暗切换按钮
+        disableSwitch: false,//隐藏明暗切换按钮
         respectPrefersColorScheme: false,//跟随用户系统默认
       },
       //自定义配置底部的版权说明与SVG图超链接
@@ -286,7 +286,7 @@ const config = {
       },
       //配置标准的明暗主题
       prism: {
-        theme: darkCodeTheme,
+        theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
         defaultLanguage: "markdown",
       },

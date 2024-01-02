@@ -19,6 +19,7 @@ import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import "yet-another-react-lightbox/plugins/captions.css";
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
+import {useColorMode } from '@docusaurus/theme-common';
 //定义图片路径
 const unsplashLink = (id, width, height) =>
   `/gallery/${id}-${width}-${height}.jpg`;
@@ -201,7 +202,10 @@ function Settings({ children }) {
     }),
     [layout, count, targetRowHeight, columns, spacing, padding, width,tag],
   );
-  const darkTheme = createTheme({ palette: { mode: 'dark' } });
+  
+
+  const darkTheme = createTheme({ palette: { mode: useColorMode().colorMode === 'dark' ? 'dark' :'light' } });
+
   return (
    
     <SettingsContext.Provider value={settings}>
@@ -323,7 +327,7 @@ function Playground() {
           borderRadius: padding > 2 ? "4px" : 0,
           boxShadow:
             spacing > 0
-              ? "0px 3px 3px -2px rgb(255 255 0 / 20%), 0px 3px 4px 0px rgb(255 255 0 / 14%), 0px 1px 8px 0px rgb(255 255 0 / 12%)"
+              ? "0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%)"
               : "none",
           transition: "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
         }}

@@ -23,7 +23,7 @@
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #FFD700;        /* 金色 */
+  --ifm-color-primary: #E6B800;        /* 金色 */
   --ifm-color-primary-dark: #CCA300;   /* 深金色 */
   --ifm-color-primary-darker: #B39400;  /* 更深金色 */
   --ifm-color-primary-darkest: #996300; /* 最深金色 */

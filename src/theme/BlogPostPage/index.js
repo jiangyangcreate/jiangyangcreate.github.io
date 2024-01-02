@@ -11,6 +11,26 @@ import Unlisted from '@theme/Unlisted';
 
 // 修改：追加评论模块
 import Giscus from '@giscus/react';
+import {useColorMode } from '@docusaurus/theme-common';
+function Comment() {
+  // merge default config
+  const giscus = useColorMode().colorMode === 'dark' ? 'dark' :'light';
+  return ( <Giscus
+    id="comments"
+    repo="jiangyangcreate/jiangyangcreate.github.io"
+    repoId="R_kgDOKVhfrw"
+    category="Announcements"
+    categoryId="DIC_kwDOKVhfr84CbuxD"
+    mapping="title"
+    reactionsEnabled="1"
+    emitMetadata="0"
+    inputPosition="top"
+    theme={giscus}
+    lang="en"
+    loading="lazy"
+  />
+  );
+}
 
 function BlogPostPageContent({sidebar, children}) {
   const {metadata, toc} = useBlogPost();
@@ -20,6 +40,7 @@ function BlogPostPageContent({sidebar, children}) {
     toc_min_heading_level: tocMinHeadingLevel,
     toc_max_heading_level: tocMaxHeadingLevel,
   } = frontMatter;
+  
   return (
     <BlogLayout
       sidebar={sidebar}
@@ -34,25 +55,11 @@ function BlogPostPageContent({sidebar, children}) {
       }>
       {unlisted && <Unlisted />}
       <BlogPostItem>{children}</BlogPostItem>
-      <Giscus
-      id="comments"
-      repo="jiangyangcreate/jiangyangcreate.github.io"
-      repoId="R_kgDOKVhfrw"
-      category="Announcements"
-      categoryId="DIC_kwDOKVhfr84CbuxD"
-      mapping="title"
-      reactionsEnabled="1"
-      emitMetadata="0"
-      inputPosition="top"
-      theme="dark"
-      lang="en"
-      loading="lazy"
-    />
+      {/* // 修改：追加评论模块 */}
+      <Comment/>
       {(nextItem || prevItem) && (
         <BlogPostPaginator nextItem={nextItem} prevItem={prevItem} />
       )}
-      {/* // 修改：追加评论模块 */}
-
     </BlogLayout>
   );
 }
