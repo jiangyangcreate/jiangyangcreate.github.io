@@ -18,7 +18,7 @@ import FormControl from "@mui/material/FormControl";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
 import "yet-another-react-lightbox/plugins/captions.css";
-
+import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 //定义图片路径
 const unsplashLink = (id, width, height) =>
   `/gallery/${id}-${width}-${height}.jpg`;
@@ -146,6 +146,7 @@ function SliderControl({
         value={value}
         disabled={disabled}
         size="small"
+        color="secondary"
         valueLabelDisplay="auto"
         marks={[
           { value: min, label: `${min}` },
@@ -200,12 +201,13 @@ function Settings({ children }) {
     }),
     [layout, count, targetRowHeight, columns, spacing, padding, width,tag],
   );
-
+  const darkTheme = createTheme({ palette: { mode: 'dark' } });
   return (
    
     <SettingsContext.Provider value={settings}>
-      <Paper variant="outlined" sx={{ mb: 4, p: 2, textAlign: "left",color:"#FF8E53",background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)' }}>
+      <Paper variant="outlined" sx={{ mb: 4, p: 2, textAlign: "left", }} theme={darkTheme}>
         <Grid container columns={24} rowSpacing={2} columnSpacing={4}>
+        <ThemeProvider theme={darkTheme}>
           <Filter>
             <TextField
               select
@@ -214,6 +216,7 @@ function Settings({ children }) {
               variant="standard"
               margin="none"
               value={layout}
+              color="warning"
               onChange={(event) => setLayout(event.target.value)}
             >
               {[
@@ -296,8 +299,8 @@ function Settings({ children }) {
                 </MenuItem>
               ))}
             </TextField>
-          </Filter>
-
+          </Filter> 
+          </ThemeProvider>
         </Grid>
       </Paper>
 

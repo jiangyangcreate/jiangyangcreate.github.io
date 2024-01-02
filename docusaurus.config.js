@@ -286,7 +286,7 @@ const config = {
       },
       //配置标准的明暗主题
       prism: {
-        theme: lightCodeTheme,
+        theme: darkCodeTheme,
         darkTheme: darkCodeTheme,
         defaultLanguage: "markdown",
       },
