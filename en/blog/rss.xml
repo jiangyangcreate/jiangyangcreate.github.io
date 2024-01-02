@@ -4,11 +4,21 @@
         <title>jiangmiemie Blog</title>
         <link>https://jiangmiemie.com/en/blog</link>
         <description>jiangmiemie Blog</description>
-        <lastBuildDate>Fri, 30 Dec 2022 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Sat, 30 Dec 2023 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
-        <copyright>Copyright © 2023 jiangmiemie</copyright>
+        <copyright>Copyright © 2024 jiangmiemie</copyright>
+        <item>
+            <title><![CDATA[设计：设计的意义]]></title>
+            <link>https://jiangmiemie.com/en/blog/design</link>
+            <guid>https://jiangmiemie.com/en/blog/design</guid>
+            <pubDate>Sat, 30 Dec 2023 00:00:00 GMT</pubDate>
+            <description><![CDATA[设计的意义]]></description>
+            <content:encoded><![CDATA[<p>设计的意义</p>]]></content:encoded>
+            <author>jiangyangcreate@gmail.com (蒋洋)</author>
+            <category>设计</category>
+        </item>
         <item>
             <title><![CDATA[原则：我的世界观]]></title>
             <link>https://jiangmiemie.com/en/blog/principle</link>
@@ -187,7 +197,7 @@
 <p>3.过滤所有的信息讨论，讨论区无法上传证据图片、完整的有结构的论述（字数限制）因此讨论区是一个忽略过程而追求结论的地方，这里的信息不具备参考价值，因为有价值的是一体化的论证过程与结论。</p>
 <p>过滤信息是为了利用过滤后的信息来解释并预测这个世界，因此我的纠偏逻辑是：避免无法证伪的思想，积极的世界做出预测并反思自己的逻辑。</p>
 <p>这个过程我会经历许多的失败，这些失败是我停步不前的原因，对于一个程序员来说，找到问题时，问题就已经解决了一半。</p>
-<h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="��正视不安的情绪">正视不安的情绪<a href="https://jiangmiemie.com/en/blog/principle#%E6%AD%A3%E8%A7%86%E4%B8%8D%E5%AE%89%E7%9A%84%E6%83%85%E7%BB%AA" class="hash-link" aria-label="Direct link to 正视不安的情绪" title="Direct link to 正视不安的情绪">​</a></h2>
+<h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="正视不安的情绪">正视不安的情绪<a href="https://jiangmiemie.com/en/blog/principle#%E6%AD%A3%E8%A7%86%E4%B8%8D%E5%AE%89%E7%9A%84%E6%83%85%E7%BB%AA" class="hash-link" aria-label="Direct link to 正视不安的情绪" title="Direct link to 正视不安的情绪">​</a></h2>
 <p>当面对难以解决的困难之时，正视不安与焦虑会促使我处理这一难题以摆脱这种焦虑。</p>
 <p>哪些我回头看来成长最快的阶段，大多来源于从不安与焦虑症中挣扎的想出了一个我此前从未想到的绝妙方案。</p>]]></content:encoded>
             <author>jiangyangcreate@gmail.com (蒋洋)</author>
