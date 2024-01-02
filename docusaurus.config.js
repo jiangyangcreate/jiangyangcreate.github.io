@@ -172,15 +172,6 @@ const config = {
         apiKey: '36cbcb8eb4d417b32200be7e427d68fd',
         indexName: websitename,
       },
-      //评论插件
-      giscus: {
-        repo: `${githubusername}/${githubuserRepository}`,
-        repoId: 'R_kgDOKVhfrw',
-        category: 'Announcements',
-        categoryId: 'DIC_kwDOKVhfr84CbuxD',
-        theme: 'light',
-        darkTheme: 'dark',
-      },
       navbar: {
         title: '首页',
         hideOnScroll: true,
@@ -229,8 +220,8 @@ const config = {
       
       colorMode: {
         defaultMode: 'dark',//定义首次访问的颜色
-        disableSwitch: false,//隐藏明暗切换按钮
-        respectPrefersColorScheme: true,//跟随用户系统默认
+        disableSwitch: true,//隐藏明暗切换按钮
+        respectPrefersColorScheme: false,//跟随用户系统默认
       },
       //自定义配置底部的版权说明与SVG图超链接
       footer: {
@@ -247,54 +238,8 @@ const config = {
             <p class="logoxs">
 
             <a  class="logox" target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="go to next website random">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" id="rss" width="30px" height="30px" ><g fill="url(#grad0)"><circle cx="3" cy="13" r="2"></circle>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" id="rss" width="30px" height="30px" ><g fill="url(#grad1)"><circle cx="3" cy="13" r="2"></circle>
             <path d="M1 5.667v2.667A6.674 6.674 0 0 1 7.667 15h2.666c0-5.146-4.187-9.333-9.333-9.333z"></path><path d="M1 1v2.667C7.25 3.667 12.334 8.75 12.334 15H15C15 7.28 8.72 1 1 1z"></path></g></svg>
-            </a>
-
-            <a  class="logox" target="_blank" rel="noopener noreferrer" href="https://www.travellings.cn/go.html" aria-label="go to next website random">
-            <svg version="1.0" xmlns="http://www.w3.org/2000/svg" clip-path="inset(0% round 16px)" width="30px" height="30px" viewBox="0 0 512.000000 512.000000" preserveAspectRatio="xMidYMid meet">
-              <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
-              fill="url(#grad0)" stroke="none">
-              <linearGradient id="grad0" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" style="stop-color: #FF0000; stop-opacity: 1" />
-              <stop offset="50%" style="stop-color: #ac4ccc; stop-opacity: 1" />
-              <stop offset="100%" style="stop-color: #4285F3; stop-opacity: 1" />
-              </linearGradient>
-              <path d="M0 2560 l0 -2560 2560 0 2560 0 0 2560 0 2560 -2560 0 -2560 0 0
-              -2560z m3545 1505 c147 -31 283 -132 346 -257 45 -90 51 -110 58 -231 l6 -108
-              200 -4 c610 -12 898 -162 825 -427 -16 -57 -102 -178 -173 -244 -211 -198
-              -590 -420 -1016 -598 -74 -31 -136 -58 -138 -60 -2 -1 9 -30 24 -62 39 -83 39
-              -167 0 -246 -127 -258 -484 -226 -563 51 -9 31 -17 57 -19 59 -1 1 -87 -22
-              -192 -52 -548 -157 -1131 -266 -1560 -292 -87 -5 -113 -10 -113 -21 0 -23 64
-              -116 105 -152 22 -19 69 -48 105 -65 l65 -31 999 -3 c892 -2 1006 -1 1055 14
-              140 40 258 164 291 306 5 24 10 129 10 234 l0 190 38 19 c20 11 40 21 44 23 5
-              2 8 -103 8 -232 0 -213 -2 -243 -21 -299 -52 -155 -161 -268 -315 -324 -52
-              -18 -97 -26 -181 -30 -62 -3 -113 -8 -113 -10 0 -3 25 -32 55 -66 54 -60 66
-              -92 43 -115 -29 -29 -56 -13 -144 88 l-89 100 -665 0 -665 0 -88 -100 c-88
-              -101 -116 -117 -145 -88 -23 23 -11 54 47 119 l60 66 -112 6 c-172 8 -274 53
-              -383 168 -28 30 -65 84 -83 120 l-32 66 -197 6 c-391 12 -626 76 -737 199
-              -110 122 -72 272 115 458 133 132 311 256 562 391 98 53 402 199 414 199 2 0
-              4 -22 4 -48 l0 -49 -232 -116 c-332 -166 -538 -300 -676 -440 -87 -89 -107
-              -114 -132 -169 -44 -96 -16 -160 95 -219 127 -68 334 -106 590 -109 77 -1 148
-              -1 158 -1 16 1 17 19 17 222 l0 220 43 -25 42 -25 6 -193 c3 -106 7 -195 7
-              -197 2 -4 177 7 240 15 l43 6 -37 37 c-60 60 -88 125 -88 206 0 39 5 87 13
-              108 22 65 84 132 152 166 201 101 430 -42 433 -269 0 -54 -5 -77 -29 -126 -17
-              -32 -31 -62 -33 -65 -2 -4 55 4 125 16 321 58 688 147 991 241 l112 35 25 48
-              c45 91 130 142 245 149 63 4 85 1 128 -18 l52 -23 126 52 c692 285 1171 624
-              1201 849 20 157 -320 270 -792 260 l-150 -3 -5 -182 -5 -183 -42 26 -43 25 0
-              282 c0 298 -5 339 -49 425 -29 57 -91 123 -149 161 -101 64 -56 62 -1158 59
-              l-1000 -3 -76 -38 c-130 -64 -209 -174 -228 -317 -5 -41 -10 -187 -10 -325 l0
-              -250 -40 -22 c-21 -13 -41 -23 -44 -23 -10 0 -6 616 4 671 34 182 204 353 393
-              394 96 21 1943 21 2042 0z m77 -395 c20 -6 48 -24 62 -41 23 -27 26 -40 26
-              -106 l0 -75 43 4 42 3 0 -45 c0 -45 0 -45 -40 -50 l-40 -5 -5 -395 c-5 -433
-              -5 -431 -65 -456 -52 -21 -853 -21 -895 1 -62 32 -60 9 -60 580 l0 520 23 28
-              c12 16 38 32 57 37 52 12 808 12 852 0z m-1286 -34 l34 -34 0 -196 c0 -108 4
-              -196 9 -196 4 0 60 13 122 30 63 16 115 30 117 30 1 0 2 -22 2 -49 l0 -49
-              -125 -32 -125 -33 0 -269 c0 -233 -2 -272 -16 -294 -36 -54 -39 -54 -496 -54
-              -401 0 -425 1 -455 20 -17 10 -37 28 -43 40 -13 23 -16 229 -12 719 l2 333 34
-              34 34 34 442 0 442 0 34 -34z"/>
-              </g>
-              </svg>
             </a>
 
             <a class="logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
@@ -355,16 +300,6 @@ const config = {
       //   isCloseable: true,//允许用户关闭
       // },
     }),
-  //用于与katex配合获得更好的公式渲染效果
-  stylesheets: [
-    {
-      href: 'https://cdn.jsdelivr.net/npm/katex@0.13.24/dist/katex.min.css',
-      type: 'text/css',
-      integrity:
-        'sha384-odtC+0UGzzFL/6PNoE8rX/SPcQDXBJ+uRepguP4QkPCm2LBxH3FA3y+fKSiJ+AmM',
-      crossorigin: 'anonymous',
-    },
-  ],
   // 开启markdown的mermaid功能
   themes: ['@docusaurus/theme-mermaid'],
   markdown: {

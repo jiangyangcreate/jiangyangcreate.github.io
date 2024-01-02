@@ -24,7 +24,7 @@
     "@emotion/react": "^11.11.1",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.0",
-    "@giscus/react": "^2.3.0",
+    "@giscus/react": "^2.4.0",
     "@mdx-js/react": "^3.0.0",
     "@mui/material": "^5.15.1",
     "clsx": "^1.2.1",

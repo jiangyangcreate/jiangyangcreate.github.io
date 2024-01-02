@@ -98,4 +98,5 @@
     text-align: left;     /* 水平靠左 */
     display: flex;
     margin: 10px;       /* 左右各留 10px 边距，你可以根据需要调整 */
+    color: #000;
 }

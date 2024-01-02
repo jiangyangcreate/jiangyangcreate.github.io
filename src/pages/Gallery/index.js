@@ -202,8 +202,9 @@ function Settings({ children }) {
   );
 
   return (
+   
     <SettingsContext.Provider value={settings}>
-      <Paper variant="outlined" sx={{ mb: 4, p: 2, textAlign: "left" }}>
+      <Paper variant="outlined" sx={{ mb: 4, p: 2, textAlign: "left",color:"#FF8E53",background: 'linear-gradient(45deg, #FE6B8B 30%, #FF8E53 90%)' }}>
         <Grid container columns={24} rowSpacing={2} columnSpacing={4}>
           <Filter>
             <TextField
@@ -302,6 +303,7 @@ function Settings({ children }) {
 
       {children}
     </SettingsContext.Provider>
+
   );
 }
 
@@ -318,7 +320,7 @@ function Playground() {
           borderRadius: padding > 2 ? "4px" : 0,
           boxShadow:
             spacing > 0
-              ? "0px 3px 3px -2px rgb(0 0 0 / 20%), 0px 3px 4px 0px rgb(0 0 0 / 14%), 0px 1px 8px 0px rgb(0 0 0 / 12%)"
+              ? "0px 3px 3px -2px rgb(255 255 0 / 20%), 0px 3px 4px 0px rgb(255 255 0 / 14%), 0px 1px 8px 0px rgb(255 255 0 / 12%)"
               : "none",
           transition: "box-shadow 300ms cubic-bezier(0.4, 0, 0.2, 1) 0ms",
         }}

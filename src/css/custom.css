@@ -8,13 +8,13 @@
 /* @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap'); */
 
 :root {
-  --ifm-color-primary: #22593A;
-  --ifm-color-primary-dark: #29784c;
-  --ifm-color-primary-darker: #277148;
-  --ifm-color-primary-darkest: #205d3b;
-  --ifm-color-primary-light: #33925d;
-  --ifm-color-primary-lighter: #359962;
-  --ifm-color-primary-lightest: #3cad6e;
+  --ifm-color-primary: #996300;        /* 金色 */
+  --ifm-color-primary-dark: #7B5100;   /* 深金色 */
+  --ifm-color-primary-darker: #664000;  /* 更深金色 */
+  --ifm-color-primary-darkest: #4E3400; /* 最深金色 */
+  --ifm-color-primary-light: #B37F00;   /* 浅金色 */
+  --ifm-color-primary-lighter: #CC9900; /* 更浅金色 */
+  --ifm-color-primary-lightest: #E6B800; /* 最浅金色 */  
   --ifm-code-font-size: 95%;
   --site-announcement-bar-stripe-color1: hsl(167deg 68% 85%);
   --site-announcement-bar-stripe-color2: hsl(167deg 68% 95%);
@@ -23,13 +23,13 @@
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 [data-theme='dark'] {
-  --ifm-color-primary: #25c2a0;
-  --ifm-color-primary-dark: #21af90;
-  --ifm-color-primary-darker: #1fa588;
-  --ifm-color-primary-darkest: #1a8870;
-  --ifm-color-primary-light: #29d5b0;
-  --ifm-color-primary-lighter: #32d8b4;
-  --ifm-color-primary-lightest: #4fddbf;
+  --ifm-color-primary: #FFD700;        /* 金色 */
+  --ifm-color-primary-dark: #CCA300;   /* 深金色 */
+  --ifm-color-primary-darker: #B39400;  /* 更深金色 */
+  --ifm-color-primary-darkest: #996300; /* 最深金色 */
+  --ifm-color-primary-light: #FFDF80;   /* 浅金色 */
+  --ifm-color-primary-lighter: #FFE699; /* 更浅金色 */
+  --ifm-color-primary-lightest: #FFF1B3; /* 最浅金色 */
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
 
@@ -57,7 +57,7 @@ div[class^='announcementBar_'] {
 }
 
 .logox {
-  padding: 0.05rem;
+  padding: 0.1rem;
   text-decoration: none !important;
 }
 
