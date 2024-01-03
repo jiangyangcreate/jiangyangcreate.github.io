@@ -1,5 +1,5 @@
 ---
-name: Bug report
+name: Bug report English
 about: Create a report to help us improve
 title: ''
 labels: ''
@@ -19,12 +19,6 @@ A clear and concise description of what you expected to happen.
 
 **Screenshots**
 If applicable, add screenshots to help explain your problem.
-
-**Specifics (please complete the following information):**
- - Python Version:
- - Reflex Version:
- - OS: 
- - Browser (Optional):
  
 **Additional context**
 Add any other context about the problem here.
