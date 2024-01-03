@@ -2,6 +2,38 @@
 sidebar_position: 2
 title: Markdown备忘录
 ---
+
+## 数学公式
+
+$$
+\Delta \delta\\
+\cos (2\theta) = \cos^2 \theta - \sin^2 \theta\\
+\lim\limits_{x \to \infty} \exp(-x) = 0
+$$
+
+``` markdown
+$$
+\Delta \delta\\
+\cos (2\theta) = \cos^2 \theta - \sin^2 \theta\\
+\lim\limits_{x \to \infty} \exp(-x) = 0
+$$
+```
+
+## 流程图
+
+``` mermaid
+flowchart LR
+   a --> b & c--> d
+```
+
+````
+``` mermaid
+flowchart LR
+   a --> b & c--> d
+```
+````
+
+
 ## 表情
 
 :smile:
@@ -137,28 +169,4 @@ title: Markdown备忘录
 
 ``` markdown
 <!-- 注释 -->
-```
-
-## 数学公式
-
-$$
-公式\\
-A \alpha\\
-B \beta\\
-\Gamma \gamma\\
-\Delta \delta\\
-\cos (2\theta) = \cos^2 \theta - \sin^2 \theta\\
-\lim\limits_{x \to \infty} \exp(-x) = 0
-$$
-
-``` markdown
-$$
-公式\\
-A \alpha\\
-B \beta\\
-\Gamma \gamma\\
-\Delta \delta\\
-\cos (2\theta) = \cos^2 \theta - \sin^2 \theta\\
-\lim\limits_{x \to \infty} \exp(-x) = 0
-$$
 ```

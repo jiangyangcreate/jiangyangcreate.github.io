@@ -1,15 +1,8 @@
 ---
-title: 更多单片机
+sidebar_position: 3
+title: Thinker
 ---
 
-
-## K210
-
-
-![示例图](/2023/k210.png)
-![示例图](/2023/K210info.png)
-
-## thinker
 [thinker-edge-R](https://tinker-board.asus.com/product/tinker-edge-r.html) 是华硕的一款单片机产品,适用于 AI 应用的单板计算机。
 
 - 支持Linux（Debian 9 [Python 3.7]，最新版支持Debian 10[Python 3.8]）和安卓系统（9）。

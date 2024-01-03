@@ -2,6 +2,9 @@
 sidebar_position: 4
 title: Terminal备忘录
 ---
+
+## 端口
+
 查看端口号占用情况
 
 ``` bash
@@ -21,6 +24,8 @@ kill -9 $(lsof -i tcp:6022 -t)
 nohup python3 fast_api.py &
 ```
 
+## 系统
+
 查看内存/显示系统当前进程信息
 
 ``` bash
@@ -38,6 +43,8 @@ df -h
 ``` bash
 uptime
 ```
+
+## 文件
 
 显示工作路径
 

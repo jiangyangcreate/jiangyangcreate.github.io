@@ -1,6 +1,5 @@
 ---
-slug: /
-sidebar_position: 0
+sidebar_position: 1
 title: 高等数学概述
 ---
 
