@@ -305,6 +305,12 @@ const config = {
   markdown: {
     mermaid: true,
   },
+  stylesheets: [
+    {
+      href: '/katex/katex.min.css',
+      type: 'text/css',
+    },
+  ],
 };
 
 module.exports = config;
