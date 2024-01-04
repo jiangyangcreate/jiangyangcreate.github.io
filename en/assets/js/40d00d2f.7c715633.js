@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkjiangmiemie=self.webpackChunkjiangmiemie||[]).push([[4489],{49066:e=>{e.exports=JSON.parse('{"label":"\u8bb0\u5f55","permalink":"/en/blog/tags/\u8bb0\u5f55","allTagsPath":"/en/blog/tags","count":3,"unlisted":false}')}}]);

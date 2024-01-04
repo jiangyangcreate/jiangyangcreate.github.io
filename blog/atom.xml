@@ -7,7 +7,6 @@
     <link rel="alternate" href="https://jiangmiemie.com/blog"/>
     <subtitle>jiangmiemie Blog</subtitle>
     <icon>https://jiangmiemie.com/img/favicon.ico</icon>
-    <rights>Copyright © 2024 jiangmiemie</rights>
     <entry>
         <title type="html"><![CDATA[设计：设计的意义]]></title>
         <id>https://jiangmiemie.com/blog/design</id>
@@ -17,7 +16,6 @@
         <content type="html"><![CDATA[<p>设计的意义</p>]]></content>
         <author>
             <name>蒋洋</name>
-            <email>jiangyangcreate@gmail.com</email>
             <uri>https://github.com/jiangyangcreate</uri>
         </author>
         <category label="设计" term="设计"/>
@@ -205,7 +203,6 @@
 <p>哪些我回头看来成长最快的阶段，大多来源于从不安与焦虑症中挣扎的想出了一个我此前从未想到的绝妙方案。</p>]]></content>
         <author>
             <name>蒋洋</name>
-            <email>jiangyangcreate@gmail.com</email>
             <uri>https://github.com/jiangyangcreate</uri>
         </author>
         <category label="原则" term="原则"/>
@@ -291,7 +288,6 @@ A住在公司附近，每天加班1小时，每个月可以拿到1000的加班�
 <p>以上适用于跨省、跨国搬家。同城搬家有驾照还是自租车最划算。</p>]]></content>
         <author>
             <name>蒋洋</name>
-            <email>jiangyangcreate@gmail.com</email>
             <uri>https://github.com/jiangyangcreate</uri>
         </author>
         <category label="家居" term="家居"/>
@@ -332,7 +328,6 @@ A住在公司附近，每天加班1小时，每个月可以拿到1000的加班�
 <p>此刻，微风吹动窗帘，无数生活在城市的人在月光下梦呓。</p>]]></content>
         <author>
             <name>蒋洋</name>
-            <email>jiangyangcreate@gmail.com</email>
             <uri>https://github.com/jiangyangcreate</uri>
         </author>
         <category label="梦" term="梦"/>
@@ -410,7 +405,6 @@ A住在公司附近，每天加班1小时，每个月可以拿到1000的加班�
 <p><a href="https://www.ruanyifeng.com/blog/weekly" target="_blank" rel="noopener noreferrer">阮一峰的网络日志</a> —— 科技爱好者周刊已经成了我每周必看的内容，阮老师是真正的布道者。</p>]]></content>
         <author>
             <name>蒋洋</name>
-            <email>jiangyangcreate@gmail.com</email>
             <uri>https://github.com/jiangyangcreate</uri>
         </author>
         <category label="blog" term="blog"/>
