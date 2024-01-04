@@ -1,18 +1,21 @@
-import React from 'react'
-import Layout from '@theme/Layout'
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext'
-import styles from './index.module.css'
+import React from 'react';
+import Layout from '@theme/Layout';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import Translate from '@docusaurus/Translate';
 
-function MyHero() {
+export default function Home() {
   const { siteConfig } = useDocusaurusContext()
   return (
-    <div className={styles.myHeroContainer}>
-      <div className={styles.leftContainer}>
-        <h1 className={styles.leftContainer_h1}>
+    <Layout
+      description="Concise, consistent, and legible badges"
+      title={siteConfig.title}
+    >
+    <div className='myHeroContainer'>
+      <div className='leftContainer'>
+        <h1 className='leftContainer_h1'>
           import this
         </h1>
-        <p className={styles.leftContainer_p}>
+        <p className='leftContainer_p'>
         <Translate id="homepage.philosophy.one">优美优于丑陋，明了优于隐晦</Translate><br />
         <Translate id="homepage.philosophy.two">简单优于复杂，复杂优于繁杂</Translate><br />
         <Translate id="homepage.philosophy.three">扁平优于嵌套，稀疏优于稠密</Translate><br />
@@ -26,21 +29,10 @@ function MyHero() {
         <Translate id="homepage.philosophy.eleven">很好解释的，可能是好方法。</Translate><br />
         </p>
       </div>
-      <div className={styles.rightContainer}>
-        <img src="/img/deskimg.png" alt='HeroImg' />
+      <div className='rightContainer'>
+        <img src="/img/deskimg.png" />
       </div>
     </div>
-  )
-}
-
-export default function Home() {
-  const { siteConfig } = useDocusaurusContext()
-  return (
-    <Layout
-      description="Concise, consistent, and legible badges"
-      title={siteConfig.title}
-    >
-      <MyHero />
     </Layout>
   )
 }

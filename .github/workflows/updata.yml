@@ -6,7 +6,6 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
-    # 不给权限会报错
     permissions:
       contents: write
 

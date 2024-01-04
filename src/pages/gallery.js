@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { PhotoAlbum ,LayoutType, Photo } from "react-photo-album";
+import { PhotoAlbum} from "react-photo-album";
 import Layout from '@theme/Layout';
 import React, { useState, useMemo, createContext, useContext, useEffect } from "react";
 import Lightbox from "yet-another-react-lightbox";
@@ -134,7 +134,7 @@ function SliderControl({
   disabled,
 }) {
   const [focused, setFocused] = useState(false);
-
+  const darkTheme = useColorMode().colorMode === 'dark' ?  'secondary':'primary';
   return (
     <FormControl margin="none" fullWidth>
       <InputLabel shrink variant="standard" focused={focused}>
@@ -147,7 +147,7 @@ function SliderControl({
         value={value}
         disabled={disabled}
         size="small"
-        color="secondary"
+        color= {darkTheme}
         valueLabelDisplay="auto"
         marks={[
           { value: min, label: `${min}` },
@@ -184,8 +184,8 @@ function Settings({ children }) {
     const viewportSize = window.innerWidth;
     //如果要更改默认设置，在这里设定
     setColumns(viewportSize < 480 ? 2 : viewportSize < 900 ? 3 : 5);
-    setSpacing(viewportSize < 480 ? 10 : viewportSize < 900 ? 20 : 30);
-    setPadding(viewportSize < 480 ? 10 : viewportSize < 900 ? 20 : 30);
+    setSpacing(viewportSize < 480 ? 5 : viewportSize < 900 ? 10 : 20);
+    setPadding(viewportSize < 480 ? 5 : viewportSize < 900 ? 10 : 20);
     setTargetRowHeight(viewportSize < 480 ? 100 : viewportSize < 900 ? 150 : 200);
   }, []);
 
@@ -295,6 +295,7 @@ function Settings({ children }) {
               variant="standard"
               margin="none"
               value={tag}
+              color="warning"
               onChange={(event) => settag(event.target.value)}
             >
               {extractedData.map(({ value, title }) => (

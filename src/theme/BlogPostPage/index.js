@@ -13,8 +13,7 @@ import Unlisted from '@theme/Unlisted';
 import Giscus from '@giscus/react';
 import {useColorMode } from '@docusaurus/theme-common';
 function Comment() {
-  // merge default config
-  const giscus = useColorMode().colorMode === 'dark' ? 'dark' :'light';
+  const darkTheme = useColorMode().colorMode === 'dark' ? 'dark' :'light';
   return ( <Giscus
     id="comments"
     repo="jiangyangcreate/jiangyangcreate.github.io"
@@ -25,7 +24,7 @@ function Comment() {
     reactionsEnabled="1"
     emitMetadata="0"
     inputPosition="top"
-    theme={giscus}
+    theme={darkTheme}
     lang="en"
     loading="lazy"
   />

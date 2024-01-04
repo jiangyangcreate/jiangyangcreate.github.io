@@ -1,82 +1,56 @@
-[English](README.md) | [中文](README_zh.md)
+## 项目简介
 
-## Design Philosophy
+这是一个基于最新版本的[Docusaurus 3.0](https://docusaurus.io/)的自定义站点
 
-Beautiful is better than ugly.
+[Docusaurus Site Showcase](https://docusaurus.io/showcase)中的自定义给了我许多灵感，但我更追求简洁而精美的设计以确保代码易于维护。
 
-Explicit is better than implicit.
+**美丽胜过丑陋，清晰胜过模糊。简洁胜过复杂，复杂胜过繁琐。**
 
-Simple is better than complex.
+在这个设计理念的指导下，我打造了这个小巧而具有吸引力的个人博客站点。
 
-Complex is better than complicated.
+> 有多小巧？[点击查看网站分析](https://pagespeed.web.dev/)
 
-Flat is better than nested.
+### 主要特性
 
-Sparse is better than dense.
+- 集成 infinum ，轻松创建个人案例页，优雅的展示你的项目。
+> [点击查看](https://jiangmiemie.com/showcase/)
+- 集成 Giscus，可在博客页|个人案例页下方评论，支持使用 GitHub 账号登录，方便与作者互动。
+> [点击体验](https://jiangmiemie.com/blog/blog/)
+- 集成 React Photo Album ，构建独特的旅行照片墙
+> 点击照片可放大并展示照片描述， [点击直达照片墙](https://jiangmiemie.com/gallery/)
+- 不将就的明暗模式，从画布到相册，从评论框到搜索框，白天不懂夜的美。
+> 点击页面左上角切换明暗， [点击体验](https://jiangmiemie.com/)
 
-Readability counts.
 
-Special cases aren't special enough to break the rules.
+### 常规特性
 
-Although practicality beats purity.
-
-Errors should never pass silently.
-
-Unless explicitly silenced.
-
-In the face of ambiguity, refuse the temptation to guess.
-
-There should be one-- and preferably only one --obvious way to do it.
-
-Now is better than never.
-
-Although never is often better than *right* now.
-
-If the implementation is hard to explain, it's a bad idea.
-
-If the implementation is easy to explain, it may be a good idea.
-
-The above is an excerpt from "The Zen of Python."
-
-Based on such design principles, I created a small and beautiful personal blog site. Click to view the [website analysis](https://pagespeed.web.dev/).
-
-## Framework
-
-Built on the latest [Docusaurus 3.0.1](https://docusaurus.io/), the personal blog site is partially incompatible with Docusaurus 2.0.
-
-Inspired by the [Docusaurus Site Showcase](https://docusaurus.io/showcase), I selected interesting designs, made some modifications, and ultimately completed this site.
-
-To facilitate customization, as much custom content as possible is placed in `docusaurus.config.js`.
-
-- Light and dark mode switchable in the upper right corner of the page.
-- Announcement bar on the homepage for announcements.
-- KaTeX formula plugin for LaTeX syntax support, making it easier to write mathematical formulas.
-- PWA support for offline access, allowing you to browse the site even without an internet connection.
-- RSS support for blog subscription. Subscribe to the [RSS feed](https://jiangmiemie.com/blog/rss.xml).
-- Algolia global search for quick content retrieval within the site.
-- Giscus for comments at the bottom of specified pages, supporting GitHub account login for communication with the author.
-- Google Analytics using Google Tag Manager to view website traffic.
-- i18n for automatic translation based on the Crowdin plugin.
-- "react-photo-album" is a photo album plugin that can display albums at the bottom of a specified page.
+- 生成静态站点托管至 GitHub Page。
+- 无障碍，配色便于视力障碍人生阅读。
+- Algolia 全局搜索，支持站内搜索，帮助您快速找到需要的内容。
+- katex 公式插件，支持 LaTeX 语法，使数学公式编辑更加便捷。
+- PWA (Progressive Web App)，支持离线访问，使您可以在没有网络连接的情况下浏览本站。
+- RSS，支持博客的 RSS 订阅。访问[RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
+- i18n，基于 Crowdin 插件自动翻译。
+- 公告栏 (announcementBar)，允许在首页设置一个公告。
+- Google Analytics，可查看网站访问情况。
 
 <details>
 
-### Google Analytics
+### 集成谷歌分析
 
-Obtain the Google Analytics code and insert it into the `googleAnalytics` field in `docusaurus.config.js`.
+获取谷歌分析代码，并填入 `docusaurus.config.js` 的 `googleAnalytics` 字段。
 
-### Global Search
+### 全局搜索配置
 
-Obtain the Algolia `Application ID` and `Search-Only API Key`, and insert them into the `algolia` field in `docusaurus.config.js`.
+获取 Algolia 的 `Application ID` 和 `Search-Only API Key`，并填入 `docusaurus.config.js` 的 `algolia` 字段。
 
-Add the search box:
-
+添加搜索框
 ```javascript
 navbar: {
-  title: 'Home',
+  title: '首页',
   hideOnScroll: true,
   items: [
-    // Search box
+    // 搜索框
     {
       type: 'search',
       position: 'right',
@@ -85,15 +59,14 @@ navbar: {
 },
 ```
 
-### Giscus
+### 集成 Giscus
 
-Utilize the Giscus plugin.
+使用 Giscus 插件
 
-Obtain the Giscus `repo` and `repoID`, and insert them into the `giscus` field in `docusaurus.config.js`.
+获取 Giscus 的 `repo` 和 `repoID`，并填入 `docusaurus.config.js` 的 `giscus` 字段。
 
-Basic usage, for example: customizing the comment board:
-
-```jsx
+基本使用，例如：自定义留言板
+```javascript
 import Giscus from '@giscus/react';
 
 function Comment() {
@@ -105,24 +78,31 @@ function Comment() {
 }
 ```
 
-If you want comments on each post, add `<Giscus />` in `src\theme\BlogPostPage`. Simply copy and paste the `src\theme\BlogPostPage` folder.
+若要在每篇文章下添加评论，需要在 `src\theme\BlogPostPage` 中添加 `<Giscus />`。
+只需复制粘贴 `src\theme\BlogPostPage` 文件夹即可。
 
-### Album
+### 配置相册
 
-Customize the photo album using the react-photo-album plugin.
+使用 React Photo Album 插件自定义相册。
 
-Supports multiple layouts, tag filtering, individual viewing on click, display of image size and description, preview of next and previous images, zooming in and out of images, and more. The `photos` field in `src\pages\gallery\index.js` contains the album images and can be customized as needed.
+支持多种布局、按标签筛选、点击单独查看、显示图片大小与描述、显示前后预览、图片放大、缩小等功能。`src\pages\gallery\index.js`中的 `photos` 字段为相册图片，可按需自定义。
 
-### Bilingual (Chinese and English)
+### 中英双语支持
 
-Obtain the Crowdin `Project ID` and `API Key`, and insert them into the `crowdin` field in `docusaurus.config.js`.
+获取 Crowdin 的 `Project ID` 和 `API Key`，并填入 `docusaurus.config.js` 的 `crowdin` 字段。
 
 </details>
 
-## Quick Reproduction
+### 快速开始
 
-`npm update` to update plugins.
+执行以下命令可快速重现项目：
 
-`npm install` to download necessary dependencies.
+- `npm update`：更新插件
+- `npm install`：下载所需依赖包
+- `npm run start`：启动站点
 
-`npm run start` to launch the site.
+### 许可证信息
+
+[Apache License 2.0](LICENSE)
+
+### 最新更新
