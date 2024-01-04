@@ -29,20 +29,6 @@ module.exports = {
   // set trailingSlash: true 可以让 algolia 抓取更完整
   trailingSlash: true,
 
-  // 国际化
-  i18n: {
-    defaultLocale: 'zh',
-    locales: ['en', 'zh'],
-    localeConfigs: {
-      en: {
-        htmlLang: 'en-GB',
-      },
-      zh:{
-        htmlLang:'zh-CN',
-      }
-    },
-  },
-
   presets: [
     [
       '@docusaurus/preset-classic',
@@ -218,12 +204,6 @@ module.exports = {
             type: 'search',
             position: 'right',
           },
-          // 中英文切换
-          {
-            type: 'localeDropdown',
-            position: 'right',
-          },
-
         ],
       },
       //自定义配置底部的版权说明与SVG图超链接

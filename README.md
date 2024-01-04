@@ -56,11 +56,11 @@ navbar: {
 
 - PWA (Progressive Web App)，支持离线访问，使您可以在没有网络连接的情况下浏览本站。
 
-- i18n，基于Crowdin插件自动翻译。
-
 - 公告栏 (announcementBar)，允许在首页设置一个公告。
 
 - Google Analytics，可查看网站访问情况。
+
+- i18n，基于Crowdin插件自动翻译（暂时移除，会导致构建包的体积翻倍，大于1G无法正常github-page部署）。
 
 <details>
 获取谷歌分析代码，并填入 `docusaurus.config.js` 的 `googleAnalytics` 字段。
