@@ -1,38 +1,98 @@
-import React from 'react';
-import Layout from '@theme/Layout';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import Translate from '@docusaurus/Translate';
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import Layout from '@theme/Layout';
+import React, { Fragment, useEffect, useState } from 'react';
+import { ShowcaseCard, CtaImageButton } from '@infinum/docusaurus-theme';
 
-export default function Home() {
-  const { siteConfig } = useDocusaurusContext()
-  return (
-    <Layout
-      description="Concise, consistent, and legible badges"
-      title={siteConfig.title}
-    >
-    <div className='myHeroContainer'>
-      <div className='leftContainer'>
-        <h1 className='leftContainer_h1'>
-          import this
-        </h1>
-        <p className='leftContainer_p'>
-        <Translate id="homepage.philosophy.one">优美优于丑陋，明了优于隐晦</Translate><br />
-        <Translate id="homepage.philosophy.two">简单优于复杂，复杂优于繁杂</Translate><br />
-        <Translate id="homepage.philosophy.three">扁平优于嵌套，稀疏优于稠密</Translate><br />
-        <Translate id="homepage.philosophy.four">可读性很重要！</Translate><br />
-        <Translate id="homepage.philosophy.five">特例亦不可违背原则，即使实用比纯粹更优。</Translate><br />
-        <Translate id="homepage.philosophy.six">错误绝不能悄悄忽略，除非它明确需要如此。</Translate><br />
-        <Translate id="homepage.philosophy.seven">面对不确定性，拒绝妄加猜测。</Translate><br />
-        <Translate id="homepage.philosophy.eight">任何问题应有一种，且最好只有一种，显而易见的解决方法。</Translate><br />
-        <Translate id="homepage.philosophy.nine">做优于不做，然而不假思索还不如不做。</Translate><br />
-        <Translate id="homepage.philosophy.ten">很难解释的，必然是坏方法。</Translate><br />
-        <Translate id="homepage.philosophy.eleven">很好解释的，可能是好方法。</Translate><br />
-        </p>
-      </div>
-      <div className='rightContainer'>
-        <img src="/img/deskimg.png" />
-      </div>
-    </div>
-    </Layout>
-  )
+const shuffleArray = (array) => array.map(value => ({ value, sort: Math.random() }))
+	.sort((a, b) => a.sort - b.sort)
+	.map(({ value }) => value);
+
+function ShowcaseGrid() {
+
+	const headingTitle =  'Welcome'
+	const headingSubtitle =  'See the awesome websites we building';
+	const ctaTitle = <span>你好 <br /> 遇到问题了吗?</span>;
+	const ctaSubtitle = 'Open an issue on GitHub';
+	const ctaUrl =  'https://github.com/jiangyangcreate/jiangyangcreate.github.io/issues';
+
+	const publicData = [
+		{
+			image: useBaseUrl('img/showcase/jiangmiemie.png'),
+			label: 'jiangmiemie',
+			desc: '这是一个基于 Docusaurus 3.0 最新版本的自定义站点。设计理念：美丽胜过丑陋，清晰胜过模糊。简洁胜过复杂，复杂胜过繁琐。希望你喜欢这个小巧而吸引人的个人博客站点。',
+			link: 'https://jiangmiemie.com/',
+		},
+		{
+			image: useBaseUrl('img/showcase/academy.webp'),
+			label: 'academy',
+			desc: 'Learn how to build apps. For free. No practical experience? No problem. People who build apps every day are teaching how to create software from scratch. By the end of the course, you will have built your very own app.',
+			link: 'https://academy.infinum.com/',
+		},
+	];
+
+	// https://reactjs.org/docs/react-dom.html#hydrate
+	const [isClient, setIsClient] = useState(false);
+	useEffect(() => {
+		setIsClient(true)
+	}, []);
+
+	const items = shuffleArray(publicData).map((item, index) => {
+		const {
+			image,
+			label,
+			link,
+			desc,
+		} = item;
+
+		return (
+			<ShowcaseCard
+				key={index}
+				url={link}
+				imageUrl={image}
+				imageAlt={label}
+				title={label}
+				description={desc}
+			/>
+		)
+	});
+
+	return (
+		// key={isClient ? 1 : 2} will trigger a rerender of the whole subtree and the images will be aligned with text
+		<Fragment key={isClient ? 1 : 2}>
+			<h1 className='es-big-title es-h-center'>{headingTitle}</h1>
+			<p className='es-big-subtitle es-text-center es-h-center'>{headingSubtitle}</p>
+
+			<div className='es-showcase-grid'>
+				{items}
+			</div>
+
+			<CtaImageButton
+				title={ctaTitle}
+				buttonLabel={ctaSubtitle}
+				buttonUrl={ctaUrl}
+				imageUrl='/img/showcase/cta.svg'
+			/>
+		</Fragment>
+	);
 }
+
+
+
+
+export default function Showcase() {
+	const context = useDocusaurusContext();
+	const { siteConfig = {} } = context;
+
+	return (
+		<Layout
+			title='Showcase'
+			description={siteConfig.tagline}
+			keywords={siteConfig.customFields.keywords}
+			metaImage={useBaseUrl(`img/${siteConfig.customFields.image}`)}
+			wrapperClassName='es-navbar-white'
+		>
+			<ShowcaseGrid />
+		</Layout>
+	);
+};

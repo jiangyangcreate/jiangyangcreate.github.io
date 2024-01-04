@@ -12,7 +12,7 @@
 
 ### 主要特性
 
-- 集成infinum，轻松创建个人案例页，优雅展示个人案例。[查看个人案例](https://jiangmiemie.com/showcase/)
+- 集成infinum，轻松创建个人案例页，优雅展示个人案例。页面左上角切换明暗，从Markdown到画布到相册，做了很多明暗切换，保持一致。 [体验](https://jiangmiemie.com/)
 
 - 集成Giscus，在博客页下方评论，支持使用GitHub账号登录，方便与作者互动。[前往博客页体验](https://jiangmiemie.com/blog/blog/)
 
@@ -20,9 +20,6 @@
 <details>
 点击照片可放大并展示照片描述，支持多种布局、按标签筛选、点击单独查看、显示图片大小与描述、前后预览、图片放大、缩小等功能。`src\pages\gallery\index.js`中的 `photos` 字段为相册图片，可按需自定义。
 </details>
-
-
-- 页面左上角切换明暗，从Markdown到画布到相册，做了很多明暗切换，保持一致。 [体验切换](https://jiangmiemie.com/)
 
 ### 常规特性
 

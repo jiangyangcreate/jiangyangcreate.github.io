@@ -194,11 +194,6 @@ module.exports = {
             position: 'left',
             label: '相簿',
           },
-          {
-            to: "/showcase",
-            position: 'left',
-            label: '个案',
-          },
           // 搜索框
           {
             type: 'search',
