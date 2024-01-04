@@ -14,22 +14,22 @@
 
 - 集成 infinum ，轻松创建个人案例页，优雅的展示你的项目。
 > [点击查看](https://jiangmiemie.com/showcase/)
-- 集成 Giscus，可在博客页|个人案例页下方评论，支持使用 GitHub 账号登录，方便与作者互动。
+- 集成 Giscus，可在博客页下方评论，支持使用 GitHub 账号登录，方便与作者互动。
 > [点击体验](https://jiangmiemie.com/blog/blog/)
 - 集成 React Photo Album ，构建独特的旅行照片墙
 > 点击照片可放大并展示照片描述， [点击直达照片墙](https://jiangmiemie.com/gallery/)
-- 不将就的明暗模式，从画布到相册，从评论框到搜索框，白天不懂夜的美。
+- 不将就的明暗模式，从画布到相册，从评论框到搜索框，白天黑夜都不将就。
 > 点击页面左上角切换明暗， [点击体验](https://jiangmiemie.com/)
 
 
 ### 常规特性
 
+- Algolia 全局搜索，支持站内搜索，帮助您快速找到需要的内容。
+- RSS，支持博客的 RSS 订阅。访问[RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
 - 生成静态站点托管至 GitHub Page。
 - 无障碍，配色便于视力障碍人生阅读。
-- Algolia 全局搜索，支持站内搜索，帮助您快速找到需要的内容。
 - katex 公式插件，支持 LaTeX 语法，使数学公式编辑更加便捷。
 - PWA (Progressive Web App)，支持离线访问，使您可以在没有网络连接的情况下浏览本站。
-- RSS，支持博客的 RSS 订阅。访问[RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
 - i18n，基于 Crowdin 插件自动翻译。
 - 公告栏 (announcementBar)，允许在首页设置一个公告。
 - Google Analytics，可查看网站访问情况。

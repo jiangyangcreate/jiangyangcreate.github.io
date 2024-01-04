@@ -85,15 +85,6 @@ sudo mv /etc/apt/sources.list /etc/apt/sources.list.bak
 sudo vim /etc/apt/sources.list
 ```
 
-vim内容如下，`a`是进入编辑模式、`esc`是退出编辑模式，`:`是指令模式，`wq!`是保存指令
-
-完整的操作就是：
-
-- `a`是进入编辑模式
-- 删除旧内容，粘贴新内容。
-- `esc`退出编辑模式
-- `:wq!`回车确认
-
 不同版本的debian系统指向的源不同，请根据你自己的系统选择合适的镜像。例如搜索：debian10镜像源
 
 ``` bash
@@ -166,16 +157,3 @@ sudo reboot
 配置输入法方式2：
 
 - 输入法被唤醒时，右键菜单中选择输入法。
-
-#### 4.安装软件
-
-在终端打开文件所在位置后，安装执行`sudo dpkg -i 包名`。以vscode为例,
-
-``` bash
-cd Downloads
-sudo dpkg -i code_1.83.0-1696349969_arm64.deb
-```
-
-#### 5.更换壁纸
-
-桌面右键，在菜单中选取即可,注意图片先压缩，不要过大。

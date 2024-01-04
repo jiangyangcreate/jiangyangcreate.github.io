@@ -22,7 +22,7 @@ import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import {useColorMode } from '@docusaurus/theme-common';
 //定义图片路径
 const unsplashLink = (id, width, height) =>
-  `/gallery/${id}-${width}-${height}.jpg`;
+  `/img/gallery/${id}-${width}-${height}.jpg`;
 //定义相册图片
 const unsplashPhotos = [
   {'id': '2021071', 'width': 1934, 'height': 2579,'title':'深圳','description':'深圳的夏天'} ,

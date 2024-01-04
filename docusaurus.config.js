@@ -24,7 +24,7 @@ module.exports = {
   url: websiteurl,
   baseUrl: '/',
   organizationName: websitename, // Usually your GitHub org/user name.
-  projectName: 'blog', // Usually your repo name.
+  projectName: githubuserRepository, // Usually your repo name.
   deploymentBranch: 'gh-pages',
   // set trailingSlash: true 可以让 algolia 抓取更完整
   trailingSlash: true,
@@ -48,7 +48,10 @@ module.exports = {
       '@docusaurus/preset-classic',
       {
         theme: {
-          customCss: require.resolve('./src/theme/custom.css'),
+          customCss: [
+          require.resolve('./src/theme/custom.css'),
+          // require.resolve('@infinum/docusaurus-theme/dist/style.css'),
+        ],
         },
 				gtag: {
 					trackingID: 'G-4GF73PJ1H7',
@@ -128,7 +131,7 @@ module.exports = {
       },
     ],
   ],
-  // 开启markdown的mermaid功能
+  // 开启markdown的mermaid功能 
   themes: ['@docusaurus/theme-mermaid'],
   markdown: {
     mermaid: true,
@@ -194,9 +197,9 @@ module.exports = {
             label: '读书',
           },
           {
-            //to: "/blog/archive",
-            // to: "/blog/tags",
             to: "/blog",
+            // to: "/blog/tags",
+            // to: "/blog",
             position: 'left',
             label: '博文',
           },
@@ -229,26 +232,22 @@ module.exports = {
         copyright: `
           <div class="footerx">
             <div align="left">
-              <a href="https://web.archive.org/web/20230609185132/https://creativecommons.org/licenses/by-nc-sa/4.0/">
+              <a href="${githuborgurl}/licenses">
                 <strong>Apache License 2.0</strong>
               </a> 
-              <br> 2019-${new Date().getFullYear()}  ©  ${websitename}
+              <br>
+              2019-${new Date().getFullYear()}  ©  ${websitename}
             </div>
-
             <p class="logoxs">
-
-            <a class="logox" target="_blank" rel="noopener noreferrer" href="mailto:${email}" aria-label="go to send email">
-            <img src='/img/email-color.svg'/>
-            </a>
-
-            <a class="logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
-            <img src='/img/github-color.svg'/>
-            </a>
-
-            <a  class="logox" target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="rss">
-            <img src='/img/rss-color.svg'/>
-            </a>
-
+              <a class="logox" target="_blank" rel="noopener noreferrer" href="mailto:${email}" aria-label="go to send email">
+                <img src='/img/email-color.svg'/>
+              </a>
+              <a class="logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
+                <img src='/img/github-color.svg'/>
+              </a>
+              <a class="logox" target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="rss">
+                <img src='/img/rss-color.svg'/>
+              </a>
             </p>
           </div> 
         `,
