@@ -131,7 +131,7 @@ module.exports = {
   themeConfig:
     ({
       // Replace with your project's social card
-      image: 'img/docusaurus-social-card.png',
+      image: 'img/ico/docusaurus-social-card.png',
       // 为亮色和暗色模式指定图表的主题
       mermaid: {
         theme: {light: 'neutral', dark: 'forest'},
@@ -213,13 +213,13 @@ module.exports = {
             </div>
             <p class="footer__logoxs">
               <a class="footer__logox" target="_blank" rel="noopener noreferrer" href="mailto:${email}" aria-label="go to send email">
-                <img src='/img/email-color.svg'/>
+                <img src='/img/ico/email-color.svg'/>
               </a>
               <a class="footer__logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
-                <img src='/img/github-color.svg'/>
+                <img src='/img/ico/github-color.svg'/>
               </a>
               <a class="footer__logox" target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="rss">
-                <img src='/img/rss-color.svg'/>
+                <img src='/img/ico/rss-color.svg'/>
               </a>
             </p>
         `,
