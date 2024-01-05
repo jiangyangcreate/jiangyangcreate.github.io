@@ -50,7 +50,7 @@ Web Authentication API（也称作 WebAuthn）使用asymmetric (public-key) cryp
 
 一个典型的注册过程包括如图 1 所示的六个步骤，这些在稍后会进一步描述。这是一个注册过程的概览，所需数据已经被简化。
 
-![image.png](/2023/image-17aa32febed04efcbe50a65b2fac4def.png)
+![image.png](/img/2023/image-17aa32febed04efcbe50a65b2fac4def.png)
 
 0. 应用程序请求注册 - 应用程序发出注册请求。这个请求的协议和格式不在 WebAuthn 标准的范围内。
 1. 服务器发送挑战、用户信息和依赖方信息 - 服务器将挑战、用户信息和依赖方信息发送回应用程序。在这里，协议和格式不在 WebAuthn 标准的范围内。通常，这可以是基于 HTTPS 连接的 REST（可能会使用 XMLHttpRequest 或 Fetch）API。不过只要在安全连接中，也可以使用 SOAP、RFC 2549 或几乎任何其他协议。从服务器接收到的参数将传递给 create() ，大部分情况下只需很少修改甚至不需要做任何修改。create() 会返回一个Promise，并返回包含 AuthenticatorAttestationResponse (en-US) 的 PublicKeyCredential (en-US)。需要注意的是挑战必须是随机的 buffer（至少 16 字节），并且必须在服务器上生成以确保安全。
@@ -73,7 +73,7 @@ Web Authentication API（也称作 WebAuthn）使用asymmetric (public-key) cryp
 1) 验证不需要用户或信赖方信息；
 2) 验证使用之前生成的密钥对创建一个断言，而不是使用在认证器在制造过程中烧录的密钥对创建证明。和上文一样，下面的验证流程图只是一个概况，并非详细描述。
 
-![image.png](/2023/image-e01383eea3144b69ba6bcab4736a30f2.png)
+![image.png](/img/2023/image-e01383eea3144b69ba6bcab4736a30f2.png)
 
 0) 应用程序请求身份验证- 应用程序发出初始身份验证请求。此请求的协议和格式超出了 WebAuthn 的范围。
 1) 服务器发送质询- 服务器发送质询 JavaScript 程序。与服务器通信的协议未指定，不在 WebAuthn 的范围内。通常，服务器通信将是基于https 的REST （可能使用XMLHttpRequest或Fetch），但它们也可以是SOAP、RFC 2549或几乎任何其他协议，前提是该协议是安全的。从服务器接收到的参数将被传递给get()调用，通常只需要很少或不需要修改。 请注意，挑战是随机信息的大缓冲区（例如 - 超过 100 个字节）是绝对关键的，并且必须在服务器上生成它以确保身份验证过程的安全性。
@@ -93,11 +93,11 @@ Web Authentication API（也称作 WebAuthn）使用asymmetric (public-key) cryp
 
 graphql 是一种用于 API 的查询语言，对你的 API 中的数据提供了一套易于理解的完整描述，使得客户端能够准确地获得它需要的数据，减少数据的冗余。
 
-![image-1657519260384](/2023/image-1657519260384.png)
+![image-1657519260384](/img/2023/image-1657519260384.png)
 
 在下图中，系统中的所有入口点（REST、GraphQL 和 RPC）都将使用相同的验证、授权和错误处理规则进行处理。
 
-![image-1657519556322](/2023/image-1657519556322.png)
+![image-1657519556322](/img/2023/image-1657519556322.png)
 
 ### 怎么使用 Graphql？
 

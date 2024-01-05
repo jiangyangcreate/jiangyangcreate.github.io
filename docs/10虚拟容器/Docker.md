@@ -18,7 +18,7 @@ curl -sSL https://get.daocloud.io/docker | sh
 
 #### Linux-宝塔面板安装
 
-![image.png](/2023/image-145c19a352e4465d96be084dff23bf5b.png)
+![image.png](/img/2023/image-145c19a352e4465d96be084dff23bf5b.png)
 
 ### 检查安装版本确认是否安装成功
 
@@ -36,7 +36,7 @@ docker -v
 
 ### Docker原理图
 
-![image.png](/2023/image-a8bc2ebbb9594825b0a8e013520d706d.png)
+![image.png](/img/2023/image-a8bc2ebbb9594825b0a8e013520d706d.png)
 
 ### 核心配置
 
@@ -131,9 +131,9 @@ Docker rmi（删除）
 
 如果是在自己的电脑上操作，可以在vscode内下载docker插件，即可查看对应容器状态。选中容器可以右键进行：删除、启动、停止等操作。也可以在Docker可视化界面进行操作。下方分别为：vscode界面与Docker界面
 
-![image.png](/2023/image-1d636c1c43f84420af4e4501251d0257.png)
+![image.png](/img/2023/image-1d636c1c43f84420af4e4501251d0257.png)
 
-![image.png](/2023/image-c6461a3269ea4692984a883fa303afc6.png)
+![image.png](/img/2023/image-c6461a3269ea4692984a883fa303afc6.png)
 
 可以通过如下命令进入到容器内部的命令窗口：
 

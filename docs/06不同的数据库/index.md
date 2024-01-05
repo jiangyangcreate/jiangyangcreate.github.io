@@ -120,7 +120,7 @@ foreach($users as $user){
 }
 ```
 
-![image.png](/2023/image-e8ee0896f8a3407cbfef8af1262e4e47.png)
+![image.png](/img/2023/image-e8ee0896f8a3407cbfef8af1262e4e47.png)
 
 通过Mysql 查询日志，可以看到查询用户表是一次，因为有四个符合该条件的用户，查询用户表关联的余额表是四次。
 
@@ -142,7 +142,7 @@ hasBalance 这个方法让User 模型与Balance 模型进行一对一关联。
 
 现在再来看一下Mysql 的查询日志：
 
-![image.png](/2023/image-0734e7e048eb4482a2521f67cf08e4a0.png)
+![image.png](/img/2023/image-0734e7e048eb4482a2521f67cf08e4a0.png)
 
 可以很清楚的看到，总查询次数由原来的1+N 变成了现在的1+1。
 

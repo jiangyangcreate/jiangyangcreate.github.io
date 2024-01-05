@@ -55,7 +55,7 @@ Git是一个版本控制工具，既可以通过图形化的方式操作，也�
 Git版本管理分为四个板块
 *Workspace*Index*Repository*Remote
 文件在这四个区域之间的转换关系如下：
-![GitImage](/2023/GitImage.png)
+![GitImage](/img/2023/GitImage.png)
 
 ### How to Learn Git
 

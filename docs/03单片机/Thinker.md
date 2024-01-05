@@ -12,11 +12,11 @@ title: Thinker
 - 带有HDMI*1、typeC*1、USB3.0*3、以太网、音频接口、GPIO接口、摄像头接口、蓝牙、WiFi、GPS、NFC、蜂窝网络、摄像头接口等接口。
 - TIP：SIM卡与SD卡的插槽在背面，同时背面绘制有此主板的具体型号，如：`Thinker Edge R 1.02`，下载配套的软件或驱动时，可认准此型号。
 
-![图片](/2023/R_3D-1.png)
+![图片](/img/2023/R_3D-1.png)
 
-![图片](/2023/R_2D-2.png)
+![图片](/img/2023/R_2D-2.png)
 
-![图片](/2023/R_2D-3.png)
+![图片](/img/2023/R_2D-3.png)
 
 ### 普通烧录系统流程
 
@@ -120,11 +120,11 @@ sudo dpkg-reconfigure locales
 - `回车`代表确认并进入下一步
 - `↑↓`上下移动光标
 
-![图片](/2023/debiancn2.png)
+![图片](/img/2023/debiancn2.png)
 
 系统默认的区域选择刚刚下载的 `zh_CN.UTF-8 UTF-8`，回车OK
 
-![图片](/2023/debiancn1.png)
+![图片](/img/2023/debiancn1.png)
 
 3.重启
 回到终端界面后会下载对应的语言包，下载完成后重启后即大功告成~

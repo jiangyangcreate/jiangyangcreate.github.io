@@ -207,8 +207,7 @@ module.exports = {
         copyright: `
             <div align="left">
               <a href="${githuborgurl}/licenses">
-                <strong>Apache License 2.0</strong>
-                <br>
+                <strong>Apache License 2.0</strong><br>
                 2019-${new Date().getFullYear()}  ©  ${websitename}
               </a> 
             </div>
