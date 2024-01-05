@@ -205,26 +205,24 @@ module.exports = {
       footer: {
         style: 'light',
         copyright: `
-          <div class="footerx">
             <div align="left">
               <a href="${githuborgurl}/licenses">
                 <strong>Apache License 2.0</strong>
+                <br>
+                2019-${new Date().getFullYear()}  ©  ${websitename}
               </a> 
-              <br>
-              2019-${new Date().getFullYear()}  ©  ${websitename}
             </div>
-            <p class="logoxs">
-              <a class="logox" target="_blank" rel="noopener noreferrer" href="mailto:${email}" aria-label="go to send email">
+            <p class="footer__logoxs">
+              <a class="footer__logox" target="_blank" rel="noopener noreferrer" href="mailto:${email}" aria-label="go to send email">
                 <img src='/img/email-color.svg'/>
               </a>
-              <a class="logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
+              <a class="footer__logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
                 <img src='/img/github-color.svg'/>
               </a>
-              <a class="logox" target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="rss">
+              <a class="footer__logox" target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="rss">
                 <img src='/img/rss-color.svg'/>
               </a>
             </p>
-          </div> 
         `,
       },
     }),

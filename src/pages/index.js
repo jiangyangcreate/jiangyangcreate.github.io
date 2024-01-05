@@ -11,7 +11,7 @@ const shuffleArray = (array) => array.map(value => ({ value, sort: Math.random()
 function ShowcaseGrid() {
 
 	const headingTitle =  'Welcome'
-	const headingSubtitle =  'See the awesome websites we building';
+	const headingSubtitle =  '有朋自远方来，不亦乐乎。这些优秀的案例是给你的礼物！';
 	const ctaTitle = <span>你好 <br /> 遇到问题了吗?</span>;
 	const ctaSubtitle = 'Open an issue on GitHub';
 	const ctaUrl =  'https://github.com/jiangyangcreate/jiangyangcreate.github.io/issues';
