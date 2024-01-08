@@ -116,8 +116,8 @@ module.exports = {
       },
     ],
   ],
-  // 开启markdown的mermaid功能 
-  themes: ['@docusaurus/theme-mermaid'],
+  // 开启markdown的mermaid功能 , live-codeblock
+  themes: ['@docusaurus/theme-mermaid','@docusaurus/theme-live-codeblock'],
   markdown: {
     mermaid: true,
   },
