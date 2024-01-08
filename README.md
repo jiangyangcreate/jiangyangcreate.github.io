@@ -12,7 +12,7 @@
 
 ### 主要特性
 
-- 集成infinum，轻松创建个人案例页，优雅展示个人案例。页面左上角切换明暗，从Markdown到画布到相册，做了很多明暗切换，保持一致。 [体验](https://jiangmiemie.com/)
+- 集成infinum，轻松创建个人案例页，优雅展示个人案例。[体验](https://jiangmiemie.com/)
 
 - 集成Giscus，在博客页下方评论，支持使用GitHub账号登录，方便与作者互动。[前往博客页体验](https://jiangmiemie.com/blog/blog/)
 
@@ -43,6 +43,18 @@ navbar: {
 ```
 </details>
 
+- 切换明暗，从Markdown到画布到相册，做了很多明暗切换，为保持页面简洁，已隐藏，如需开启可参考下方说明。 
+<details>
+```
+    //将下方艾玛中的disableSwitch: true改为false即可显示明暗切换按钮
+    colorMode: {
+      defaultMode: 'light',//定义首次访问的颜色
+      disableSwitch: true,//隐藏明暗切换按钮
+      respectPrefersColorScheme: false,//跟随用户系统默认
+    },
+```
+</details>
+
 - RSS，支持博客的RSS订阅。访问[RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
 
 - 生成静态站点托管至GitHub Page。
@@ -56,12 +68,12 @@ navbar: {
 - 公告栏 (announcementBar)，允许在首页设置一个公告。
 
 - Google Analytics，可查看网站访问情况。
-
-- i18n，基于Crowdin插件自动翻译（暂时移除，会导致构建包的体积翻倍，大于1G无法正常github-page部署）。
-
 <details>
 获取谷歌分析代码，并填入 `docusaurus.config.js` 的 `googleAnalytics` 字段。
 </details>
+
+- i18n，基于Crowdin插件自动翻译（暂时移除，会导致构建包的体积翻倍，大于1G无法正常github-page部署）。
+
 
 ### 快速开始
 

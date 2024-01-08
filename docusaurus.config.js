@@ -13,7 +13,6 @@ const email = 'jiangyangcreate@gmail.com';
 
 const websiteurl = `https://${websitename}.com`;
 const githubuserRepository = `${githubusername}.github.io`;
-const githuburl = `https://github.com/${githubusername}`;
 const githuborgurl = `https://github.com/${githubusername}/${githubuserRepository}`;
 const editUrl = `${githuborgurl}/blob/main`;
 
@@ -148,8 +147,8 @@ module.exports = {
         indexName: websitename,
       },
       colorMode: {
-        defaultMode: 'dark',//定义首次访问的颜色
-        disableSwitch: false,//隐藏明暗切换按钮
+        defaultMode: 'light',//定义首次访问的颜色
+        disableSwitch: true,//隐藏明暗切换按钮
         respectPrefersColorScheme: false,//跟随用户系统默认
       },
       //配置标准的明暗主题
