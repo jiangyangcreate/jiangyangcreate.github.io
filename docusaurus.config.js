@@ -212,14 +212,14 @@ module.exports = {
               </a> 
             </div>
             <p class="footer__logoxs">
-              <a class="footer__logox" target="_blank" rel="noopener noreferrer" href="mailto:${email}" aria-label="go to send email">
-                <img src='/img/ico/email-color.svg'/>
-              </a>
-              <a class="footer__logox" target="_blank" rel="noopener noreferrer" href="${githuburl}" aria-label="go to my github">
+              <a target="_blank" rel="noopener noreferrer" href="${githuborgurl}" aria-label="go to my github">
                 <img src='/img/ico/github-color.svg'/>
               </a>
-              <a class="footer__logox" target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="rss">
+              <a target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="rss">
                 <img src='/img/ico/rss-color.svg'/>
+              </a>
+              <a target="_blank" rel="noopener noreferrer" href="mailto:${email}" aria-label="go to send email">
+                <img src='/img/ico/email-color.svg'/>
               </a>
             </p>
         `,

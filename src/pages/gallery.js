@@ -171,14 +171,14 @@ export function useSettings() {
 }
 
 function Settings({ children }) {
-  const [layout, setLayout] = useState("masonry");
+  const [layout, setLayout] = useState("columns");
   const [count, setCount] = useState(photos.length);
   const [targetRowHeight, setTargetRowHeight] = useState(200);
   const [columns, setColumns] = useState(5);
   const [spacing, setSpacing] = useState(30);
   const [padding, setPadding] = useState(30);
-  const [width, setWidth] = useState(100);
-  const [tag, settag] = useState('深圳');
+  const [width, setWidth] = useState(95);
+  const [tag, settag] = useState('上海');
 
   useLayoutEffect(() => {
     const viewportSize = window.innerWidth;
