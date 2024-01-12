@@ -38,7 +38,7 @@ div[class^='announcementBar_'] {
   --docsearch-primary-color: var(--ifm-color-primary);
   --docsearch-text-color: var(--ifm-font-color-base);
   --docsearch-muted-color: var(--ifm-color-secondary-darkest);
-  --docsearch-container-background: rgba(94, 100, 112, 0.7);
+  --docsearch-container-background: rgba(8, 8, 8, 0.7);
   /* Modal */
   --docsearch-modal-background: var(--ifm-color-secondary-lighter);
   /* Search box */
@@ -106,9 +106,7 @@ input::-moz-placeholder,textarea::-moz-placeholder {opacity:1;color:#9ca3af}
 input::placeholder,textarea::placeholder {opacity:1;color:#9ca3af}
 button,[role=button] {cursor:pointer}
 :disabled {cursor:default}
-/* img,svg,video,canvas,audio,iframe,embed,object {display:block;vertical-align:middle}
-img,video {max-width:100%;height:auto}
-[hidden] {display:none} */
+
 *,:before,:after {--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x:;--tw-pan-y:;--tw-pinch-zoom:;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position:;--tw-gradient-via-position:;--tw-gradient-to-position:;--tw-ordinal:;--tw-slashed-zero:;--tw-numeric-figure:;--tw-numeric-spacing:;--tw-numeric-fraction:;--tw-ring-inset:;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur:;--tw-brightness:;--tw-contrast:;--tw-grayscale:;--tw-hue-rotate:;--tw-invert:;--tw-saturate:;--tw-sepia:;--tw-drop-shadow:;--tw-backdrop-blur:;--tw-backdrop-brightness:;--tw-backdrop-contrast:;--tw-backdrop-grayscale:;--tw-backdrop-hue-rotate:;--tw-backdrop-invert:;--tw-backdrop-opacity:;--tw-backdrop-saturate:;--tw-backdrop-sepia:}
 ::backdrop {--tw-border-spacing-x:0;--tw-border-spacing-y:0;--tw-translate-x:0;--tw-translate-y:0;--tw-rotate:0;--tw-skew-x:0;--tw-skew-y:0;--tw-scale-x:1;--tw-scale-y:1;--tw-pan-x:;--tw-pan-y:;--tw-pinch-zoom:;--tw-scroll-snap-strictness:proximity;--tw-gradient-from-position:;--tw-gradient-via-position:;--tw-gradient-to-position:;--tw-ordinal:;--tw-slashed-zero:;--tw-numeric-figure:;--tw-numeric-spacing:;--tw-numeric-fraction:;--tw-ring-inset:;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-color:rgb(59 130 246 / .5);--tw-ring-offset-shadow:0 0 #0000;--tw-ring-shadow:0 0 #0000;--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;--tw-blur:;--tw-brightness:;--tw-contrast:;--tw-grayscale:;--tw-hue-rotate:;--tw-invert:;--tw-saturate:;--tw-sepia:;--tw-drop-shadow:;--tw-backdrop-blur:;--tw-backdrop-brightness:;--tw-backdrop-contrast:;--tw-backdrop-grayscale:;--tw-backdrop-hue-rotate:;--tw-backdrop-invert:;--tw-backdrop-opacity:;--tw-backdrop-saturate:;--tw-backdrop-sepia:}
 .relative {position:relative}
@@ -247,7 +245,7 @@ img,video {max-width:100%;height:auto}
 .text-h2 {font-size:clamp(2.8193058827290858rem,calc(2.8193058827290858rem + ((5.182314101769203 - 2.8193058827290858) * ((100vw - 20rem) / (96 - 20)))),5.182314101769203rem);line-height:1.02;letter-spacing:-.0125em}
 .text-h3 {font-size:clamp(2.131350900116625rem,calc(2.131350900116625rem + ((3.3609981453282645 - 2.131350900116625) * ((100vw - 20rem) / (96 - 20)))),3.3609981453282645rem);line-height:1.12;letter-spacing:-.0096em}
 :root {--ifm-navbar-height:4rem}
-:root {--ifm-color-primary:var(--global-colors-infinum);--ifm-color-primary-dark:#c32323;--ifm-color-primary-darker:#b82121;--ifm-color-primary-darkest:#981c1c;--ifm-color-primary-light:#dc3e3e;--ifm-color-primary-lighter:#de4949;--ifm-color-primary-lightest:#e46969;--ifm-code-font-size:95%;--ifm-code-background:var(--global-colors-sky70)}
+:root {--ifm-color-primary-dark:#c32323;--ifm-color-primary-darker:#b82121;--ifm-color-primary-darkest:#981c1c;--ifm-color-primary-light:#dc3e3e;--ifm-color-primary-lighter:#de4949;--ifm-color-primary-lightest:#e46969;--ifm-code-font-size:95%;--ifm-code-background:var(--global-colors-sky70)}
 aside {--doc-sidebar-width:320px}
 h1 {font-family:neue-haas-grotesk-display,Arial,sans-serif;font-weight:700;font-size:clamp(2.131350900116625rem,calc(2.131350900116625rem + ((3.3609981453282645 - 2.131350900116625) * ((100vw - 20rem) / (96 - 20)))),3.3609981453282645rem);line-height:1.12;letter-spacing:-.0096em}
 h2 {font-family:neue-haas-grotesk-display,Arial,sans-serif;font-weight:700;font-size:clamp(1.6692195887945571rem,calc(1.6692195887945571rem + ((2.302327957702624 - 1.6692195887945571) * ((100vw - 20rem) / (96 - 20)))),2.302327957702624rem);line-height:1.17;letter-spacing:-.0138em}
