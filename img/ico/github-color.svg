@@ -2,9 +2,8 @@
     <g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)"
     fill="url(#grad1)" stroke="none">
     <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-    <stop offset="0%" style="stop-color: #4ca2cd; stop-opacity: 1" />
-    <stop offset="50%" style="stop-color: #ac4ccc; stop-opacity: 1" />
-    <stop offset="100%" style="stop-color: #ff6c2c; stop-opacity: 1" />
+    <stop offset="0%" style="stop-color: #D8262C; stop-opacity: 1" />
+    <stop offset="100%" style="stop-color: #E6B800; stop-opacity: 1" />
     </linearGradient>
     <path d="M2384 5060 c-1012 -69 -1891 -738 -2235 -1703 -53 -146 -102 -349
     -125 -512 -23 -157 -25 -496 -5 -655 102 -816 575 -1526 1287 -1932 164 -94
