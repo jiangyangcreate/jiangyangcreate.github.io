@@ -182,7 +182,7 @@ module.exports = {
             label: '读书',
           },
           {
-            to: "/blog",
+            to: "/blog/archive",
             // to: "/blog/tags",
             // to: "/blog",
             position: 'left',
