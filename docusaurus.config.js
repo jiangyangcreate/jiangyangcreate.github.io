@@ -211,7 +211,7 @@ module.exports = {
               </a> 
             </div>
             <p class="footer__logoxs">
-              <a target="_blank" rel="noopener noreferrer" href="${githuborgurl}" aria-label="go to my github">
+              <a target="_blank" rel="noopener noreferrer" href="${githuborgurl}" aria-label="https://www.travellings.cn/go.html">
                 <img src='/img/ico/github-color.svg'/>
               </a>
               <a target="_blank" rel="noopener noreferrer" href="${websiteurl}/blog/rss.xml" aria-label="rss">
