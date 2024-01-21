@@ -2,6 +2,74 @@
 sidebar_position: 5
 title: Git备忘录
 ---
+
+
+## 常用操作
+
+**初始化一个新的Git仓库：**
+```bash
+git init
+```
+
+**克隆一个已存在的Git仓库：**
+```bash
+git clone <repo_url>
+```
+
+**查看当前的文件状态（哪些文件已修改或已准备提交等）：**
+```bash
+git status
+```
+
+**添加文件到暂存区：**
+```bash
+git add <file_name>
+```
+**添加所有改动到暂存区：**
+```bash
+git add .
+```
+
+**提交暂存区的改动：**
+```bash
+git commit -m "Your descriptive commit message"
+```
+
+**查看提交历史：**
+```bash
+git log
+```
+
+**拉取远程仓库的改动并合并到当前分支：**
+```bash
+git pull
+```
+
+**将改动推送到远程仓库：**
+```bash
+git push
+```
+
+**创建新的分支：**
+```bash
+git branch <branch_name>
+```
+
+**切换到特定的分支：**
+```bash
+git checkout <branch_name>
+```
+
+**合并特定分支到当前分支：**
+```bash
+git merge <branch_name>
+```
+
+**查看当前分支和远程分支：**
+```bash
+git branch -a
+```
+
 ## 分支
 ``` bash
 git tag -l | xargs git tag -d #删除所有本地分支

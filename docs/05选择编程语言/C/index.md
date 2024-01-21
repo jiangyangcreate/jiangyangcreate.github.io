@@ -3,7 +3,7 @@ sidebar_position: 1
 title: C语言学习
 ---
 
-本文完全转载自[https://github.com/coderit666/CNote](https://github.com/coderit666/CNote),如果对你有帮助，请至源项目下支持原作者。
+本文完全转载自[https://github.com/coderit666/CNote](https://github.com/coderit666/CNote),仅对错别字、大纲排版做简单修正，因此如果这篇文章对你有帮助，请至源项目下支持原作者。
 
 
 
@@ -23,7 +23,7 @@ title: C语言学习
 
 ### C语言历史
 
-![](https://img-blog.csdnimg.cn/img_convert/61231e41c3ac5ebf9aa13e98a46c6505.png)
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/61231e41c3ac5ebf9aa13e98a46c6505.png)
 
 - 最早的高级语言:FORTRAN-->ALGOL-->CPL-->BCPL-->C-->C++等
 
@@ -33,7 +33,7 @@ title: C语言学习
 - 1967年英国剑桥大学的 Matin Richards(理查兹)对CPL语言做了简化,推出了 BCPL (Base Combined Programming Langurage)语言
 - 1970年美国贝尔实验室的 Ken Thompson(肯·汤普逊) 以 BCPL 语言为基础,又作了进一步的简化,设计出了很简单的而且很接近硬件的 B 语言(取BCPL的第一个字母),并用B语言写出了第一个 UNIX 操作系统。但B语言过于简单,功能有限
 - 1972年至1973年间,贝尔实验室的 Dennis.Ritchie(丹尼斯·里奇) 在 B语言的基础上设计出了C语言(取BCPL的第二个字母)。C语言即保持 BCPL 语言和B语言的优点(精练、接近硬件),又克服了他们的缺点(过于简单,数据无类型等)
-  ![](https://img-blog.csdnimg.cn/img_convert/4ba25f6defb66dda5e45a1e6048089f5.png)
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/4ba25f6defb66dda5e45a1e6048089f5.png)
 
 ### C语言标准
 
@@ -48,7 +48,7 @@ title: C语言学习
 
 - 年度编程语言
 - 该奖项颁发给了一年中最热门的编程语言
-  ![](https://img-blog.csdnimg.cn/img_convert/3d49b9d00bab09124c51ac3620dbbc51.png)
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/3d49b9d00bab09124c51ac3620dbbc51.png)
 - [编程语言排行榜查看](http://www.tiobe.com/index.php/content/paperinfo/tpci/index.html)
 
 
