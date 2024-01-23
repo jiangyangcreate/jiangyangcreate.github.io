@@ -92,16 +92,12 @@
 </span><span class="token-line" style="color:#393A34"><span class="token plain">  </span><span class="token punctuation" style="color:#393A34">)</span><span class="token punctuation" style="color:#393A34">;</span><span class="token plain"></span>
 </span><span class="token-line" style="color:#393A34"><span class="token plain"></span><span class="token punctuation" style="color:#393A34">}</span>
 </span></pre></div><div class="playgroundHeader_dyrN">Result</div><div class="playgroundPreview_DzOI"><div>Loading...</div></div></div>
-<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="简洁">简洁<a href="https://jiangmiemie.com/blog#%E7%AE%80%E6%B4%81" class="hash-link" aria-label="Direct link to 简洁" title="Direct link to 简洁">​</a></h3>
-<p>优秀的设计往往需要投入大量的精力和时间。简洁的设计，更是需要巧妙的思考和精细的打磨。以下是毕加索的《公牛》系列草图，从复杂到简洁，展现了设计中"简洁"的魅力：</p>
-<p><img loading="lazy" alt="cow" src="https://jiangmiemie.com/assets/images/cow-4755ffe8470481bce8547467d15f68c3.webp" width="600" height="427" class="img_ev3q">
-<img loading="lazy" alt="cow" src="https://jiangmiemie.com/assets/images/cow-02026ae319602b2486f17231f2760613.png" width="968" height="692" class="img_ev3q"></p>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="简洁中添加层次">简洁中添加层次<a href="https://jiangmiemie.com/blog#%E7%AE%80%E6%B4%81%E4%B8%AD%E6%B7%BB%E5%8A%A0%E5%B1%82%E6%AC%A1" class="hash-link" aria-label="Direct link to 简洁中添加层次" title="Direct link to 简洁中添加层次">​</a></h3>
+<p>优秀的设计往往需要投入大量的精力和时间。简洁的设计，更是需要巧妙的思考和精细的打磨。毕加索的《公牛》系列草图，从复杂到简洁，展现了设计中"简洁"的魅力。</p>
 <p>Evan You （尤雨溪）的个人网站干净简洁。<a href="https://evanyou.me/" target="_blank" rel="noopener noreferrer">https://evanyou.me/</a></p>
 <iframe src="https://evanyou.me/" width="100%" height="400"></iframe>
-<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="层次">层次<a href="https://jiangmiemie.com/blog#%E5%B1%82%E6%AC%A1" class="hash-link" aria-label="Direct link to 层次" title="Direct link to 层次">​</a></h3>
 <p>让同一平面上的不同主题处于不同图层，可以产生层次感。</p>
-<p>infinum的首页层次感强烈</p>
-<p><a href="https://academy.infinum.com/" target="_blank" rel="noopener noreferrer"><img loading="lazy" alt="academy" src="https://jiangmiemie.com/assets/images/academy-719b724563d66bfba15e8748502b62b0.webp" width="600" height="400" class="img_ev3q"></a></p>
+<p>infinum的首页层次感强烈<a href="https://academy.infinum.com/" target="_blank" rel="noopener noreferrer">https://academy.infinum.com</a></p>
 <h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="docusaurus的设计">docusaurus的设计<a href="https://jiangmiemie.com/blog#docusaurus%E7%9A%84%E8%AE%BE%E8%AE%A1" class="hash-link" aria-label="Direct link to docusaurus的设计" title="Direct link to docusaurus的设计">​</a></h2>
 <p>docusaurus 十分明确的把各个功能拆解为不同的插件，正常是隐藏且无法修改，譬如博客文章的渲染。</p>
 <p>Swizzle可以导出这些插件。</p>
