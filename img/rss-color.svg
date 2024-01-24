@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" id="rss" width="20px" height="20px" >
-<g fill="url(#grad1)">              
-<linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
-<stop offset="0%" style="stop-color: #D8262C; stop-opacity: 1" />
-<stop offset="100%" style="stop-color: #E6B800; stop-opacity: 1" />
-</linearGradient>
-<circle cx="3" cy="13" r="2"></circle>
-<path d="M1 5.667v2.667A6.674 6.674 0 0 1 7.667 15h2.666c0-5.146-4.187-9.333-9.333-9.333z"></path><path d="M1 1v2.667C7.25 3.667 12.334 8.75 12.334 15H15C15 7.28 8.72 1 1 1z"></path></g></svg>

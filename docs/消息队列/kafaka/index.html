@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="generator" content="Docusaurus v3.1.0">
-<title data-rh="true">kafaka | jiangmiemie</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://jiangmiemie.com/pages/case/jiangmiemie.png"><meta data-rh="true" name="twitter:image" content="https://jiangmiemie.com/pages/case/jiangmiemie.png"><meta data-rh="true" property="og:url" content="https://jiangmiemie.com/docs/消息队列/kafaka/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="keywords" content="blog, javascript, python"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-docs-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-docs-current"><meta data-rh="true" property="og:title" content="kafaka | jiangmiemie"><meta data-rh="true" name="description" content="Kafka和Mysql相比，都是需要"><meta data-rh="true" property="og:description" content="Kafka和Mysql相比，都是需要"><link data-rh="true" rel="icon" href="/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://jiangmiemie.com/docs/消息队列/kafaka/"><link data-rh="true" rel="alternate" href="https://jiangmiemie.com/docs/消息队列/kafaka/" hreflang="en"><link data-rh="true" rel="alternate" href="https://jiangmiemie.com/docs/消息队列/kafaka/" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://B8DUWB4CMX-dsn.algolia.net" crossorigin="anonymous"><link rel="preconnect" href="https://www.google-analytics.com">
+<title data-rh="true">kafaka | jiangmiemie</title><meta data-rh="true" name="viewport" content="width=device-width,initial-scale=1"><meta data-rh="true" name="twitter:card" content="summary_large_image"><meta data-rh="true" property="og:image" content="https://jiangmiemie.com/img/logo-512.svg"><meta data-rh="true" name="twitter:image" content="https://jiangmiemie.com/img/logo-512.svg"><meta data-rh="true" property="og:url" content="https://jiangmiemie.com/docs/消息队列/kafaka/"><meta data-rh="true" property="og:locale" content="en"><meta data-rh="true" name="docusaurus_locale" content="en"><meta data-rh="true" name="docsearch:language" content="en"><meta data-rh="true" name="keywords" content="blog, javascript, python"><meta data-rh="true" name="docusaurus_version" content="current"><meta data-rh="true" name="docusaurus_tag" content="docs-docs-current"><meta data-rh="true" name="docsearch:version" content="current"><meta data-rh="true" name="docsearch:docusaurus_tag" content="docs-docs-current"><meta data-rh="true" property="og:title" content="kafaka | jiangmiemie"><meta data-rh="true" name="description" content="Kafka和Mysql相比，都是需要"><meta data-rh="true" property="og:description" content="Kafka和Mysql相比，都是需要"><link data-rh="true" rel="icon" href="/img/favicon.ico"><link data-rh="true" rel="canonical" href="https://jiangmiemie.com/docs/消息队列/kafaka/"><link data-rh="true" rel="alternate" href="https://jiangmiemie.com/docs/消息队列/kafaka/" hreflang="en"><link data-rh="true" rel="alternate" href="https://jiangmiemie.com/docs/消息队列/kafaka/" hreflang="x-default"><link data-rh="true" rel="preconnect" href="https://B8DUWB4CMX-dsn.algolia.net" crossorigin="anonymous"><link rel="preconnect" href="https://www.google-analytics.com">
 <link rel="preconnect" href="https://www.googletagmanager.com">
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-4GF73PJ1H7"></script>
 <script>function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-4GF73PJ1H7",{anonymize_ip:!0})</script>
 
 
 <link rel="search" type="application/opensearchdescription+xml" title="jiangmiemie" href="/opensearch.xml">
-<link rel="icon" href="/img/docusaurus.png">
+<link rel="icon" href="/img/logo-512.svg">
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="rgb(37, 194, 160)">
 
@@ -21,9 +21,9 @@
 <link rel="alternate" type="application/json" href="/feed.json" title="jiangmiemie JSON Feed">
 
 
-<link rel="stylesheet" href="/katex/katex.min.css"><link rel="stylesheet" href="/assets/css/styles.01950132.css">
-<script src="/assets/js/runtime~main.d2ddab84.js" defer="defer"></script>
-<script src="/assets/js/main.63f0ffe4.js" defer="defer"></script>
+<link rel="stylesheet" href="/katex/katex.min.css"><link rel="stylesheet" href="/assets/css/styles.38471994.css">
+<script src="/assets/js/runtime~main.10fb38b5.js" defer="defer"></script>
+<script src="/assets/js/main.3d52690f.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
 <script>!function(){function t(t){document.documentElement.setAttribute("data-theme",t)}var e=function(){try{return new URLSearchParams(window.location.search).get("docusaurus-theme")}catch(t){}}()||function(){try{return localStorage.getItem("theme")}catch(t){}}();null!==e?t(e):window.matchMedia("(prefers-color-scheme: dark)").matches?t("dark"):(window.matchMedia("(prefers-color-scheme: light)").matches,t("light"))}(),function(){try{const c=new URLSearchParams(window.location.search).entries();for(var[t,e]of c)if(t.startsWith("docusaurus-data-")){var a=t.replace("docusaurus-data-","data-");document.documentElement.setAttribute(a,e)}}catch(t){}}()</script><div id="__docusaurus"><div role="region" aria-label="Skip to main content"><a class="skipToContent_fXgn" href="#__docusaurus_skipToContent_fallback">Skip to main content</a></div><nav aria-label="Main" class="navbar navbar--fixed-top navbarHideable_m1mJ"><div class="navbar__inner"><div class="navbar__items"><button aria-label="Toggle navigation bar" aria-expanded="false" class="navbar__toggle clean-btn" type="button"><svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg></button><a class="navbar__brand" href="/"><b class="navbar__title text--truncate">首页</b></a><div class="navbar__item dropdown dropdown--hoverable"><a href="#" aria-haspopup="true" aria-expanded="false" role="button" class="navbar__link">文档</a><ul class="dropdown__menu"><li><a aria-current="page" class="dropdown__link dropdown__link--active" href="/docs/">开发</a></li><li><a class="dropdown__link" href="/ai/">算法</a></li><li><a class="dropdown__link" href="/read/">书架</a></li></ul></div><a class="navbar__item navbar__link" href="/archive/">博文</a><a class="navbar__item navbar__link" href="/case/">个案</a><a class="navbar__item navbar__link" href="/gallery/">相簿</a></div><div class="navbar__items navbar__items--right"><div class="navbarSearchContainer_Bca1"><button type="button" class="DocSearch DocSearch-Button" aria-label="Search"><span class="DocSearch-Button-Container"><svg width="20" height="20" class="DocSearch-Search-Icon" viewBox="0 0 20 20"><path d="M14.386 14.386l4.0877 4.0877-4.0877-4.0877c-2.9418 2.9419-7.7115 2.9419-10.6533 0-2.9419-2.9418-2.9419-7.7115 0-10.6533 2.9418-2.9419 7.7115-2.9419 10.6533 0 2.9419 2.9418 2.9419 7.7115 0 10.6533z" stroke="currentColor" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="DocSearch-Button-Placeholder">Search</span></span><span class="DocSearch-Button-Keys"></span></button></div></div></div><div role="presentation" class="navbar-sidebar__backdrop"></div></nav><div id="__docusaurus_skipToContent_fallback" class="main-wrapper mainWrapper_z2l0"><div class="docsWrapper_hBAB"><button aria-label="Scroll back to top" class="clean-btn theme-back-to-top-button backToTopButton_sjWU" type="button"></button><div class="docRoot_UBD9"><aside class="theme-doc-sidebar-container docSidebarContainer_YfHR"><div class="sidebarViewport_aRkj"><div class="sidebar_njMd sidebarWithHideableNavbar_wUlq"><a tabindex="-1" class="sidebarLogo_isFc" href="/"><b>首页</b></a><nav aria-label="Docs sidebar" class="menu thin-scrollbar menu_SIkG"><ul class="theme-doc-sidebar-menu menu__list"><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/docs/">编程外的基础概述</a><button aria-label="Expand sidebar category &#x27;编程外的基础概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/docs/选择编程语言/">选择编程语言概述</a><button aria-label="Expand sidebar category &#x27;选择编程语言概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/docs/不同的数据库/">不同的数据库概述</a><button aria-label="Expand sidebar category &#x27;不同的数据库概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/docs/接口认证/">接口认证概述</a><button aria-label="Expand sidebar category &#x27;接口认证概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist menu__link--active" aria-expanded="true" href="/docs/消息队列/">消息队列概述</a><button aria-label="Collapse sidebar category &#x27;消息队列概述&#x27;" type="button" class="clean-btn menu__caret"></button></div><ul style="display:block;overflow:visible;height:auto" class="menu__list"><li class="theme-doc-sidebar-item-link theme-doc-sidebar-item-link-level-2 menu__list-item"><a class="menu__link menu__link--active" aria-current="page" tabindex="0" href="/docs/消息队列/kafaka/">kafaka</a></li></ul></li><li class="theme-doc-sidebar-item-category theme-doc-sidebar-item-category-level-1 menu__list-item menu__list-item--collapsed"><div class="menu__list-item-collapsible"><a class="menu__link menu__link--sublist" aria-expanded="false" href="/docs/逆向测试/">逆向测试概述</a><button aria-label="Expand sidebar category &#x27;逆向测试概述&#x27;" type="button" class="clean-btn menu__caret"></button></div></li></ul></nav></div></div></aside><main class="docMainContainer_TBSr"><div class="container padding-top--md padding-bottom--lg"><div class="row"><div class="col docItemCol_VOVn"><div class="docItemContainer_Djhp"><article><nav class="theme-doc-breadcrumbs breadcrumbsContainer_Z_bl" aria-label="Breadcrumbs"><ul class="breadcrumbs" itemscope="" itemtype="https://schema.org/BreadcrumbList"><li class="breadcrumbs__item"><a aria-label="Home page" class="breadcrumbs__link" href="/"><svg viewBox="0 0 24 24" class="breadcrumbHomeIcon_YNFT"><path d="M10 19v-5h4v5c0 .55.45 1 1 1h3c.55 0 1-.45 1-1v-7h1.7c.46 0 .68-.57.33-.87L12.67 3.6c-.38-.34-.96-.34-1.34 0l-8.36 7.53c-.34.3-.13.87.33.87H5v7c0 .55.45 1 1 1h3c.55 0 1-.45 1-1z" fill="currentColor"></path></svg></a></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item"><a class="breadcrumbs__link" itemprop="item" href="/docs/消息队列/"><span itemprop="name">消息队列概述</span></a><meta itemprop="position" content="1"></li><li itemscope="" itemprop="itemListElement" itemtype="https://schema.org/ListItem" class="breadcrumbs__item breadcrumbs__item--active"><span class="breadcrumbs__link" itemprop="name">kafaka</span><meta itemprop="position" content="2"></li></ul></nav><div class="tocCollapsible_ETCw theme-doc-toc-mobile tocMobile_ITEo"><button type="button" class="clean-btn tocCollapsibleButton_TO0P">On this page</button></div><div class="theme-doc-markdown markdown"><header><h1>kafaka</h1></header><blockquote>
@@ -31,19 +31,19 @@
 <ul>
 <li>先下载安装对应的包</li>
 <li>接着可以直接命令行调用</li>
-<li>也可以通过python、java这样的编程语言来调用</li>
-<li>都存在地址接口的概念，localhost:9092指的是本机地址的9092端口</li>
-<li>如果你想调用Docker里的端口，要提前通过--expose 暴露出这个端口</li>
-<li>如果你想调用服务器的kafka或者mysql，得填服务器的ip+端口</li>
+<li>也可以通过 python、java 这样的编程语言来调用</li>
+<li>都存在地址接口的概念，localhost:9092 指的是本机地址的 9092 端口</li>
+<li>如果你想调用 Docker 里的端口，要提前通过--expose 暴露出这个端口</li>
+<li>如果你想调用服务器的 kafka 或者 mysql，得填服务器的 ip+端口</li>
 </ul>
 </blockquote>
 <h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka">kafka<a href="#kafka" class="hash-link" aria-label="Direct link to kafka" title="Direct link to kafka">​</a></h2>
-<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka的应用场景">Kafka的应用场景<a href="#kafka的应用场景" class="hash-link" aria-label="Direct link to Kafka的应用场景" title="Direct link to Kafka的应用场景">​</a></h3>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-的应用场景">Kafka 的应用场景<a href="#kafka-的应用场景" class="hash-link" aria-label="Direct link to Kafka 的应用场景" title="Direct link to Kafka 的应用场景">​</a></h3>
 <ul>
 <li>
 <p>异步处理</p>
 <ul>
-<li>可以将一些比较耗时的操作放在其他系统中，通过消息队列将需要进  行处理的消息进行存储，其他系统可以消费消息队列中的数据</li>
+<li>可以将一些比较耗时的操作放在其他系统中，通过消息队 列将需要进行处理的消息进行存储，其他系统可以消费消息队列中的数据</li>
 <li>比较常见的：发送短信验证码、发送邮件</li>
 </ul>
 </li>
@@ -67,12 +67,12 @@
 </ul>
 </li>
 </ul>
-<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka消息队列的两种模型">Kafka消息队列的两种模型<a href="#kafka消息队列的两种模型" class="hash-link" aria-label="Direct link to Kafka消息队列的两种模型" title="Direct link to Kafka消息队列的两种模型">​</a></h3>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-消息队列的两种模型">Kafka 消息队列的两种模型<a href="#kafka-消息队列的两种模型" class="hash-link" aria-label="Direct link to Kafka 消息队列的两种模型" title="Direct link to Kafka 消息队列的两种模型">​</a></h3>
 <ul>
 <li>生产者、消费者模型<!-- -->
 <ul>
-<li>生产者负责将消息生产到MQ中</li>
-<li>消费者负责从MQ中获取消息</li>
+<li>生产者负责将消息生产到 MQ 中</li>
+<li>消费者负责从 MQ 中获取消息</li>
 <li>生产者和消费者是解耦的，可能是生产者一个程序、消费者是另外一个程序</li>
 </ul>
 </li>
@@ -83,287 +83,287 @@
 </ul>
 </li>
 </ul>
-<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka中的重要概念">Kafka中的重要概念<a href="#kafka中的重要概念" class="hash-link" aria-label="Direct link to Kafka中的重要概念" title="Direct link to Kafka中的重要概念">​</a></h3>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-中的重要概念">Kafka 中的重要概念<a href="#kafka-中的重要概念" class="hash-link" aria-label="Direct link to Kafka 中的重要概念" title="Direct link to Kafka 中的重要概念">​</a></h3>
 <ul>
 <li>broker<!-- -->
 <ul>
-<li>Kafka服务器进程，生产者、消费者都要连接broker</li>
-<li>一个集群由多个broker组成，功能实现Kafka集群的负载 均衡、容错</li>
+<li>Kafka 服务器进程，生产者、消费者都要连接 broker</li>
+<li>一个集群由多个 broker 组成，功能实现 Kafka 集群的负载均衡、容错</li>
 </ul>
 </li>
-<li>producer：生产者，用于生产数据，可将生产后的消息送入指定的Topic；</li>
-<li>consumer：消费者，获取数据，可消费指定的Topic；</li>
-<li>topic：一组消息数据的标记符，一个Kafka集群中，可以包含多个topic。一个topic可以包含多个分区<!-- -->
+<li>producer：生产者，用于生产数据，可将生产后的消息送入指定的 Topic；</li>
+<li>consumer：消费者，获取数据，可消费指定的 Topic；</li>
+<li>topic：一组消息数据的标记符，一个 Kafka 集群中，可以包含多个 topic。一个 topic 可以包含多个分区<!-- -->
 <ul>
-<li>是一个逻辑结构，生产、消费消息都需要指定topic</li>
+<li>是一个逻辑结构，生产、消费消息都需要指定 topic</li>
 </ul>
 </li>
-<li>partition：分区，Kafka集群的分布式就是由分区来实现的。一个topic中的消息可以分布在topic中的不同partition中，为了保证kafka的吞吐量，一个Topic可以设置多个分区。同一分区只能被一个消费者订阅。</li>
-<li>replica：副本，实现Kafkaf集群的容错，实现partition的容错。一个topic至少应该包含大于1个的副本</li>
-<li>consumer group：消费者组，一个消费者组中的消费者可以共同消费topic中的分区数据。每一个消费者组都一个唯一的名字。配置group.id一样的消费者是属于同一个组中，同一个group可以有多个消费者，一条消息在一个group中，只会被一个消费者获取；</li>
-<li>offset：偏移量。相对消费者、partition来说，可以通过offset来拉取数据</li>
+<li>partition：分区，Kafka 集群的分布式就是由分区来实现的。一个 topic 中的消息可以分布在 topic 中的不同 partition 中，为了保证 kafka 的吞吐量，一个 Topic 可以设置多个分区。同一分区只能被一个消费者订阅。</li>
+<li>replica：副本，实现 Kafkaf 集群的容错，实现 partition 的容错。一个 topic 至少应该包含大于 1 个的副本</li>
+<li>consumer group：消费者组，一个消费者组中的消费者可以共同消费 topic 中的分区数据。每一个消费者组都一个唯一的名字。配置 group.id 一样的消费者是属于同一个组中，同一个 group 可以有多个消费者，一条消息在一个 group 中，只会被一个消费者获取；</li>
+<li>offset：偏移量。相对消费者、partition 来说，可以通过 offset 来拉取数据</li>
 </ul>
 <h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="消费者组">消费者组<a href="#消费者组" class="hash-link" aria-label="Direct link to 消费者组" title="Direct link to 消费者组">​</a></h4>
 <ul>
-<li>一个消费者组中可以包含多个消费者，共同来消费topic中的数据</li>
-<li>一个topic中如果只有一个分区，那么这个分区只能被某个组中的一个消费者消费</li>
+<li>一个消费者组中可以包含多个消费者，共同来消费 topic 中的数据</li>
+<li>一个 topic 中如果只有一个分区，那么这个分区只能被某个组中的一个消费者消费</li>
 <li>有多少个分区，那么就可以被同一个组内的多少个消费者消费</li>
 </ul>
-<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka集群搭建">Kafka集群搭建<a href="#kafka集群搭建" class="hash-link" aria-label="Direct link to Kafka集群搭建" title="Direct link to Kafka集群搭建">​</a></h3>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-集群搭建">Kafka 集群搭建<a href="#kafka-集群搭建" class="hash-link" aria-label="Direct link to Kafka 集群搭建" title="Direct link to Kafka 集群搭建">​</a></h3>
 <ul>
-<li>Kafka集群是必须要有ZooKeeper的</li>
+<li>Kafka 集群是必须要有 ZooKeeper 的</li>
 </ul>
 <p>注意：</p>
 <ul>
-<li>每一个Kafka的节点都需要修改<strong>broker. id</strong>（每个节点的标识，不能重复）</li>
-<li>log.dir数据存储目录需要配置</li>
+<li>每一个 Kafka 的节点都需要修改<strong>broker. id</strong>（每个节点的标识，不能重复）</li>
+<li>log.dir 数据存储目录需要配置</li>
 </ul>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka的生产者消费者工具">Kafka的生产者/消费者/工具<a href="#kafka的生产者消费者工具" class="hash-link" aria-label="Direct link to Kafka的生产者/消费者/工具" title="Direct link to Kafka的生产者/消费者/工具">​</a></h4>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-的生产者消费者工具">Kafka 的生产者/消费者/工具<a href="#kafka-的生产者消费者工具" class="hash-link" aria-label="Direct link to Kafka 的生产者/消费者/工具" title="Direct link to Kafka 的生产者/消费者/工具">​</a></h4>
 <ul>
-<li>安装Kafka集群，可以测试以下<!-- -->
+<li>安装 Kafka 集群，可以测试以下<!-- -->
 <ul>
-<li>创建一个topic主题（消息都是存放在topic中，类似mysql建表的过程）</li>
-<li>基于kafka的内置测试生产者脚本来读取标准输入（键盘输入）的数据，并放入到topic中</li>
-<li>基于kafka的内置测试消费者脚本来消费topic中的数据</li>
+<li>创建一个 topic 主题（消息都是存放在 topic 中，类似 mysql 建表的过程）</li>
+<li>基于 kafka 的内置测试生产者脚本来读取标准输入（键盘输入）的数据，并放入到 topic 中</li>
+<li>基于 kafka 的内置测试消费者脚本来消费 topic 中的数据</li>
 </ul>
 </li>
-<li>推荐大家开发的使用Kafka Tool<!-- -->
+<li>推荐大家开发的使用 Kafka Tool<!-- -->
 <ul>
-<li>浏览Kafka集群节点、多少个topic、多少个分区</li>
-<li>创建topic/删除topic</li>
-<li>浏览ZooKeeper中的数据</li>
+<li>浏览 Kafka 集群节点、多少个 topic、多少个分区</li>
+<li>创建 topic/删除 topic</li>
+<li>浏览 ZooKeeper 中的数据</li>
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="本地安装与启动基于docker">本地安装与启动（基于Docker）<a href="#本地安装与启动基于docker" class="hash-link" aria-label="Direct link to 本地安装与启动（基于Docker）" title="Direct link to 本地安装与启动（基于Docker）">​</a></h4>
-<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="1下载zookeeper镜像与kafka镜像">1.下载zookeeper镜像与kafka镜像<a href="#1下载zookeeper镜像与kafka镜像" class="hash-link" aria-label="Direct link to 1.下载zookeeper镜像与kafka镜像" title="Direct link to 1.下载zookeeper镜像与kafka镜像">​</a></h5>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">docker pull wurstmeister/zookeeper</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">docker pull wurstmeister/kafka</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="2本地启动zookeeper">2.本地启动zookeeper<a href="#2本地启动zookeeper" class="hash-link" aria-label="Direct link to 2.本地启动zookeeper" title="Direct link to 2.本地启动zookeeper">​</a></h5>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">docker run -d --name zookeeper -p 2181:2181 -t wurstmeister/zookeeper  </span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="3-本地启动kafka">3. 本地启动kafka<a href="#3-本地启动kafka" class="hash-link" aria-label="Direct link to 3. 本地启动kafka" title="Direct link to 3. 本地启动kafka">​</a></h5>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">docker run -d --name kafka --publish 9092:9092 --link zookeeper --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 --env KAFKA_ADVERTISED_HOST_NAME=localhost --env KAFKA_ADVERTISED_PORT=9092  wurstmeister/kafka:latest</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<p>注意：上述代码，将kafka启动在9092端口</p>
-<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="4-进入kafka-bash">4. 进入kafka bash<a href="#4-进入kafka-bash" class="hash-link" aria-label="Direct link to 4. 进入kafka bash" title="Direct link to 4. 进  入kafka bash">​</a></h5>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">docker exec -it kafka bash</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">cd /opt/kafka/bin</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="5-创建topic分区为2topic-name为kafka_demo">5. 创建Topic，分区为2，Topic name为&#x27;kafka_demo&#x27;<a href="#5-创建topic分区为2topic-name为kafka_demo" class="hash-link" aria-label="Direct link to 5. 创建Topic，分区为2，Topic name为&#x27;kafka_demo&#x27;" title="Direct link to 5. 创建Topic，分区为2，Topic name为&#x27;kafka_demo&#x27;">​</a></h5>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 2 --topic kafka_demo</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="6-查看当前所有topic">6. 查看当前所有topic<a href="#6-查看当前所有topic" class="hash-link" aria-label="Direct link to 6. 查看当前所有topic" title="Direct link to 6. 查看当前所有topic">​</a></h5>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --list</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="7-本地安装kafka-python">7. 本地安装kafka-python<a href="#7-本地安装kafka-python" class="hash-link" aria-label="Direct link to 7. 本地安装kafka-python" title="Direct link to 7. 本地安装kafka-python">​</a></h5>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">pip install kafka-python</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="docker中kafka的topic增删改查命令汇总">Docker中kafka的topic增删改查命令汇总<a href="#docker中kafka的topic增删改查命令汇总" class="hash-link" aria-label="Direct link to Docker中kafka的topic增删改查命令汇总" title="Direct link to Docker中kafka的topic增删改查命令汇总">​</a></h5>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="本地安装与启动基于-docker">本地安装与启动（基于 Docker）<a href="#本地安装与启动基于-docker" class="hash-link" aria-label="Direct link to 本地安装与启动（基于 Docker）" title="Direct link to 本地安装与启动（基于 Docker）">​</a></h4>
+<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="1下载-zookeeper-镜像与-kafka-镜像">1.下载 zookeeper 镜像与 kafka 镜像<a href="#1下载-zookeeper-镜像与-kafka-镜像" class="hash-link" aria-label="Direct link to 1.下载 zookeeper 镜像与 kafka 镜像" title="Direct link to 1.下载 zookeeper 镜像与 kafka 镜像">​</a></h5>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">docker pull wurstmeister/zookeeper</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">docker pull wurstmeister/kafka</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="2本地启动-zookeeper">2.本地启动 zookeeper<a href="#2本地启动-zookeeper" class="hash-link" aria-label="Direct link to 2.本地启动 zookeeper" title="Direct link to 2.本地启动 zookeeper">​</a></h5>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">docker run -d --name zookeeper -p 2181:2181 -t wurstmeister/zookeeper</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="3-本地启动-kafka">3. 本地启动 kafka<a href="#3-本地启动-kafka" class="hash-link" aria-label="Direct link to 3. 本地启动 kafka" title="Direct link to 3. 本地启动 kafka">​</a></h5>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">docker run -d --name kafka --publish 9092:9092 --link zookeeper --env KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 --env KAFKA_ADVERTISED_HOST_NAME=localhost --env KAFKA_ADVERTISED_PORT=9092  wurstmeister/kafka:latest</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<p>注意：上述代码，将 kafka 启动在 9092 端口</p>
+<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="4-进入-kafka-bash">4. 进入 kafka bash<a href="#4-进入-kafka-bash" class="hash-link" aria-label="Direct link to 4. 进入 kafka bash" title="Direct link to 4. 进入 kafka bash">​</a></h5>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">docker exec -it kafka bash</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">cd /opt/kafka/bin</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="5-创建-topic分区为-2topic-name-为kafka_demo">5. 创建 Topic，分区为 2，Topic name 为&#x27;kafka_demo&#x27;<a href="#5-创建-topic分区为-2topic-name-为kafka_demo" class="hash-link" aria-label="Direct link to 5. 创建 Topic，分区为 2，Topic name 为&#x27;kafka_demo&#x27;" title="Direct link to 5. 创建 Topic，分区为 2，Topic name 为&#x27;kafka_demo&#x27;">​</a></h5>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 2 --topic kafka_demo</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="6-查看当前所有-topic">6. 查看当前所有 topic<a href="#6-查看当前所有-topic" class="hash-link" aria-label="Direct link to 6. 查看当前所有 topic" title="Direct link to 6. 查看当前所有 topic">​</a></h5>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --list</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="7-本地安装-kafka-python">7. 本地安装 kafka-python<a href="#7-本地安装-kafka-python" class="hash-link" aria-label="Direct link to 7. 本地安装 kafka-python" title="Direct link to 7. 本地安装 kafka-python">​</a></h5>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">pip install kafka-python</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h5 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="docker-中-kafka-的-topic-增删改查命令汇总">Docker 中 kafka 的 topic 增删改查命令汇总<a href="#docker-中-kafka-的-topic-增删改查命令汇总" class="hash-link" aria-label="Direct link to Docker 中 kafka 的 topic 增删改查命令汇总" title="Direct link to Docker 中 kafka 的 topic 增删改查命令汇总">​</a></h5>
 <ul>
 <li>增</li>
 </ul>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">创建Topic：</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">分区为2，Topic name为&#x27;kafka_demo&#x27;</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 2 --topic kafka_demo</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">增加分区：</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">通过--alter修改主题的分区数，增加分区。通过命令行工具操作，主题的分区只能增加，不能减少。否则报错。</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --zookeeper  zookeeper:2181 --alter --topic myTop1 -- partitions 2</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">创建Topic：</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">分区为2，Topic name为&#x27;kafka_demo&#x27;</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 2 --topic kafka_demo</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">增加分区：</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">通过--alter修改主题的分区数，增加分区。通过命令行工具操作，主题的分区只能增加，不能减少。否则报错。</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --zookeeper  zookeeper:2181 --alter --topic myTop1 -- partitions 2</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 <ul>
 <li>删</li>
 </ul>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">删除：</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">名为kafka_demo的主题</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh  --delete --zookeeper  zookeeper:2181   --topic  kafka_demo</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">删除：</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">名为kafka_demo的主题</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh  --delete --zookeeper  zookeeper:2181   --topic  kafka_demo</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 <ul>
 <li>改</li>
 </ul>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --create --topic topic_test_01 --partitions 2 --replication-factor 1</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --alter --topic topic_test_01 --config max.message.bytes=1048576</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --describe --topic topic_test_01</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --alter --topic topic_test_01 --config segment.bytes=10485760</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --alter --delete-config max.message.bytes --topic topic_test_01</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --create --topic topic_test_01 --partitions 2 --replication-factor 1</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --alter --topic topic_test_01 --config max.message.bytes=1048576</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --describe --topic topic_test_01</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --alter --topic topic_test_01 --config segment.bytes=10485760</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --alter --delete-config max.message.bytes --topic topic_test_01</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 <ul>
 <li>查</li>
 </ul>
-<div class="language-language codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-language codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">查看</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">当前所有topic</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --list</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">查看</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">当前所有topic详情</span><br></span><span class="token-line" style="color:#393A34"><span class="token plain" style="display:inline-block"></span><br></span><span class="token-line" style="color:#393A34"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --describe</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka幂等性">Kafka幂等性<a href="#kafka幂等性" class="hash-link" aria-label="Direct link to Kafka幂等性" title="Direct link to Kafka幂等性">​</a></h3>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">查看</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">当前所有topic</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --list</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">查看</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">当前所有topic详情</span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain" style="display:inline-block"></span></span><br></span><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">kafka-topics.sh --zookeeper zookeeper:2181 --describe</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-幂等性">Kafka 幂等性<a href="#kafka-幂等性" class="hash-link" aria-label="Direct link to Kafka 幂等性" title="Direct link to Kafka 幂等性">​</a></h3>
 <ul>
 <li>
 <p>生产者消息重复问题</p>
 <ul>
-<li>Kafka生产者生产  消息到partition，如果直接发送消息，kafka会将消息保存到分区中，但Kafka会返回一个ack给生产者，表示当前操作是否成功，是否已经保存了这条消息。如果ack响应的过程失败了，此时生产者会重试，继续发送没有发送成功的消息，Kafka又会保存一条一模一样的消息</li>
+<li>Kafka 生产者生产消息到 partition，如果直接发送消息，kafka 会将消息保存到分区中，但 Kafka 会返回一个 ack 给生产者，表示当前操作是否成功，是否已经保存了这条消息。如果 ack 响应的过程失败了，此时生产者会重试，继续发送没有发送成功的消息，Kafka 又会保存一条一模一样的消息</li>
 </ul>
 </li>
 <li>
-<p>在Kafka中可以开启幂等性</p>
+<p>在 Kafka 中可以开启幂等性</p>
 <ul>
-<li>当Kafka的生产者生产消息时，会增加一个pid（生产者的唯一编号）和sequence number（针对消息的一个递增序列）</li>
-<li>发送消息，会连着pid和sequence number一块发送</li>
-<li>kafka接收到消息，会将消息和pid、sequence number一并保存下来</li>
-<li>如果ack响应失败，生产者重试，再次发送消息时，Kafka会根据pid、sequence number是否需要再保存一条消息</li>
-<li>判断条件：生产者发送过来的sequence number 是否小于等于 partition中消息对应的sequence</li>
+<li>当 Kafka 的生产者生产消息时，会增加一个 pid（生产者的唯一编号）和 sequence number（针对消息的一个递增序列）</li>
+<li>发送消息，会连着 pid 和 sequence number 一块发送</li>
+<li>kafka 接收到消息，会将消息和 pid、sequence number 一并保存下来</li>
+<li>如果 ack 响应失败，生产者重试，再次发送消息时，Kafka 会根据 pid、sequence number 是否需要再保存一条消息</li>
+<li>判断条件：生产者发送过来的 sequence number 是否小于等于 partition 中消息对应的 sequence</li>
 </ul>
 </li>
 </ul>
-<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka中的分区副本机制">Kafka中的分区副本机制<a href="#kafka中的分区副本机制" class="hash-link" aria-label="Direct link to Kafka中的分区副本机制" title="Direct link to Kafka中的分区副本机制">​</a></h3>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-中的分区副本机制">Kafka 中的分区副本机制<a href="#kafka-中的分区副本机制" class="hash-link" aria-label="Direct link to Kafka 中的分区副本机制" title="Direct link to Kafka 中的分区副本机制">​</a></h3>
 <h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="生产者的分区写入策略">生产者的分区写入策略<a href="#生产者的分区写入策略" class="hash-link" aria-label="Direct link to 生产者的分区写入策略" title="Direct link to 生产者的分区写入策略">​</a></h4>
 <ul>
-<li>轮询（按照消息尽量保证每个分区的负载）策略，消息会均匀地分布到每个partition<!-- -->
+<li>轮询（按照消息尽量保证每个分区的负载）策略，消息会均匀地分布到每个 partition<!-- -->
 <ul>
-<li>写入消息的时候，key为null的时候，默认使用的是轮询策略</li>
+<li>  写入消息的时候，key 为 null 的时候，默认使用的是轮询策略</li>
 </ul>
 </li>
 <li>随机策略（不使用）</li>
-<li>按key写入策略，key.hash() % 分区的数量</li>
-<li>自定义分区策略（类似于MapReduce指定分区）</li>
+<li>按 key 写入策略，key.hash() % 分区的数量</li>
+<li>自定义分区策略（类似于 MapReduce 指定分区）</li>
 </ul>
 <blockquote>
 <p>乱序问题</p>
 <ul>
-<li>  在Kafka中生产者是有写入策略，如果topic有多个分区，就会将数据分散在不同的partition中存储</li>
-<li>当partition数量大于1的时候，数据（消息）会打散分布在不同的partition中</li>
+<li>在 Kafka 中生产者是有写入策略，如果 topic 有多个分区，就会将数据分散在不同的 partition 中存储</li>
+<li>当 partition 数量大于 1 的时候，数据（消息）会打散分布在不同的 partition 中</li>
 <li>如果只有一个分区，消息是有序的</li>
 </ul>
 </blockquote>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="消费组consumer-group-rebalance机制">消费组Consumer Group Rebalance机制<a href="#消费组consumer-group-rebalance机制" class="hash-link" aria-label="Direct link to 消费组Consumer Group Rebalance机制" title="Direct link to 消费组Consumer Group Rebalance机制">​</a></h4>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="消费组-consumer-group-rebalance-机制">消费组 Consumer Group Rebalance 机制<a href="#消费组-consumer-group-rebalance-机制" class="hash-link" aria-label="Direct link to 消费组 Consumer Group Rebalance 机制" title="Direct link to 消费组 Consumer Group Rebalance 机制">​</a></h4>
 <ul>
-<li>再均衡：在某些情况下，消费者组中的消费者消费的分区会产生变化，会导致消费者分配不均匀（例如：有两个消费者消费3个，因为某个partition崩溃了，还有一个消费者当前没有分区要削峰），Kafka Consumer Group就会启用rebalance机制，重新平衡这个Consumer Group内的消费者消费的分区分配。</li>
+<li>再均衡：在某些情况下，消费者组中的消费者消费的分区会产生变化，会导致消费者分配不均匀（例如：有两个消费者消费 3 个，因为某个 partition 崩溃了，还有一个消费者当前没有分区要削峰），Kafka Consumer Group 就会启用 rebalance 机制，重新平衡这个 Consumer Group 内的消费者消费的分区分配。</li>
 <li>触发时机<!-- -->
 <ul>
 <li>消费者数量发生变化<!-- -->
 <ul>
-<li>某个消费者crash</li>
+<li>某个消费者 crash</li>
 <li>新增消费者</li>
 </ul>
 </li>
-<li>topic的数量发生变化<!-- -->
+<li>topic 的数量发生变化<!-- -->
 <ul>
-<li>某个topic被删除</li>
+<li>某个 topic 被删除</li>
 </ul>
 </li>
-<li>partition的数量发生变化<!-- -->
+<li>partition 的数量发生变化<!-- -->
 <ul>
-<li>删除partition</li>
-<li>新增partition</li>
+<li>删除 partition</li>
+<li>新增 partition</li>
 </ul>
 </li>
 </ul>
 </li>
 <li>不良影响<!-- -->
 <ul>
-<li>发生rebalance，所有的consumer将不再工作，共同来参与再均衡，直到每个消费者都已经被成功分配所需要消费的分区为止（rebalance结束）</li>
+<li>发生 rebalance，所有的 consumer 将不再工作，共同来参与再均衡，直到每个消费者都已经被成功分配所需要消费的分区为止（rebalance 结束）</li>
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="消费者的分区分配策略">消费者的分区分配策略<a href="#消费者的分区分配策略" class="hash-link" aria-label="Direct link to 消费者的分区分配策略" title="Direct link to 消费者的分区分配策略">​</a></h4>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="消  费者的分区分配策略">消费者的分区分配策略<a href="#消费者的分区分配策略" class="hash-link" aria-label="Direct link to 消费者的分区分配策略" title="Direct link to 消费者的分区分配策略">​</a></h4>
 <p>分区分配策略：保障每个消费者尽量能够均衡地消费分区的数据，不能出现某个消费者消费分区的数量特别多，某个消费者消费的分区特别少</p>
 <ul>
-<li>Range分配策略（范围分配策略）：Kafka默认的分配策略<!-- -->
+<li>Range 分配策略（范围分配策略）：Kafka 默认的分配策略<!-- -->
 <ul>
 <li>n：分区的数量 / 消费者数量</li>
 <li>m：分区的数量 % 消费者数量</li>
-<li>前m个消费者消费n+1个分区</li>
-<li>剩余的消费者消费n个分区</li>
+<li>前 m 个消费者消费 n+1 个分区</li>
+<li>剩余的消费者消费 n 个分区</li>
 </ul>
 </li>
-<li>RoundRobin分配策略（轮询分配策略）<!-- -->
+<li>RoundRobin 分配策略（轮询分配策略）<!-- -->
 <ul>
 <li>消费者挨个分配消费的分区</li>
 </ul>
 </li>
-<li>Striky粘性分配策略<!-- -->
+<li>Striky 粘性分配策略<!-- -->
 <ul>
-<li>在没有发生rebalance跟轮询分配策略是一致的</li>
-<li>发生了rebalance，轮询分配策略，重新走一遍轮询分配的过程。而粘性会保证跟上一次的尽量一致，只是将新的需要分配的分区，均匀的分配到现有可用的消费者中即可</li>
+<li>在没有发生 rebalance 跟轮询分配策略是一致的</li>
+<li>发生了 rebalance，轮询分配策略，重新走一遍轮询分配的过程。而粘性会保证跟上一次的尽量一致，只是将新的需要分配的分区，均匀的分配到现有可用的消费者中即可</li>
 <li>减少上下文的切换</li>
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="副本的ack机制">副本的ACK机制<a href="#副本的ack机制" class="hash-link" aria-label="Direct link to 副本的ACK机制" title="Direct link to 副本的ACK机制">​</a></h4>
-<p>producer是不断地往Kafka中写入数据，写入数据会有一个返回结果，表示是否写入成功。这里对应有一个ACKs的配置。</p>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="副本的-ack-机制">副本的 ACK 机制<a href="#副本的-ack-机制" class="hash-link" aria-label="Direct link to 副本的 ACK 机制" title="Direct link to 副本的 ACK 机制">​</a></h4>
+<p>producer 是不断地往 Kafka 中写入数据，写入数据会有一个返回结果，表示是否写入成功。这里对应有一个 ACKs 的配置。</p>
 <ul>
 <li>acks = 0：生产者只管写入，不管是否写入成功，可能会数据丢失。性能是最好的</li>
-<li>acks = 1：生产者会等到leader分区写入成功后，返回成功，接着发送下一条</li>
-<li>acks = -1/all：确保消息写入到leader分区、还确保消息写入到对应副本都成功后，接着发送下一条，性能是最差的</li>
+<li>acks = 1：生产者会等到 leader 分区写入成功后，返回成功，接着发送下一条</li>
+<li>acks = -1/all：确保消息写入到 leader 分区、还确保消息写入到对应副本都成功后，接着发送下一条，性能是最差的</li>
 </ul>
-<p>根据业务情况来选择ack机制，是要求性能最高，一部分数据丢失影响不大，可以选择0/1。如果要求数据一定不能丢失，就得配置为-1/all。</p>
-<p>分区中是有leader和follower的概念，为了确保消费者消费的数据是一致的，只能从分区leader去读写消息，follower做的事情就是同步数据，Backup。</p>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="高级apihigh-level-api低级apilow-level-api">高级API（High-Level API）、低级API（Low-Level API）<a href="#高级apihigh-level-api低级apilow-level-api" class="hash-link" aria-label="Direct link to 高级API（High-Level API）、低级API（Low-Level API）" title="Direct link to 高级API（High-Level API）、低级API（Low-Level API）">​</a></h4>
+<p>根据业务情况来选择 ack 机制，是要求性能最高，一部分数据丢失影响不大，可以选择 0/1。如果要求数据一定不能丢失，就得配置为-1/all。</p>
+<p>分区中是有 leader 和 follower 的概念，为了确保消费者消费的数据是一致的，只能从分区 leader 去读写消息，follower 做的事情就是同步数据，Backup。</p>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="高级-apihigh-level-api低级-apilow-level-api">高级 API（High-Level API）、低级 API（Low-Level API）<a href="#高级-apihigh-level-api低级-apilow-level-api" class="hash-link" aria-label="Direct link to 高级 API（High-Level API）、低级 API（Low-Level API）" title="Direct link to 高级 API（High-Level API）、低级 API（Low-Level API）">​</a></h4>
 <ul>
-<li>高级API就是直接让Kafka帮助管理、处理分配、数据<!-- -->
+<li>高级 API 就是直接让 Kafka 帮助管理、处理分配、数据<!-- -->
 <ul>
-<li>offset存储在ZK中</li>
-<li>由kafka的rebalance来控制消费者分配的分区</li>
+<li>offset 存储在 ZK 中</li>
+<li>由 kafka 的 rebalance 来控制消费者分配的分区</li>
 <li>开发起来比较简单，无需开发者关注底层细节</li>
 <li>无法做到细粒度的控制</li>
 </ul>
 </li>
-<li>低级API：由编写的程序自己控制逻辑<!-- -->
+<li>低级 API：由编写的程序自己控制逻辑<!-- -->
 <ul>
-<li>自己来管理Offset，可以将offset存储在ZK、MySQL、Redis、HBase、Flink的状态存储</li>
+<li>自己来管理 Offset，可以将 offset 存储在 ZK、MySQL、Redis、HBase、Flink 的状态存储</li>
 <li>指定消费者拉取某个分区的数据</li>
 <li>可以做到细粒度的控制</li>
-<li>原有的Kafka的策略会失效，需要我们自己来实现消费机制</li>
+<li>原有的 Kafka 的策略会失效，需要我们自己来实现消费机制</li>
 </ul>
 </li>
 </ul>
-<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka原理">Kafka原理<a href="#kafka原理" class="hash-link" aria-label="Direct link to Kafka原理" title="Direct link to Kafka原理">​</a></h3>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="leader和follower">leader和follower<a href="#leader和follower" class="hash-link" aria-label="Direct link to leader和follower" title="Direct link to leader和follower">​</a></h4>
+<h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-原理">Kafka 原理<a href="#kafka-原理" class="hash-link" aria-label="Direct link to Kafka 原理" title="Direct link to Kafka 原理">​</a></h3>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="leader-和-follower">leader 和 follower<a href="#leader-和-follower" class="hash-link" aria-label="Direct link to leader 和 follower" title="Direct link to leader 和 follower">​</a></h4>
 <ul>
-<li>Kafka中的leader和follower是相对分区有意义，不是相对broker</li>
-<li>Kafka在创建topic的时候，会尽量分配分区的leader在不同的broker中，其实就是负载均衡</li>
-<li>leader职责：读写数据</li>
-<li>follower职责：同步数据、参与选举（leader crash之后，会选举一个follower重新成为分区的leader</li>
-<li>注意和ZooKeeper区分<!-- -->
+<li>Kafka 中的 leader 和 follower 是相对分区有意义，不是相对 broker</li>
+<li>Kafka 在创建 topic 的时候，会尽量分配分区的 leader 在不同的 broker 中，其实就是负载均衡</li>
+<li>leader 职责：读写数据</li>
+<li>follower 职责：同步数据、参与选举（leader crash 之后，会选举一个 follower 重新成为分区的 leader</li>
+<li>注意和 ZooKeeper 区分<!-- -->
 <ul>
-<li>ZK的leader负责读、写，follower可以读取</li>
-<li>Kafka的leader负责读  写、follower不能读写数据（确保每个消费者消费的数据是一致的），Kafka一个topic有多个分区leader，一样可以实现数据操作的负载均衡</li>
+<li>ZK 的 leader 负责读、写，follower 可以读取</li>
+<li>Kafka 的 leader 负责读写、follower 不能读写数据（确保每个消费者消费的数据是一致的），Kafka 一个 topic 有多个分区 leader，一样可以实现数据操作的负载均衡</li>
 </ul>
 </li>
 </ul>
 <h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="arisrosr">AR\ISR\OSR<a href="#arisrosr" class="hash-link" aria-label="Direct link to AR\ISR\OSR" title="Direct link to AR\ISR\OSR">​</a></h4>
 <ul>
-<li>AR表示一个topic下的所有副本</li>
-<li>ISR：In Sync Replicas，正在同步的副本（可以理解为当前有几个follower是存活的）</li>
+<li>AR 表示一个 topic 下的所有副本</li>
+<li>ISR：In Sync Replicas，正在同步的副本（可以理解为当前有几个 follower 是存活的）</li>
 <li>OSR：Out of Sync Replicas，不再同步的副本</li>
 <li>AR = ISR + OSR</li>
 </ul>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="leader选举">leader选举<a href="#leader选举" class="hash-link" aria-label="Direct link to leader选举" title="Direct link to leader选举">​</a></h4>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="leader-选举">leader 选举<a href="#leader-选举" class="hash-link" aria-label="Direct link to leader 选举" title="Direct link to leader 选举">​</a></h4>
 <ul>
 <li>
-<p>Controller：controller是kafka集群的老大，是针对Broker的一个角色</p>
+<p>Controller：controller 是 kafka 集群的老大，是针对 Broker 的一个角色</p>
 <ul>
-<li>Controller是高可用的，是用过ZK来进行选举</li>
+<li>Controller 是高可用的，是用过 ZK 来进行选举</li>
 </ul>
 </li>
 <li>
-<p>Leader：是针对partition的一个角色</p>
+<p>Leader：是针对 partition 的一个角色</p>
 <ul>
-<li>Leader是通过ISR来进行快速选举</li>
+<li>Leader 是通过 ISR 来进行快速选举</li>
 </ul>
 </li>
 <li>
-<p>如果Kafka是基于ZK来进行选举，ZK的压力可能会比较大。例如：某个节点崩溃，这个节点上不仅仅只有一个leader，是有不少的leader需要选举。通过ISR快速进行选举。</p>
+<p>如果 Kafka 是基于 ZK 来进行选举，ZK 的压力可能会比较大。例如：某个节点崩溃，这个节点上不仅仅只有一个 leader，是有不少的 leader 需要选举。通过 ISR 快速进行选举。</p>
 </li>
 <li>
-<p>leader的负载均衡</p>
+<p>leader 的负载均衡</p>
 <ul>
-<li>如果某个broker crash之后，就可能会导致partition的leader分布不均匀，就是一个broker上存在一个topic下不同partition的leader</li>
-<li>通过以下指令，可以将leader分配到优先的leader对应的broker，确保leader是均匀分配的</li>
+<li>如果某个 broker crash 之后，就可能会导致 partition 的 leader 分布不均匀，就是一个 broker 上存在一个 topic 下不同 partition 的 leader</li>
+<li>通过以下指令，可以将 leader 分配到优先的 leader 对应的 broker，确保 leader 是均匀分配的</li>
 </ul>
-<div class="language-shell codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-shell codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#393A34"><span class="token plain">bin/kafka-leader-election.sh --bootstrap-server node1.itcast.cn:9092 --topic test --partition=2 --election-type preferred</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
 </li>
 </ul>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka读写流程">Kafka读写流程<a href="#kafka读写流程" class="hash-link" aria-label="Direct link to Kafka读写流程" title="Direct link to Kafka读写流程">​</a></h4>
+<div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#393A34;--prism-background-color:#f6f8fa"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#393A34;background-color:#f6f8fa"><code class="codeBlockLines_e6Vv codeBlockLinesWithNumbering_o6Pm"><span class="token-line codeLine_lJS_" style="color:#393A34"><span class="codeLineNumber_Tfdd"></span><span class="codeLineContent_feaV"><span class="token plain">  bin/kafka-leader-election.sh --bootstrap-server node1.itcast.cn:9092 --topic test --partition=2 --election-type preferred</span></span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-读写流程">Kafka 读写流程<a href="#kafka-读写流程" class="hash-link" aria-label="Direct link to Kafka 读写流程" title="Direct link to Kafka 读写流程">​</a></h4>
 <ul>
 <li>写流程<!-- -->
 <ul>
-<li>通过ZooKeeper找partition对应的leader，leader是负责写的</li>
-<li>producer开始写入数据</li>
-<li>ISR里面的follower开始同步数据，并返回给leader ACK</li>
-<li>返回给producer ACK</li>
+<li>通过 ZooKeeper 找 partition 对应的 leader，leader 是负责写的</li>
+<li>producer 开始写入数据</li>
+<li>ISR 里面的 follower 开始同步数据，并返回给 leader ACK</li>
+<li>返回给 producer ACK</li>
 </ul>
 </li>
 <li>读流程<!-- -->
 <ul>
-<li>通过ZooKeeper找partition对应的leader，leader是负责读的</li>
-<li>通过ZooKeeper找到消费者对应的offset</li>
-<li>然后开始从offset往后顺序拉取数据</li>
-<li>提交offset（自动提交——每隔多少秒提交一次offset、手动提交——放入到事务中提交）</li>
+<li>通过 ZooKeeper 找 partition 对应的 leader，leader 是负责读的</li>
+<li>通过 ZooKeeper 找到消费者对应的 offset</li>
+<li>然后开始从 offset 往后顺序拉取数据</li>
+<li>提交 offset（自动提交——每隔多少秒提交一次 offset、手动提交——放入到事务中提交）</li>
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka的物理存储">Kafka的物理存储<a href="#kafka的物理存储" class="hash-link" aria-label="Direct link to Kafka的物理存储" title="Direct link to Kafka的物理存储">​</a></h4>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-的物理存储">Kafka 的物理存储<a href="#kafka-的物理存储" class="hash-link" aria-label="Direct link to Kafka 的物理存储" title="Direct link to Kafka 的物理存储">​</a></h4>
 <ul>
-<li>Kafka的数据组织结构<!-- -->
+<li>Kafka 的数据组织结构<!-- -->
 <ul>
 <li>topic</li>
 <li>partition</li>
 <li>segment<!-- -->
 <ul>
-<li>.log数据文件</li>
+<li>.log 数据文件</li>
 <li>.index（稀疏索引）</li>
 <li>.timeindex（根据时间做的索引）</li>
 </ul>
@@ -372,49 +372,49 @@
 </li>
 <li>深入了解读数据的流程<!-- -->
 <ul>
-<li>消费者的offset是一个针对partition全局offset</li>
-<li>可以根据这个offset找到segment段</li>
-<li>接着需要将全局的offset转换成segment的局部offset</li>
-<li>根据局部的offset，就可以从（.index稀疏索引）找到对应的数据位置</li>
+<li>消费者的 offset 是一个针对 partition 全局 offset</li>
+<li>可以根据这个 offset 找到 segment 段</li>
+<li>接着需要将全局的 offset 转换成 segment 的局部 offset</li>
+<li>根据局部的 offset，就可以从（.index 稀疏索引）找到对应的数据位置</li>
 <li>开始顺序读取</li>
 </ul>
 </li>
 </ul>
 <h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="消息传递的语义性">消息传递的语义性<a href="#消息传递的语义性" class="hash-link" aria-label="Direct link to 消息传递的语义性" title="Direct link to 消息传递的语义性">​</a></h4>
-<p>Flink里面有对应的每种不同机制的保证，提供Exactly-Once保障（二阶段事务提交方式）</p>
+<p>Flink 里面有对应的每种不同机制的保证，提供 Exactly-Once 保障（二阶段事务提交方式）</p>
 <ul>
 <li>At-most once：最多一次（只管把数据消费到，不管有没有成功，可能会有数据丢失）</li>
 <li>At-least once：最少一次（有可能会出现重复消费）</li>
 <li>Exactly-Once：仅有一次（事务性性的保障，保证消息有且仅被处理一次）</li>
 </ul>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka的消息不丢失">Kafka的消息不丢失<a href="#kafka的消息不丢失" class="hash-link" aria-label="Direct link to Kafka的消息不丢失" title="Direct link to Kafka的消息不丢失">​</a></h4>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="kafka-的消息不丢失">Kafka 的消息不丢失<a href="#kafka-的消息不丢失" class="hash-link" aria-label="Direct link to Kafka 的消息不丢失" title="Direct link to Kafka 的消息不丢失">​</a></h4>
 <ul>
-<li>broker消息不丢失：因为有副本relicas的存在，会不断地从leader中同步副本，所以，一个broker crash，不会导致数据丢失，除非是只有一个副本。</li>
-<li>生产者消息不丢失：ACK机制（配置成ALL/-1）、配置0或者1有可能会存在丢失</li>
-<li>消费者消费不丢失：重点控制offset<!-- -->
+<li>broker 消息不丢失：因为有副本 relicas 的存在，会不断地从 leader 中同步副本，所以，一个 broker crash，不会导致数据丢失，除非是只有一个副本。</li>
+<li>生产者消息不丢失：ACK 机制（配置成 ALL/-1）、配置 0 或者 1 有可能会存在丢失</li>
+<li>消费者消费不丢失：重点控制 offset<!-- -->
 <ul>
 <li>At-least once：一种数据可能会重复消费</li>
 <li>Exactly-Once：仅被一次消费</li>
 </ul>
 </li>
 </ul>
-<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="数据积压">数据  积压<a href="#数据积压" class="hash-link" aria-label="Direct link to 数据积压" title="Direct link to 数据积压">​</a></h4>
+<h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="数据积压">数据积压<a href="#数据积压" class="hash-link" aria-label="Direct link to 数据积压" title="Direct link to 数据积压">​</a></h4>
 <ul>
-<li>数据积压指的是消费者因为有一些外部的IO、一些比较耗时的操作（Full GC——Stop the world），就会造成消息在partition中一直存在得不到消费，就会产生数据积压</li>
-<li>在企业中，我们要有监控系统，如果出现这种情况，需要尽快处理。虽然后续的Spark Streaming/Flink可以实现背压机制，但是数据累积太多一定对实时系统它的实时性是有说影响的</li>
+<li>数据积压指的是消费者因为有一些外部的 IO、一些比较耗时的操作（Full GC——Stop the world），就会造成消息在 partition 中一直存在得不到消费，就会产生数据积压</li>
+<li>在企业中，我们要有监控系统，如果出现这种情况，需要尽快处理。虽然后续的 Spark Streaming/Flink 可以实现背压机制，但是数据累积太多一定对实时系统它的实时性是有说影响的</li>
 </ul>
 <h4 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="数据清理配额限速">数据清理&amp;配额限速<a href="#数据清理配额限速" class="hash-link" aria-label="Direct link to 数据清理&amp;配额限速" title="Direct link to 数据清理&amp;配额限速">​</a></h4>
 <ul>
 <li>数据清理<!-- -->
 <ul>
-<li>Log Deletion（日志删除）：如果消息达到一定的条件（时间、日志大小、offset大小），Kafka就会自动将日志设置为待删除（segment端的后缀名会以 .delete结尾），日志管理程序会定期清理这些日志<!-- -->
+<li>Log Deletion（日志删除）：如果消息达到一定的条件（时间、日志大小、offset 大小），Kafka 就会自动将日志设置为待删除（segment 端的后缀名会以 .delete 结尾），日志管理程序会定期清理这些日志<!-- -->
 <ul>
-<li>默认是7天过期</li>
+<li>默认是 7 天过期</li>
 </ul>
 </li>
 <li>Log Compaction（日志合并）<!-- -->
 <ul>
-<li>如果在一些key-value数据中，一个key可以对应多个不同版本的value</li>
+<li>如果在 一些 key-value 数据中，一个 key 可以对应多个不同版本的 value</li>
 <li>经过日志合并，就会只保留最新的一个版本</li>
 </ul>
 </li>
@@ -422,20 +422,16 @@
 </li>
 <li>配额限速<!-- -->
 <ul>
-<li>可以限制Producer、Consumer的速率</li>
-<li>防止Kafka的速度过快，占用整个服务器（broker）的所有IO资源</li>
+<li>可以限制 Producer、Consumer 的速率</li>
+<li>防止 Kafka 的速度过快，占用整个服务器（broker）的所有 IO 资源</li>
 </ul>
 </li>
-</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"><a href="https://github.com/jiangyangcreate/jiangyangcreate.github.io/blob/main/docs/docs/消息队列/kafaka.md" target="_blank" rel="noopener noreferrer" class="theme-edit-this-page"><svg fill="currentColor" height="20" width="20" viewBox="0 0 40 40" class="iconEdit_Z9Sw" aria-hidden="true"><g><path d="m34.5 11.7l-3 3.1-6.3-6.3 3.1-3q0.5-0.5 1.2-0.5t1.1 0.5l3.9 3.9q0.5 0.4 0.5 1.1t-0.5 1.2z m-29.5 17.1l18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"></path></g></svg>Edit this page</a></div><div class="col lastUpdated_vwxv"></div></div></footer></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/消息队列/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">消息队列概述</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/逆向测试/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">逆向测试概述</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#kafka" class="table-of-contents__link toc-highlight">kafka</a><ul><li><a href="#kafka的应用场景" class="table-of-contents__link toc-highlight">Kafka的应用场景</a></li><li><a href="#kafka消息队列的两种模型" class="table-of-contents__link toc-highlight">Kafka消息队列的两种模型</a></li><li><a href="#kafka中的重要概念" class="table-of-contents__link toc-highlight">Kafka中的重要概念</a></li><li><a href="#kafka集群搭建" class="table-of-contents__link toc-highlight">Kafka集群搭建</a></li><li><a href="#kafka幂等性" class="table-of-contents__link toc-highlight">Kafka幂等性</a></li><li><a href="#kafka中的分区副本机制" class="table-of-contents__link toc-highlight">Kafka中的分区副本机制</a></li><li><a href="#kafka原理" class="table-of-contents__link toc-highlight">Kafka原理</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">
-              <a href="https://github.com/jiangyangcreate/jiangyangcreate.github.io/licenses">
-                2019-2024 © jiangmiemie
+</ul><div class="margin-vert--lg" style="display:flex;align-items:center;justify-content:center"><a class="button button--link" href="https://github.com/jiangyangcreate/jiangyangcreate.github.io/blob/main/docs/docs/消息队列/kafaka.md" target="_blank" rel="noreferrer noopener" aria-label="share on twitter" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 512 512" height="20" width="20" style="margin-right:7px"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="url(#grad1)" stroke="none"><path d="M2384 5060 c-1012 -69 -1891 -738 -2235 -1703 -53 -146 -102 -349 -125 -512 -23 -157 -25 -496 -5 -655 102 -816 575 -1526 1287 -1932 164 -94 418 -200 483 -202 51 -1 94 20 116 57 18 30 19 50 16 267 -1 129 -3 236 -4 236 -1 1 -38 -4 -82 -12 -263 -43 -497 16 -646 165 -58 58 -76 86 -134 206 -94 196 -149 271 -255 348 -78 56 -120 98 -120 119 0 50 121 67 217 30 125 -47 208 -119 299 -258 126 -191 284 -276 485 -261 77 6 233 49 245 68 3 6 13 38 20 71 19 80 68 181 110 228 40 45 44 42 -86 60 -103 14 -282 60 -368 94 -362 143 -571 410 -649 829 -25 134 -25 463 0 567 36 149 103 285 195 398 l43 53 -15 47 c-52 161 -46 370 16 564 20 61 24 67 54 73 107 20 352 -68 576 -206 l98 -61 87 20 c204 47 298 57 553 57 256 0 349 -10 553 -57 l88 -20 77 48 c153 96 304 167 407 193 85 21 159 31 191 25 28 -5 33 -12 52 -72 57 -178 67 -404 23 -542 l-21 -65 20 -25 c98 -121 175 -269 212 -409 26 -98 36 -348 19 -488 -74 -608 -407 -935 -1041 -1023 -120 -16 -118 -15 -83 -53 46 -48 90 -134 115 -223 20 -74 22 -106 27 -529 7 -492 5 -482 66 -507 47 -20 102 -13 200 26 348 135 622 311 884 569 417 410 679 942 752 1527 20 159 18 498 -5 655 -173 1219 -1151 2131 -2373 2215 -161 11 -175 11 -339 0z"></path></g></svg></a><a class="button button--link" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fjiangmiemie.com%2Fdocs%2F%25E6%25B6%2588%25E6%2581%25AF%25E9%2598%259F%25E5%2588%2597%2Fkafaka%2F&amp;text=%E6%88%91%E5%88%9A%E5%88%9A%E8%AF%BB%E4%BA%86%20%22kafaka%22%20by%20%40jiangyangcreate" target="_blank" rel="noreferrer noopener" aria-label="share on twitter" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 24 24" height="20" width="20" style="margin-right:7px"><g fill="url(#grad1)"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg></a><a class="button button--link" href="https://jiangmiemie.com/rss.xml" target="_blank" rel="noreferrer noopener" aria-label="rss" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 16 16" height="20" width="20" style="margin-right:7px"><g fill="url(#grad1)"><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#D8262C;stop-opacity:1"></stop><stop offset="100%" style="stop-color:#E6B800;stop-opacity:1"></stop></linearGradient><circle cx="3" cy="13" r="2"></circle><path d="M1 5.667v2.667A6.674 6.674 0 0 1 7.667 15h2.666c0-5.146-4.187-9.333-9.333-9.333z"></path><path d="M1 1v2.667C7.25 3.667 12.334 8.75 12.334 15H15C15 7.28 8.72 1 1 1z"></path></g></svg></a><a class="button button--link" href="mailto:jiangyangcreate@gmail.com" target="_blank" rel="noreferrer noopener" aria-label="send email" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1024 1024" style="margin-right:7px;height:20px;width:20px"><g><path style="opacity:0.996;fill:url(#grad1)" d="M 243.5,420.5 C 189.523,379.185 135.857,337.518 82.5,295.5C 140.987,183.298 229.487,104.632 348,59.5C 432.42,30.213 518.587,23.713 606.5,40C 693.576,57.6997 769.243,96.6997 833.5,157C 787.833,202.667 742.167,248.333 696.5,294C 695.5,294.667 694.5,294.667 693.5,294C 642.378,246.775 581.711,222.942 511.5,222.5C 407.283,227.337 327.117,273.337 271,360.5C 259.938,379.624 250.771,399.624 243.5,420.5 Z"></path></g><g><path style="opacity:0.996;fill:url(#grad1)" d="M 82.5,295.5 C 135.857,337.518 189.523,379.185 243.5,420.5C 223.5,481.168 223.5,541.835 243.5,602.5C 189.523,643.815 135.857,685.482 82.5,727.5C 31.7513,624.612 18.5846,516.945 43,404.5C 51.5465,366.35 64.7132,330.016 82.5,295.5 Z"></path></g><g><path style="opacity:0.998;fill:url(#grad1)" d="M 829.5,876.5 C 777.833,835.833 726.167,795.167 674.5,754.5C 725.318,718.61 756.985,669.944 769.5,608.5C 683.503,607.5 597.503,607.167 511.5,607.5C 511.5,546.167 511.5,484.833 511.5,423.5C 662.5,423.5 813.5,423.5 964.5,423.5C 979.017,509.532 974.517,594.532 951,678.5C 928.206,755.703 887.706,821.703 829.5,876.5 Z"></path></g><g><path style="opacity:0.997;fill:url(#grad1)" d="M 243.5,602.5 C 274.71,690.744 334.043,751.577 421.5,785C 487.78,805.861 553.78,804.861 619.5,782C 638.723,774.388 657.056,765.222 674.5,754.5C 726.167,795.167 777.833,835.833 829.5,876.5C 762.129,936.339 683.462,972.839 593.5,986C 437.233,1008.45 300.566,967.451 183.5,863C 141.888,823.583 108.222,778.416 82.5,727.5C 135.857,685.482 189.523,643.815 243.5,602.5 Z"></path></g></svg></a></div></div></article><nav class="pagination-nav docusaurus-mt-lg" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/消息队列/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">消息队列概述</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/逆向测试/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">逆向测试概述</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#kafka" class="table-of-contents__link toc-highlight">kafka</a><ul><li><a href="#kafka-的应用场景" class="table-of-contents__link toc-highlight">Kafka 的应用场景</a></li><li><a href="#kafka-消息队列的两种模型" class="table-of-contents__link toc-highlight">Kafka 消息队列的两种模型</a></li><li><a href="#kafka-中的重要概念" class="table-of-contents__link toc-highlight">Kafka 中的重要概念</a></li><li><a href="#kafka-集群搭建" class="table-of-contents__link toc-highlight">Kafka 集群搭建</a></li><li><a href="#kafka-幂等性" class="table-of-contents__link toc-highlight">Kafka 幂等性</a></li><li><a href="#kafka-中的分区副本机制" class="table-of-contents__link toc-highlight">Kafka 中的分区副本机制</a></li><li><a href="#kafka-原理" class="table-of-contents__link toc-highlight">Kafka 原理</a></li></ul></li></ul></div></div></div></div></main></div></div></div><footer class="footer"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright">
+              <a href="https://github.com/jiangyangcreate/jiangyangcreate.github.io/licenses" aria-label="https://www.travellings.cn/go.html">
+                2019 - 2024 © jiangmiemie
               </a> 
-              <a target="_blank" rel="noopener noreferrer" href="https://github.com/jiangyangcreate/jiangyangcreate.github.io" aria-label="https://www.travellings.cn/go.html">
-                <img src="/img/github-color.svg">
-              </a>
-
-              <a target="_blank" rel="noopener noreferrer" href="mailto:jiangyangcreate@gmail.com" aria-label="go to send email">
-                <img src="/img/email-color.svg">
+              <a target="_blank" rel="noopener noreferrer" href="https://docusaurus.io/">
+                <img src="/img/docusaurus.svg">
               </a>
         </div></div></div></footer></div>
 </body>
