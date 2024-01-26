@@ -1,0 +1,16 @@
+---
+sidebar_position: 6
+title: 云原生开发
+---
+
+云原生架构是一种构建和运行应用程序的方法，这种方法充分利用了云计算的优势。
+
+这并不意味着你必须在云上运行你的应用程序。
+
+你的应用程序可以在云上运行，而且可以在云上运行得更好。
+
+云原生架构的关键技术包括以下几个方面：
+
+import DocCardList from '@theme/DocCardList';
+
+<DocCardList />
