@@ -107,7 +107,7 @@ export default function MDXContent({ children }) {
         </a>
         <a
           className="button button--link"
-          href={`${siteConfig.url}/rss.xml`}
+          href={`${siteConfig.url}/blog/rss.xml`}
           target="_blank"
           rel="noreferrer noopener"
           aria-label="rss reader link"
