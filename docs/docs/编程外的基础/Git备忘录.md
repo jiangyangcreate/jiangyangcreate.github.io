@@ -5,16 +5,29 @@ title: Git备忘录
 
 Git 是一个版本控制工具，既可以通过图形化的方式操作，也可以通过命令行来完成。
 
-注意区别：git是一个开源的分布式版本控制系统，GitHub是一个托管和协作管理 Git 仓库的平台
+Git 版本管理分为四个板块：
 
-Git 版本管理分为四个板块
-*Workspace*Index*Repository*Remote
+1. **Workspace**：这是你的工作目录，包含了项目的所有文件。在这里你可以修改、创建和删除文件。Workspace包含了你正在工作的文件，这些文件可能已经被Git跟踪（tracked），也可能还没有被Git跟踪。
+
+2. **Index**（也被称为暂存区或者stage）：这是一个中间区域，一个准备提交到Repository的更改列表。当你执行`git add`命令时，更改（添加、修改、删除）会被加入到Index中。然后通过执行`git commit`命令，Index中的所有更改会被永久记录到Repository中。
+
+3. **Repository**：这是Git存储项目历史记录的地方，可以认为它是一个数据库，存储了所有的提交（commit）和包含改动的文件。每次提交，Git都会保存一个快照并记录其详细信息。你可以回到任何一个已经提交的版本。
+
+4. **Remote**：这是存储在网络上的版本库，可以让多个人共享和交换各自的更改。最常见的远程仓库服务包括GitHub、GitLab和Bitbucket等。你可以执行`git push`命令将本地Repository的更改推送到Remote，也可以执行`git pull`或`git fetch`命令从Remote获取最新的更改。
+
 文件在这四个区域之间的转换关系如下：
-![GitImage](/docs/GitImage.webp)
 
-[Git](https://git-scm.com/docs)官方文档
+```mermaid
+flowchart LR
+    A[Workspace] -- git add --> B[Index]
+    B -- git commit --> C[Repository]
+    C -- git push --> D[Remote]
+    D -- git fetch/clone --> C
+    C -- git checkout --> A
+    D -- git pull --> A
+```
 
-[Interactive Git Courses](https://ooloo.io/project/github-flow/mindset)了解如何在 GitHub 团队中使用 Git
+[Interactive Git Courses](https://ooloo.io/project/github-flow/mindset)了解如何在 GitHub (一个托管和协作管理 Git 仓库的平台)团队中使用 Git
 
 ## 常用操作
 

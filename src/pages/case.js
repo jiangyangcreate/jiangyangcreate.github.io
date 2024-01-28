@@ -16,7 +16,7 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/jiangmiemie.webp"),
       label: "jiangmiemie",
-      desc: "这是一个基于 Docusaurus 3.0 最新版本的自定义站点。设计理念：美丽胜过丑陋，清晰胜过模糊。简洁胜过复杂，复杂胜过繁琐。希望你喜欢这个小巧而吸引人的个人博客站点。",
+      desc: "这是一个基于 Docusaurus 3 最新版本的自定义站点。设计理念：美丽胜过丑陋，清晰胜过模糊。简洁胜过复杂，复杂胜过繁琐。希望你喜欢这个小巧而吸引人的个人博客站点。",
       link: "https://jiangmiemie.com/",
     },
     {
@@ -51,7 +51,15 @@ function ShowcaseGrid() {
   return (
     // key={isClient ? 1 : 2} will trigger a rerender of the whole subtree and the images will be aligned with text
     <Fragment key={isClient ? 1 : 2}>
-      <h1 className="es-big-title es-h-center">{headingTitle}</h1>
+      <h1
+        className="es-big-title es-h-center"
+        style={{
+          backgroundImage: 'url("/pages/case/sky.webp")',
+          backgroundPosition: "50% 50%",
+        }}
+      >
+        {headingTitle}
+      </h1>
       {/* <p className="es-big-subtitle es-text-center es-h-center">
         {headingSubtitle}
       </p> */}

@@ -1258,7 +1258,6 @@ blockquote {
   color: rgba(231, 216, 200, 0.1);
   white-space: nowrap;
   cursor: default;
-  background: url("/pages/case/sky.webp") 50% 50%;
   background-size: cover;
   -webkit-background-clip: text;
   transition: 1s linear;

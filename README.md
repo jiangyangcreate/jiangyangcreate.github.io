@@ -1,6 +1,6 @@
 ## 项目概览
 
-欢迎来到这个基于[Docusaurus 3.0](https://docusaurus.io/)最新版本构建的定制站点。
+欢迎来到这个基于[Docusaurus 3](https://docusaurus.io/)最新版本构建的定制站点。
 
 我从[Docusaurus Site Showcase](https://docusaurus.io/showcase)中汲取了许多灵感，但我更倾向于简洁且精美的设计，以确保代码能够便于维护。
 
