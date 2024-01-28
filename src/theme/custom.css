@@ -1406,3 +1406,71 @@ blockquote {
   display: flex;
   justify-content: space-evenly;
 }
+.mm-toolbar:hover {
+  --un-border-opacity: 1;
+  border-color: rgb(156 163 175 / var(--un-border-opacity));
+}
+.mm-toolbar svg {
+  display: block;
+}
+.mm-toolbar a {
+  display: inline-block;
+  text-decoration: none;
+}
+.mm-toolbar-brand > img {
+  width: 1rem;
+  height: 1rem;
+  vertical-align: middle;
+}
+.mm-toolbar-brand > span {
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+}
+.mm-toolbar-brand:not(:first-child),
+.mm-toolbar-item:not(:first-child) {
+  margin-left: 0.25rem;
+}
+.mm-toolbar-brand > *,
+.mm-toolbar-item > * {
+  min-width: 20px;
+  height: 20px;
+  line-height: 20px;
+  cursor: pointer;
+  text-align: center;
+  font-size: 0.75rem;
+  line-height: 1rem;
+  --un-text-opacity: 1;
+  color: rgb(156 163 175 / var(--un-text-opacity));
+}
+.mm-toolbar-brand.active > *,
+.mm-toolbar-brand:hover > *,
+.mm-toolbar-item.active > *,
+.mm-toolbar-item:hover > * {
+  --un-text-opacity: 1;
+  color: rgb(31 41 55 / var(--un-text-opacity));
+}
+.mm-toolbar-brand.active,
+.mm-toolbar-brand:hover,
+.mm-toolbar-item.active,
+.mm-toolbar-item:hover {
+  border-radius: 0.25rem;
+  --un-bg-opacity: 1;
+  background-color: rgb(229 231 235 / var(--un-bg-opacity));
+}
+.mm-toolbar-brand.active,
+.mm-toolbar-item.active {
+  --un-bg-opacity: 1;
+  background-color: rgb(209 213 219 / var(--un-bg-opacity));
+}
+.mm-toolbar {
+  display: flex;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+  align-items: center;
+  justify-content: center;
+  --un-border-opacity: 1;
+  --un-bg-opacity: 1;
+  padding: 0.25rem;
+  line-height: 1;
+}

@@ -20,6 +20,8 @@
 
 - 集成 mermaid 与 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown 演示](https://jiangmiemie.com/docs/编程外的基础/Markdown备忘录/)
 
+- 集成 markmap ，用markdown绘制易维护的交互式思维导图。[访问 交互式思维导图 演示](https://jiangmiemie.com/read/)
+
 - RSS 订阅，支持博客的 RSS 订阅。访问[RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
 
 <details>
