@@ -1,17 +1,68 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from "react";
+
+// 思维导图部分
+// 完整文档与修改可参见https://markmap.js.org/
+import { Transformer } from "markmap-lib";
+import { Markmap } from "markmap-view";
+import { Toolbar } from "markmap-toolbar";
+import { deriveOptions } from "markmap-view";
+
+export default function MarkmapHooks({ initialMarkdown }) {
+  const jsonOptions = {
+    color: ["#DD551E"],
+    initialExpandLevel: 3, //限制展开级别
+    maxWidth: 170,
+  };
+
+  const markmapOptions = deriveOptions(jsonOptions);
+  const t = new Transformer();
+  const refSvg = useRef();
+  const refTb = useRef();
+
+  useEffect(() => {
+    const mm = Markmap.create(refSvg.current, markmapOptions);
+    const { root } = t.transform(initialMarkdown);
+    mm.setData(root);
+    mm.fit();
+
+    const w = refTb.current;
+    while (w?.firstChild) w.firstChild.remove();
+
+    if (w) {
+      const tb = new Toolbar();
+      tb.setBrand(false);
+      tb.attach(mm);
+      tb.setItems(["fit","zoomIn", "zoomOut", ]);
+      w.append(tb.render());
+    }
+  }, [initialMarkdown]);
+
+  return (
+    <div className="flex flex-col h-screen p-2">
+      <React.Fragment>
+        <svg className="flex-1" style={{ height: '50vh'}} ref={refSvg} />
+        <div className="absolute bottom-1 right-1" ref={refTb}></div>
+      </React.Fragment>
+    </div>
+  );
+}
 
 // 样式标题h1
 
 const CustomH1Title = ({ children }) => (
   <div style={{ display: "flex", justifyContent: "center" }}>
-    <h1 style={{ whiteSpace: "nowrap", margin: "40px 0 15px 0" }}>{children}</h1>
+    <h1 style={{ whiteSpace: "nowrap", margin: "40px 0 15px 0" }}>
+      {children}
+    </h1>
   </div>
-  );
+);
 
 // 样式标题h2
 const CustomTitle = ({ children }) => (
   <div style={{ display: "flex", justifyContent: "center" }}>
-    <h2 style={{ whiteSpace: "nowrap", margin: "40px 0 15px 0" }}>{children}</h2>
+    <h2 style={{ whiteSpace: "nowrap", margin: "40px 0 15px 0" }}>
+      {children}
+    </h2>
   </div>
 );
 
@@ -56,4 +107,4 @@ const photos = unsplashPhotos.map((photo) => ({
   }),
 }));
 
-export { CustomTitle, Center, Text, CustomH1Title ,photos };
+export { CustomTitle, Center, Text, CustomH1Title, MarkmapHooks, photos };
