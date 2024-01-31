@@ -1,32 +1,4 @@
-import React, { useState, useEffect } from 'react';
-
-// 样式标题h1
-
-const CustomH1Title = ({ children }) => (
-  <div style={{ display: "flex", justifyContent: "center" }}>
-    <h1 style={{ whiteSpace: "nowrap", margin: "40px 0 15px 0" }}>{children}</h1>
-  </div>
-  );
-
-// 样式标题h2
-const CustomTitle = ({ children }) => (
-  <div style={{ display: "flex", justifyContent: "center" }}>
-    <h2 style={{ whiteSpace: "nowrap", margin: "40px 0 15px 0" }}>{children}</h2>
-  </div>
-);
-
-// 居中
-const Center = ({ children }) => (
-  <div style={{ display: "flex", justifyContent: "center" }}>{children}</div>
-);
-
-// 设置颜色
-const Text = ({ children, color }) => (
-  <span style={{ display: "inline", color: color }}>{children}</span>
-);
-
-// 相册部分
-
+import { PhotoAlbum } from "react-photo-album";
 const breakpoints = [1080, 640, 384, 256, 128, 96, 64, 48];
 
 const unsplashLink = (id, width, height) =>
@@ -56,4 +28,6 @@ const photos = unsplashPhotos.map((photo) => ({
   }),
 }));
 
-export { CustomTitle, Center, Text, CustomH1Title ,photos };
+export const PhotoAlbums = () => (
+  <PhotoAlbum photos={photos} layout="rows" />
+);

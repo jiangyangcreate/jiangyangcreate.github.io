@@ -2,19 +2,13 @@
 title: 站点介绍
 ---
 
-import { CustomTitle, Center, Text, CustomH1Title, photos } from '../mdxcustom/customtitle';
-import { PhotoAlbum } from "react-photo-album";
-
-<CustomH1Title>
+<CustomTitle  level="h1">
 欢迎来到我的站点
-</CustomH1Title>
-
-
+</CustomTitle>
 
 <CustomTitle>
   使用<Text color="#D8262C">强大</Text>的<Text color="#D8262C"> MD</Text><Text color="#00A3E9">X </Text>
 </CustomTitle>
-
 
 <Center>
 ❤️强大：MDX 混合了 markdown 和 JSX 语法  
@@ -24,17 +18,15 @@ import { PhotoAlbum } from "react-photo-album";
 🔥极快：MDX 没有运行时，所有编译都发生在构建阶段  
 </Center>
 
-
 <CustomTitle>
   集成 <Text color="#D8262C">React Photo Album</Text>
 </CustomTitle>
-
 
 <Center>
 :point_right:[查看更多完整演示](https://jiangmiemie.com/gallery/)
 </Center>
 
-<PhotoAlbum photos={photos} layout="rows" />
+<PhotoAlbums/>
 
 <Center>
 <CustomTitle>
