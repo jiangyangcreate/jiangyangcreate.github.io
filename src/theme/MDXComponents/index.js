@@ -1,6 +1,8 @@
 import React from 'react';
 import MDXComponents from '@theme-original/MDXComponents';
+import MarkmapHooks from '@site/src/components/MarkmapHooks';
 import { PhotoAlbums } from '@site/src/components/PhotoAlbums';
+
 
 // 样式标题
 const CustomTitle = ({ children, level = "h2"}) => (
@@ -26,4 +28,5 @@ export default {
   Center,
   Text,
   PhotoAlbums,
+  MarkmapHooks,
 };
