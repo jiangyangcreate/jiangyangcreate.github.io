@@ -39,7 +39,7 @@
 
 - PWA (Progressive Web App)，让使用网页像使用原生应用一样，可在`docusaurus.config.js`中搜索`pwa`。
 
-- ~~i18n，基于 Crowdin 插件自动翻译~~（但会使构建包体积倍数增长，影响 github-page 部署 ）。
+- ~~i18n，多语言，但会使构建包体积倍数增长，影响 github-page 部署~~。
 </details>
 
 ### 结构目录
@@ -60,15 +60,11 @@
 ├── docs
 │   ├── ai                  # 算法文档
 │   ├── read                # 书架文档
-│   ├── docs                # 开发文档
-│   └── draft               # 草稿
+│   └── docs                # 开发文档
 ├── src
-│   ├── mdxcustom           # 自定义MDX组件
+│   ├── components          # 自定义组件：相册、markdown等
 │   ├── theme               # 自定义主题
-│   └── pages               # 自定义页面
-│       ├──case.js          # 案例页
-│       ├──gallery.js       # 相册页
-│       └──index.mdx        # 首页
+│   └── pages               # 自定义页面：首页、案例页、相册页等
 └── static
     ├── img                 # 公用图片
     ├── katex               # Latext 公式插件所需资源
