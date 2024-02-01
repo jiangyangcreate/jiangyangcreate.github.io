@@ -4,7 +4,7 @@ import rehypeKatex from "rehype-katex";
 
 // 设置明暗模式
 const lightCodeTheme = require("prism-react-renderer").themes.vsLight;
-const darkCodeTheme = require("prism-react-renderer").themes.dracula;
+const darkCodeTheme = require("prism-react-renderer").themes.vsDark;
 
 // 用户自定义
 const username = "jiangyang";
