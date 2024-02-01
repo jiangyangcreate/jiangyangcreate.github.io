@@ -12,20 +12,20 @@
 
 ## 核心特性
 
-- 集成 React Photo Album，布局优雅，点击照片可放大并展示照片描述、拍摄地、照片尺寸等信息。[直达照片墙](https://jiangmiemie.com/gallery/)
+- 集成 React Photo Album，布局优雅，点击照片可放大并展示照片描述、拍摄地、照片尺寸等信息。[访问 照片墙](https://jiangmiemie.com/gallery/)
 
-- 集成 infinum，轻松创建个人案例页，优雅展示个人作品。[立即查看](https://jiangmiemie.com/case/)
+- 集成 mermaid 与 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown](https://jiangmiemie.com/docs/编程外的基础/Markdown备忘录/)
 
-- 博客评论与分享，使用 GitHub 账号在博客页下方评论，一键分享至 twitte。[访问博客页体验](https://jiangmiemie.com/blog/)
+- 集成 markmap ，用markdown绘制易维护的交互式思维导图。[访问 交互式思维导图](https://jiangmiemie.com/read/)
 
-- 集成 mermaid 与 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown 演示](https://jiangmiemie.com/docs/编程外的基础/Markdown备忘录/)
-
-- 集成 markmap ，用markdown绘制易维护的交互式思维导图。[访问 交互式思维导图 演示](https://jiangmiemie.com/read/)
-
-- RSS 订阅，支持博客的 RSS 订阅。访问[RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
+- 集成 giscus，使用 GitHub 账号评论，还能一键分享至 twitter。[访问 博客页](https://jiangmiemie.com/blog/)
 
 <details>
   <summary>点击以查看更多信息</summary>
+
+- 集成 infinum，轻松创建个人案例页，优雅展示个人作品。[访问 个案页](https://jiangmiemie.com/case/)
+
+- RSS 订阅，支持博客的 RSS 订阅。访问[访问 RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
 
 - 支持生成静态站点，托管至 GitHub Page。[查看 workflows](.github\workflows\updata.yml)
 

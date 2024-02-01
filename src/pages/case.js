@@ -16,13 +16,19 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/jiangmiemie.webp"),
       label: "jiangmiemie",
-      desc: "这是一个基于 Docusaurus 3 最新版本的自定义站点。设计理念：美丽胜过丑陋，清晰胜过模糊。简洁胜过复杂，复杂胜过繁琐。希望你喜欢这个小巧而吸引人的个人博客站点。",
+      desc: "这是一个基于 Docusaurus 3 的自定义站点 , 希望你喜欢这个小巧而吸引人的网站。",
       link: "https://jiangmiemie.com/",
+    },
+    {
+      image: useBaseUrl("pages/case/docusaurus.webp"),
+      label: "Docusaurus",
+      desc: "如果你对Docusaurus感兴趣，可以系统学习Docusaurus教程。",
+      link: "https://docusaurus.io/",
     },
     {
       image: useBaseUrl("pages/case/academy.webp"),
       label: "academy",
-      desc: "本站点部分样式来源于infinum，他们的口号是Learning by doing，如果你想系统的学习，请试试infinum。",
+      desc: "本站点的设计参考了infinum主题，建议每个设计网页的人都参观一下他们干净简洁的站点。",
       link: "https://academy.infinum.com/",
     },
   ];
@@ -35,8 +41,8 @@ function ShowcaseGrid() {
 
   const items = shuffleArray(publicData).map((item, index) => {
     const { image, label, link, desc } = item;
-
-    return (
+    //academy.infinum.com/
+    https: return (
       <ShowcaseCard
         key={index}
         url={link}

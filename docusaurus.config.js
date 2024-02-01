@@ -7,6 +7,7 @@ const lightCodeTheme = require("prism-react-renderer").themes.vsLight;
 const darkCodeTheme = require("prism-react-renderer").themes.dracula;
 
 // 用户自定义
+const username = "jiangyang";
 const websitename = "jiangmiemie";
 const githubusername = "jiangyangcreate";
 
@@ -248,12 +249,9 @@ module.exports = {
     footer: {
       style: "light",
       copyright: `
-              <a href="${githuborgurl}/licenses" aria-label="https://www.travellings.cn/go.html">
-                2019 - ${new Date().getFullYear()} © ${websitename}
+              <a href="${githuborgurl}/blob/main/LICENSE" aria-label="https://www.travellings.cn/go.html">
+                Copyright © ${username} ${new Date().getFullYear()}
               </a> 
-              <a target="_blank" rel="noopener noreferrer" href="https://docusaurus.io/"  aria-label="https://docusaurus.io/">
-                <img width="20px" height="20px" src='/img/docusaurus.svg' alt="docusaurus" />
-              </a>
         `,
     },
   },
