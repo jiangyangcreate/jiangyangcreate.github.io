@@ -50,7 +50,7 @@ const JsonReader = ({
 
   const getFieldData = () => {
     if (!jsonData) {
-      return '本文章暂未生成摘要，24小时后再来看看吧';
+      return <TypingComponent text='摘要生成中...' speed={100} />;
     }
     // 根据字段进行匹配
     const matchingField = jsonData[fieldToMatch]["summary"];
