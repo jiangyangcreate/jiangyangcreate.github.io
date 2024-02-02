@@ -1,6 +1,6 @@
 ---
 sidebar_position: 5
-title: Git备忘录
+title: Git
 ---
 
 Git 是一个版本控制工具，既可以通过图形化的方式操作，也可以通过命令行来完成。
@@ -163,6 +163,18 @@ git show [tag名] #显示指定tag详细信息
 
 git branch -a --contains Tag_V1.0.0 # 看看哪个分支包含这个tag/commit
 ```
+
+## Git commit 规范
+
+Git commit的规范是为了更好的管理代码，方便后续的代码维护和版本回退。
+
+因此它并不是一个硬性要求，但是在团队协作中，规范的commit message可以让团队更好的理解代码的变更。
+
+个人开发者可以根据自己的习惯来定义规范，譬如：Gitmoji
+
+> Gitmoji是一种在Git提交消息中使用表情符号来表示提交目的的规范。每个表情符号（emoji）都代表着一种特定的提交类型，使提交消息更加生动和易读。Gitmoji 的目标是通过简单的图标和表情符号传达清晰的信息，从而提高代码提交历史的可读性和可理解性。
+
+> Gitmoji提供Vscode插件，可以在提交时选择对应的表情符号，然后填写提交信息。
 
 ## Github Action
 

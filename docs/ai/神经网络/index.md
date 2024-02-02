@@ -54,6 +54,6 @@ ds = tf.data.experimental.CsvDataset('./data/iris.csv', [tf.float32]*4+[tf.int32
 ds = tf.data.Dataset.list_files('./data/images/*.jpg').map(tf.io.read_file)
 ```
 
-import DocCardList from '@theme/DocCardList';
+
 
 <DocCardList />

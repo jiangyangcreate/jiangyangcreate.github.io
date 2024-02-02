@@ -13,6 +13,6 @@ title: 不同的数据库
 
 常见的数据库分为以下几类：
 
-import DocCardList from '@theme/DocCardList';
+
 
 <DocCardList />

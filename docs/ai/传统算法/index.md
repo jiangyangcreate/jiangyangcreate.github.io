@@ -87,6 +87,6 @@ data = np.loadtxt('./data/iris.csv', delimiter=",", skiprows=1)
 
 ```
 
-import DocCardList from '@theme/DocCardList';
+
 
 <DocCardList />

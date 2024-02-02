@@ -14,6 +14,6 @@ title: 选择编程语言
 
 以下是我常用的语言：
 
-import DocCardList from '@theme/DocCardList';
+
 
 <DocCardList />

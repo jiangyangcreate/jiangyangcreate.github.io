@@ -13,6 +13,6 @@ title: 逆向测试
 
 具体的流程包括以下几个方面：
 
-import DocCardList from '@theme/DocCardList';
+
 
 <DocCardList />

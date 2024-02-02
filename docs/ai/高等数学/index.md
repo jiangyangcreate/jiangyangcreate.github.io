@@ -14,6 +14,6 @@ title: 高等数学入门✍️
 
 > 本章节内容主要源自《高等数学（第七版）》，仅对语序、相似内容做调整。
 
-import DocCardList from '@theme/DocCardList';
+
 
 <DocCardList />
