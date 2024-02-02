@@ -13,7 +13,7 @@
         <link href="https://jiangmiemie.com/blog/2024/1/31/"/>
         <updated>2024-01-31T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[记录自己博客如何实现生成式AI文本摘要]]></summary>
-        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block">本文章暂未生成摘要，24小时后再来看看吧</div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><p>前段时间偶然间看到了一些生成式 AI 文本摘要项目，觉得很有意思。个人不太信任第三方服务，于是就加到待办里，想着自己也实现一个，最近终于有空了。</p>
+        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block"></div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><p>前段时间偶然间看到了一些生成式 AI 文本摘要项目，觉得很有意思。个人不太信任第三方服务，于是就加到待办里，想着自己也实现一个，最近终于有空了。</p>
 <p>逻辑上的核心功能是：自动生成，无需人工干预，一次生成，再次生成消耗 key
 样式上的核心功能是：逐字显示，好像是个机器人真的在实时生成。</p>
 <p>博客是基于 Docusaurus 搭建的，而 Docusaurus 是基于 React 的，文章内容是通过 markdown 文件写的，所以需要设计一个 React 组件，传入 markdown 文件将其转换为文本摘要。</p>
@@ -45,7 +45,7 @@
         <link href="https://jiangmiemie.com/blog/blog"/>
         <updated>2023-12-30T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[记录自己是如何写博客的]]></summary>
-        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block">本文章暂未生成摘要，24小时后再来看看吧</div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><p>写博客对我而言，是一种爱好，可以追溯到 2009 年，这篇文章记录了一些博客写作过程之中的实践。</p>
+        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block"></div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><p>写博客对我而言，是一种爱好，可以追溯到 2009 年，这篇文章记录了一些博客写作过程之中的实践。</p>
 <h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="设计博客">设计博客<a href="https://jiangmiemie.com/blog/blog#%E8%AE%BE%E8%AE%A1%E5%8D%9A%E5%AE%A2" class="hash-link" aria-label="Direct link to 设计博客" title="Direct link to 设计博客">​</a></h2>
 <h3 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="广泛的查看别人的博客">广泛的查看别人的博客<a href="https://jiangmiemie.com/blog/blog#%E5%B9%BF%E6%B3%9B%E7%9A%84%E6%9F%A5%E7%9C%8B%E5%88%AB%E4%BA%BA%E7%9A%84%E5%8D%9A%E5%AE%A2" class="hash-link" aria-label="Direct link to 广泛的查看别人的博客" title="Direct link to 广泛的查看别人的博客">​</a></h3>
 <p>设计博客好比画画，从零开始画出一幅好画比较困难，但是如果临摹大师的作品就会相对容易一些。你可以搜索一些博客聚合类站点，查看成员的博客配置，对博客站点的设计有个大概的印象。这类站点通常有比较好的可迁移性。</p>
@@ -146,7 +146,7 @@
         <link href="https://jiangmiemie.com/blog/principle"/>
         <updated>2022-12-30T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[记录自己的原则]]></summary>
-        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block">本文章暂未生成摘要，24小时后再来看看吧</div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="做个现实的人">做个现实的人<a href="https://jiangmiemie.com/blog/principle#%E5%81%9A%E4%B8%AA%E7%8E%B0%E5%AE%9E%E7%9A%84%E4%BA%BA" class="hash-link" aria-label="Direct link to 做个现实的人" title="Direct link to 做个现实的人">​</a></h2>
+        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block"></div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="做个现实的人">做个现实的人<a href="https://jiangmiemie.com/blog/principle#%E5%81%9A%E4%B8%AA%E7%8E%B0%E5%AE%9E%E7%9A%84%E4%BA%BA" class="hash-link" aria-label="Direct link to 做个现实的人" title="Direct link to 做个现实的人">​</a></h2>
 <p>一切精神源于物质：一份镇定剂可以改变人的情绪，一杯咖啡能让人振作。精神世界与虚拟网络世界都是基于现实的物质存在的，或许它让你感到挫折和压抑，但是事实就是如此。</p>
 <p>因此：直面现实，用行动代替祈祷才能真正的改变世界。</p>
 <h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="记录下所有">记录下所有<a href="https://jiangmiemie.com/blog/principle#%E8%AE%B0%E5%BD%95%E4%B8%8B%E6%89%80%E6%9C%89" class="hash-link" aria-label="Direct link to 记录下所有" title="Direct link to 记录下所有">​</a></h2>
@@ -324,7 +324,7 @@
         <link href="https://jiangmiemie.com/blog/home"/>
         <updated>2021-12-30T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[记录自己在最近关于智能家居的思考]]></summary>
-        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block">本文章暂未生成摘要，24小时后再来看看吧</div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="完美的家庭自动化需要解决哪些问题">完美的家庭自动化需要解决哪些问题？<a href="https://jiangmiemie.com/blog/home#%E5%AE%8C%E7%BE%8E%E7%9A%84%E5%AE%B6%E5%BA%AD%E8%87%AA%E5%8A%A8%E5%8C%96%E9%9C%80%E8%A6%81%E8%A7%A3%E5%86%B3%E5%93%AA%E4%BA%9B%E9%97%AE%E9%A2%98" class="hash-link" aria-label="Direct link to 完美的家庭自动化需要解决哪些问题？" title="Direct link to 完美的家庭自动化需要解决哪些问题？">​</a></h2>
+        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block"></div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="完美的家庭自动化需要解决哪些问题">完美的家庭自动化需要解决哪些问题？<a href="https://jiangmiemie.com/blog/home#%E5%AE%8C%E7%BE%8E%E7%9A%84%E5%AE%B6%E5%BA%AD%E8%87%AA%E5%8A%A8%E5%8C%96%E9%9C%80%E8%A6%81%E8%A7%A3%E5%86%B3%E5%93%AA%E4%BA%9B%E9%97%AE%E9%A2%98" class="hash-link" aria-label="Direct link to 完美的家庭自动化需要解决哪些问题？" title="Direct link to 完美的家庭自动化需要解决哪些问题？">​</a></h2>
 <ul>
 <li>不必适应技术</li>
 </ul>
@@ -349,7 +349,7 @@
 <li>全屋智能需要考虑合并同类项</li>
 </ul>
 <p>房间如果太多，那么语音控制和全屋智能对应的成本也会上升，转换空间也会产生不适感。合并具有相同或类似功能的物品。不影响质量的情况下减少数量，空间感是最值钱的。</p>
-<h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="从折叠家具到租房选择">从折叠家具到租房选择<a href="https://jiangmiemie.com/blog/home#%E4%BB%8E%E6%8A%98%E5%8F%A0%E5%AE%B6%E5%85%B7%E5%88%B0%E7%A7%9F%E6%88%BF%E9%80%89%E6%8B%A9" class="hash-link" aria-label="Direct link to 从折叠家具到租房选择" title="Direct link to 从折叠家具到租房��选择">​</a></h2>
+<h2 class="anchor anchorWithHideOnScrollNavbar_WYt5" id="从折叠家具到租房选择">从折叠家具到租房选择<a href="https://jiangmiemie.com/blog/home#%E4%BB%8E%E6%8A%98%E5%8F%A0%E5%AE%B6%E5%85%B7%E5%88%B0%E7%A7%9F%E6%88%BF%E9%80%89%E6%8B%A9" class="hash-link" aria-label="Direct link to 从折叠家具到租房选择" title="Direct link to 从折叠家具到租房选择">​</a></h2>
 <p>毕业之后，租房不便，因为工资不高，只能选择租一个很小很小的小单间，如果你想做点什么，得把多余的物品收起来，之后再放回去。</p>
 <p>我买了很多折叠和收纳的物品，但是发现所有的折叠和收纳物品都在浪费自己时间，一个正常的桌子可以直接被使用，一个折叠的桌子需要 2 分钟的展开与收回；正常我洗漱用品放在洗手台上直接取用，合租时放在床底每次取用耗时增加 2 分钟。</p>
 <p>因此我得出一个简单的结论，日常生活的耗时与空间呈相关性：空间为 1 时，日常行动耗时增加。空间增加时，日常行动耗时减少。</p>
@@ -411,7 +411,7 @@ A 住在公司附近，每天加班 1 小时，每个月可以拿到 1000 的加
         <link href="https://jiangmiemie.com/blog/dream"/>
         <updated>2020-12-30T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[记录自己一段连续的梦境与现实]]></summary>
-        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block">本文章暂未生成摘要，24小时后再来看看吧</div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><p>天空是被明码标价的，在一线城市生活多年的我早已知道这条潜规则：能看见天空的房间和看不见天空的房间价格是不同，今年天空的价格大概是 300 块一个月。价格不算便宜，但为了能看见阳光，我还是买了。</p>
+        <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block"></div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><p>天空是被明码标价的，在一线城市生活多年的我早已知道这条潜规则：能看见天空的房间和看不见天空的房间价格是不同，今年天空的价格大概是 300 块一个月。价格不算便宜，但为了能看见阳光，我还是买了。</p>
 <p>饭后，沿着昏暗宝深路隧道散步。深圳的雨季总是潮湿，潮湿的好像鱼儿能在空气中游动，行走在海底。</p>
 <p>我回想起几个月前，得知某个同学去世的消息，在得知他死去的消息后，我像往常一样生活着。</p>
 <p>此刻，我想打个电话给他，打开通讯录，看到他名字的瞬间，他死去时的容颜便突然出现在脑海里。接着便是无穷尽的记忆片段从不知名的地方涌出来，在空气中弥漫着，把我裹挟。粘稠的空气像是混合了他的灵魂，缺氧的我想要急促的喘息，但越是如此便越是窒息。我忽然明白，人的死亡这四个字，是这个意思。</p>
