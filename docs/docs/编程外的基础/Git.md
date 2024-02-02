@@ -3,6 +3,8 @@ sidebar_position: 5
 title: Git
 ---
 
+Git
+
 Git 是一个版本控制工具，既可以通过图形化的方式操作，也可以通过命令行来完成。
 
 Git 版本管理分为四个板块：

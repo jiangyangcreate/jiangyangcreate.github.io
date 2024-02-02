@@ -199,9 +199,8 @@ module.exports = {
     //   isCloseable: true,//允许用户关闭
     // },
     navbar: {
-      title: "首页",
-      hideOnScroll: true,
-
+      title:'首页',
+      hideOnScroll: false,
       items: [
         {
           position: "left",

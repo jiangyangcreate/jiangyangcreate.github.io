@@ -3,8 +3,6 @@ sidebar_position: 2
 title: Markdown
 ---
 
-Markdown 是一种轻量级标记语言，可用于将格式元素添加到纯文本文档。 Markdown 由 John Gruber 于 2004 年创建，现在是世界上最流行的标记语言之一。
-
 ## 数学公式
 
 $\Delta \delta\\$

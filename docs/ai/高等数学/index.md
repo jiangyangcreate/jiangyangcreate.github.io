@@ -1,7 +1,7 @@
 ---
 slug: /
 sidebar_position: 1
-title: 高等数学入门✍️
+title: 高等数学入门🚧
 ---
 
 - 人工智能（Artificial Intelligence）属于计算机科学的分支，是让各类机器载体上模拟并拥有类似生物的智能，让机器可以进行感知、学习、识别、推理等行为的计算机科学技术。
