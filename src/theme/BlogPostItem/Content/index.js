@@ -31,7 +31,10 @@ const TypingComponent = ({ text, speed = 100 }) => {
 const JsonReader = ({
   fieldToMatch,
 }) => {
-  const url = "https://raw.githubusercontent.com/jiangyangcreate/jiangyangcreate/master/output.json";
+  // 替换url与/
+  const path = fieldToMatch.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
+  const url = `https://raw.githubusercontent.com/jiangyangcreate/jiangyangcreate/master/summary/${path}.json`;
+  console.log(url);
   const [jsonData, setJsonData] = useState(null);
 
   useEffect(() => {
@@ -53,7 +56,7 @@ const JsonReader = ({
       return <TypingComponent text='摘要生成中...' speed={100} />;
     }
     // 根据字段进行匹配
-    const matchingField = jsonData[fieldToMatch]["summary"];
+    const matchingField = jsonData["summary"];
     return (
       <>
       <TypingComponent text={matchingField} speed={100} />
