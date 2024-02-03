@@ -238,7 +238,7 @@ module.exports = {
           label: "相簿",
         },
         {
-          to: "/jiangyangcreate",
+          to: "https://jiangmiemie.com/jiangyangcreate/",
           position: "left",
           label: "关于",
         },
