@@ -1402,10 +1402,6 @@ blockquote {
   border-top-color: rgb(216 38 44 / var(--tw-border-opacity));
   color: currentColor;
 }
-.footer__copyright {
-  display: flex;
-  justify-content: space-evenly;
-}
 .mm-toolbar:hover {
   --un-border-opacity: 1;
   border-color: rgb(156 163 175 / var(--un-border-opacity));

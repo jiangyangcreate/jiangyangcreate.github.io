@@ -6,7 +6,7 @@ import Box from '@mui/material/Box';
 
 function MyComponent() {
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '90vh',}}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '79vh',}}>
       <h1>Hello , World</h1>
     </Box>
   );
@@ -20,7 +20,6 @@ export default function Title() {
     <Layout
       description={siteConfig.tagline}
       keywords={siteConfig.customFields.keywords}
-      metaImage={useBaseUrl(`img/${siteConfig.customFields.image}`)}
       wrapperClassName="es-navbar-white"
     >
      <MyComponent/>

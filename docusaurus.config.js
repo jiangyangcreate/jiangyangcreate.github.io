@@ -244,14 +244,9 @@ module.exports = {
         },
       ],
     },
-    //自定义配置底部的版权说明与SVG图超链接
     footer: {
       style: "light",
-      copyright: `
-              <a href="${githuborgurl}/blob/main/LICENSE" aria-label="https://www.travellings.cn/go.html">
-                Copyright © ${username} ${new Date().getFullYear()}
-              </a> 
-        `,
+      copyright: `<div style="font-size: 0.75rem;">Copyright ©  ${username} ${new Date().getFullYear()}<div/>`,
     },
   },
 };
