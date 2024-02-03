@@ -237,6 +237,11 @@ module.exports = {
           position: "left",
           label: "相簿",
         },
+        {
+          to: "/jiangyangcreate",
+          position: "left",
+          label: "关于",
+        },
         // 搜索框
         {
           type: "search",

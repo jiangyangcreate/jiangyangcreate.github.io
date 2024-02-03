@@ -33,7 +33,7 @@ const JsonReader = ({
 }) => {
   // 替换url与/
   const path = fieldToMatch.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
-  const url = `https://raw.githubusercontent.com/jiangyangcreate/jiangyangcreate/master/summary/${path}.json`;
+  const url = `https://jiangmiemie.com/jiangyangcreate/summary/${path}.json`;
   console.log(url);
   const [jsonData, setJsonData] = useState(null);
 
