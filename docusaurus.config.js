@@ -199,7 +199,6 @@ module.exports = {
     //   isCloseable: true,//允许用户关闭
     // },
     navbar: {
-      title:'首页',
       hideOnScroll: false,
       items: [
         {
@@ -222,8 +221,6 @@ module.exports = {
         },
         {
           to: "/blog/archive",
-          // to: "/blog/tags",
-          // to: "/blog",
           position: "left",
           label: "博文",
         },
@@ -236,11 +233,6 @@ module.exports = {
           to: "/gallery",
           position: "left",
           label: "相簿",
-        },
-        {
-          to: "https://jiangmiemie.com/jiangyangcreate/",
-          position: "left",
-          label: "关于",
         },
         // 搜索框
         {

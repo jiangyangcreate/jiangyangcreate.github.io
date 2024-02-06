@@ -1351,17 +1351,8 @@ blockquote {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000),
     var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
-.navbar__brand {
-  padding-top: 0.25rem;
-}
-.navbar__logo {
-  max-height: 1.5rem;
-  max-width: 14.5rem;
-}
-@media (min-width: 997px) {
-  .navbar__logo {
-    max-width: 100%;
-  }
+.navbar__brand{
+  display: none;
 }
 .navbar__items {
   gap: 1rem;

@@ -20,16 +20,10 @@ function ShowcaseGrid() {
       link: "https://jiangmiemie.com/",
     },
     {
-      image: useBaseUrl("pages/case/docusaurus.webp"),
-      label: "Docusaurus",
-      desc: "如果你对Docusaurus感兴趣，可以系统学习Docusaurus教程。",
-      link: "https://docusaurus.io/",
-    },
-    {
-      image: useBaseUrl("pages/case/academy.webp"),
-      label: "academy",
-      desc: "本站点的设计参考了infinum主题，建议每个设计网页的人都参观一下他们干净简洁的站点。",
-      link: "https://academy.infinum.com/",
+      image: useBaseUrl("pages/case/readme.webp"),
+      label: "Readme",
+      desc: "关于我自己的一些介绍，使用jinja模板与baiduAI，每天定时更新。",
+      link: "https://jiangmiemie.com/jiangyangcreate/",
     },
   ];
 
