@@ -11,7 +11,7 @@ export default function MarkmapHooks({ initialMarkdown }) {
   const jsonOptions = {
     color: ["#DD551E"],
     initialExpandLevel: 3, //限制展开级别
-    maxWidth: 170,
+    maxWidth: 500,
   };
 
   const markmapOptions = deriveOptions(jsonOptions);
