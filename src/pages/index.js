@@ -21,7 +21,7 @@ function MyComponent() {
           fontSize: "12vmin",
         }}
       >
-        Hello,World
+        Hello, World!
       </h1>
     </Box>
   );
