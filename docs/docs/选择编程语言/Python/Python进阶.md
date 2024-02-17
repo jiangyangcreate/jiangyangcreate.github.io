@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: Python入门
+title: Python进阶
 ---
 
 ### 面向对象编程
