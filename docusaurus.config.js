@@ -189,13 +189,11 @@ module.exports = {
       darkTheme: darkCodeTheme,
       defaultLanguage: "markdown",
     },
-    // 告示条
+    //告示条
     // announcementBar: {
     //   id: 'support',
     //   content:
-    //     `🚀 如果你觉得还不错, 就给一个<a target="_blank" rel="noopener noreferrer" href="${githuborgurl}"  aria-label="star on github "> star </a>吧 ~`,
-    //   backgroundColor: '#fafbfc',
-    //   textColor: '#091E42',
+    //     `🚀 如果你觉得还不错, 可以上 <a target="_blank" rel="noopener noreferrer" href="${githuborgurl}"  aria-label="star on github ">Github</a> 克隆这个站点。`,
     //   isCloseable: true,//允许用户关闭
     // },
     navbar: {
