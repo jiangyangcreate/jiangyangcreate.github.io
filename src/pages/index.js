@@ -1,13 +1,11 @@
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
-import useBaseUrl from "@docusaurus/useBaseUrl";
 import Layout from "@theme/Layout";
 import React from "react";
-import Box from "@mui/material/Box";
 
 function MyComponent() {
   return (
-    <Box
-      sx={{
+    <div
+      style={{
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -23,7 +21,7 @@ function MyComponent() {
       >
         Hello, World!
       </h1>
-    </Box>
+    </div>
   );
 }
 
