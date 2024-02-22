@@ -6,6 +6,7 @@
   --ifm-color-primary-light: #885800;
   --ifm-color-primary-lighter: #8f5c00;
   --ifm-color-primary-lightest: #a16800;
+  --ifm-color-primary-font: #000000;
   --ifm-code-font-size: 95%;
   --site-announcement-bar-stripe-color1: hsl(167deg 68% 85%);
   --site-announcement-bar-stripe-color2: hsl(167deg 68% 95%);
@@ -20,6 +21,7 @@
   --ifm-color-primary-light: #fdca00;
   --ifm-color-primary-lighter: #ffce0a;
   --ifm-color-primary-lightest: #ffd52c;
+  --ifm-color-primary-font: #ffffff;
   --ifm-background-color: #000000;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
 }
@@ -942,8 +944,9 @@ blockquote {
   padding: 5.56vw;
 }
 
+
 .es-showcase-grid p {
-  color: black; 
+    color: var(--ifm-color-primary-font);
 }
 
 @media (min-width: 997px) {
