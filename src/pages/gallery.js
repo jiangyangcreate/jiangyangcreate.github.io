@@ -32,6 +32,13 @@ const unsplashLink = (id, width, height) =>
 //定义相册图片
 const unsplashPhotos = [
   {
+    id: "Newyear",
+    width: 4624,
+    height: 3948,
+    title: "上海",
+    description: "新年的烟火",
+  },
+  {
     id: "2021071",
     width: 1934,
     height: 2579,
