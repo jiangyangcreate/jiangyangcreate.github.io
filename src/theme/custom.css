@@ -941,6 +941,11 @@ blockquote {
   gap: 3.5rem;
   padding: 5.56vw;
 }
+
+.es-showcase-grid p {
+  color: black; 
+}
+
 @media (min-width: 997px) {
   .es-showcase-grid {
     display: grid;
