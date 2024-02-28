@@ -4,10 +4,65 @@
         <title>jiangmiemie Blog</title>
         <link>https://jiangmiemie.com/blog</link>
         <description>jiangmiemie Blog</description>
-        <lastBuildDate>Wed, 31 Jan 2024 00:00:00 GMT</lastBuildDate>
+        <lastBuildDate>Wed, 28 Feb 2024 00:00:00 GMT</lastBuildDate>
         <docs>https://validator.w3.org/feed/docs/rss2.html</docs>
         <generator>https://github.com/jpmonette/feed</generator>
         <language>en</language>
+        <item>
+            <title><![CDATA[旧服务的迁移]]></title>
+            <link>https://jiangmiemie.com/blog/oldremove</link>
+            <guid>https://jiangmiemie.com/blog/oldremove</guid>
+            <pubDate>Wed, 28 Feb 2024 00:00:00 GMT</pubDate>
+            <description><![CDATA[记录自己是对公司旧服务迁移的]]></description>
+            <content:encoded><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block"></div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><h2 class="anchor anchorWithStickyNavbar_LWe7" id="背景">背景<a href="https://jiangmiemie.com/blog/oldremove#%E8%83%8C%E6%99%AF" class="hash-link" aria-label="Direct link to 背景" title="Direct link to 背景">​</a></h2>
+<p>一段时间以前，我们的公司为了完成一个招投标项目，与一家第三方公司合作开发了一个网站。这个项目采取了全包模式：服务器、技术栈、域名等所有事宜都由第三方公司负责，我们只需提供内容即可。然而，现在这个网站的服务器租期即将到期。考虑到维持现状的成本较高，且丢弃已有的网站又显得浪费，我们决定以较低的成本将其托管到公司自己的服务器上。</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="原环境的分析">原环境的分析<a href="https://jiangmiemie.com/blog/oldremove#%E5%8E%9F%E7%8E%AF%E5%A2%83%E7%9A%84%E5%88%86%E6%9E%90" class="hash-link" aria-label="Direct link to 原环境的分析" title="Direct link to 原环境的分析">​</a></h2>
+<p>网站使用了前后端分离的设计模式，前端是基于Vue生成的静态页面。后端则是基于Java，允许上传一些文件，使用的是3000端口进行通信，文件传输则是在8000端口，路径设置为/upload/。通过Nginx进行了反向代理，将/upload/路径的请求转发到8080端口，将其他请求（80端口）转发到3000端口。因此，对于这个网站，通信主要通过80端口和8080端口进行。</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>如果你遇到了类似的问题，只需要梳理出我们最终通过宝塔面板的哪些端口访问就可以了。</p></div></div>
+<p>租用的服务器是阿里云的产品，并选择了宝塔面板进行管理。</p>
+<p>域名是从一家小型第三方公司购买的，该公司仅提供域名解析服务。</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="迁移策略">迁移策略<a href="https://jiangmiemie.com/blog/oldremove#%E8%BF%81%E7%A7%BB%E7%AD%96%E7%95%A5" class="hash-link" aria-label="Direct link to 迁移策略" title="Direct link to 迁移策略">​</a></h2>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="服务器迁移">服务器迁移<a href="https://jiangmiemie.com/blog/oldremove#%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%BF%81%E7%A7%BB" class="hash-link" aria-label="Direct link to 服务器迁移" title="Direct link to 服务器迁移">​</a></h3>
+<p>由于我对Java并不熟悉，且这种服务一旦部署就很少需要修改，我决定为其创建一个独立的容器，并按照原来的交接文档在容器内部重新运行服务。这就需要创建一个宝塔面板的Docker，并将所有服务原样迁移过去。相关的命令设置为开机自启动。另外，重要的文件等资料需要单独挂载，并可以设置为只读模式，以防止数据丢失同时更加安全。</p>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="端口映射">端口映射<a href="https://jiangmiemie.com/blog/oldremove#%E7%AB%AF%E5%8F%A3%E6%98%A0%E5%B0%84" class="hash-link" aria-label="Direct link to 端口映射" title="Direct link to 端口映射">​</a></h3>
+<p>Docker的镜像可以通过端口映射的方式，将容器内的端口映射到宿主机（群晖）的端口上。</p>
+<p>华为路由器可以将外网流量转发到宿主机（群晖）上，因此只需要在路由器上设置端口转发即可。</p>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>需要注意的是，群晖的部分端口可能已被群晖自身使用，可以通过群晖官网<a href="https://kb.synology.cn/zh-cn/DSM/tutorial/What_network_ports_are_used_by_Synology_services" target="_blank" rel="noopener noreferrer">查询</a>。外网的部分端口（譬如80端口）可能被运营商封掉，或者华为路由器自身需要使用。因此，我们需要选择一些不常用的端口，以避免出现服务异常。</p></div></div>
+<p>因此有了以下的端口映射规则（你可以先停止容器再设置）：</p>
+<table><thead><tr><th>容器内端口（宝塔）</th><th>宿主机端口（群晖）</th><th>外网端口</th></tr></thead><tbody><tr><td>80</td><td>4080</td><td>4080</td></tr><tr><td>8080</td><td>8080</td><td>4880</td></tr></tbody></table>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="域名解析">域名解析<a href="https://jiangmiemie.com/blog/oldremove#%E5%9F%9F%E5%90%8D%E8%A7%A3%E6%9E%90" class="hash-link" aria-label="Direct link to 域名解析" title="Direct link to 域名解析">​</a></h3>
+<p>由于我们的服务器之前主要用于内部服务，通过IP地址访问并无大碍。但现在我们需要将域名解析到公司的服务器上，由于80端口不能直接访问，并且园区和域名供应商都会要求备案，这就需要我们使用Cloudflare的DNS解析服务。Cloudflare可以充当中间人，将流量转发到公司的服务器上。</p>
+<blockquote>
+<p>即无法通过 <a href="http://www.xxx.com/" target="_blank" rel="noopener noreferrer">http://www.xxx.com</a> 直接访问到公司的服务器，只能通过域名+端口号如 <a href="http://www.xxx.com:8080/" target="_blank" rel="noopener noreferrer">http://www.xxx.com:8080</a> 访问。</p>
+</blockquote>
+<p>在cloudflare中添加域名，全程按照提示操作添加即可。</p>
+<p>添加完成后，选择规则-&gt;回源（Origin Rules）,因为Java用到了2个端口，所以需要添加两个端口转发规则：</p>
+<ul>
+<li>
+<p>当满足条件时（访问域名且路径不以/upload/开头），将流量转发到公司服务器的4080端口。</p>
+</li>
+<li>
+<p>当满足条件时（访问域名且路径以/upload/开头），将流量转发到公司服务器的4880端口。</p>
+</li>
+</ul>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="结果">结果<a href="https://jiangmiemie.com/blog/oldremove#%E7%BB%93%E6%9E%9C" class="hash-link" aria-label="Direct link to 结果" title="Direct link to 结果">​</a></h2>
+<p>通过以上步骤，我们成功地将网站迁移到了公司的服务器上。用户访问网站时，流程如下：</p>
+<ul>
+<li>通过DNS解析，找到cloudflare的服务器。</li>
+<li>cloudflare根据规则，把80流量转发到路由器的4080上。</li>
+<li>公司服务器接收到流量，把流量转发到群晖的4080端口。</li>
+<li>群晖接收到流量，把流量转发到容器的80端口。</li>
+<li>容器接收到流量，通过Nginx分配数据。</li>
+<li>Nginx根据规则，把流量转发到容器内的8080端口。</li>
+<li>数据按照原本的路径逐一返回至cloudflare。</li>
+<li>cloudflare把数据返回给访问者。</li>
+</ul>
+<p>这种迁移方式不仅保证了原有服务的连续性，也确保了公司服务器不会被外网直接访问，从而提高了公司的网络安全性。即使网站被黑，也不会影响到公司的其他服务，只需重启这个容器即可恢复原状。</p>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="后话">后话<a href="https://jiangmiemie.com/blog/oldremove#%E5%90%8E%E8%AF%9D" class="hash-link" aria-label="Direct link to 后话" title="Direct link to 后话">​</a></h2>
+<p>这次的迁移过程体现了分层思想的重要性，这主要来自《白帽子讲Web安全》这本书。整个过程没有遇到什么问题，只需要对容器化和Cloudflare有一定的了解。我希望我的经验能给读者带来一些启示。</p><div class="margin-vert--lg" style="display:flex;align-items:center;justify-content:center"><a class="button button--link" href="https://github.com/jiangyangcreate/jiangyangcreate.github.io/blob/main/blog/2024-2-28.md" target="_blank" rel="noreferrer noopener" aria-label="edit on github" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 512 512" height="20" width="20" style="margin-right:7px"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="url(#grad1)" stroke="none"><path d="M2384 5060 c-1012 -69 -1891 -738 -2235 -1703 -53 -146 -102 -349 -125 -512 -23 -157 -25 -496 -5 -655 102 -816 575 -1526 1287 -1932 164 -94 418 -200 483 -202 51 -1 94 20 116 57 18 30 19 50 16 267 -1 129 -3 236 -4 236 -1 1 -38 -4 -82 -12 -263 -43 -497 16 -646 165 -58 58 -76 86 -134 206 -94 196 -149 271 -255 348 -78 56 -120 98 -120 119 0 50 121 67 217 30 125 -47 208 -119 299 -258 126 -191 284 -276 485 -261 77 6 233 49 245 68 3 6 13 38 20 71 19 80 68 181 110 228 40 45 44 42 -86 60 -103 14 -282 60 -368 94 -362 143 -571 410 -649 829 -25 134 -25 463 0 567 36 149 103 285 195 398 l43 53 -15 47 c-52 161 -46 370 16 564 20 61 24 67 54 73 107 20 352 -68 576 -206 l98 -61 87 20 c204 47 298 57 553 57 256 0 349 -10 553 -57 l88 -20 77 48 c153 96 304 167 407 193 85 21 159 31 191 25 28 -5 33 -12 52 -72 57 -178 67 -404 23 -542 l-21 -65 20 -25 c98 -121 175 -269 212 -409 26 -98 36 -348 19 -488 -74 -608 -407 -935 -1041 -1023 -120 -16 -118 -15 -83 -53 46 -48 90 -134 115 -223 20 -74 22 -106 27 -529 7 -492 5 -482 66 -507 47 -20 102 -13 200 26 348 135 622 311 884 569 417 410 679 942 752 1527 20 159 18 498 -5 655 -173 1219 -1151 2131 -2373 2215 -161 11 -175 11 -339 0z"></path></g></svg></a><a class="button button--link" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fjiangmiemie.com%2Fblog%2Foldremove&amp;text=%E6%88%91%E5%88%9A%E5%88%9A%E8%AF%BB%E4%BA%86%20%22%E6%97%A7%E6%9C%8D%E5%8A%A1%E7%9A%84%E8%BF%81%E7%A7%BB%22%20by%20%40jiangyangcreate" target="_blank" rel="noreferrer noopener" aria-label="share on twitter" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 24 24" height="20" width="20" style="margin-right:7px"><g fill="url(#grad1)"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg></a><a class="button button--link" href="https://jiangmiemie.com/blog/rss.xml" target="_blank" rel="noreferrer noopener" aria-label="rss reader link" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 16 16" height="20" width="20" style="margin-right:7px"><g fill="url(#grad1)"><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#D8262C;stop-opacity:1"></stop><stop offset="100%" style="stop-color:#E6B800;stop-opacity:1"></stop></linearGradient><circle cx="3" cy="13" r="2"></circle><path d="M1 5.667v2.667A6.674 6.674 0 0 1 7.667 15h2.666c0-5.146-4.187-9.333-9.333-9.333z"></path><path d="M1 1v2.667C7.25 3.667 12.334 8.75 12.334 15H15C15 7.28 8.72 1 1 1z"></path></g></svg></a><a class="button button--link" href="mailto:jiangyangcreate@gmail.com" target="_blank" rel="noreferrer noopener" aria-label="send email" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1024 1024" style="margin-right:7px;height:20px;width:20px"><g><path style="opacity:0.996;fill:url(#grad1)" d="M 243.5,420.5 C 189.523,379.185 135.857,337.518 82.5,295.5C 140.987,183.298 229.487,104.632 348,59.5C 432.42,30.213 518.587,23.713 606.5,40C 693.576,57.6997 769.243,96.6997 833.5,157C 787.833,202.667 742.167,248.333 696.5,294C 695.5,294.667 694.5,294.667 693.5,294C 642.378,246.775 581.711,222.942 511.5,222.5C 407.283,227.337 327.117,273.337 271,360.5C 259.938,379.624 250.771,399.624 243.5,420.5 Z"></path></g><g><path style="opacity:0.996;fill:url(#grad1)" d="M 82.5,295.5 C 135.857,337.518 189.523,379.185 243.5,420.5C 223.5,481.168 223.5,541.835 243.5,602.5C 189.523,643.815 135.857,685.482 82.5,727.5C 31.7513,624.612 18.5846,516.945 43,404.5C 51.5465,366.35 64.7132,330.016 82.5,295.5 Z"></path></g><g><path style="opacity:0.998;fill:url(#grad1)" d="M 829.5,876.5 C 777.833,835.833 726.167,795.167 674.5,754.5C 725.318,718.61 756.985,669.944 769.5,608.5C 683.503,607.5 597.503,607.167 511.5,607.5C 511.5,546.167 511.5,484.833 511.5,423.5C 662.5,423.5 813.5,423.5 964.5,423.5C 979.017,509.532 974.517,594.532 951,678.5C 928.206,755.703 887.706,821.703 829.5,876.5 Z"></path></g><g><path style="opacity:0.997;fill:url(#grad1)" d="M 243.5,602.5 C 274.71,690.744 334.043,751.577 421.5,785C 487.78,805.861 553.78,804.861 619.5,782C 638.723,774.388 657.056,765.222 674.5,754.5C 726.167,795.167 777.833,835.833 829.5,876.5C 762.129,936.339 683.462,972.839 593.5,986C 437.233,1008.45 300.566,967.451 183.5,863C 141.888,823.583 108.222,778.416 82.5,727.5C 135.857,685.482 189.523,643.815 243.5,602.5 Z"></path></g></svg></a></div>]]></content:encoded>
+            <category>remove</category>
+            <category>tutorial</category>
+        </item>
         <item>
             <title><![CDATA[博客文本摘要]]></title>
             <link>https://jiangmiemie.com/blog/2024/1/31/</link>
