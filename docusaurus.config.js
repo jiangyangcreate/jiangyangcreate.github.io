@@ -18,7 +18,7 @@ const githuborgurl = `https://github.com/${githubusername}/${githubuserRepositor
 module.exports = {
   title: websitename,
   tagline: "真实的记录自己，比获得他人的认同感更重要",
-  favicon: "img/favicon.ico",
+  favicon: "favicon.ico",
   url: websiteurl,
   baseUrl: "/",
   organizationName: websitename, // Usually your GitHub org/user name.
