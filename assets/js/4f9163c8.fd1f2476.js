@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkjiangmiemie=self.webpackChunkjiangmiemie||[]).push([[4732],{17628:a=>{a.exports=JSON.parse('{"label":"xiaoai","permalink":"/blog/tags/xiaoai","allTagsPath":"/blog/tags","count":1,"unlisted":false}')}}]);
