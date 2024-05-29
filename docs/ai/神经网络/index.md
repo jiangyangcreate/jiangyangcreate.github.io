@@ -3,57 +3,62 @@ sidebar_position: 3
 title: 神经网络入门
 ---
 
-## TensorFlow 数据的来源？
+## PyTorch 数据的来源？
 
-### TensorFlow 数据集
+### PyTorch 数据集
 
-TensorFlow 提供了一个名为 `tensorflow_datasets` 的库，其中包含了大量的公开数据集，可以用于训练各种类型的机器学习模型。这些数据集已经被处理成 TensorFlow 可以直接使用的格式。
+PyTorch 也提供了一些内置的数据集类来加载常用的数据集，如图像、文本等。此外，你也可以使用第三方库来加载自定义的数据集。
 
-数据集的详细信息可以参考 [https://www.tensorflow.org/datasets/catalog/overview](https://www.tensorflow.org/datasets/catalog/overview)。
+这些数据集的详细信息可以在 PyTorch 官方文档中找到。
 
-这些数据集包括了各种类型的数据，如图像、文本、音频和视频等，可以用于各种任务，如分类、回归、聚类、生成模型等。
+这些数据集包括了各种类型的数据，如图像、文本、音频等，可以用于各种任务，如分类、回归、聚类等。
 
-| 数据集名称    | 加载方法                   | 模型类型 | 数据大小(样本数\*特征数) |
-| ------------- | -------------------------- | -------- | ------------------------ |
-| MNIST         | tfds.load('mnist')         | 分类     | 70000\*784               |
-| CIFAR-10      | tfds.load('cifar10')       | 分类     | 60000\*3072              |
-| IMDB Reviews  | tfds.load('imdb_reviews')  | 文本分类 | 50000\*1                 |
-| Fashion MNIST | tfds.load('fashion_mnist') | 分类     | 70000\*784               |
-| SVHN          | tfds.load('svhn_cropped')  | 分类     | 99289\*3072              |
+| 数据集名称    | 加载方法                         | 模型类型 | 数据大小(样本数\*特征数) |
+| ------------- | -------------------------------- | -------- | ------------------------ |
+| MNIST         | torchvision.datasets.MNIST       | 分类     | 70000\*784               |
+| CIFAR-10      | torchvision.datasets.CIFAR10    | 分类     | 60000\*3072              |
+| Fashion MNIST | torchvision.datasets.FashionMNIST| 分类     | 70000\*784               |
 
-```python showLineNumbers
-import tensorflow_datasets as tfds
+```python
+import torchvision.datasets as datasets
 # 加载数据集
-ds, info = tfds.load('mnist', with_info=True)
+train_dataset = datasets.MNIST(root='./data', train=True, download=True)
+test_dataset = datasets.MNIST(root='./data', train=False, download=True)
 ```
 
 ### 自定义数据生成器
 
-TensorFlow 也提供了工具来生成自定义的数据集，这可以用于创建具有特定属性的数据集，如特定的分布、特定的噪声水平等。
+与 TensorFlow 类似，你也可以使用 PyTorch 来生成自定义的数据集，以便创建具有特定属性的数据集，如特定的分布、特定的噪声水平等。
 
-```python showLineNumbers
-import tensorflow as tf
+```python
+import torch
 # 创建一个线性数据集
-X = tf.random.uniform((1000, 1))
-y = 3 * X + 2 + tf.random.normal((1000, 1))
+X = torch.rand((1000, 1))
+y = 3 * X + 2 + torch.randn((1000, 1))
 
 # 创建一个分类数据集
-X = tf.random.uniform((1000, 2))
-y = tf.cast(tf.reduce_sum(X, axis=1) > 1, tf.int32)
+X = torch.rand((1000, 2))
+y = (torch.sum(X, dim=1) > 1).int()
 ```
 
 ### 自有数据集
 
-如果你有自己的数据集，你可以使用 TensorFlow 的 `tf.data` API 来加载和预处理数据。这个 API 支持各种数据格式，如 CSV、TFRecord、图片等。
+如果你有自己的数据集，你可以使用 PyTorch 的 `torch.utils.data.Dataset` 类来加载和预处理数据。这个类支持各种数据格式，如 CSV、图片等。
 
-```python showLineNumbers
-# 从 CSV 文件加载数据
-ds = tf.data.experimental.CsvDataset('./data/iris.csv', [tf.float32]*4+[tf.int32])
-
-# 从图片文件加载数据
-ds = tf.data.Dataset.list_files('./data/images/*.jpg').map(tf.io.read_file)
+```python
+from torch.utils.data import Dataset
+# 自定义数据集类
+class CustomDataset(Dataset):
+    def __init__(self, data_path):
+        # 从文件加载数据
+        self.data = torch.load(data_path)
+    
+    def __len__(self):
+        return len(self.data)
+    
+    def __getitem__(self, idx):
+        return self.data[idx]
 ```
-
 
 
 <DocCardList />
