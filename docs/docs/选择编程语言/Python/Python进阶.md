@@ -2654,3 +2654,71 @@ pyinstaller -F -i app.ico app.py --noconsole
 # 将数据文件添加到捆绑包中，中间使用分号分隔，前面是源目录地址，后面是目的目录地址
 pyinstaller -F -i app.ico app.py --add-data="C:\mediapipe\modules;mediapipe/modules" --noconsole
 ```
+
+### Python 虚拟环境
+
+使用虚拟环境可以帮助你隔离项目依赖，从而避免不同项目之间的冲突。
+
+### 1. 创建虚拟环境
+
+在你想创建虚拟环境的项目目录下运行以下命令：
+
+```bash
+python3 -m venv myenv
+```
+
+这里的 `myenv` 是虚拟环境的名称，你可以随意替换成你喜欢的名字。
+
+### 2. 进入虚拟环境
+
+在虚拟环境创建成功后，需要激活虚拟环境。不同操作系统激活方式不同：
+
+- **在 Windows 上：**
+
+  ```bash
+  myenv\Scripts\activate
+  ```
+
+- **在 macOS 和 Linux 上：**
+
+  ```bash
+  source myenv/bin/activate
+  ```
+
+激活成功后，你会看到命令提示符前面出现了虚拟环境的名称，例如 `(myenv)`。
+
+### 3. 查看虚拟环境
+
+你可以使用 `pip list` 或 `pip freeze` 命令来查看虚拟环境中已安装的包。
+
+```bash
+pip list
+```
+
+或者
+
+```bash
+pip freeze
+```
+
+### 4. 在虚拟环境中安装和运行代码
+
+激活虚拟环境后，你可以使用 `pip` 安装所需的依赖包。例如，安装 `requests` 包：
+
+```bash
+pip install requests
+```
+
+然后你就可以运行你的 Python 代码了。比如你有一个 `script.py` 文件，可以使用以下命令运行：
+
+```bash
+python script.py
+```
+
+### 5. 退出虚拟环境
+
+当你完成工作后，可以退出虚拟环境，回到全局环境。使用以下命令：
+
+```bash
+deactivate
+```
