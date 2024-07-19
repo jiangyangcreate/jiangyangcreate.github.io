@@ -1593,3 +1593,7 @@ blockquote {
   background: #ffc848;
   color: #fff;
 }
+
+input::placeholder {
+  color: gray
+}
