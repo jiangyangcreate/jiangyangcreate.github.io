@@ -1,7 +1,7 @@
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
+import React, { useState, useEffect } from "react";
 import { useHistory } from "@docusaurus/router";
-import React, { useState, useEffect } from 'react';
 
 const CustomSearch = () => {
   const [searchValue, setSearchValue] = useState("");
@@ -19,25 +19,6 @@ const CustomSearch = () => {
     history.push(`/search?q=${event.target.value}`);
   };
 
-  return (
-    <div>
-      <input
-        type="text"
-        value={searchValue}
-        onChange={handleSearchChange}
-        placeholder="Search : Hello, World!"
-        style={{
-          width: "100%",
-          padding: "10px",
-          borderRadius: "20px",
-          border: "1px solid #ccc",
-        }}
-      />
-    </div>
-  );
-};
-
-const Clock = () => {
   const [date, setDate] = useState(new Date());
 
   useEffect(() => {
@@ -53,12 +34,20 @@ const Clock = () => {
   };
 
   return (
-    <div style={{ color: 'black', height: "200px", display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <h1>{date.toLocaleTimeString()}</h1>
-    </div>
+    <input
+      type="text"
+      value={searchValue}
+      onChange={handleSearchChange}
+      placeholder={date.toLocaleTimeString()}
+      style={{
+        width: "70%",
+        padding: "10px",
+        borderRadius: "5px",
+        border: "1px solid #ccc",
+      }}
+    />
   );
 };
-
 function MyComponent() {
   return (
     <div
@@ -68,21 +57,17 @@ function MyComponent() {
         alignItems: "center",
         justifyContent: "center",
         height: "79vh",
-        margin: "0 5%",
       }}
     >
-      <div style={{ marginBottom: "-60px" }}> 
-        <Clock />
-      </div>
       <h1
         style={{
           textShadow: "-1px 1px #3C3C3C, -10px 10px 5px #3C3C3C80",
-          // fontSize: "12vmin",
+          fontSize: "12vmin",
         }}
       >
-        {/* Hello, World! */}
-        <CustomSearch />
+        Hello, World!
       </h1>
+      <CustomSearch />
     </div>
   );
 }
@@ -101,5 +86,3 @@ export default function Title() {
     </Layout>
   );
 }
-
-
