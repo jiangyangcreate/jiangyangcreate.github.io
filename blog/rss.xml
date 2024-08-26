@@ -319,10 +319,29 @@
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="总结">总结<a class="hash-link" aria-label="Direct link to 总结" title="Direct link to 总结" href="https://jiangmiemie.com/blog/2024/3/31/#%E6%80%BB%E7%BB%93">​</a></h3>
 <p>乐高设计快，但是采购之后自己拼搭比较耗时，遇到问题时可以先思考我之前有没有见过类似的图纸，没有见过而且比较复杂的话，一般选择 3D 打印。</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="3d-打印">3D 打印<a class="hash-link" aria-label="Direct link to 3D 打印" title="Direct link to 3D 打印" href="https://jiangmiemie.com/blog/2024/3/31/#3d-%E6%89%93%E5%8D%B0">​</a></h2>
-<p>3D 打印是个人制造的一种重要方式，它可以将数字模型转化为实体物体。</p>
-<p>3D 打印目前主要有定制手办方向（需要深入的学习建模软件、调色与上色）、工业设计（简单的学习建模软件、深入学习螺丝螺母磁铁钢针等材料的嵌入）</p>
-<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>目前桌面级打印机难以直接获得彩色精美手办。大多是光固化再上色或彩色 FDM 打印后打磨。</p><p>设备需要常维护：使用洗涤器清洗底板、挪动后重新调平。便宜的设备往往打印慢的同时需要调试：层纹错位、堵头、首层不平、拉丝翘边、悬空下垂等问题。</p></div></div>
+<p>3D 打印是个人制造的一种重要方式，它可以将数字模型转化为实体物体。一张 A4 纸的大小大约是 210mm×297mm，可以在此基础上选购合适的成型尺寸。</p>
 <p>3D 打印分为多种技术，常见的有 FDM（熔融沉积成型）、SLA（光固化成型）、SLS（激光烧结成型）等。其中 FDM 是最常见的 3D 打印技术，也是我使用的技术。</p>
+<p>3D 打印目前主要有：</p>
+<ul>
+<li>定制手办方向</li>
+</ul>
+<blockquote>
+<p>需要深入的学习建模软件</p>
+</blockquote>
+<blockquote>
+<p>学习调色与上色</p>
+</blockquote>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>目前桌面级打印机难以直接获得彩色精美手办。大多是光固化再上色或彩色 FDM 打印后打磨。</p><p>设备需要常维护：使用洗涤器清洗底板、挪动后重新调平。便宜的设备往往打印慢的同时需要调试：层纹错位、堵头、首层不平、拉丝翘边、悬空下垂等问题。</p></div></div>
+<ul>
+<li>工业设计</li>
+</ul>
+<blockquote>
+<p>简单的学习建模软件</p>
+</blockquote>
+<blockquote>
+<p>深入学习螺丝螺母磁铁钢针等材料的嵌入</p>
+</blockquote>
+<div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><h4 class="anchor anchorWithStickyNavbar_LWe7" id="嵌入螺丝与螺母">嵌入螺丝与螺母<a class="hash-link" aria-label="Direct link to 嵌入螺丝与螺母" title="Direct link to 嵌入螺丝与螺母" href="https://jiangmiemie.com/blog/2024/3/31/#%E5%B5%8C%E5%85%A5%E8%9E%BA%E4%B8%9D%E4%B8%8E%E8%9E%BA%E6%AF%8D">​</a></h4><p>暂停埋入螺母，预留 0.2mm 的间隙，然后再埋入螺母，可以避免打印头碰到螺母。</p><p>暂停层设置方法：切片后点右边的 z 轴预览条,右键可以选择：添加暂停打印</p><h4 class="anchor anchorWithStickyNavbar_LWe7" id="嵌入磁铁">嵌入磁铁<a class="hash-link" aria-label="Direct link to 嵌入磁铁" title="Direct link to 嵌入磁铁" href="https://jiangmiemie.com/blog/2024/3/31/#%E5%B5%8C%E5%85%A5%E7%A3%81%E9%93%81">​</a></h4><p>普通磁铁与 N52 磁铁价格相差较大，但依旧推荐使用 N52 磁铁。因为普通磁铁在打印件中，磁吸力会有所衰减，而 N52 磁铁衰减后依然有不错的吸力。如果因为吸力不够导致打印件整体作废得不偿失。</p><h4 class="anchor anchorWithStickyNavbar_LWe7" id="嵌入钢针">嵌入钢针<a class="hash-link" aria-label="Direct link to 嵌入钢针" title="Direct link to 嵌入钢针" href="https://jiangmiemie.com/blog/2024/3/31/#%E5%B5%8C%E5%85%A5%E9%92%A2%E9%92%88">​</a></h4><p>钢针是最为常见的材料，可以选择的尺寸最多，将钢针以不同角度垂直嵌入 3D 打印件中可以提高打印件的强度。</p><p>想要将钢针水平嵌入到 3D 打印件中同时避免磕碰打印头、保持与打印件接触紧密，可以通过将打印一个辅助件完成：<code>长方体的内切圆柱（剪切掉内切圆柱）</code>，然后将钢针嵌入到辅助件中，再通过暂停层将辅助件嵌入到打印件中。</p><p>另外也可以利用钢针制作合页等结构，比纯3D打印更耐用。</p></div></div>
 <p>在 3D 打印过程中，材料的选择对打印效果和性能有重要影响。下面是部分常见材料及其价格与特点。</p>
 <div class="theme-admonition theme-admonition-tip admonition_xJq3 alert alert--success"><div class="admonitionHeading_Gvgb"><span class="admonitionIcon_Rf37"><svg viewBox="0 0 12 16"><path fill-rule="evenodd" d="M6.5 0C3.48 0 1 2.19 1 5c0 .92.55 2.25 1 3 1.34 2.25 1.78 2.78 2 4v1h5v-1c.22-1.22.66-1.75 2-4 .45-.75 1-2.08 1-3 0-2.81-2.48-5-5.5-5zm3.64 7.48c-.25.44-.47.8-.67 1.11-.86 1.41-1.25 2.06-1.45 3.23-.02.05-.02.11-.02.17H5c0-.06 0-.13-.02-.17-.2-1.17-.59-1.83-1.45-3.23-.2-.31-.42-.67-.67-1.11C2.44 6.78 2 5.65 2 5c0-2.2 2.02-4 4.5-4 1.22 0 2.36.42 3.22 1.19C10.55 2.94 11 3.94 11 5c0 .66-.44 1.78-.86 2.48zM4 14h5c-.23 1.14-1.3 2-2.5 2s-2.27-.86-2.5-2z"></path></svg></span>tip</div><div class="admonitionContent_BuS1"><p>不同品牌价格不同，仅供参考，以下是一些材料的前缀与后缀的简要解释：</p><ul>
 <li>CR ，表示更多色彩</li>
@@ -333,8 +352,8 @@
 </ul></div></div>
 <table><thead><tr><th>材料</th><th>全称</th><th>特点及应用说明</th><th>价格</th></tr></thead><tbody><tr><td>ABS</td><td>丙烯腈-丁二烯-苯乙烯共聚物</td><td>强度高、耐热性好、易加工，适用于一般性的 3D 打印项目。</td><td>59 元/KG</td></tr><tr><td>PETG</td><td>改性聚对苯二甲酸乙二醇酯</td><td>耐热、透明度高、耐化学性强，适用于透明或耐热性能的打印项目。</td><td>59 元/KG</td></tr><tr><td>PLA</td><td>聚乳酸</td><td>生物降解、环保、易于打印、无毒，适用于一般性的 3D 打印项目。</td><td>69 元/KG</td></tr><tr><td>PA</td><td>聚酰胺/尼龙 (Nylon)</td><td>机械性能更强，耐热，用于制作普通机械强度要求的打印项目。</td><td>79 元/KG</td></tr><tr><td>TPU</td><td>热塑性聚氨酯</td><td>弹性好、耐磨性强，常用于制作柔软的零件或弹性组件。</td><td>98 元/KG</td></tr><tr><td>PET-CF</td><td>碳纤维增强聚对苯二甲酸乙二醇酯</td><td>更高的强度和刚性，适用于要求更高机械性能的打印项目。</td><td>108 元/KG</td></tr><tr><td>PLA-CF</td><td>碳纤维增强聚乳酸</td><td>更高的强度和刚性，适用于要求更高机械性能的打印项目。</td><td>129 元/KG</td></tr><tr><td>ASA</td><td>聚酰胺酸酯</td><td>工程塑料，耐热性和机械性能优异，适用于高强度和耐热性的打印项目。</td><td>169 元/KG</td></tr><tr><td>PC</td><td>聚碳酸酯</td><td>抗冲击性和透明度优异，常用于制作耐用的零件或透明的构件。</td><td>219 元/KG</td></tr><tr><td>PA-CF</td><td>碳纤维增强聚酰胺/尼龙碳纤维</td><td>更高的强度和耐热性，适用于要求更高机械性能的打印项目。</td><td>249 元/KG</td></tr></tbody></table>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="建模软件">建模软件<a class="hash-link" aria-label="Direct link to 建模软件" title="Direct link to 建模软件" href="https://jiangmiemie.com/blog/2024/3/31/#%E5%BB%BA%E6%A8%A1%E8%BD%AF%E4%BB%B6">​</a></h3>
-<p>建模软件是 3D 打印的基础，可选的非常多，譬如<code>Fusion 360</code>。</p>
-<p>模型可以从 0 开始建，也在别人的基础上修改。</p>
+<p>建模软件是 3D 打印的基础，可选的非常多，譬如<code>Fusion 360</code>、<code>Blender</code>。</p>
+<p>模型可以从 0 开始建，也在别人的基础上修改，由于家用3D打印机尺寸较小，工具物品难以一体成型，因此模块化设计思维较为重要。</p>
 <p>成品模型库：</p>
 <ul>
 <li>
