@@ -22,7 +22,7 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/readme.webp"),
       label: "Readme",
-      desc: "关于我自己的一些介绍，使用jinja模板与文心一言4.0总结，每天定时更新。",
+      desc: "关于我自己的中英介绍，使用jinja模板与文心一言4.0。hash存储文章，去重生成总结、每天定时更新。",
       link: "https://jiangmiemie.com/jiangyangcreate/",
     },
     {
@@ -30,6 +30,12 @@ function ShowcaseGrid() {
       label: "Bluetooth 小程序",
       desc: "蓝牙遥控最小示例：微信小程序与设备通信（测试设备为ESP32单片机）。支持中文、英文、文件分片传输。",
       link: "https://github.com/jiangyangcreate/WX-Mini-Program/",
+    },
+    {
+      image: useBaseUrl("pages/case/exboard.webp"),
+      label: "exboard",
+      desc: "Python驱动库，适用于Jetson Orin Nano 和 RK3399 Pro芯片，支持RSS协议（摄像头云台）、数字量模拟量的处理（常见传感器）、i2c协议（控制RGB灯带）、超声波读取、非加密NFC读写。",
+      link: "https://github.com/jiangyangcreate/exboard/",
     },
   ];
 
