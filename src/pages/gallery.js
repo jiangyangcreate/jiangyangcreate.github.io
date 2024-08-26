@@ -493,7 +493,7 @@ export function useSettings() {
 }
 
 function Settings({ children }) {
-  const [layout, setLayout] = useState("columns");
+  const [layout, setLayout] = useState("rows");
   const [count, setCount] = useState(photos.length);
   const [targetRowHeight, setTargetRowHeight] = useState(200);
   const [columns, setColumns] = useState(5);
@@ -553,7 +553,7 @@ function Settings({ children }) {
               <TextField
                 select
                 fullWidth
-                label="Layout"
+                label="布局"
                 variant="standard"
                 margin="none"
                 value={layout}
@@ -561,9 +561,9 @@ function Settings({ children }) {
                 onChange={(event) => setLayout(event.target.value)}
               >
                 {[
-                  { value: "rows", title: "Rows" },
-                  { value: "columns", title: "Columns" },
-                  { value: "masonry", title: "Masonry" },
+                  { value: "rows", title: "按行" },
+                  { value: "columns", title: "按列" },
+                  { value: "masonry", title: "动态" },
                 ].map(({ value, title }) => (
                   <MenuItem key={value} value={value}>
                     {title}
@@ -571,7 +571,7 @@ function Settings({ children }) {
                 ))}
               </TextField>
             </Filter>
-
+{/* 
             <Filter>
               <SliderControl
                 name="Photos"
@@ -634,13 +634,13 @@ function Settings({ children }) {
                 value={width}
                 onChange={(_, value) => setWidth(value)}
               />
-            </Filter>
+            </Filter> */}
 
             <Filter>
               <TextField
                 select
                 fullWidth
-                label="Tag"
+                label="城市"
                 variant="standard"
                 margin="none"
                 value={tag}

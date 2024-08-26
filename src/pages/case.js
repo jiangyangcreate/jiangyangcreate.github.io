@@ -16,14 +16,20 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/jiangmiemie.webp"),
       label: "jiangmiemie",
-      desc: "这是一个基于 Docusaurus 3 的自定义站点 , 希望你喜欢这个小巧而吸引人的网站。",
-      link: "https://jiangmiemie.com/",
+      desc: "精巧且开源的个人博客站点。配置生成式 AI 文章总结，个人相册，支持 mermaid 、KaTeX 、交互式思维导图。可使用 GitHub 账号评论，一键分享至 twitter。",
+      link: "https://github.com/jiangyangcreate/jiangyangcreate.github.io",
     },
     {
       image: useBaseUrl("pages/case/readme.webp"),
       label: "Readme",
-      desc: "关于我自己的一些介绍，使用jinja模板与baiduAI，每天定时更新。",
+      desc: "关于我自己的一些介绍，使用jinja模板与文心一言4.0总结，每天定时更新。",
       link: "https://jiangmiemie.com/jiangyangcreate/",
+    },
+    {
+      image: useBaseUrl("pages/case/Bluetooth.webp"),
+      label: "Bluetooth 小程序",
+      desc: "蓝牙遥控最小示例：微信小程序与设备通信（测试设备为ESP32单片机）。支持中文、英文、文件分片传输。",
+      link: "https://github.com/jiangyangcreate/WX-Mini-Program/",
     },
   ];
 
