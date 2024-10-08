@@ -80,6 +80,7 @@
 以下命令可快速启动和重现项目：
 
 - `npm update`：更新插件
+- `npm audit`：检查漏洞
 - `npm install`：下载所需依赖包
 - `npm run start`：启动站点
 

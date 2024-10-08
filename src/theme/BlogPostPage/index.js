@@ -1,19 +1,17 @@
-import React from "react";
-import clsx from "clsx";
-import {
-  HtmlClassNameProvider,
-  ThemeClassNames,
-} from "@docusaurus/theme-common";
+import React from 'react';
+import clsx from 'clsx';
+import {HtmlClassNameProvider, ThemeClassNames} from '@docusaurus/theme-common';
 import {
   BlogPostProvider,
   useBlogPost,
-} from "@docusaurus/theme-common/internal";
-import BlogLayout from "@theme/BlogLayout";
-import BlogPostItem from "@theme/BlogPostItem";
-import BlogPostPaginator from "@theme/BlogPostPaginator";
-import BlogPostPageMetadata from "@theme/BlogPostPage/Metadata";
-import TOC from "@theme/TOC";
-import Unlisted from "@theme/Unlisted";
+} from '@docusaurus/plugin-content-blog/client';
+import BlogLayout from '@theme/BlogLayout';
+import BlogPostItem from '@theme/BlogPostItem';
+import BlogPostPaginator from '@theme/BlogPostPaginator';
+import BlogPostPageMetadata from '@theme/BlogPostPage/Metadata';
+import BlogPostPageStructuredData from '@theme/BlogPostPage/StructuredData';
+import TOC from '@theme/TOC';
+import ContentVisibility from '@theme/ContentVisibility';
 
 // 修改：追加评论模块
 import Giscus from "@giscus/react";
@@ -37,10 +35,9 @@ function Giscus_Comment() {
     />
   );
 }
-
-function BlogPostPageContent({ sidebar, children }) {
-  const { metadata, toc } = useBlogPost();
-  const { nextItem, prevItem, frontMatter, unlisted } = metadata;
+function BlogPostPageContent({sidebar, children}) {
+  const {metadata, toc} = useBlogPost();
+  const {nextItem, prevItem, frontMatter} = metadata;
   const {
     hide_table_of_contents: hideTableOfContents,
     toc_min_heading_level: tocMinHeadingLevel,
@@ -57,13 +54,11 @@ function BlogPostPageContent({ sidebar, children }) {
             maxHeadingLevel={tocMaxHeadingLevel}
           />
         ) : undefined
-      }
-    >
-      {unlisted && <Unlisted />}
+      }>
+      <ContentVisibility metadata={metadata} />
+
       <BlogPostItem>{children}</BlogPostItem>
-
       <Giscus_Comment />
-
       {(nextItem || prevItem) && (
         <BlogPostPaginator nextItem={nextItem} prevItem={prevItem} />
       )}
@@ -77,10 +72,10 @@ export default function BlogPostPage(props) {
       <HtmlClassNameProvider
         className={clsx(
           ThemeClassNames.wrapper.blogPages,
-          ThemeClassNames.page.blogPostPage
-        )}
-      >
+          ThemeClassNames.page.blogPostPage,
+        )}>
         <BlogPostPageMetadata />
+        <BlogPostPageStructuredData />
         <BlogPostPageContent sidebar={props.sidebar}>
           <BlogPostContent />
         </BlogPostPageContent>
