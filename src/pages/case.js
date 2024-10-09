@@ -22,7 +22,7 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/SocialMood.webp"),
       label: "SocialMood",
-      desc: "自动化抓取和分析社交媒体平台上的热搜话题，来监测和分析公众情绪。该项目利用热搜幂律性补全数据结合Qwen2.5模型分析数据，Vue绘制多种图表以实现对网络舆情的实时监控和深入分析。",
+      desc: "自动化抓取和分析社交媒体平台上的热搜话题，来监测和分析公众情绪。该项目利用热搜幂律性补全数据结合语义模型分析数据，Vue绘制多种图表以实现对网络舆情的深入分析。",
       link: "https://github.com/jiangyangcreate/SocialMood",
     },
     {
