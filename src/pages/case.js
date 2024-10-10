@@ -20,6 +20,12 @@ function ShowcaseGrid() {
       link: "https://github.com/jiangyangcreate/jiangyangcreate.github.io",
     },
     {
+      image: useBaseUrl("pages/case/pocwatchdog.webp"),
+      label: "pocwatchdog",
+      desc: "进程管理器，用于定时管理进程，多种组合式定时任务。支持成功发送邮件通知、失败发送邮件通知，可插入附件、图片，自动识别邮箱服务器与端口号。",
+      link: "https://github.com/jiangyangcreate/pocwatchdog/",
+    },
+    {
       image: useBaseUrl("pages/case/SocialMood.webp"),
       label: "SocialMood",
       desc: "自动化抓取和分析社交媒体平台上的热搜话题，来监测和分析公众情绪。该项目利用热搜幂律性补全数据结合语义模型分析数据，Vue绘制多种图表以实现对网络舆情的深入分析。",
