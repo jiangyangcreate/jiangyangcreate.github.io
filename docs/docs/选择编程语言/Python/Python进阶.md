@@ -2484,151 +2484,77 @@ main(int argc, char* argv[])
 
 ### Python 发布包
 
-#### 简易打包说明
+截至2024年10月,有了非常多成熟的包管理工具,如 poetry、rye等工具，我相信未来还会有更多更好用的一站式包管理工具出现。
+
+#### 目录结构
 
 ```bash showLineNumbers
-配置pyproject.toml、setup.py、LICENSE、README.md
-配置.pypirc 如果是Linux/mac 路径为 $HOME/.pypirc 如果是Windows 则为C:\Users\<your username>\.pypirc
+your_project/
+├── .github/（可选）
+│  └── workflows/（可选）
+│      └── python-publish.yml（可选）
+│
+├── your_package/（包名）
+│   ├── __init__.py
+│   └── module.py
+│
+├── tests/（可选）
+│   └── test_module.py
+│
+├── README.md（可选）
+├── LICENSE（可选）
+└── pyproject.toml
+```
+#### pyproject.toml 示例
 
+```showLineNumbers title="pyproject.toml"
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
 
-root:[.]
-+--LICENSE
-+--pyproject.toml
-+--README.md
-+--setup.py
-+--src
-| +--Vulncapture
-| | +--dialogui.png
-| | +--mshei.ttf
-| | +--requirements.txt
-| | +--titlegui.png
-| | +--Vulncapture.py
-| | +--__init__.py
+[project]
+name = "pocwatchdog"
+version = "1.1.6"
+authors = [
+  { name="Allen", email="jiangyangcreate@gmail.com" },
+]
+description = "A pocwatchdog package for security monitoring"
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "schedule>=1.1.0",
+]
 
-自建Python构建包
-py -m build
-python -m pip install --user --upgrade setuptools wheel
-python setup.py sdist bdist_wheel
-py -m twine upload dist/*
-
+[project.urls]
+Homepage = "https://github.com/jiangyangcreate/pocwatchdog"
+Issues = "https://github.com/jiangyangcreate/pocwatchdog/issues"
 ```
 
-#### 打包
-
-这里 Python 3.12 以前的老项目可以使用 distutils 模块，更推荐使用 setuptools 模块，setuptools 最常用的功能有：
-
-- 依赖包安装与版本管理
-- python 库的打包分发
-- c/c++ 拓展
-- python 环境限制与生成脚本
-
-整个打包过程最重要的就是**setup.py**，它指定了重要的配置信息。setup.py 的内容如下(示例)：
-
-```python showLineNumbers
-from setuptools import setup,Extension
-
-setup(
-    ext_modules=[
-    Extension(
-    name = 'spam', # 包名称
-    sources=['spammodule.cpp'],
-    )]
-)
-```
-
-通过 setup 函数的这些参数 packages、include_package_data（其实就是 MANIFEST.in 文件）、exclude_package_data、package_data、data_files 来指定需要打包的文件。
-
-包含的文件如下：
-
-- py_modules 和 packages 参数中所有 Python 源文件
-- ext_modules or libraries 参数中提到的所有 C 源文件
-- scripts 参数指定的脚本
-- package_data 和 data_files 参数指定的所有文件
-- setup.cfg 和 setup.py
-- 类似于 readme 的文件（如 README、README.txt、 README.rst、README.md）
-- MANIFEST.in 中指定的所有文件（当运行 python setup.py sdist 时，会查阅 MANIFEST.in 文件，并且将里面约定的文件打包到最后的包里。什么要，什么不要）
-
-打包命令说明：
-
-1. 源码包 source dist（简称 sdist）：就是我们熟悉的 .zip 、.tar.gz 等后缀文件。就是一个压缩包，里面包含了所需要的的所有源码文件以及一些静态文件（txt 文本、css、图片等）。
-
-```python showLineNumbers
-python setup.py sdist --formats=gztar
-```
-
-2. 二进制包 binary dist（简称 bdist）：格式是 wheel（.whl 后缀），它的前身是 egg。wheel 本质也还是一个压缩包，可以像像 zip 一样解压缩。与源码包相比，二进制包的特点是不用再编译，也就是安装更快！在使用 wheel 之前，需要先安装 wheel 模块
-
-```python showLineNumbers
-# 先安装wheel模块
-pip install wheel
-
-python setup.py bdist --formats=rpm
-# 等价于
-python setup.py build_rpm
-```
-
-3. 开发方式安装包，该命名不会真正的安装包，而是在系统环境中创建一个软链接指向包实际所在目录。这边在修改包之后不用再安装就能生效，便于调试。
-
-```python showLineNumbers
-pip install -e .
-等价于
-python setup.py develop
-```
-
-4. 构建扩展，如用 C/C++, Cython 等编写的扩展，在调试时通常加 --inplace 参数，表示原地编译，即生成的扩展与源文件在同样的位置。
-
-```python showLineNumbers
-python setup.py build_ext --inplace
-```
-
-5. 构建一个 wheel 分发包，egg 包是过时的，whl 包是新的标准
-
-```python showLineNumbers
-python setup.py bdist_wheel
-```
-
-6. 构建一个 egg 分发包，经常用来替代基于 bdist 生成的模式
-
-```python showLineNumbers
-python setup.py bdist_egg
-```
-
-7. 安装到库
-
-```python showLineNumbers
-python setup.py install
-#等价于
-python setup.py build
-python setup.py install
-
-#python setup.py install包括两步：python setup.py build python setup.py install。
-#这两步可分开执行， 也可只执行python setup.py install, 因为python setup.py install总是会先build后install.
+其中：dependencies 是依赖的包，在这里添加你需要的依赖包之后，安装此包时会自动安装这些依赖包。
 
 
-#根据生成的文件等价于
-pip install  xxx.zip
-# 或
-pip install xxx.whl
-# 或.... xxx.egg
-```
-
-#### 发布
+#### 打包发布
 
 如果我们需要包被全世界的同好通过 pip install 直接安装的话，需要将包上传到 pypi 网站。首先注册 pypi，获得用户名和密码。
 
-上传 tar 包
+安装了 build 工具：
 
-`python setup.py sdist upload`
+`pip install --upgrade build`
 
-上传 whl 包
+然后，在项目根目录下运行以下命令来创建分发文件：
 
-`python setup.py bdist_wheel upload`
+`python -m build`
 
-如果要更安全和方便地上传包就使用 twine 上传。
+该命令将在 dist/ 目录下生成 .tar.gz 和 .whl 文件。
 
-安装 twine
+Twine 是一个用于上传 Python 包到 PyPI 的工具。安装 Twine：
 
-`pip install twine`
+`pip install --upgrade twine`
 
 上传所有包
 
@@ -2643,6 +2569,67 @@ pip install xxx.whl
 username=your_username
 password=your_password
 ```
+
+#### 通过git自动发布
+
+```yaml showLineNumbers title=".github\workflows\python-publish.yml"
+name: Upload Python Package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: '3.x'
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install build
+    - name: Build package
+      run: python -m build
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@27b31702a0e7fc50959f5ad993c78deac1bdfc29
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+```
+
+这个过程需要我们在pypi中获取密钥，然后在github的项目设置中添加。
+
+在pypi中获取密钥:
+
+```
+访问：https://pypi.org/manage/account/token/
+
+选择ADD API tokens
+
+名称可以随便填，勾选你需要授权的权限，然后创建
+
+```
+
+
+在github的项目设置中添加:
+
+```bash showLineNumbers
+Settings -> Secrets and variables-> Actions -> New repository secret
+
+Name: PYPI_API_TOKEN
+Value: 刚刚复制的密钥
+```
+
+这样当我们在github上**创建release**时，会自动将包上传到pypi。注意不是push代码自动上传。
 
 #### 封装程序为可执行文件
 
