@@ -49,6 +49,13 @@ function ShowcaseGrid() {
       desc: "Python驱动库，适用于Jetson Orin Nano 和 RK3399 Pro芯片，支持RSS协议（摄像头云台）、数字量模拟量的处理（常见传感器）、i2c协议（控制RGB灯带）、超声波读取、非加密NFC读写。",
       link: "https://github.com/jiangyangcreate/exboard/",
     },
+    {
+      image: useBaseUrl("pages/case/WebScreenShare.webp"),
+      label: "WebScreenShare Public",
+      desc: "网页形式分享你的屏幕/摄像头和音频，观众无需下载任何会议软件，仅需打开浏览器即可观看。还允许你上传与下载文件。",
+      link: "https://github.com/jiangyangcreate/WebScreenShare/",
+    },
+    
   ];
 
   // https://reactjs.org/docs/react-dom.html#hydrate
