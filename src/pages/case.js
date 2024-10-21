@@ -44,7 +44,7 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/SocialMood.webp"),
       title: "SocialMood",
-      desc: "纯Python项目。自动化抓取和分析社交媒体平台上的热搜话题，来监测和分析公众情绪。该项目利用热搜幂律性补全数据结合语义模型分析数据，绘制多种图表以实现对网络舆情的深入分析。",
+      desc: "纯Python项目。抓取社交媒体平台上的热搜话题，利用机器学习补全数据，结合本地Qwen大模型分析数据，绘制多种图表实现网络舆情深入分析。",
       url: "https://github.com/jiangyangcreate/SocialMood",
       category: "项目DEMO", // 添加分类字段
     },
@@ -60,6 +60,7 @@ function ShowcaseGrid() {
     //   title: "WebModel",
     //   desc: "纯Python构建的前后端AI模型应用。包含：聊天模型、文生图、实时训练的分类器、基于本地传统算法的鸢尾花分类器",
     //   url: "https://github.com/jiangyangcreate/Webmodel/",
+    //   category: "项目DEMO", // 添加分类字段
     // },
     {
       image: useBaseUrl("pages/case/Bluetooth.webp"),
