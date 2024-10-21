@@ -44,16 +44,16 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/SocialMood.webp"),
       title: "SocialMood",
-      desc: "自动化抓取和分析社交媒体平台上的热搜话题，来监测和分析公众情绪。该项目利用热搜幂律性补全数据结合语义模型分析数据，Vue绘制多种图表以实现对网络舆情的深入分析。",
+      desc: "纯Python项目。自动化抓取和分析社交媒体平台上的热搜话题，来监测和分析公众情绪。该项目利用热搜幂律性补全数据结合语义模型分析数据，绘制多种图表以实现对网络舆情的深入分析。",
       url: "https://github.com/jiangyangcreate/SocialMood",
-      category: "全栈项目DEMO", // 添加分类字段
+      category: "项目DEMO", // 添加分类字段
     },
     {
       image: useBaseUrl("pages/case/WebScreenShare.webp"),
-      title: "WebScreenShare Public",
-      desc: "一个全平台通用的网络分享程序，仅需打开浏览器，即可允许你上传与下载文件、视频直播、屏幕共享。",
+      title: "WebScreenShare",
+      desc: "一个全平台通用的网络分享程序，仅需打开浏览器，即可允许你上传与下载文件、媒体共享（可以自由选择屏幕窗口、摄像头、麦克风）。使用JS编写逻辑代码，使用python编写路由映射。",
       url: "https://github.com/jiangyangcreate/WebScreenShare/",
-      category: "全栈项目DEMO", // 添加分类字段
+      category: "项目DEMO", // 添加分类字段
     },
     // {
     //   image: useBaseUrl("pages/case/webmodel.webp"),
