@@ -115,17 +115,6 @@ module.exports = {
       },
     ],
     [
-      "@docusaurus/plugin-content-docs",
-      {
-        id: "ai",
-        path: "docs/ai",
-        routeBasePath: "ai",
-        sidebarPath: require.resolve("./sidebars.js"),
-        remarkPlugins: [remarkMath],
-        rehypePlugins: [rehypeKatex],
-      },
-    ],
-    [
       "@docusaurus/plugin-content-blog",
       {
         routeBasePath: "/blog",
@@ -206,10 +195,6 @@ module.exports = {
             {
               label: "开发",
               to: "/docs",
-            },
-            {
-              label: "算法",
-              to: "/ai",
             },
             {
               label: "书架",

@@ -59,7 +59,6 @@
 │   ├── xxxx.md             # 博客文件
 │   └── authors.yml         # 博客作者
 ├── docs
-│   ├── ai                  # 算法文档
 │   ├── read                # 书架文档
 │   └── docs                # 开发文档
 ├── src
