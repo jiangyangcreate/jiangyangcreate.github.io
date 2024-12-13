@@ -2513,12 +2513,12 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pocwatchdog"
-version = "1.1.6"
+name = "exboard"
+version = "1.0.12"
 authors = [
   { name="Allen", email="jiangyangcreate@gmail.com" },
 ]
-description = "A pocwatchdog package for security monitoring"
+description = "A exboard package for AIBOX"
 readme = "README.md"
 requires-python = ">=3.6"
 classifiers = [
@@ -2531,8 +2531,8 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/jiangyangcreate/pocwatchdog"
-Issues = "https://github.com/jiangyangcreate/pocwatchdog/issues"
+Homepage = "https://github.com/jiangyangcreate/exboard"
+Issues = "https://github.com/jiangyangcreate/exboard/issues"
 ```
 
 其中：dependencies 是依赖的包，在这里添加你需要的依赖包之后，安装此包时会自动安装这些依赖包。

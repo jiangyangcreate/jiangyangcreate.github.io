@@ -28,13 +28,6 @@ function ShowcaseGrid() {
       category: "关于我", 
     },
     {
-      image: useBaseUrl("pages/case/pocwatchdog.webp"),
-      title: "pocwatchdog",
-      desc: "进程管理器，用于定时管理进程，多种组合式定时任务。支持成功发送邮件通知、失败发送邮件通知，可插入附件、图片，自动识别邮箱服务器与端口号。",
-      url: "https://github.com/jiangyangcreate/pocwatchdog/",
-      category: "模块库", 
-    },
-    {
       image: useBaseUrl("pages/case/exboard.webp"),
       title: "exboard",
       desc: "Python驱动库，适用于Jetson Orin Nano 和 RK3399 Pro芯片，支持RSS协议（摄像头云台）、数字量模拟量的处理（常见传感器）、i2c协议（控制RGB灯带）、超声波读取、非加密NFC读写。",
