@@ -28,6 +28,13 @@ function ShowcaseGrid() {
       category: "关于我", 
     },
     {
+      image: useBaseUrl("pages/case/halo-theme-2020.webp"),
+      title: "halo-theme-2020",
+      desc: "2020年，我使用halo博客框架，在xue主题上二次开发了我的个人博客主题，适配 Halo 最新 1.5.5 版本 修复网易云音乐。",
+      url: "https://github.com/jiangyangcreate/halo-theme-2020/",
+      category: "关于我", 
+    },
+    {
       image: useBaseUrl("pages/case/exboard.webp"),
       title: "exboard",
       desc: "Python驱动库，适用于Jetson Orin Nano 和 RK3399 Pro芯片，支持RSS协议（摄像头云台）、数字量模拟量的处理（常见传感器）、i2c协议（控制RGB灯带）、超声波读取、非加密NFC读写。",
@@ -35,32 +42,25 @@ function ShowcaseGrid() {
       category: "模块库", 
     },
     {
+      image: useBaseUrl("pages/case/etool.webp"),
+      title: "eTool",
+      desc: "一个常用工具库集合，包含：进程定时监听并发送邮件、硬件测速（网络、硬盘、内存、显存）、全平台通用的网络分享程序（仅需打开浏览器，即可允许你上传与下载文件、媒体共享。可以自由选择屏幕窗口、摄像头、麦克风）",
+      url: "https://github.com/jiangyangcreate/eTool/",
+      category: "模块库", 
+    },
+    {
       image: useBaseUrl("pages/case/SocialMood.webp"),
       title: "SocialMood",
       desc: "纯Python项目。抓取社交媒体平台上的热搜话题，利用机器学习补全数据，结合本地Qwen大模型分析数据，绘制多种图表实现网络舆情深入分析。",
       url: "https://github.com/jiangyangcreate/SocialMood",
-      category: "项目DEMO", // 添加分类字段
+      category: "项目DEMO", 
     },
-    {
-      image: useBaseUrl("pages/case/WebScreenShare.webp"),
-      title: "WebScreenShare",
-      desc: "一个全平台通用的网络分享程序，仅需打开浏览器，即可允许你上传与下载文件、媒体共享（可以自由选择屏幕窗口、摄像头、麦克风）。使用JS编写逻辑代码，使用python编写路由映射。",
-      url: "https://github.com/jiangyangcreate/WebScreenShare/",
-      category: "项目DEMO", // 添加分类字段
-    },
-    // {
-    //   image: useBaseUrl("pages/case/webmodel.webp"),
-    //   title: "WebModel",
-    //   desc: "纯Python构建的前后端AI模型应用。包含：聊天模型、文生图、实时训练的分类器、基于本地传统算法的鸢尾花分类器",
-    //   url: "https://github.com/jiangyangcreate/Webmodel/",
-    //   category: "项目DEMO", // 添加分类字段
-    // },
     {
       image: useBaseUrl("pages/case/Bluetooth.webp"),
       title: "Bluetooth 小程序",
-      desc: "蓝牙遥控最小示例：微信小程序与设备通信（测试设备为ESP32单片机）。支持中文、英文、文件分片传输。",
+      desc: "微信小程序实现蓝牙遥控最小示例：微信小程序与设备通信（测试设备为ESP32单片机）。支持中文、英文、文件分片传输。",
       url: "https://github.com/jiangyangcreate/WX-Mini-Program/",
-      category: "小程序", // 添加分类字段
+      category: "项目DEMO", 
     },
   ];
 
