@@ -23,3 +23,5 @@ yarn-error.log*
 
 # draft
 draft
+
+blog/20*-*-*.md
