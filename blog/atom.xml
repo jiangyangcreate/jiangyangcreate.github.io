@@ -108,7 +108,6 @@
         <updated>2024-08-30T00:00:00.000Z</updated>
         <summary type="html"><![CDATA[机器学习与LLM舆情分析]]></summary>
         <content type="html"><![CDATA[<div class="post-ai"><div class="ai-title"><a class="ai-title-left" href="https://jiangmiemie.com/blog/2024/1/31/" title="查看详情" data-pjax-state=""><div class="ai-title-text">文章摘要</div></a></div><div class="ai-explanation" style="display:block"></div><div class="ai-suggestions"></div><div class="ai-bottom"><div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div></div></div><p>该项目适合作为小型的项目原型，适合教学和练手。最初这个项目的灵感源于我的个人需求，我需要一个工具来查看主流话题，同时又不想下载一堆 APP 来接收推送。项目最终的数据使用github pages来展示。</p>
-<p>可以结合我的另一个项目<code>pocwatchdog</code>实现定时执行加发送邮件。</p>
 <p>项目开源地址：<a href="https://github.com/jiangyangcreate/SocialMood" target="_blank" rel="noopener noreferrer">https://github.com/jiangyangcreate/SocialMood</a></p>
 <p>项目查看地址：<a href="https://jiangyangcreate.github.io/SocialMood/" target="_blank" rel="noopener noreferrer">https://jiangyangcreate.github.io/SocialMood/</a></p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="使用流程">使用流程<a href="https://jiangmiemie.com/blog/2024/8/30/#%E4%BD%BF%E7%94%A8%E6%B5%81%E7%A8%8B" class="hash-link" aria-label="Direct link to 使用流程" title="Direct link to 使用流程">​</a></h2>
