@@ -32,6 +32,62 @@ const unsplashLink = (id, width, height) =>
 //定义相册图片
 const unsplashPhotos = [
   {
+    id: 202412151,
+    width: 4624,
+    height: 2080,
+    title: "广东",
+    description: "仙湖植物园的绿地"
+  },
+  {
+    id: 202412152,
+    width: 2160,
+    height: 5044,
+    title: "上海",
+    description: "古猗园的莲花"
+  },
+  {
+    id: 202412153,
+    width: 2160,
+    height: 5044,
+    title: "浙江",
+    description: "端午节的天一阁"
+  },
+  {
+    id: 202412154,
+    width: 2160,
+    height: 8102,
+    title: "浙江",
+    description: "温州江心屿与特色小吃"
+  },
+  {
+    id: 202412155,
+    width: 1706,
+    height: 1279,
+    title: "山东",
+    description: "趵突泉的正面"
+  },
+  {
+    id: 202412156,
+    width: 2160,
+    height: 6019,
+    title: "浙江",
+    description: "乌镇的食住行"
+  },
+  {
+    id: 202412157,
+    width: 2160,
+    height: 5070,
+    title: "上海",
+    description: "青浦区的道路"
+  },
+  {
+    id: 202412158,
+    width: 2080,
+    height: 2080,
+    title: "广东",
+    description: "仙湖植物园的大树"
+  },
+  {
     id: "Newyear",
     width: 4624,
     height: 3948,
@@ -493,7 +549,7 @@ export function useSettings() {
 }
 
 function Settings({ children }) {
-  const [layout, setLayout] = useState("rows");
+  const [layout, setLayout] = useState("columns");
   const [count, setCount] = useState(photos.length);
   const [targetRowHeight, setTargetRowHeight] = useState(200);
   const [columns, setColumns] = useState(5);
@@ -519,13 +575,13 @@ function Settings({ children }) {
       photos:
         tag === "其他"
           ? photos
-              .filter(
-                (photo) => photo.title === undefined || photo.title === null
-              )
-              .slice(0, count)
+            .filter(
+              (photo) => photo.title === undefined || photo.title === null
+            )
+            .slice(0, count)
           : tag === "全选"
-          ? photos.slice(0, count)
-          : photos.filter((photo) => photo.title === tag).slice(0, count),
+            ? photos.slice(0, count)
+            : photos.filter((photo) => photo.title === tag).slice(0, count),
       layout,
       targetRowHeight,
       columns,
@@ -571,7 +627,7 @@ function Settings({ children }) {
                 ))}
               </TextField>
             </Filter>
-{/* 
+            {/* 
             <Filter>
               <SliderControl
                 name="Photos"
