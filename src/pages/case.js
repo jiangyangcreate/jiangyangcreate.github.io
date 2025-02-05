@@ -23,7 +23,7 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/readme.webp"),
       title: "Readme",
-      desc: "关于我自己的中英介绍，使用jinja模板与文心一言4.0。hash存储文章，去重生成总结、每天定时更新。",
+      desc: "关于我自己的中英介绍，使用jinja模板。通过hash去重存储文章、deepseek模型生成总结、每天定时更新。",
       url: "https://jiangmiemie.com/jiangyangcreate/",
       category: "关于我", 
     },
@@ -44,15 +44,15 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/etool.webp"),
       title: "eTool",
-      desc: "一个常用工具库集合，包含：进程定时监听并发送邮件、硬件测速（网络、硬盘、内存、显存）、全平台通用的网络分享程序（仅需打开浏览器，即可允许你上传与下载文件、媒体共享。可以自由选择屏幕窗口、摄像头、麦克风）",
+      desc: "30 多种常用工具集合库，包含：进程定时监听；发送邮件；硬件测速（网络、硬盘、内存、显存）；PDF、excel、word、图片等常用处理；windows右键菜单管理等",
       url: "https://github.com/jiangyangcreate/eTool/",
       category: "模块库", 
     },
     {
-      image: useBaseUrl("pages/case/SocialMood.webp"),
-      title: "SocialMood",
-      desc: "纯Python项目。抓取社交媒体平台上的热搜话题，利用机器学习补全数据，结合本地Qwen大模型分析数据，绘制多种图表实现网络舆情深入分析。",
-      url: "https://github.com/jiangyangcreate/SocialMood",
+      image: useBaseUrl("pages/case/AI-Practice-Collection.webp"),
+      title: "AI-Practice-Collection",
+      desc: "这是一个用于AI技术练习和探索的项目合集。该仓库汇集了多个完整的AI项目，适用于学习和练习。",
+      url: "https://github.com/jiangyangcreate/AI-Practice-Collection",
       category: "项目DEMO", 
     },
     {

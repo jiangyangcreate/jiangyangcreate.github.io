@@ -23,7 +23,7 @@ listx = [15, 7, 1, 1, "+", "-", "/", 3, "*", 2, 1, 1, "+", "+", "-"]
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 
 # 方法1-python人思维
 while len(listx) > 1:
@@ -85,7 +85,7 @@ string.whitespace   空白字符
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 import string
 # 方法1 正常Python人思维
 def generate_pwd_list(dic, max_len):
@@ -160,19 +160,23 @@ print(len(res))
 
 ```
 
-```python
-"""
+## 电影演员
+
+### 描述
+
 小明拿到了一个电影+演员的数据名单，他想设计一个程序，要求：
 1.输入演员名
 2.如果演员出演了电影，则打印他+他出演的全部电影。程序结束
 3.如果演员没有出演电影，则打印查无此人。程序继续
+```python  showLineNumbers
 电影 = [
 '妖猫传',['黄轩','染谷将太'],
 '无问西东',['章子怡','王力宏','祖峰'],
 '超时空同居',['雷佳音','佟丽娅','黄轩']]
-"""
+```
+### 题解（Python）
 
-
+```python  showLineNumbers
 
 电影 = [
 '妖猫传',['黄轩','染谷将太'],
@@ -202,7 +206,7 @@ while True:
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 
 
 def fun(num, list=None):
@@ -247,7 +251,7 @@ print(fun(x))
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 #方法一
 for i in range(1,10):
     print()
@@ -274,7 +278,7 @@ while i<10: #控制行，1到9
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 # 方法1：
 sorted(d.cop(),key = lambda i:i[k])
 
@@ -290,7 +294,7 @@ heappush(h,(i[k],i)) for i in d
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 
 
 list1 = [13, 22, 6, 99, 11, 0]
@@ -318,7 +322,7 @@ print(list1)
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 def partition(arr, low: int, high: int):
     pivot, j = arr[low], low  # 获取底部元素与 对应的初始下标
 
@@ -362,7 +366,7 @@ if __name__ == '__main__':
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 aList = []
 for i in range(0,2023):
     aList.append(i)
@@ -381,7 +385,7 @@ print(aList)
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 
 for a in range(1,2022):
     if (2022 - a*a)**0.5 in range(1,2022):
@@ -400,7 +404,7 @@ for a in range(1,2022):
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 
 for i in range(1,440):
     if i <= 80 :
@@ -425,7 +429,7 @@ for i in range(1,440):
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 
 for 时钟 in range(24):
     for 分钟 in range(60):
@@ -444,7 +448,7 @@ for 时钟 in range(24):
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 
 i = 0
 while True:
@@ -489,7 +493,7 @@ while 睡觉的状态 != '睡着': # 只要不是睡着，就继续数
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 
 
 from tkinter import *
@@ -790,7 +794,7 @@ byte字节是内存的基本单位
 
 8 bit = 1 byte
 
-```python
+```python  showLineNumbers
 # 参考知识
 
 data = b'\xff' # b代表这是一个二进制数据，\x代表这是一个十六进制的数据
@@ -813,7 +817,7 @@ with open("black.bmp", "wb") as f:
 
 ### 题解（Python）
 
-```python
+```python  showLineNumbers
 class Readbmp:
     """
     read bmp files
