@@ -3,1920 +3,96 @@ sidebar_position: 3
 title: Python进阶
 ---
 
-### 面向对象编程
-
-面向对象编程——Object Oriented Programming，简称 OOP，是一种程序设计思想。OOP 把对象作为程序的基本单元，一个对象包含了数据和操作数据的函数。
-
-在 Python 中，所有数据类型都可以视为对象，当然也可以自定义对象。自定义的对象数据类型就是面向对象中的类（Class）的概念。
-
-面向对象的设计思想是从自然界中来的，因为在自然界中，类（Class）和实例（Instance）的概念是很自然的。Class 是一种抽象概念，比如我们定义的 Class——Student，是指学生这个概念，而实例（Instance）则是一个个具体的 Student，比如，张三和李四是两个具体的 Student。
-
-所以，面向对象的设计思想是抽象出 Class，根据 Class 创建 Instance。
-
-面向对象的抽象程度又比函数要高，因为一个 Class 既包含数据，又包含操作数据的方法。
-
-#### 创建类
-
-##### 类的特殊方法
-
-Python 使用 \_\_ 开头的名字来定义特殊的方法和属性，它们有：
-
-```
-__init__()
-__repr__()
-__str__()
-__call__()
-__iter__()
-__add__()
-__sub__()
-__mul__()
-__rmul__()
-__class__
-__name__
-```
-
-构造方法 `__init__()`
-
-在产生对象之后，我们可以向对象中添加属性。
-事实上，还可以通过构造方法，在构造对象的时候直接添加属性：
-
-```python showLineNumbers
-class Clothes(object):
-    """
-    init_demo
-    """
-
-    def __init__(self, color="green"):
-        self.color = color
-
-
-my_clothes = Clothes()
-my_clothes.color
-```
-
-传入有参数的值：
-
-```python showLineNumbers
-your_clothes = Clothes('orange')
-your_clothes.color
-```
-
-表示方法 `__repr__() 和 __str__()`:
-
-```python showLineNumbers
-class Clothes(object):
-    """
-    repr and str demo
-    """
-
-    def __init__(self, color="green"):
-        self.color = color
-
-    def __str__(self):
-        "This is a string to print."
-        return ("a {} clothes".format(self.color))
-
-    def __repr__(self):
-        "This string recreates the object."
-        return ("{}(color='{}')".format(self.__class__.__name__, self.color))
-```
-
-`__str__()` 是使用 print 函数显示的结果,类似 java 中的 toString：
-
-```python showLineNumbers
-my_clothes = Clothes()
-print(my_clothes)
-```
-
-`__repr__()` 返回的是不使用 print 方法的结果:
-
-```python showLineNumbers
-my_clothes
-```
-
-```python showLineNumbers
-print(my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color)
-```
-
-```python showLineNumbers
-my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color
-```
-
-##### 类的属性
-
-只读属性：
-
-```python showLineNumbers
-class Clothes(object):
-    def __init__(self, price):
-        self.price = price
-
-    # 这样 discount_price 就变成属性了
-    @property
-    def discount_price(self):
-        return self.price * 0.8
-```
-
-这里 discount_price 就是一个只读不写的属性了（注意是属性不是方法）,
-而 price 是可读写的属性：
-
-```python showLineNumbers
-my_clothes = Clothes(100)
-print(my_clothes.discount_price)  # 80.0
-```
-
-可以修改 price 属性来改变 discount_price：
-
-```python showLineNumbers
-my_clothes.price = 200
-print(my_clothes.discount_price)  # 160.0
-```
-
-my_clothes.discount_price()会报错，因为 my_clothes.discount_price 是属性，不是方法；
-
-my_clothes.discount_price=100 也会报错，因为只读。
-
-对于 @property 生成的只读属性，我们可以使用相应的 @attr.setter 修饰符来使得这个属性变成可写的：
-
-```python showLineNumbers
-class Clothes(object):
-    def __init__(self, price):
-        self.price = price
-
-    # 这样就变成属性了
-    @property
-    def discount_price(self):
-        return self.price * 0.8
-
-    @discount_price.setter
-    def discount_price(self, new_price):
-        self.price = new_price * 1.25
-```
-
-测试一下：
-
-```python showLineNumbers
-my_clothes = Clothes(100)
-print(my_clothes.discount_price)
-
-my_clothes.price = 200
-print(my_clothes.discount_price)
-```
-
-修改 discount_price 属性：
-
-```python showLineNumbers
-my_clothes.discount_price = 180
-print(my_clothes.price)
-print(my_clothes.discount_price)
-```
-
-一个等价的替代如下，用方法：
-
-```python showLineNumbers
-class Clothes(object):
-    def __init__(self, price):
-        self.price = price
-
-    def get_discount_price(self):
-        return self.price * 0.8
-
-    def set_discount_price(self, new_price):
-        self.price = new_price * 1.25
-
-    discount_price = property(get_discount_price, set_discount_price)
-
-```
-
-```python showLineNumbers
-my_clothes = Clothes(100)
-print(my_clothes.discount_price)
-
-my_clothes.price = 200
-print(my_clothes.discount_price)
-
-my_clothes.discount_price = 180
-print(my_clothes.price)
-print(my_clothes.discount_price)
-```
-
-#### 继承
-
-类定义的基本形式：
-
-```python showLineNumbers
-class ClassName(ParentClass):
-    """class docstring"""
-    def method(self):
-        return
-```
-
-里面的 ParentClass 就是用来继承的。
-
-```python showLineNumbers
-class Clothes(object):
-    def __init__(self, color="green"):
-        self.color = color
-
-    def out_print(self):
-        return self.__class__.__name__, self.color
-```
-
-```python showLineNumbers
-my_clothes = Clothes()
-my_clothes.color
-```
-
-```python showLineNumbers
-my_clothes.out_print()
-```
-
-定义一个子类，继承父类的所有方法:
-
-```python showLineNumbers
-class NikeClothes(Clothes):
-    def change_color(self):
-        if self.color == "green":
-            self.color = "red"
-```
-
-继承父类的所有方法：
-
-```python showLineNumbers
-your_clothes = NikeClothes()
-your_clothes.color
-```
-
-```python showLineNumbers
-your_clothes.out_print()
-```
-
-但有自己的方法：
-
-```python showLineNumbers
-your_clothes.change_color()
-your_clothes.color
-```
-
-如果想对父类的方法进行修改，只需要在子类中重定义这个类即可：
-
-```python showLineNumbers
-class AdidasClothes(Clothes):
-    def change_color(self):
-        if self.color == "green":
-            self.color = "black"
-
-    def out_print(self):
-        self.change_color()
-        return self.__class__.__name__, self.color
-
-
-him_clothes = AdidasClothes()
-print(him_clothes.color)
-
-him_clothes.change_color()
-print(him_clothes.color)
-print(him_clothes.out_print())
-```
-
-#### super() 函数
-
-super(CurrentClassName, instance)
-
-返回该类实例对应的父类对象。
-
-刚才 AdidasClothes 可以改写为：
-
-```python showLineNumbers
-class NewAdidasClothes(Clothes):
-    def change_color(self):
-        if self.color == "green":
-            self.color = "black"
-
-    def out_print(self):
-        self.change_color()
-        print(super(NewAdidasClothes, self).out_print())
-
-her_clothes = NewAdidasClothes()
-print(her_clothes.color)
-
-her_clothes.out_print()
-```
-
-#### **new**() 方法
-
-**new**()用来创建一个实例，它至少有一个参数 cls，代表当前类。默认情况下**new**()会创建当前类的实例，该方法也可以被重载，重载后也可以创建其他类的实例。
-
-```python showLineNumbers
-class Fun(object):
-    def __init__(self, fun):
-        self.fun = fun
-
-    def __new__(cls, *args, **kwargs):
-        return object.__new__(Fun)
-
-if __name__ == '__main__':
-    f = Fun.__new__(Fun)
-    print(type(f))
-```
-
-**new**()方法只是创建实例，此时拿到的实例并不能正常使用。一个实例需要被**init**()方法初始化后才可以被正常使用。也就是说，正常场景下，我们生成一个类的实例，Python 先调用该类的**new()\*\*方法创建一个实例，然后再调用**init\*\*()方法初始化该实例。**new()**方法存在于 object 方法中，通常情况下不需要被重载。
-
-可以使用**new**方法创建出其它类的实例。在这种场景下，**new**方法创建后会调用对应类的**init**方法完成初始化：
-
-```python showLineNumbers
-class Fun(object):
-    def __init__(self, fun):
-        self.fun = fun
-
-    def __new__(cls, *args, **kwargs):
-        return Demo(*args, **kwargs)
-
-
-class Demo(object):
-    def __init__(self, d):
-        self.demo = d
-
-
-if __name__ == '__main__':
-    f = Fun(1)
-    print("type f:", type(f))
-    print("f.demo:", f.demo)
-```
-
-可以看出，f 不是 Fun 类的一个实例，而是 Demo 类的一个实例，拥有 Demo 类的字段。因为 Fun 类的**new**方法创建的是一个 Demo 类实例，而非 Fun 类本身。因此 Fun.**new**方法在 return 后调用了 Demo.**init**方法，以完成该实例的初始化。
-
-#### 接口
-
-接口的调用：
-
-```python showLineNumbers
-class Clothes(object):
-    def __init__(self, color="green"):
-        self.color = color
-
-    def out(self):
-        print("father.")
-
-
-class NikeClothes(Clothes):
-    def out(self):
-        self.color = "brown"
-        super(NikeClothes, self).out()
-
-
-class AdidasClothes(object):
-    def out(self):
-        print("adidas.")
-
-```
-
-因为三个类都实现了 out() 方法，因此可以这样使用：
-
-```python showLineNumbers
-objects = [Clothes(), NikeClothes(), AdidasClothes()]
-for obj in objects:
-    obj.out()
-```
-
-#### 类方法
-
-类方法包括以下几种：
-
-1. special 方法和属性，即以 \_\_ 开头和结尾的方法和属性
-2. 私有方法和属性，以 \_ 开头，不过不是真正私有，而是可以调用的，
-   但是不会被代码自动完成所记录（即 Tab 键之后不会显示）
-3. 共有的方法和属性
-
-以 `__` 开头不以 `__` 结尾的属性是更加特殊的方法，调用方式也不同：
-
-```python showLineNumbers
-class MyDemoClass(object):
-    def __init__(self):
-        print("special.")
-
-    def _get_name(self):
-        print("_get_name is private method.")
-
-    def get_value(self):
-        print("get_value is public method.")
-
-    def __get_type(self):
-        print("__get_type is really special method.")
-```
-
-```python showLineNumbers
-demo = MyDemoClass()
-
-```
-
-```python showLineNumbers
-demo.get_value()
-demo._get_name()
-demo._MyDemoClass__get_type()
-```
-
-### 文件
-
-#### 写文件
-
-我们使用 open 函数的写入模式来写文件：
-
-```python showLineNumbers
-f = open('test.txt', 'w')
-f.write('hello world.')
-f.close()
-```
-
-```python showLineNumbers
-print(open('test.txt').read())
-```
-
-使用 w 模式时，如果文件不存在会被创建
-
-除了写入模式，还有追加模式 a
-
-读写模式 w+
-
-```python showLineNumbers
-f = open('test.txt', 'w+')
-f.write('hello world. morning.')
-f.seek(3)
-print(f.read())  # hello world.
-f.close()
-```
-
-#### 读文件
-
-使用 open 函数 来读文件，使用文件名的字符串作为输入参数：
-
-默认打开文件是 ‘r’ 读模式
-
-```python showLineNumbers
-f = open("test.txt")
-
-# 默认以读的方式打开文件，如果文件不存在会报错。
-# 可以使用 read 方法来读入文件中的所有内容：
-text = f.read()
-print(text)
-```
-
-按照行读入内容，readlines 方法返回一个列表，每个元素代表文件中每一行的内容：
-
-```python showLineNumbers
-f = open("test.txt")
-lines = f.readlines()
-print(lines)
-f.close()
-```
-
-```python showLineNumbers
-# 事实上，我们可以将 f 放在一个循环中，得到它每一行的内容：
-f = open('test.txt')
-for line in f:
-    print(line)
-f.close()
-```
-
-#### 上下文管理器
-
-```python showLineNumbers
-with open('my_file.txt', 'w') as fp:
-    data = fp.write("Hello world")
-```
-
-这等效于下面的代码，但是要更简便：
-
-```python showLineNumbers
-fp = open('my_file.txt', 'w')
-try:
-    # do stuff with f
-    data = fp.write("Hello world")
-finally:
-    fp.close()
-```
-
-#### 自定义上下文管理器
-
-比如可以这样定义一个简单的上下文管理器：
-
-```python showLineNumbers
-class ContextManager(object):
-    def __enter__(self):
-        print("Entering")
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-
-
-with ContextManager():
-    print("inside operate")
-```
-
-#### **enter** 的返回值
-
-如果在 **enter** 方法下添加了返回值，
-
-那么我们可以使用 as 把这个返回值传给某个参数：
-
-```python showLineNumbers
-class ContextManager2(object):
-    def __enter__(self):
-        print("Entering")
-        return "my value"
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-
-
-with ContextManager2() as val:
-    print(val)
-
-```
-
-一个通常的做法是将 **enter** 的返回值设为这个上下文管理器对象本身，
-文件对象就是这样做的.
-
-```python showLineNumbers
-class ContextManager3(object):
-    def __enter__(self):
-        print("Entering")
-        return self
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-
-```
-
-#### 错误处理
-
-上下文管理器对象将错误处理交给 **exit** 进行，可以将错误类型，
-错误值和 traceback 等内容作为参数传递给 **exit** 函数：
-
-```python showLineNumbers
-class ContextManager4(object):
-    def __enter__(self):
-        print("Entering")
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-        if exc_type is not None:
-            print("  Exception:", exc_value)
-            return True  # 不想让错误抛出，只需要将 __exit__ 的返回值设为 True
-
-
-with ContextManager4():
-    print(1 / 0)
-
-```
-
-```python showLineNumbers
-import os
-os.remove('my_file.txt')
-```
-
-#### 二进制文件
-
-二进制读写模式 b：
-
-```python showLineNumbers
-import os
-
-f = open('binary.bin', 'wb')
-f.write(os.urandom(10))
-f.close()
-```
-
-```python showLineNumbers
-f = open('binary.bin', 'rb')
-print(repr(f.read()))
-f.close()
-```
-
-#### with 方法
-
-事实上，Python 提供了更安全的方法，当 with 块的内容结束后，
-Python 会自动调用它的 close 方法，确保读写的安全：
-
-```python showLineNumbers
-with open('new_file.txt', 'w') as f:
-    for i in range(3000):
-        x = 1.0 / (i - 1000)
-        f.write('hello world: ' + str(i) + '\n')
-```
-
-与 try/exception/finally 效果相同，但更简单。
-
-查看文件写的结果，虽然触发 error，但已经写的内容是成功的。
-
-```python showLineNumbers
-!tail new_file.txt
-```
-
-```python showLineNumbers
-!wc -l new_file.txt
-```
-
-```python showLineNumbers
-# 删除文件：
-import os
-os.remove('test.txt')
-os.remove('binary.bin')
-os.remove('new_file.txt')
-```
-
-### 异常
-
-#### try & except 块
-
-捕捉不同的错误类型，尝试在下面输入框输入：-1，1，2，q
-
-```python showLineNumbers
-import math
-
-while True:
-    try:
-        text = input('>')
-        if text[0] == 'q':
-            break
-        x = float(text)
-        y = 1 / math.log10(x)
-        print("1/log10({0}) = {1}".format(x, y))
-    except ValueError:
-        print("value must bigger than 0")
-    except ZeroDivisionError:
-        print("the value must not be 1")
-
-```
-
-#### 自定义异常
-
-异常是标准库中的类，这意味着我们可以自定义异常类：
-
-尝试在文本输入框输入：k，start，q
-
-```python showLineNumbers
-class CommandError(ValueError):
-    print("bad command operation. must input 'start', 'stop', 'pause'")
-
-
-
-valid_commands = {'start', 'stop', 'pause'}
-while True:
-    command = input('>')
-    if command == 'q':
-        break
-    try:
-        if command.lower() not in valid_commands:
-            raise CommandError('Invalid command: %s' % command)
-        print('input command:', command)
-    except CommandError:
-        print("bad command string: %s" % command)
-
-```
-
-#### finally
-
-try/catch 块还有一个可选的关键词 finally。
-
-不管 try 块有没有异常， finally 块的内容总是会被执行，
-而且会在抛出异常前执行，因此可以用来作为安全保证，
-
-比如文件操作时，常在 finally 关闭文件。
-
-```python showLineNumbers
-try:
-    print(1 / 0)
-except ZeroDivisionError:
-    print('divide by 0.')
-finally:
-    print('finally was called.')
-```
-
-### 装饰器
-
-如果你有一批变量想统一按一个规则处理，并且需要缩减代码，你需要函数。
-
-如果你有一批函数想统一按一个规则处理，并且需要缩减代码，你需要装饰器（Decorator）
-
-理清下面 2 点：
-
-函数
-
-- 接受参数
-- 做点事情
-- 返回结果
-
-装饰器
-
-- 接受函数作为参数
-- 做点事情
-- 返回一个函数
-
-用 @ 来使用装饰器
-
-使用 @ 符号来将某个函数替换为装饰符之后的函数：
-
-例如这个函数：
-
-```python showLineNumbers
-def dec(f):
-    print('I am decorating function', id(f))
-    return f
-```
-
-```python showLineNumbers
-def foo(x):
-    print(x)  # I am decorating function 45206384
-```
-
-```python showLineNumbers
-foo = dec(foo)
-```
-
-可以替换为：
-
-```python showLineNumbers
-@dec
-def foo(x):
-    print(x)
-```
-
-那么他有什么实际作用？故事的开始是这样的，你写好了 2 个函数：
-
-```python showLineNumbers
-def test1():
-  print('test1 ..')
-
-def test2():
-  print('test2 ..')
-
-test1()
-test2()
-```
-
-当你准备把它放到服务器上，这个时候领导提醒你要输出日志，不然查错跑断腿。
-输出要求是：在每次函数调用的前后加上时间。
-于是你写成了下面这个样子
-
-```python showLineNumbers
-import time
-def test1():
-    print('测试开始：现在时间是',time.time())
-    print('test1 ..')
-    print('测试结束：现在时间是',time.time())
-
-def test2():
-    print('测试开始：现在时间是',time.time())
-    print('test2 ..')
-    print('测试结束：现在时间是',time.time())
-
-test1()
-test2()
-```
-
-领导说，他有 3 个问题：
-
-- 首先代码 1 和代码 2 是一样的，也就是说把同样的代码写了 2 遍，这一点也不程序员！
-- 而且，你修改了你的核心代码，使得它变得很长。后面要再删也很麻烦，万一手抖删错了就完了。
-- 最后，在大项目合作中，可能 test 代码是 A 同事写的，输出日志代码是 B 同事写的，代码保密，每个程序员只能拿到部分片段，所以你根本不知道对方的代码，要提供一个通用的打印日志的方式。
-
-思考下，可以怎么修改能既不修改源代码，又对代码结构影响最小呢？
-
-我说，这样子，那我可以写成这样？
-
-```python showLineNumbers
-import time
-
-def a_decorator(func):
-    print('测试开始：现在时间是',time.time())
-    func()
-    print('测试结束：现在时间是',time.time())
-
-def test1():
-    print('test1 ..')
-
-def test2():
-    print('test2 ..')
-
-a_decorator(test1)
-a_decorator(test2)
-```
-
-领导说：有进步，但是原本调用 test1()的语法被你改成了 a_decorator(test1)，这要是再多几个功能不得把我绕晕了啊。
-
-看来函数嵌套掌握的不熟啊，给你点提示，我带你透过现象看本质
-
-- 变量的本质：就是变量指向的内存地址
-- 函数名的本质：就是函数的内存地址
-- 变量可以作为函数的参数，因此函数名可以用做函数的参数
-- 变量可以作为函数的返回值，同理，函数名也可以作为函数的返回值
-
-我说，那就写成这样？
-
-```python showLineNumbers
-import time
-
-def a_decorator(func):
-    def wrap_the_func():
-        print('测试开始：现在时间是',time.time())
-        func()
-        print('测试结束：现在时间是',time.time())
-    return wrap_the_func
-
-def test1():
-    print('test1 ..')
-
-def test2():
-    print('test2 ..')
-
-test1 = a_decorator(test1) #这里a_decorator(test1) 代指wrap_the_func()，把这个wrap_the_func()函数的地址赋值给test1，由于代码从上而下执行，从而替换掉原本test1的指向。
-test2 = a_decorator(test2)
-
-test1()
-test1()
-```
-
-领导说：这倒数 3、4 行看着很碍眼，且会占据命名空间，你不会修饰符吗？我教你啊。
-
-- 我们先定义一个函数（名字随便起，这里只是用 a_decorator 做示例）
-- 然后简单的设置下这个函数运行逻辑，
-- 最后在原有的函数的头上加@函数名就行啦
-
-直接使用@函数修饰符是很方便的，你也看出来所谓【@函数修饰符】其实就是【函数】嵌入。
-
-这里我再假设你的函数是带参数的。我也用修饰符写一下吧。好好看，好好学。
-
-核心代码（下方的 test 函数）无需知道我（下方的 log 函数）是怎么写的，我也无需知道核心代码是怎么写的，我们就能快速完成协作。
-
-```python showLineNumbers
-import time
-
-#args 是 arguments 的缩写，表示位置参数；
-#kwargs 是 keyword arguments 的缩写，表示关键字参数。
-#这其实就是 Python 中可变参数的两种形式，
-#并且 *args 必须放在 **kwargs 的前面，因为位置参数在关键字参数的前面。
-
-def log(func):
-  def wrapper(*args,**kwargs):
-    print('测试开始：现在时间是',time.time())
-    ret = func(*args,**kwargs)
-    print('测试结束：现在时间是',time.time())
-    return ret
-  return wrapper
-
-@log
-def test1(s):
-  print('test1 ..', s)
-  return s
-@log
-def test2(s1, s2):
-  print('test2 ..', s1, s2)
-  return s1 + s2
-
-test1(1)
-test2(1,2)
-```
-
-于是你回想起之前 Python 也提供了一些自带函数，例如：print()、input()
-
-那会不会也有一些自带的【@函数修饰符】呢？还真有，常见的包括：@property、@classmethod、@staticmethod 还有 typing 里面各种用于测试的函数。
-
-默认的self结构，可以通过self访问类的属性、方法。但是需要先实例化。
-
-@staticmethod (静态方法)不需要 self 参数，也不需要 cls 参数。它们与类或实例没有任何绑定，只是类中的一个普通函数。静态方法通常用于与类相关，但不依赖于实例或类属性的操作。调用时不需要实例化类。
-
-@classmethod (类方法)使用 cls 作为第一个参数，表示调用该方法的类本身，而不是实例。它可以访问类级别的属性和方法。调用时可以实例化类，也可以不实例化类。
-
-不过这些结构相对复杂，当你理解普通的@修饰符之后，这些自带的你只需要记得用法即可，原理都是一样的。
-
-#### 例子
-
-定义两个装饰器函数，一个将原来的函数值加一，另一个乘二：
-
-```python showLineNumbers
-def plus_one(f):
-    def new_func(x):
-        return f(x) + 1
-
-    return new_func
-```
-
-```python showLineNumbers
-def times_two(f):
-    def new_func(x):
-        return f(x) * 2
-
-    return new_func
-```
-
-定义函数，先乘二再加一：
-
-```python showLineNumbers
-@plus_one
-@times_two
-def foo(x):
-    return int(x)
-```
-
-```python showLineNumbers
-b = foo(2)
-b  # 5
-```
-
-#### 修饰器工厂
-
-decorators factories 是返回修饰器的函数
-
-它的作用在于产生一个可以接受参数的修饰器，
-
-例如我们想将 函数 输出的内容写入一个文件去，可以这样做：
-
-```python showLineNumbers
-def super_loud(filename):
-    fp = open(filename, 'w')
-
-    def loud(f):
-        def new_func(*args, **kw):
-            fp.write(str(args))
-            fp.writelines('\n')
-            fp.write('calling with' + str(args) + str(kw))
-            # 确保内容被写入
-            fp.flush()
-            fp.close()
-            rtn = f(*args, **kw)
-            return rtn
-
-        return new_func
-
-    return loud
-```
-
-```python showLineNumbers
-@super_loud('test.txt')
-def foo(x):
-    print(x)
-
-
-# 调用 foo 就会在文件中写入内容：
-foo(100)
-```
-
-```python showLineNumbers
-import os
-os.remove('test.txt')
-```
-
-#### @classmethod 装饰器
-
-在 Python 标准库中，有很多自带的装饰器，
-
-例如 classmethod 将一个对象方法转换了类方法：
-
-```python showLineNumbers
-class Foo(object):
-    @classmethod
-    def bar(cls, x):
-        print('the input is', x)
-
-    def __init__(self):
-        pass
-```
-
-类方法可以通过 类名.方法 来调用：
-
-```python showLineNumbers
-Foo.bar(10)
-```
-
-#### @property 装饰器
-
-有时候，我们希望像 Java 一样支持 getters 和 setters 的方法，
-
-这时候就可以使用 property 装饰器：
-
-```python showLineNumbers
-class Foo(object):
-    def __init__(self, data):
-        self.data = data
-
-    @property
-    def x(self):
-        return self.data
-
-```
-
-此时可以使用 .x 这个属性查看数据（不需要加上括号）：
-
-```python showLineNumbers
-foo = Foo(22)
-print(foo.x)
-```
-
-这样做的好处在于，这个属性是只读的：
-
-foo.x = 1 会报错
-
-如果想让它变成可读写，可以加上一个装饰符 @x.setter：
-
-```python showLineNumbers
-class Foo(object):
-    def __init__(self, data):
-        self.data = data
-
-    @property
-    def x(self):
-        return self.data
-
-    @x.setter
-    def x(self, value):
-        self.data = value
-```
-
-```python showLineNumbers
-foo = Foo(1000)
-foo.x
-```
-
-```python showLineNumbers
-foo.x = 2222
-foo.x
-```
-
-#### 应用：定时器
-
-要求：写一个定时器功能，要求监控一个执行程序，超时则报警。
-
-如何完成？
-
-下方代码在 mac 下可用
-
-```python showLineNumbers
-
-import signal
-import time
-
-
-def set_timeout(num, callback):
-    def wrap(func):
-        def handle(signum, frame):  # 收到信号 SIGALRM 后的回调函数，参数1是信号的数字，参数2是the interrupted stack frame.
-            raise RuntimeError
-
-        def to_do(*args, **kwargs):
-            try:
-                signal.signal(signal.SIGALRM, handle)  # 设置信号和回调函数
-                signal.alarm(num)  # 设置 num 秒的闹钟
-                print('start alarm signal.')
-                r = func(*args, **kwargs)
-                print('close alarm signal.')
-                signal.alarm(0)  # 关闭闹钟
-                return r
-            except RuntimeError as e:
-                callback()
-
-        return to_do
-
-    return wrap
-
-
-def after_timeout():  # 超时后的处理函数
-    print("do something after timeout.")
-    raise RuntimeError
-
-
-@set_timeout(2, after_timeout)  # 限时 2 秒超时
-def connect():  # 要执行的函数
-    time.sleep(2.4)  # 函数执行时间，写大于2的值，可测试超时
-    return "完成"
-
-class Demo:
-    @set_timeout(2, after_timeout)
-    def conn(self):
-        time.sleep(3)
-        return "ok"
-```
-
-试一下：
-
-```python showLineNumbers
-try:
-    a = connect()
-    print(a)
-except Exception as e:
-    a = 'err'
-    print(a)
-
-```
-
-如果不超时：
-
-```python showLineNumbers
-b = Demo()
-try:
-    c = b.conn()
-    print(c)
-except RuntimeError as e:
-    print('run time err.')
-
-class Demo:
-    @set_timeout(2, after_timeout)
-    def conn(self):
-        time.sleep(1)
-        return "ok"
-
-b = Demo()
-try:
-    c = b.conn()
-    print(c)
-except RuntimeError as e:
-    print('run time err.')
-```
-
-### 迭代器
-
-迭代是 Python 最强大的功能之一，是访问集合元素的一种方式。
-
-迭代器是一个可以记住遍历的位置的对象。
-
-迭代器对象从集合的第一个元素开始访问，直到所有的元素被访问完结束。迭代器只能往前不会后退。
-
-迭代器有两个基本的方法：iter() 和 next()。
-
-字符串，列表或元组对象都可用于创建迭代器：
-
-```python showLineNumbers
-list=[1,2,3,4]
-it = iter(list)    # 创建迭代器对象
-```
-
-```python showLineNumbers
-next(it) # 输出迭代器的下一个元素
-```
-
-```python showLineNumbers
-next(it) # 再输出下一个元素
-```
-
-#### enumerate
-
-列表好处是不需要对下标进行迭代，直接输出列表的值：
-
-```python showLineNumbers
-x = [2, 4, 6]
-
-for i in x:
-    print(i)
-```
-
-但是有些情况下，我们既希望获得下标，
-也希望获得对应的值，那么：
-
-可以将迭代器传给 enumerate 函数，
-这样每次迭代都会返回一组 (index, value) 组成的元组：
-
-```python showLineNumbers
-x = [2, 4, 6]
-for i, n in enumerate(x):
-    print(i, 'is', n)
-```
-
-#### 自定义迭代器
-
-一个迭代器都有 `__iter__()` 与 `__next__()`
-
-`__iter__()` 方法返回一个特殊的迭代器对象， 这个迭代器对象实现了 `__next__()` 方法并通过 StopIteration 异常标识迭代的完成。
-
-`__next__()` 方法（Python 2 里是 next()）会返回下一个迭代器对象。
-
-自定义一个 list 的取反迭代器：
-
-```python showLineNumbers
-class ReverseListIterator(object):
-    def __init__(self, lst):
-        self.list = lst
-        self.index = len(lst)
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        self.index -= 1
-        if self.index >= 0:
-            return self.list[self.index]
-        else:
-            raise StopIteration
-```
-
-```python showLineNumbers
-x = range(10)
-for i in ReverseListIterator(x):
-    print(i)
-```
-
-只要我们定义了这三个方法(`__init__, __iter__, __next__`)，我们可以返回任意迭代值：
-
-#### 实现 Collatz 猜想
-
-这里我们实现 Collatz 猜想：
-
-- 奇数 n：返回 3n + 1
-- 偶数 n：返回 n / 2
-- 直到 n 为 1 为止：
-
-```python showLineNumbers
-class Collatz(object):
-    def __init__(self, start):
-        self.value = start
-
-    def __iter__(self):
-        return self
-
-    def __next__(self):
-        if self.value == 1:
-            raise StopIteration
-        elif self.value % 2 == 0:
-            self.value = self.value / 2
-        else:
-            self.value = 3 * self.value + 1
-        return self.value
-
-
-for x in Collatz(5):
-    print(x)
-
-```
-
-不过迭代器对象存在状态，**有问题**：
-
-```python showLineNumbers
-i = Collatz(5)
-# zip() 函数用于将可迭代的对象作为参数，将对象中对应的元素打包成一个个元组，然后返回由这些元组组成的迭代器。
-for x, y in zip(i, i):
-    print(x, y)
-
-# 下方代码等价于上方代码
-i = Collatz(5)
-# *zipped 可理解为解压，返回二维矩阵式
-zipped = zip(i, i)
-#<zip object at 0x00000200CFC1F400> #返回的是一个对象
-x, y = zip(*zipped)
-print(x, y)
-```
-
-解决方法是将迭代器和可迭代对象分开处理。
-
-#### 迭代器和可迭代对象分开处理
-
-这里提供了一个二分树的中序遍历实现：
-
-```python showLineNumbers
-class BinaryTree(object):
-    def __init__(self, value, left=None, right=None):
-        self.value = value
-        self.left = left
-        self.right = right
-
-    def __iter__(self):
-        return InorderIterator(self)
-
-class InorderIterator(object):
-    def __init__(self, node):
-        self.node = node
-        self.stack = []
-
-    def __next__(self):
-        if len(self.stack) > 0 or self.node is not None:
-            while self.node is not None:
-                self.stack.append(self.node)
-                self.node = self.node.left
-            node = self.stack.pop()
-            self.node = node.right
-            return node.value
-        else:
-            raise StopIteration()
-```
-
-测试：
-
-```python showLineNumbers
-tree = BinaryTree(
-    left=BinaryTree(
-        left=BinaryTree(1),
-        value=2,
-        right=BinaryTree(
-            left=BinaryTree(3),
-            value=4,
-            right=BinaryTree(5)
-        ),
-    ),
-    value=6,
-    right=BinaryTree(
-        value=7,
-        right=BinaryTree(8)
-    )
-)
-```
-
-```python showLineNumbers
-for value in tree:
-    print(value)
-```
-
-不会出现之前的问题：
-
-```python showLineNumbers
-
-for x, y in zip(tree, tree):
-    print(x, y)
-
-```
-
-### 生成器
-
-在 Python 中，使用了 yield 的函数被称为生成器（generator）。
-
-跟普通函数不同的是，生成器是一个返回迭代器的函数，只能用于迭代操作，更简单点理解生成器就是一个迭代器。
-
-1. 迭代器则通过 next 的 return 将值返回；
-2. 与迭代器不同的是，生成器会自动记录当前的状态，
-   而迭代器则需要进行额外的操作来记录当前的状态。
-
-之前的 collatz 猜想，简单循环的实现如下：
-
-collatz:
-
-- 奇数 n：返回 3n + 1
-- 偶数 n：返回 n / 2
-- 直到 n 为 1 为止：
-
-```python showLineNumbers
-def collatz(n):
-    sequence = []
-    while n != 1:
-        if n % 2 == 0:
-            n /= 2
-        else:
-            n = 3 * n + 1
-        sequence.append(n)
-    return sequence
-
-
-for x in collatz(5):
-    print(x)
-```
-
-生成器的版本如下：
-
-```python showLineNumbers
-def collatz(n):
-    while n != 1:
-        if n % 2 == 0:
-            n /= 2
-        else:
-            n = 3 * n + 1
-        yield n
-
-
-for x in collatz(5):
-    print(x)
-```
-
-迭代器的版本如下：
-
-```python showLineNumbers
-class Collatz(object):
-    def __init__(self, start):
-        self.value = start
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        if self.value == 1:
-            raise StopIteration
-        elif self.value % 2 == 0:
-            self.value = self.value / 2
-        else:
-            self.value = 3 * self.value + 1
-        return self.value
-
-for x in collatz(5):
-    print(x)
-```
-
-事实上，生成器也是一种迭代器：
-
-```python showLineNumbers
-x = collatz(5)
-x
-```
-
-它支持 next 方法，返回下一个 yield 的值：
-
-```python showLineNumbers
-next(x)
-```
-
-```python showLineNumbers
-next(x)
-```
-
-`__iter__` 方法返回的是它本身：
-
-```python showLineNumbers
-x.__iter__()
-```
-
-#### return 和 yield 有什么区别？
-
-yield 是暂停的意思(它有程序中起着类似红绿灯中等红灯的作用)；yield 是创建迭代器，可以用 for 来遍历，有点事件触发的意思
-
-return 在方法中直接返回值；是函数返回值，当执行到 return，后续的逻辑代码不在执行
-
-相同点： 都是定义函数过程中返回值
-
-不同点：yield 是暂停函数，return 是结束函数； 即 yield 返回值后继续执行函数体内代码，return 返回值后不再执行函数体内代码。
-
-yield 返回的是一个迭代器（yield 本身是生成器-生成器是用来生成迭代器的）；return 返回的是正常可迭代对象（list,set,dict 等具有实际内存地址的存储对象）
-
-如果要返回的数据是通过 for 等循环生成的迭代器类型数据（如列表、元组），return 只能在循环外部一次性地返回，yeild 则可以在循环内部逐个元素返回。
-
-yiled from 还可以使一个生成器可以委派子生成器，建立双向通道
-
-```python showLineNumbers
-
-def g1(x):
-   yield range(x, 0, -1)
-   yield range(x)
-print(list(g1(5)))
-#[range(5, 0, -1), range(0, 5)]
-
-def g2(x):
-   yield from range(x, 0, -1)
-   yield from range(x)
-print(list(g2(5)))
-#[5, 4, 3, 2, 1, 0, 1, 2, 3, 4]
-```
-
-##### 迭代器和生成器有什么区别？
-
-在 Python 中，使用了 yield 的函数被称为生成器（generator）。跟普通函数不同的是，生成器是一个返回迭代器的函数，只能用于迭代操作，更简单点理解生成器就是一个迭代器。在调用生成器运行的过程中，每次遇到 yield 时函数会暂停并保存当前所有的运行信息，返回 yield 的值, 并在下一次执行 next() 方法时从当前位置继续运行。
-
-调用一个生成器函数，返回的是一个迭代器对象：迭代是 Python 最强大的功能之一，是访问集合元素的一种方式。迭代器是一个可以记住遍历的位置的对象。迭代器对象从集合的第一个元素开始访问，直到所有的元素被访问完结束。迭代器只能往前不会后退。迭代器有两个基本的方法：iter() 和 next()
-
-##### **new**和 **init**的区别？
-
-执行顺序的不同：只有在**new**返回一个 cls 的实例时后面的**init**才能被调用
-
-功能上的不同：当创建一个新实例时调用**new**,初始化一个实例时用**init**
-
-返回值的不同：**new**方法会返回一个创建的实例,而**init**什么都不返回
-
-#### 闭包
-
-闭包可以用在许多地方。它的最大用处有两个：
-
-1.可以读取函数内部的变量 2.让这些变量的值始终保存在内存中 3.单向访问，函数内可以访问，但是全局不能访问
-
-#### 闭包原理（命名空间与作用域）
-
-##### 命名空间
-
-- 全局命名空间：创建的存储“变量名与值的关系”的空间叫做全局命名空间
-- 局部命名空间：在函数的运行中开辟的临时的空间叫做局部命名空间
-- 内置命名空间：内置命名空间中存放了 python 解释器为我们提供的名字：input,print,str,list,tuple...它们都是我们熟悉的，拿过来就可以用的方法。
-
-三种命名空间之间的加载顺序和取值顺序：
-
-- 加载顺序：内置（程序运行前加载）-->全局（从上到下顺序加载进来的）-->局部（调用的时候加载）--->内置
-- 取值：在局部调用：局部命名空间--->全局命名空间--->内置命名空间
-- 在全局范围找：全局----内置----局部
-  使用：
-  全局不能使用局部的，局部的可以使用全局的
-
-##### 作用域
-
-作用域：就是作用范围，为了函数内的变量不会影响到全局。作用域分为两种：
-
-- 全局作用域：全局命名空间与内置命名空间的名字都属于全局范围在整个文件的任意位置都能被引用，全局有效
-- 局部作用域：局部命名空间，只能在局部范围内生效
-  站在全局看：使用名字的时候：如果全局有，用全局的。如果全局没有，用内置的。
-- globals 方法：查看全局作用域的名字【print(globals())】
-- locals 方法：查看局部作用域的名字【print(locals())】
-  `<br>`下面看 2 个示例
-
-##### 闭包失败示例
-
-```python showLineNumbers
-name = 1 #变量在函数外部,inner可以访问，但是全局也能访问。直接闭包失败
-def func():
-    def inner():
-        print(name)
-        print(inner.__closure__)
-        return name
-    return inner
-
-p = func()
-print(p())#输出的__closure__为None ：不是闭包函数
-print(name)
-```
-
-##### 闭包成功示例
-
-```python showLineNumbers
-def func():
-    name = 1 #变量在函数内部,inner可以访问,但是全局不能访问。闭包成功！此时加上nonlocal
-    def inner():
-        nonlocal name
-        # nonlocal非局部声明变量 是python3.2的语法,简单说就是让内部函数中的变量在上一层函数中生效
-        # 非局部声明变量指代的已有标识符是最近外面函数的已声明变量，但是不包括全局变量。这个是很重要的，因为绑定的默认行为是首先搜索本地命名空间。nonlocal声明的变量只对局部起作用，离开封装函数，那么该变量就无效。
-        name += 1
-        print(inner.__closure__)
-        return name
-    return inner
-
-p = func()
-print(p())
-print(p())
-print(p())
-
-print(name)
-```
-
-#### 单例模式
-
-单例模式就是确保一个类只有一个实例.当你希望整个系统中,某个类只有一个实例时,单例模式就派上了用场.
-
-比如,某个服务器的配置信息存在在一个文件中,客户端通过 AppConfig 类来读取配置文件的信息.如果程序的运行的过程中,很多地方都会用到配置文件信息,则就需要创建很多的 AppConfig 实例,这样就导致内存中有很多 AppConfig 对象的实例,造成资源的浪费.其实这个时候 AppConfig 我们希望它只有一份,就可以使用单例模式.
-
-#### 使用闭包函数实现单例模式
-
-```python showLineNumbers
-def single(cls, *args, **kwargs):
-    instance = {}
-
-    def get_instance():
-        if cls not in instance:
-            instance[cls] = cls(*args, **kwargs)
-        return instance[cls]
-    return get_instance
-
-
-@single
-class Apple:
-    pass
-
-# 测试新建2个不同实例，id是否一致
-a = Apple()
-print(id(a))
-b = Apple()
-print(id(b))
-```
-
-#### 也可以直接使用**new**方法实现的单例模式
-
-```python showLineNumbers
-class Single:
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, '_instance'):
-            cls._instance = super(Single, cls).__new__(cls)
-        return cls._instance
-
-
-s1 = Single()
-s2 = Single()
-print(id(s1))
-print(id(s2))
-```
-
-### 进程
-
-进程是系统独立安排和分配系统资源（CPU、内存）的基本单位，操作系统以进程为单位分配存储空间，操作系统管理所有进程的执行，为它们合理的分配资源。
-
-一个进程就是 macOS 中的“活动监视器”、Windows 中的“任务管理器”的一个执行程序。
-
-Python 既支持多进程又支持多线程。
-
-#### 多进程
-
-进程之间是相互独立的，Python 中的进程通信一般由进程对 Queue 完成。
-
-进程绕过了全局解释器锁。因此，多进程模块允许程序员充分利用特定机器上的多个处理器。它在 Unix 和 Windows 上都能运行。
-
-进程的数量等于 CPU 核心的数量，这是最有效的。如果核数太多，就不能充分利用核数。如果太少，会造成进程切换，增加程序的运行时间。
-
-[multiprocessing](https://docs.python.org/zh-cn/3.10/library/multiprocessing.html?highlight=multiprocessing#module-multiprocessing):Multiprocessing Module Code Documentation
-
-```python showLineNumbers
-from multiprocessing import Pool
-
-def f(vaule):
-    x = vaule[0]
-    y = vaule[1]
-    return x*y
-
-if __name__ == '__main__':
-    p = Pool(16) # new 16 process pools ， because i have 16 cpu
-    print(p.map(f, [(1,1), (2,2), (3,3)])) # take in data
-    p.close() # close pool
-
-# [1, 4, 9]
-```
-
-我们来完成 1~100000000 求和的计算密集型任务，循环解决，暂时也不考虑列表切片操作花费的时间，只是把做运算和合并运算结果的时间统计出来。
-
-```python showLineNumbers
-from time import time
-
-
-def main():
-    total = 0
-    number_list = [x for x in range(1, 100000001)]
-    start = time()
-    for number in number_list:
-        total += number
-    print(total)
-    end = time()
-    print('Execution time: %.3fs' % (end - start))
-
-```
-
-```python showLineNumbers
-main()
-# 5000000050000000
-# Execution time: 6.798s
-```
-
-利用多进程“分而治之”，
-
-当我们将这个任务分解到 8 个进程中去执行：
-
-```python showLineNumbers
-from multiprocessing import Process, Queue
-from time import time
-
-core_num = 8
-
-
-def task_handler(curr_list, result_queue):
-    total = 0
-    for number in curr_list:
-        total += number
-    result_queue.put(total)
-
-
-def main():
-    processes = []
-    number_list = [x for x in range(1, 100000001)]
-    result_queue = Queue()
-    index = 0
-    # 启动core_num(8)个进程将数据切片后进行运算
-    index_batch = int(100000000 / core_num)
-    for _ in range(core_num):
-        p = Process(target=task_handler,
-                    args=(number_list[index:index + index_batch], result_queue))
-        index += index_batch
-        processes.append(p)
-        p.start()
-    # 开始记录所有进程执行完成花费的时间
-    start = time()
-    for p in processes:
-        p.join()
-    # 合并执行结果
-    total = 0
-    while not result_queue.empty():
-        total += result_queue.get()
-    print(total)
-    end = time()
-    print('Execution time: ', (end - start), 's', sep='')
-
-
-if __name__ == '__main__':
-    main()
-
-```
-
-以上代码保存为 multi_process.py
-
-```python showLineNumbers
-!python multi_process.py
-```
-
-```python showLineNumbers
-# 5000000050000000
-# Execution time: 0.7936668395996094s
-```
-
-明显，多进程更快。
-
-使用多进程后由于获得了更多的 CPU 执行时间以及更好的利用了 CPU 的多核特性，明显的减少了程序的执行时间，而且计算量越大效果越明显。
-
-### 线程
-
-线程是系统调度资源的最小单位（CPU 通过计时器来切换线程）
-
-在 Python 中，同个时间只有一个线程在运行
-
-当然，如果你运行大量的 I/O 任务，多进程依然是最好的选择
-
-线程数等于 CPU 内核数的两倍是最高效的。
-
-GIL 是一个防止多个线程同时执行 Python 字节码的互斥锁。之所以需要这种锁，主要是因为 CPython 的内存管理不是线程安全的
-
-在这种环境下，GIL 限制解释器本身只能有一个线程运行，而且任何 Python 解释器级别的操作都是序列化的，因此任何时候都只能有一条语句抛出异常。与异常相关的共享变量也因此受到保护。
-
-线程间通信的目的主要是为了线程同步，因此线程没有像进程通信那样用于数据交换的通信机制。
-
-Python 的标准库提供了两个模块：\_thread 和 threading，\_thread 是低级模块，threading 是高级模块，对\_thread 进行了封装。绝大多数情况下，我们只需要使用 threading 这个高级模块。
-
-[threading](https://docs.python.org/zh-cn/3.10/library/threading.html?highlight=threading#module-threading):Threading Multiprocessing Module Code Documentation
-
-#### 多线程
-
-```python showLineNumbers
-
-import time
-import threading
-
-
-def test_thread(para='hi', sleep=3):
-    time.sleep(sleep)
-    print(para)
-
-
-def main():
-    # create thread
-    thread_hi = threading.Thread(target=test_thread)
-    thread_hello = threading.Thread(target=test_thread, args=('hello', 1))
-    # run thread
-    thread_hi.start()
-    thread_hello.start()
-    print('Main thread has ended!')
-
-
-if __name__ == '__main__':
-    main()
-
-```
-
-如下所示的界面中，有“下载”和“关于”两个按钮，用休眠的方式模拟点击“下载”按钮会联网下载文件需要耗费 10 秒的时间，当点击“下载”按钮后，整个任务阻塞：
-
-```python showLineNumbers
-import time
-import tkinter
-import tkinter.messagebox
-
-
-def download():
-    # 模拟下载任务需要花费5秒钟时间
-    time.sleep(5)
-    tkinter.messagebox.showinfo('提示', '下载完成!')
-
-
-def show_about():
-    tkinter.messagebox.showinfo('关于', '作者: 123(v1.0)')
-
-
-def main():
-    top = tkinter.Tk()
-    top.title('单线程')
-    top.geometry('400x400')
-    top.wm_attributes('-topmost', True)
-
-    panel = tkinter.Frame(top)
-    button1 = tkinter.Button(panel, text='下载', command=download)
-    button1.pack(side='left')
-    button2 = tkinter.Button(panel, text='关于', command=show_about)
-    button2.pack(side='right')
-    panel.pack(side='bottom')
-
-    tkinter.mainloop()
-
-
-if __name__ == '__main__':
-    main()
-```
-
-使用多线程后，不会阻塞了主线程：
-
-```python showLineNumbers
-import time
-import tkinter
-import tkinter.messagebox
-from threading import Thread
-
-
-def main():
-
-    class DownloadTaskHandler(Thread):
-
-        def run(self):
-            time.sleep(5)
-            tkinter.messagebox.showinfo('提示', '下载完成!')
-            # 启用下载按钮
-            button1.config(state=tkinter.NORMAL)
-
-    def download():
-        # 禁用下载按钮
-        button1.config(state=tkinter.DISABLED)
-        # 通过daemon参数将线程设置为守护线程(主程序退出就不再保留执行)
-        # 在线程中处理耗时间的下载任务
-        DownloadTaskHandler(daemon=True).start()
-
-    def show_about():
-        tkinter.messagebox.showinfo('关于', '作者: 123(v1.0)')
-
-    top = tkinter.Tk()
-    top.title('多线程')
-    top.geometry('400x400')
-    top.wm_attributes('-topmost', 1)
-
-    panel = tkinter.Frame(top)
-    button1 = tkinter.Button(panel, text='下载', command=download)
-    button1.pack(side='left')
-    button2 = tkinter.Button(panel, text='关于', command=show_about)
-    button2.pack(side='right')
-    panel.pack(side='bottom')
-
-    tkinter.mainloop()
-
-
-if __name__ == '__main__':
-    main()
-```
-
-会看到弹出的窗口是多模态的，点击下载按钮不影响其他按钮操作。
-
-**Python 的多线程并不能发挥 CPU 的多核特性**，这一点只要启动几个执行死循环的线程就可以得到证实了。之所以如此，是因为 Python 的解释器有一个“全局解释器锁”（GIL）的东西，任何线程执行前必须先获得 GIL 锁，然后每执行 100 条字节码，解释器就自动释放 GIL 锁，让别的线程有机会执行，这是一个历史遗留问题。
-
-Python 解释器由于设计时有 GIL 全局锁，导致了多线程无法利用多核。多线程的并发在 Python 中就是一个美丽的梦。
-
-多进程是有效的。
-
-### 协程
-
-协程是编写并发代码的库，是构建 IO 密集型和高级结构化网络代码的最佳选择。
-
-例程的运行方式是通过代码主动切换状态并等待处理，因此效率更高，语法也更详细。循环对象需要处于活动状态：创建、设置、提交、等待运行和停止。
-
-例行程序的最佳数量取决于内存使用情况。
-
-asyncio 模块包含了一些工具，用于编写异步代码。
-
-协程的工作原理是事件循环，事件循环是一个无限循环，它等待事件并执行它们。
-
-每次任务会被挂起至事件循环队列中，然后按顺序执行。
-
-await 关键字用于挂起协程，直到它被调用。
-
-async 关键字用于定义协程。
-
-asyncio 模块用于实现异步编程。
-
-[asyncio](https://docs.python.org/zh-cn/3.10/library/asyncio.html?highlight=asyncio#module-asyncio):asyncio Multiprocessing Module Code Documentation
-
-```python showLineNumbers
-import asyncio
-
-class TestA:
-    def __init__(self,loop) -> None:
-        self.loop = loop
-        asyncio.set_event_loop(loop=self.loop) # step 3.1
-
-    async def run_page(self,tid): # step 7
-        print(tid)
-        # 此处编写爬虫代码
-        return tid
-
-    async def close(self,):
-        for i in asyncio.all_tasks(): # step 9.1
-            i.cancel()
-        self.loop.stop() # step  9.2
-
-
-def test():
-    get_async_loop = asyncio.new_event_loop() # step 1
-    asyncio.set_event_loop(get_async_loop) # step 2
-
-    async def spider(task_obj):
-        async_task =  [asyncio.ensure_future(task_obj.run_page(1)),
-                    asyncio.ensure_future(task_obj.run_page(2)),] # step  6
-        await asyncio.wait(async_task) # step  8
-
-        await task_obj.close() # step 9
-
-    task_obj = TestA(get_async_loop) #step 3
-    asyncio.run_coroutine_threadsafe(spider(task_obj), loop=get_async_loop) #step  4
-    get_async_loop.run_forever() # step 5
-
-test()
-```
-
-生成器函数与协程（注：函数）非常相似，它们 yield 多次，它们具有多个入口点，并且它们的执行可以被挂起。唯一的区别是生成器函数不能控制在它在 yield 后交给哪里继续执行，控制权总是转移到生成器的调用者
-
-在 Python 创建协程时，task 是 future 的子类，所以 task 继承了 future 的属性和方法。几乎没有不同。
-
-### Python 内置库的使用
+本部分侧重于介绍常用的，与开发息息相关的[Python标准库](https://docs.python.org/zh-cn/3.13/library/index.html)。
+
+Python 标准库非常庞大，所提供的组件涉及范围十分广泛，正如以下内容目录所显示的。这个库包含了多个内置模块 (以 C 编写)，Python 程序员必须依靠它们来实现系统级功能，例如文件 I/O，此外还有大量以 Python 编写的模块，提供了日常编程中许多问题的标准解决方案。其中有些模块经过专门设计，通过将特定平台功能抽象化为平台中立的 API 来鼓励和加强 Python 程序的可移植性。
+
+Windows 版本的 Python 安装程序通常包含整个标准库，往往还包含许多额外组件。对于类 Unix 操作系统，Python 通常会分成一系列的软件包，因此可能需要使用操作系统所提供的包管理工具来获取部分或全部可选组件。
+
+
+## 数据类型
+
+### 👍enum 模块
+
+基本示例
+
+```python showLineNumbers
+from enum import Enum
+
+class TrafficLight(Enum):
+    RED = 1
+    YELLOW = 2
+    GREEN = 3
+    # YELLOW = 1  #常见错误：将枚举成员的值设置为相同类型
+    # RED = [255, 0, 0] # 常见错误：错误地将枚举成员的值设置为可变类型
+    # YELLOW = None # 常见错误：错误地将枚举成员的值设置为None、False、True等
+# 使用枚举
+light = TrafficLight.RED
+
+# if light == 1   常见错误：错误地使用Enum成员进行比较
+if light == TrafficLight.RED:
+    print("红灯，停车")
+elif light == TrafficLight.YELLOW:
+    print("黄灯，准备")
+else:
+    print("绿灯，通行")
+```
+
+是否使用`Enum`取决于你项目的需求和代码的复杂度。你可能觉得不需要它，尤其是在简单的场景下，直接使用字符串或整数常量看似足够。但是，`Enum`有以下几个优势：
+
+#### 1. **增加可读性**
+   当你看到`Color.RED`时，比直接看到一个`1`或`'red'`更容易理解。`Enum`能让你的代码更具语义化，避免硬编码的常量值。
+   
+   例如：
+   ```python
+   status = Status.SUCCESS  # 一目了然：状态是成功
+   ```
+   相比：
+   ```python
+   status = 1  # 需要额外判断 1 是什么意义
+   ```
+
+#### 2. **减少错误**
+   使用`Enum`可以避免常见的错误，比如不小心使用了错误的值或者字符串拼写错误。`Enum`成员是唯一的，且不可变的，能够防止无意间改变它们的值。
+   
+   比如，如果你用了`Status.SUCCESS = 1`，然后在后续代码中某处错误地设置了`Status.SUCCESS = 2`，你会收到警告或报错，而不是默默覆盖，产生潜在的 bug。
+
+#### 3. **类型安全**
+   使用`Enum`可以确保变量的值只来自于枚举成员，而不会误用其他类型的值（如普通的数字、字符串等）。这对于大型项目来说尤其重要，因为它能有效地避免一些奇怪的 bug。
+   
+   比如：
+   ```python
+   def set_color(color: Color):
+       if not isinstance(color, Color):
+           raise ValueError("Invalid color")
+   ```
+
+#### 4. **易于扩展和维护**
+   随着项目的扩展，你可能会有更多的常量值需要添加，`Enum`让这种扩展变得更清晰、更系统化。你不再需要在多个地方定义相同的常量，所有的常量都集中在一个地方。
+   
+   比如，随着系统需求变化，你可能需要扩展交通灯的状态：
+   ```python
+   class TrafficLight(Enum):
+       RED = 1
+       YELLOW = 2
+       GREEN = 3
+       FLASHING = 4  # 新增状态
+   ```
+
+#### 5. **集成与协作的优势**
+   在多人开发的团队中，使用`Enum`可以提高协作性。它使得每个成员的代码中常量的含义更加清晰，减少误解或重复定义的问题。
+
+#### 6. **可迭代、可比较**
+   `Enum`支持迭代、比较等操作，允许你灵活处理。例如，你可以遍历所有的`Enum`成员，或者比较它们的顺序。
+   
+   ```python
+   for state in TrafficLight:
+       print(state)
+   ```
+
+## 文件
+
+### os 模块
 
 库、包、模块的包含关系为：多个模块组成为包、多个包组成为库。
 
@@ -2125,6 +301,963 @@ print(d)
 b = ast.literal_eval('[10.0, 2, True, "foo"]')
 print(b)
 ```
+
+### open
+
+#### 写文件
+
+我们使用 open 函数的写入模式来写文件：
+
+```python showLineNumbers
+f = open('test.txt', 'w')
+f.write('hello world.')
+f.close()
+```
+
+```python showLineNumbers
+print(open('test.txt').read())
+```
+
+使用 w 模式时，如果文件不存在会被创建
+
+除了写入模式，还有追加模式 a
+
+读写模式 w+
+
+```python showLineNumbers
+f = open('test.txt', 'w+')
+f.write('hello world. morning.')
+f.seek(3)
+print(f.read())  # hello world.
+f.close()
+```
+
+#### 读文件
+
+使用 open 函数 来读文件，使用文件名的字符串作为输入参数：
+
+默认打开文件是 ‘r’ 读模式
+
+```python showLineNumbers
+f = open("test.txt")
+
+# 默认以读的方式打开文件，如果文件不存在会报错。
+# 可以使用 read 方法来读入文件中的所有内容：
+text = f.read()
+print(text)
+```
+
+按照行读入内容，readlines 方法返回一个列表，每个元素代表文件中每一行的内容：
+
+```python showLineNumbers
+f = open("test.txt")
+lines = f.readlines()
+print(lines)
+f.close()
+```
+
+```python showLineNumbers
+# 事实上，我们可以将 f 放在一个循环中，得到它每一行的内容：
+f = open('test.txt')
+for line in f:
+    print(line)
+f.close()
+```
+
+#### 上下文管理器
+
+```python showLineNumbers
+with open('my_file.txt', 'w') as fp:
+    data = fp.write("Hello world")
+```
+
+这等效于下面的代码，但是要更简便：
+
+```python showLineNumbers
+fp = open('my_file.txt', 'w')
+try:
+    # do stuff with f
+    data = fp.write("Hello world")
+finally:
+    fp.close()
+```
+
+#### 自定义上下文管理器
+
+比如可以这样定义一个简单的上下文管理器：
+
+```python showLineNumbers
+class ContextManager(object):
+    def __enter__(self):
+        print("Entering")
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+
+with ContextManager():
+    print("inside operate")
+```
+
+#### **enter** 的返回值
+
+如果在 **enter** 方法下添加了返回值，
+
+那么我们可以使用 as 把这个返回值传给某个参数：
+
+```python showLineNumbers
+class ContextManager2(object):
+    def __enter__(self):
+        print("Entering")
+        return "my value"
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+
+with ContextManager2() as val:
+    print(val)
+
+```
+
+一个通常的做法是将 **enter** 的返回值设为这个上下文管理器对象本身，
+文件对象就是这样做的.
+
+```python showLineNumbers
+class ContextManager3(object):
+    def __enter__(self):
+        print("Entering")
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+```
+
+#### 错误处理
+
+上下文管理器对象将错误处理交给 **exit** 进行，可以将错误类型，
+错误值和 traceback 等内容作为参数传递给 **exit** 函数：
+
+```python showLineNumbers
+class ContextManager4(object):
+    def __enter__(self):
+        print("Entering")
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+        if exc_type is not None:
+            print("  Exception:", exc_value)
+            return True  # 不想让错误抛出，只需要将 __exit__ 的返回值设为 True
+
+
+with ContextManager4():
+    print(1 / 0)
+
+```
+
+```python showLineNumbers
+import os
+os.remove('my_file.txt')
+```
+
+#### 二进制文件
+
+二进制读写模式 b：
+
+```python showLineNumbers
+import os
+
+f = open('binary.bin', 'wb')
+f.write(os.urandom(10))
+f.close()
+```
+
+```python showLineNumbers
+f = open('binary.bin', 'rb')
+print(repr(f.read()))
+f.close()
+```
+
+#### with 方法
+
+事实上，Python 提供了更安全的方法，当 with 块的内容结束后，
+Python 会自动调用它的 close 方法，确保读写的安全：
+
+```python showLineNumbers
+with open('new_file.txt', 'w') as f:
+    for i in range(3000):
+        x = 1.0 / (i - 1000)
+        f.write('hello world: ' + str(i) + '\n')
+```
+
+与 try/exception/finally 效果相同，但更简单。
+
+查看文件写的结果，虽然触发 error，但已经写的内容是成功的。
+
+```python showLineNumbers
+!tail new_file.txt
+```
+
+```python showLineNumbers
+!wc -l new_file.txt
+```
+
+```python showLineNumbers
+# 删除文件：
+import os
+os.remove('test.txt')
+os.remove('binary.bin')
+os.remove('new_file.txt')
+```
+
+
+### 🚧tempfile 模块
+
+tempfile 模块是 Python 标准库中的一个模块，用于创建和操作临时文件和目录。它可以帮助程序员在运行时生成临时文件，并且在程序结束时自动删除这些文件，从而避免留下不必要的临时文件。tempfile 模块特别适用于那些需要在运行时创建临时文件来存储中间数据的应用场景。
+
+### 🚧pathlib 模块
+
+### 🚧shutil 模块
+
+### 🚧sys 模块
+
+## 数据处理
+
+### json 模块
+
+json 模块提供了 python->json 以及 json->python 两种格式，转换规则如下
+
+| JSON ->        | Python -> | JSON           |
+| -------------- | --------- | -------------- |
+| object -- 对象 | dict      | object -- 对象 |
+| array          | list      | array          |
+| string         | str       | string         |
+| number (int)   | int       | number         |
+| number (real)  | float     | number         |
+| TRUE           | true      |                |
+| FALSE          | false     |                |
+|                | TRUE      | true           |
+|                | FALSE     | false          |
+| null           | None      | null           |
+|                | tuple     | array          |
+
+注意：JSON 中的键-值对中的键永远是 str 类型的。当一个对象被转化为
+JSON 时，字典中所有的键都会被强制转换为字符串。这所造成的结果是字典被转换为 JSON 然后转换回字典时可能和原来的不相等。换句话说，如果 x 具有非字符串的键，则有 loads(dumps(x)) != x。
+
+json 模块还有一些其他参数可以控制：编码形式、格式化输出等，不过很少用到
+
+[json 官方模块文档](https://docs.python.org/zh-cn/3/library/json.html#module-json)
+
+#### json.load 与 json.dump
+
+json.load 与 json.dump 是基于文件的转换
+
+```python showLineNumbers
+import json
+
+data = {
+    "name": "Satyam kumar",
+    "place": "patna",
+    "skills": [
+        "Raspberry pi",
+        "Machine Learning",
+        "Web Development"
+    ],
+    "email": "xyz@gmail.com",
+    "projects": [
+        "Python Data Mining",
+        "Python Data Science"
+    ]
+}
+with open("data_file.json", "w") as write:
+    json.dump(data, write)
+
+with open("data_file.json", "r") as read_content:
+    print(json.load(read_content))
+```
+
+#### json.loads 与 json.dumps
+
+json.load 与 json.dump 是直接基于数据的转换
+
+```python showLineNumbers
+import json
+
+# JSON string:
+# Multi-line string
+data = """{
+    "Name": "Jennifer Smith",
+    "Contact Number": 7867567898,
+    "Email": "jen123@gmail.com",
+    "Hobbies":["Reading", "Sketching", "Horse Riding"]
+    }"""
+
+# parse data:
+res_p = json.loads(data)
+print(type(res_p)) # <class 'dict'>
+
+res_j = json.dumps(res_p)
+print(type(res_j)) # <class 'str'>
+```
+
+
+### re 模块 （正则表达式）
+
+正则表达式作为多编程语言中的数据匹配工具，实用又简单，预计学习时长 8 小时。这里送上学习笔记和思维导图。
+
+<MarkmapHooks initialMarkdown={`
+
+# 正则表达式
+
+## 概括字符集
+
+### \\d：表示该位置上的字符是数字，即匹配成功
+- 等价于[0-9]
+### \\D：表示该位置上的字符不是数字，即匹配成功
+- 等价于[^0-9]
+### \\w：表示该位置上的字符是字母或，即匹配成功
+- 等价于[A-Za-z ]
+### \\W：表示该位置上的字符不是是字母或_，即匹配成功
+- 等价于[^A-Za-z_]
+### \\s：表示该位置上是不可见字符(空格、制表符\\t、垂直制表符\\v、回车符\\r、换行符\\n、换页符\\f)，即匹配成功
+- 等价于[\\n\\t\\r\\f\\v]
+### \\S：表示该位置上不是不可见字符，即匹配成功
+
+## 数量词
+
+### {3}：表示前面的一个字符出现3次
+### {3,8}：表示前面的一个字符出现3-8次
+### ?：表示前面的一个字符出现0次或1次
+### +：表示前面的一个字符出现1次或无限多次
+### *：表示前面的一个字符出现0次或无限多次
+
+## 边界匹配符
+
+### ^：表示只要是以后面的字符开头的，即匹配成功
+### $：表示只要是以前面的字符结尾的，即匹配成功
+### .：表示一个除换行符\n以外的所有字符
+### \\b：匹配一个单词边界，也就是指单词和空格间的位置。例如，'er\b' 可以匹配"never"中的'er'，但不能匹配"verb" 中的'er'。
+### \\B：匹配非单词边界。'er\B'能匹配"verb"中的er'，但不能匹配"never" 中的'er'。
+
+## 元字符
+
+### [a-z]：表示该位置上的字符在a-z之间，即匹配成功
+### [^a-z]：表示该位置上的字符不在a-z之间，即匹配成功
+### [abf]：表示该位置上的字符为a或者b或者f，即匹配成功
+- result = re.findall('a[de]c', target)
+
+## 修饰符
+
+### re.I：使匹配对大小写不敏感
+### re.L：做本地化识别(locale-aware)匹配
+### re.M：多行匹配，影响 ^和$
+### re.S：使.匹配包括换行在内的所有字符
+### re.U：根据Unicode字符集解析字符。这个标志影响\w, \W, \b, \B.
+### re.X：该标志通过给予你更灵活的格式以便你将正则表达式写得更易于理解。
+
+## 匹配所有
+
+### findall
+
+- 如果匹配到就返回一个列表，没有匹配到就返回空列表。
+
+### finditer
+
+- 和 findal 类似，在字符串中找到正则表达式所匹配的所有子串，并把它们作为一个迭代器返回。
+
+## 匹配一次
+
+### match
+
+#### re.match(pattern, string, flags=0)
+
+- pattern: 匹配的正则表达式
+- string: 要匹配的字符串
+- flags: 标志位，用于控制正则表达式的匹配方式，如是否区分大小写，多行匹配等等。参见:正则表达式修饰符中可选标志
+- re.match只匹配字符串的开始，如果字符串开始不符合正则表达式，则匹配失败，函数返回None
+
+### search
+
+#### re.search(pattern, string, flags=0)
+- pattern: 匹配的正则表达式
+- string: 要匹配的字符串
+- flags: 标志位，用于控制正则表达式的匹配方式，如是否区分大小写，多行匹配等等。参见:正则表达式修饰符中可选标志
+- re.search匹配整个字符串，直到找到一个匹配。
+
+## 组
+
+### (\\d+)
+
+- ()内的内容构成一个组，只要当前位置满足\d+就匹配成功，返回()内匹配成功的内容
+
+### group(num=0)
+
+- 匹配的整个表达式的字符串，group() 可以一次输入多个组号，在这种情况下它将返回一个包含那些组所对应值的元组。
+
+### group()
+
+- 返回一个包含所有小组字符串的元组，从1到 所含的小组号。
+
+## 序列
+
+### str.span()
+
+- #返回匹配值的下标,左闭右开
+
+## 检索和替换
+
+### re.sub(pattern, repl, string, count=0, flags=0)
+
+- pattern: 正则中的模式字符串。
+- repl: 替换的字符串，也可为一个函数。
+- string: 要被查找替换的原始字符串。
+- count: 模式匹配后替换的最大次数，默认 0 表示替换所有的匹配。
+
+## 编译正则表达式
+
+### re.compile(pattern[, flags])
+- pattern: 一个字符串形式的正则表达式
+- flags: 可选，表示匹配模式，比如忽略大小写，多行模式等，具体参数为：re.I, re.M
+- compile 函数用于编译正则表达式，生成一个正则表达式(Pattern)对象，供match()和 search() 这两个函数使用。
+
+## 正则分割
+
+### re.split(pattern, string[, maxsplit=0, flags=0])
+
+- pattern: 正则中的模式字符串。
+- string: 要匹配的字符串。
+- maxsplit: 分隔次数，maxsplit=1 分隔一次，默认为 0，不限制次数。
+- flags: 标志位，用于控制正则表达式的匹配方式，如：是否区分大小写，多行匹配等等。
+
+## 贪婪和非贪婪
+
+### 贪婪模式就是尽可能多地去匹配字符
+
+### 非贪婪模式就是尽可能少地去匹配字符，python默认采取的是贪婪模式。
+
+`} />
+
+经典示例
+
+```python showLineNumbers
+import re
+
+# findall
+target = 'life is short, i learn python.'
+result = re.findall('python', target)
+result1 = re.findall('java', target)
+# findall是re库的一个重要方法，第一个参数是匹配规则，第二个参数是要匹配的目标字符串，还有第三个参数，我们之后讲，findall返回的结果是一个列表。
+# result这行代码的意思是从target中匹配'python',如果匹配到就返回，没有匹配到就返回空列表。
+print(result)# 得到的结果是['python']
+print(result1)# 得到的结果是[]
+
+
+# 元字符
+target = 'abc acc aec agc adc aic'
+result = re.findall('a[de]c', target)
+# 这一行中的[de]表示这个位置上的字符是d或者是e都可以匹配出来
+print(result)# 得到的结果是['aec', 'adc']
+
+result = re.findall('a[b‐z]c', target)
+# 这一行中的[b‐z]表示这个位置上的字符在b‐z范围内都可以匹配出来
+print(result)# 得到的结果是['abc', 'acc', 'aec', 'agc', 'adc', 'aic']
+
+result = re.findall('a[^c‐z]c', target)
+# 这一行中的[^c‐z]表示这个位置上的字符不在c‐z范围内都可以匹配出来，注意是不在
+print(result)# 得到的结果是['abc']
+
+
+# 示例
+text = '我住在3号楼666,我的电话号码是17606000003你后面有事给我打电话，打不通就打17327567890。实在不行就打固定电话010-7788'
+result = re.findall('\d{3}[\d-]\d*',text)
+# \d{3}代表至少3个数字起匹配（区号和电话号码都满足）
+# [\d-]代表后面跟着的可以是数字（电话号码），也可以是-
+# \d*代表后面的数字我都要
+print(result)#结果是['17606000003', '17327567890', '010-7788']
+
+
+# 分组
+line = "Cats are smarter than dogs"
+matchObj = re.match( r'(.*) are (.*?) .*', line, re.M|re.I)
+#re.M表示多行匹配，影响 ^ 和 $
+#re.I 使匹配对大小写不敏感
+if matchObj:
+   print ("matchObj.group() : ", matchObj.group())#返回所有组
+   print ("matchObj.group(1) : ", matchObj.group(1)) # 返回组1【注意不是从0开始】
+   print ("matchObj.group(2) : ", matchObj.groups())# 返回所有组的元组形式
+else:
+   print ("No match!!")
+
+
+# 替换与检索sub
+phone = "2004-959-559 # 这是一个国外电话号码"
+# 删除字符串中的 Python注释
+num = re.sub(r'#.*$', "", phone)
+print ("电话号码是: ", num)
+# 删除非数字(-)的字符串
+num = re.sub(r'\D', "", phone)
+print ("电话号码是 : ", num)
+
+# 将匹配的数字乘以 2
+def double(matched):
+    value = int(matched.group('value'))
+    return str(value * 2)
+s = 'A23G4HFD567'
+print(re.sub('(?P<value>\d+)', double, s))
+
+
+#贪婪与非贪婪
+content = '发布于2018/12/23'
+result = re.findall('.*?(\d.*\d)', content)
+# 这里的?表示的就是非贪婪模式，第一个.*会尽可能少地去匹配内容，因为后面跟的是\d，所以碰见第一个数字就终止了。
+print(result)
+
+result = re.findall('.*(\d.*\d)', content)
+# 这里的第一个.*后面没有添加问号，表示的就是贪婪模式，第一个.*会尽可能多地去匹配
+#内容，后面跟的是\d，碰见第一个数字并不一定会终止，当它匹配到2018的2的时候，发现剩#下的内容依然满足(\d.*\d)，所以会一直匹配下去，直到匹配到12后面的/的时候，发现剩下
+#的23依然满足(\d.*\d)，但是如果再匹配下去，匹配到23的2的话，剩下的3就不满足
+#(\d.*\d)了，所以第一个.*就会停止匹配，(\d.*\d)最终匹配到的结果就只剩下23了。
+print(result)
+
+result = re.findall('.*?(\d.*?\d)', content)
+# 这里的第一个.*?表示非贪婪模式(非贪婪模式就是尽可能少地去匹配字符)，匹配到2018前面的'于'之后就停止了
+# 括号里的.*?也是表示非贪婪模式，括号里的内容从2018的2开始匹配，因为后面一个数字
+#是0，那么也就满足了(\d.*?\d)，所以就直接返回结果了，同样的，接下来的18也是这样，一
+#直匹配到23才结束
+print(result)
+```
+
+### 🚧pickle 模块
+
+pickle 模块是 Python 标准库中的一个模块，用于序列化和反序列化 Python 对象。它可以将 Python 对象转换为字节流，并将其保存到文件中，或者从文件中读取字节流并转换回 Python 对象。
+
+### 🚧sqlite3 模块
+
+sqlite3 模块是 Python 标准库中的一个模块，用于访问 SQLite 数据库。SQLite 是一个轻量级的关系型数据库管理系统，它不需要单独的服务器进程或配置，适合于嵌入式系统和小型应用程序。
+
+
+
+## 并发
+
+### multiprocessing 模块
+
+进程是系统独立安排和分配系统资源（CPU、内存）的基本单位，操作系统以进程为单位分配存储空间，操作系统管理所有进程的执行，为它们合理的分配资源。
+
+一个进程就是 macOS 中的“活动监视器”、Windows 中的“任务管理器”的一个执行程序。
+
+Python 既支持多进程又支持多线程。
+
+#### 多进程
+
+进程之间是相互独立的，Python 中的进程通信一般由进程对 Queue 完成。
+
+进程绕过了全局解释器锁。因此，多进程模块允许程序员充分利用特定机器上的多个处理器。它在 Unix 和 Windows 上都能运行。
+
+进程的数量等于 CPU 核心的数量，这是最有效的。如果核数太多，就不能充分利用核数。如果太少，会造成进程切换，增加程序的运行时间。
+
+[multiprocessing](https://docs.python.org/zh-cn/3.10/library/multiprocessing.html?highlight=multiprocessing#module-multiprocessing):Multiprocessing Module Code Documentation
+
+```python showLineNumbers
+from multiprocessing import Pool
+
+def f(vaule):
+    x = vaule[0]
+    y = vaule[1]
+    return x*y
+
+if __name__ == '__main__':
+    p = Pool(16) # new 16 process pools ， because i have 16 cpu
+    print(p.map(f, [(1,1), (2,2), (3,3)])) # take in data
+    p.close() # close pool
+
+# [1, 4, 9]
+```
+
+我们来完成 1~100000000 求和的计算密集型任务，循环解决，暂时也不考虑列表切片操作花费的时间，只是把做运算和合并运算结果的时间统计出来。
+
+```python showLineNumbers
+from time import time
+
+
+def main():
+    total = 0
+    number_list = [x for x in range(1, 100000001)]
+    start = time()
+    for number in number_list:
+        total += number
+    print(total)
+    end = time()
+    print('Execution time: %.3fs' % (end - start))
+
+```
+
+```python showLineNumbers
+main()
+# 5000000050000000
+# Execution time: 6.798s
+```
+
+利用多进程“分而治之”，
+
+当我们将这个任务分解到 8 个进程中去执行：
+
+```python showLineNumbers
+from multiprocessing import Process, Queue
+from time import time
+
+core_num = 8
+
+
+def task_handler(curr_list, result_queue):
+    total = 0
+    for number in curr_list:
+        total += number
+    result_queue.put(total)
+
+
+def main():
+    processes = []
+    number_list = [x for x in range(1, 100000001)]
+    result_queue = Queue()
+    index = 0
+    # 启动core_num(8)个进程将数据切片后进行运算
+    index_batch = int(100000000 / core_num)
+    for _ in range(core_num):
+        p = Process(target=task_handler,
+                    args=(number_list[index:index + index_batch], result_queue))
+        index += index_batch
+        processes.append(p)
+        p.start()
+    # 开始记录所有进程执行完成花费的时间
+    start = time()
+    for p in processes:
+        p.join()
+    # 合并执行结果
+    total = 0
+    while not result_queue.empty():
+        total += result_queue.get()
+    print(total)
+    end = time()
+    print('Execution time: ', (end - start), 's', sep='')
+
+
+if __name__ == '__main__':
+    main()
+
+```
+
+以上代码保存为 multi_process.py
+
+```python showLineNumbers
+!python multi_process.py
+```
+
+```python showLineNumbers
+# 5000000050000000
+# Execution time: 0.7936668395996094s
+```
+
+明显，多进程更快。
+
+使用多进程后由于获得了更多的 CPU 执行时间以及更好的利用了 CPU 的多核特性，明显的减少了程序的执行时间，而且计算量越大效果越明显。
+
+### threading 模块
+
+线程是系统调度资源的最小单位（CPU 通过计时器来切换线程）
+
+在 Python 中，同个时间只有一个线程在运行
+
+当然，如果你运行大量的 I/O 任务，多进程依然是最好的选择
+
+线程数等于 CPU 内核数的两倍是最高效的。
+
+GIL 是一个防止多个线程同时执行 Python 字节码的互斥锁。之所以需要这种锁，主要是因为 CPython 的内存管理不是线程安全的
+
+在这种环境下，GIL 限制解释器本身只能有一个线程运行，而且任何 Python 解释器级别的操作都是序列化的，因此任何时候都只能有一条语句抛出异常。与异常相关的共享变量也因此受到保护。
+
+线程间通信的目的主要是为了线程同步，因此线程没有像进程通信那样用于数据交换的通信机制。
+
+Python 的标准库提供了两个模块：\_thread 和 threading，\_thread 是低级模块，threading 是高级模块，对\_thread 进行了封装。绝大多数情况下，我们只需要使用 threading 这个高级模块。
+
+[threading](https://docs.python.org/zh-cn/3.10/library/threading.html?highlight=threading#module-threading):Threading Multiprocessing Module Code Documentation
+
+#### 多线程
+
+```python showLineNumbers
+
+import time
+import threading
+
+
+def test_thread(para='hi', sleep=3):
+    time.sleep(sleep)
+    print(para)
+
+
+def main():
+    # create thread
+    thread_hi = threading.Thread(target=test_thread)
+    thread_hello = threading.Thread(target=test_thread, args=('hello', 1))
+    # run thread
+    thread_hi.start()
+    thread_hello.start()
+    print('Main thread has ended!')
+
+
+if __name__ == '__main__':
+    main()
+
+```
+
+如下所示的界面中，有“下载”和“关于”两个按钮，用休眠的方式模拟点击“下载”按钮会联网下载文件需要耗费 10 秒的时间，当点击“下载”按钮后，整个任务阻塞：
+
+```python showLineNumbers
+import time
+import tkinter
+import tkinter.messagebox
+
+
+def download():
+    # 模拟下载任务需要花费5秒钟时间
+    time.sleep(5)
+    tkinter.messagebox.showinfo('提示', '下载完成!')
+
+
+def show_about():
+    tkinter.messagebox.showinfo('关于', '作者: 123(v1.0)')
+
+
+def main():
+    top = tkinter.Tk()
+    top.title('单线程')
+    top.geometry('400x400')
+    top.wm_attributes('-topmost', True)
+
+    panel = tkinter.Frame(top)
+    button1 = tkinter.Button(panel, text='下载', command=download)
+    button1.pack(side='left')
+    button2 = tkinter.Button(panel, text='关于', command=show_about)
+    button2.pack(side='right')
+    panel.pack(side='bottom')
+
+    tkinter.mainloop()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+使用多线程后，不会阻塞了主线程：
+
+```python showLineNumbers
+import time
+import tkinter
+import tkinter.messagebox
+from threading import Thread
+
+
+def main():
+
+    class DownloadTaskHandler(Thread):
+
+        def run(self):
+            time.sleep(5)
+            tkinter.messagebox.showinfo('提示', '下载完成!')
+            # 启用下载按钮
+            button1.config(state=tkinter.NORMAL)
+
+    def download():
+        # 禁用下载按钮
+        button1.config(state=tkinter.DISABLED)
+        # 通过daemon参数将线程设置为守护线程(主程序退出就不再保留执行)
+        # 在线程中处理耗时间的下载任务
+        DownloadTaskHandler(daemon=True).start()
+
+    def show_about():
+        tkinter.messagebox.showinfo('关于', '作者: 123(v1.0)')
+
+    top = tkinter.Tk()
+    top.title('多线程')
+    top.geometry('400x400')
+    top.wm_attributes('-topmost', 1)
+
+    panel = tkinter.Frame(top)
+    button1 = tkinter.Button(panel, text='下载', command=download)
+    button1.pack(side='left')
+    button2 = tkinter.Button(panel, text='关于', command=show_about)
+    button2.pack(side='right')
+    panel.pack(side='bottom')
+
+    tkinter.mainloop()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+会看到弹出的窗口是多模态的，点击下载按钮不影响其他按钮操作。
+
+**Python 的多线程并不能发挥 CPU 的多核特性**，这一点只要启动几个执行死循环的线程就可以得到证实了。之所以如此，是因为 Python 的解释器有一个“全局解释器锁”（GIL）的东西，任何线程执行前必须先获得 GIL 锁，然后每执行 100 条字节码，解释器就自动释放 GIL 锁，让别的线程有机会执行，这是一个历史遗留问题。
+
+Python 解释器由于设计时有 GIL 全局锁，导致了多线程无法利用多核。多线程的并发在 Python 中就是一个美丽的梦。
+
+多进程是有效的。
+
+### asyncio 模块
+
+协程是编写并发代码的库，是构建 IO 密集型和高级结构化网络代码的最佳选择。
+
+例程的运行方式是通过代码主动切换状态并等待处理，因此效率更高，语法也更详细。循环对象需要处于活动状态：创建、设置、提交、等待运行和停止。
+
+例行程序的最佳数量取决于内存使用情况。
+
+asyncio 模块包含了一些工具，用于编写异步代码。
+
+协程的工作原理是事件循环，事件循环是一个无限循环，它等待事件并执行它们。
+
+每次任务会被挂起至事件循环队列中，然后按顺序执行。
+
+await 关键字用于挂起协程，直到它被调用。
+
+async 关键字用于定义协程。
+
+asyncio 模块用于实现异步编程。
+
+[asyncio](https://docs.python.org/zh-cn/3.10/library/asyncio.html?highlight=asyncio#module-asyncio):asyncio Multiprocessing Module Code Documentation
+
+```python showLineNumbers
+import asyncio
+
+class TestA:
+    def __init__(self,loop) -> None:
+        self.loop = loop
+        asyncio.set_event_loop(loop=self.loop) # step 3.1
+
+    async def run_page(self,tid): # step 7
+        print(tid)
+        # 此处编写爬虫代码
+        return tid
+
+    async def close(self,):
+        for i in asyncio.all_tasks(): # step 9.1
+            i.cancel()
+        self.loop.stop() # step  9.2
+
+
+def test():
+    get_async_loop = asyncio.new_event_loop() # step 1
+    asyncio.set_event_loop(get_async_loop) # step 2
+
+    async def spider(task_obj):
+        async_task =  [asyncio.ensure_future(task_obj.run_page(1)),
+                    asyncio.ensure_future(task_obj.run_page(2)),] # step  6
+        await asyncio.wait(async_task) # step  8
+
+        await task_obj.close() # step 9
+
+    task_obj = TestA(get_async_loop) #step 3
+    asyncio.run_coroutine_threadsafe(spider(task_obj), loop=get_async_loop) #step  4
+    get_async_loop.run_forever() # step 5
+
+test()
+```
+
+生成器函数与协程（注：函数）非常相似，它们 yield 多次，它们具有多个入口点，并且它们的执行可以被挂起。唯一的区别是生成器函数不能控制在它在 yield 后交给哪里继续执行，控制权总是转移到生成器的调用者
+
+在 Python 创建协程时，task 是 future 的子类，所以 task 继承了 future 的属性和方法。几乎没有不同。
+
+
+
+### 🚧queue 模块
+
+### 🚧concurrent 模块
+
+
+## 网络与通信
+
+### 🚧webbrowser 模块
+
+### urllib 模块
+
+urllib 是一个收集了多个涉及 URL 的模块的自带包：可以打开和读取 URL、 抛出异常、解析 URL、解析 robots.txt 文件是最底层的模块。虽然仅支持 HTTP1.0 仅同步 ，但是解码和解析功能是真的很好用
+
+[urllib 模块代码文档](https://docs.python.org/zh-cn/3/library/urllib.html?highlight=urllib#module-urllib)
+
+#### urllib 发送请求
+
+```python showLineNumbers
+import urllib.request
+
+url = 'https://www.python.org'
+# 方式一
+response = urllib.request.urlopen(url)
+print(type(response))  # <class 'http.client.HTTPResponse'>
+# 方式二
+request = urllib.request.Request(url)
+res = urllib.request.urlopen(url)
+print(type(res))  # <class 'http.client.HTTPResponse'>
+print(response.read())                  # 获取响应体 二进制字符串
+print(response.getheaders())
+## 结果为
+[('Connection', 'close'), ('Content-Length', '50064'), ('Server', 'nginx'), ('Content-Type', 'text/html; charset=utf-8'), ('X-Frame-Options', 'DENY'), ('Via', '1.1 vegur, 1.1 varnish, 1.1 varnish'), ('Accept-Ranges', 'bytes'), ('Date', 'Tue, 17 Jan 2023 14:37:33 GMT'), ('Age', '1938'), ('X-Served-By', 'cache-iad-kiad7000025-IAD, cache-nrt-rjtf7700057-NRT'), ('X-Cache', 'HIT, HIT'), ('X-Cache-Hits', '263, 1190'), ('X-Timer', 'S1673966254.566369,VS0,VE0'), ('Vary', 'Cookie'), ('Strict-Transport-Security', 'max-age=63072000; includeSubDomains')]
+```
+
+#### urllib 异常处理
+
+URLError 是 OSError 的一个子类，所有请求问题都会被捕获。
+
+HTTPError 是 URLError 的一个子类，服务器上 HTTP 的响应会返回一个状态码，根据这个 HTTP 状态码来决定是否捕获，比如常见的 404 错误等。
+
+```python showLineNumbers
+from urllib import request
+from urllib import error
+
+if __name__ == "__main__":
+    url = "http://www.iloveyou.com/"#一个不存在的连接
+    req = request.Request(url)
+    try:
+        response = request.urlopen(req)
+        print(response.read())
+    except error.URLError as e:
+        print(e) # <urlopen error [Errno 11002] getaddrinfo failed>
+```
+
+#### urllib 解析 URL
+
+你肯定经历过复制网址出现乱码，这是因为网址必须以通用码的形式传送，而且还要避免几个特殊字符，因此网址要经编码，汉字经过编码后自然就是不可辨认的乱码了。
+
+那么浏览器的地址栏中，网址为什么看起来是中文呢？这大概是浏览器的“人性化”处理，将编码好的中文网址还原出来“暂时”显示在地址栏中。
+
+知道原理就能清楚的解码啦，你可以通过 encode 和 decode 方法进行操作解码和转码，只不过要考虑汉字中有%等特殊字符和/x 与%互转的情况，所以，直接用 quote 函数吧，别重复造轮子。
+
+```python showLineNumbers
+from urllib.parse import unquote
+from urllib.parse import quote
+
+url = 'https://www.baidu.com/s?ie=UTF-8&wd=%E7%A7%91%E6%8A%80&%E6%8A%80%E6%9C%AF'
+print(unquote(url))
+# 结果为https://www.baidu.com/s?ie=UTF-8&wd=科技&技术
+
+
+print( 'https://www.baidu.com/s?ie=UTF-8&wd='+quote('科技&技术'))
+# 结果为'https://www.baidu.com/s?ie=UTF-8&wd=%E7%A7%91%E6%8A%80&%E6%8A%80%E6%9C%AF'
+```
+
+#### urllib 解析 robots.txt 文件
+
+```python showLineNumbers
+import urllib.robotparser
+rp = urllib.robotparser.RobotFileParser()
+rp.set_url("http://www.musi-cal.com/robots.txt")
+rp.read()
+
+print(rp.can_fetch("*", "http://www.musi-cal.com/")) #判断网页是否可以抓取，'*'表示适用于所有爬虫
+# True
+```
+
+
+## 拓展
 
 ### 第三方库
 

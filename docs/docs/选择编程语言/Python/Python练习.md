@@ -21,7 +21,7 @@ title: Python练习
 
 listx = [15, 7, 1, 1, "+", "-", "/", 3, "*", 2, 1, 1, "+", "+", "-"]
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 
@@ -83,7 +83,7 @@ string.punctuation  标点符号
 string.printable    可打印字符
 string.whitespace   空白字符
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 import string
@@ -174,7 +174,7 @@ print(len(res))
 '无问西东',['章子怡','王力宏','祖峰'],
 '超时空同居',['雷佳音','佟丽娅','黄轩']]
 ```
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 
@@ -204,7 +204,7 @@ while True:
 
 每个数字可以写成多个质数的乘积，给定一个数字，请你分解为多个质数
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 
@@ -249,7 +249,7 @@ print(fun(x))
 1*9=9 2*9=18 3*9=27 4*9=36 5*9=45 6*9=54 7*9=63 8*9=72 9*9=81 
 ```
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 #方法一
@@ -276,7 +276,7 @@ while i<10: #控制行，1到9
 
 将字典数组按字典的某个key排序
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 # 方法1：
@@ -292,7 +292,7 @@ heappush(h,(i[k],i)) for i in d
 
 给定一个列表，请你对列表的元素进行     从大到小排序   与从小到大排序
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 
@@ -320,7 +320,7 @@ print(list1)
 
 请你编写它的实现代码。
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 def partition(arr, low: int, high: int):
@@ -364,7 +364,7 @@ if __name__ == '__main__':
 
 要求：0-N，每次抽走奇数，打印剩余的那个数字
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 aList = []
@@ -383,7 +383,7 @@ print(aList)
 
 两个数字的平方和是2022，请问这2个数分别是多少
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 
@@ -402,7 +402,7 @@ for a in range(1,2022):
 3号考场考试号要求为0301--0340
 后续考场以此类推，请你打印出来这些考场号吧
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 
@@ -427,7 +427,7 @@ for i in range(1,440):
 - 23 : 53
 - 23 : 54
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 
@@ -446,7 +446,7 @@ for 时钟 in range(24):
 如果没有睡着，继续循环，并打印“继续数羊”。
 如果睡着了，则停止循环，并打印“终于睡着了”。
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 
@@ -491,7 +491,7 @@ while 睡觉的状态 != '睡着': # 只要不是睡着，就继续数
 安装命令 pip install tkinter-page
 
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 
@@ -815,7 +815,7 @@ with open("black.bmp", "wb") as f:
     f.write(data)
 ```
 
-### 题解（Python）
+### 题解
 
 ```python  showLineNumbers
 class Readbmp:
