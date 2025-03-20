@@ -29,9 +29,16 @@ flowchart LR
     D -- git pull --> A
 ```
 
+在git中，有许多操作可以实现同样的效果，例如拉取远程分支
+
+- `git pull` 获取远程变化并自动合并到当前分支，默认不清理不再存在的远程跟踪分支。
+- `git fetch origin --prune` 获取远程变化并清理不再存在的远程跟踪分支，但不合并到当前分支。
+
+因此在AI编程的今天，如果我们的不了解git原理就使用提示词获取git命令，可能会出现意料之外的情况。git命令的全部难点都在于，如何处理与合并分支。
+
 [Interactive Git Courses](https://ooloo.io/project/github-flow/mindset)了解如何在 GitHub (一个托管和协作管理 Git 仓库的平台)团队中使用 Git
 
-## 常用操作
+## 基础操作
 
 **初始化一个新的 Git 仓库：**
 
@@ -55,11 +62,8 @@ git status
 
 ```bash showLineNumbers
 git add <file_name>
-```
 
-**添加所有改动到暂存区：**
-
-```bash showLineNumbers
+# 添加所有改动到暂存区
 git add .
 ```
 
@@ -78,37 +82,36 @@ git log
 **拉取远程仓库的改动并合并到当前分支：**
 
 ```bash showLineNumbers
-git pull
+# 对于个人的仓库，可以直接使用 git pull
+git pull # 实际上是 git fetch 和 git merge 的组合
+
+# 对于多人协作的项目，可以按如下流程
+git fetch # 只拉取
+git diff origin/main..main 
+
+# 查看本地与远程的差异
+# 在 Git 中，A..B 两点语法表示"在 B 中但不在 A 中的提交
+
+git fetch origin            
+
+# 约定俗成：当你克隆一个仓库时，Git 会自动将你克隆的远程仓库命名为 "origin"
+# 可自定义：这个名称完全可以更改，不是强制的，可以是任何名称
+
+git merge origin/feature-branch  # 合并远程仓库的feature-branch分支
+git fetch --prune  # 获取更新并移除已删除的远程分支引用
+```
+
+**设置用户名和邮箱用于推送分支（一次配置，长期有效）：**
+
+```bash showLineNumbers
+git config --global user.name "您的姓名"
+git config --global user.email "您的邮箱@example.com"
 ```
 
 **将改动推送到远程仓库：**
 
 ```bash showLineNumbers
 git push
-```
-
-**创建新的分支：**
-
-```bash showLineNumbers
-git branch <branch_name>
-```
-
-**切换到特定的分支：**
-
-```bash showLineNumbers
-git checkout <branch_name>
-```
-
-**合并特定分支到当前分支：**
-
-```bash showLineNumbers
-git merge <branch_name>
-```
-
-**查看当前分支和远程分支：**
-
-```bash showLineNumbers
-git branch -a
 ```
 
 ## 分支
@@ -127,6 +130,8 @@ git branch newBranch # 创建本地分支
 git checkout newBranch # 切换到本地分支
 
 git checkout -b newBranch  # 创建并切换到分支
+
+git merge <branch_name>  # 将指定的 branch_name 合并到当前分支
 ```
 
 ## 版本
@@ -170,9 +175,9 @@ git branch -a --contains Tag_V1.0.0 # 看看哪个分支包含这个tag/commit
 
 Git commit的规范是为了更好的管理代码，方便后续的代码维护和版本回退。
 
-因此它并不是一个硬性要求，但是在团队协作中，规范的commit message可以让团队更好的理解代码的变更。
+因此它并不是一个硬性要求，但是在团队协作中，规范的commit message可以让团队更好的理解代码的变更。现在AI编辑器也可以自动生成格式优雅，内容准确的commit信息。
 
-个人开发者可以根据自己的习惯来定义规范，譬如：Gitmoji
+个人开发者也可以根据自己的习惯来定义规范，譬如：Gitmoji
 
 > Gitmoji是一种在Git提交消息中使用表情符号来表示提交目的的规范。每个表情符号（emoji）都代表着一种特定的提交类型，使提交消息更加生动和易读。Gitmoji 的目标是通过简单的图标和表情符号传达清晰的信息，从而提高代码提交历史的可读性和可理解性。
 
