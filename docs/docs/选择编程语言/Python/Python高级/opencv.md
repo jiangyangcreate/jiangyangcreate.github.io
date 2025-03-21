@@ -22,6 +22,60 @@ title: opencv
 - 选项 3 - 无窗口主模块包：``pip install opencv-python-headless``
 - 选项 4 - 无窗口完整包（包含主模块和 contrib/extra 模块）：``pip install opencv-contrib-python-headless``（请参考 [OpenCV 文档](https://docs.opencv.org/master/) 中的 contrib/extra 模块列表）
 
+
+### 基础用法
+
+```python showLineNumbers
+# 导入必要的包
+import numpy as np
+import matplotlib.pyplot as plt
+%matplotlib inline
+# 导入opencv
+import cv2
+
+# 使用opencv的imread方法，打开图片
+img = cv2.imread('./img/cat.jpg')
+# 检查类型，会发现自动转成了Numpy 数组的形式
+type(img)
+img
+
+# 如果打开一张不存在的图片，不会报错，但是会返回空类型
+img_wrong = cv2.imread('./img/wrong.jpg')
+type(img_wrong)
+img_wrong
+
+plt.imshow(img)
+# 为什么会显示的这么奇怪？
+
+# （OpenCV和matplotlib 默认的RBG顺序不一样）
+# matplotlib: R G B
+# opencv: B G R
+# 需要调整顺序
+
+# 将OpenCV BGR 转换成RGB，cv2.COLOR_可以看到更多转换形式
+img_fixed = cv2.cvtColor(img,cv2.COLOR_BGR2RGB)
+
+# 算法参考：RGB取均值、RGB按阈值取值、按色彩心理学公式取值R*0.299 + G*0.587 + B*0.114 = Gray
+
+plt.imshow(img_fixed)
+# 显示正常了
+
+# 另外，我们再读取图片时也可以以灰度模式读取
+img_gray = cv2.imread('./img/cat.jpg',cv2.IMREAD_GRAYSCALE)
+# 显示这个灰度图
+plt.imshow(img_gray,cmap="gray")
+
+# 使用resize缩放（打开函数帮助）
+img_resize = cv2.resize(img_fixed,(1000,300))
+# 显示缩放后的图片
+plt.imshow(img_resize)
+
+# 翻转图片：0表示垂直翻转、1表示水平翻转，-1表示水平垂直都翻转
+img_flip = cv2.flip(img_fixed,-1)
+
+plt.imshow(img_flip)
+```
+
 ### 人脸识别：录入并识别不同人脸
 
 - 这段程序首先会读取摄像头，并自动截取一定数量的人脸用作训练。

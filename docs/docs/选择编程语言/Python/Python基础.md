@@ -3,7 +3,7 @@ sidebar_position: 2
 title: Python基础
 ---
 
-### 安装 Python
+## 安装 Python
 
 [Python 官网下载网址](https://www.python.org/downloads/)
 
@@ -16,7 +16,7 @@ title: Python基础
 如果我们安装了中文语言包，那么我们的系统就可以识别与显示中文。
 如果我们安装了 Python 语言包，那么我们的系统就可以识别与运行 Python 程序。
 
-#### pip
+### pip
 
 在部分系统预装版中，`python`名为`python3`，`pip`为`pip3`
 
@@ -24,12 +24,12 @@ Python 安装完成后，pip 也会自动安装完成。
 
 后续代码示例以`python`和`pip`为例
 
-#### 更新
+### 更新
 
 - `python -m pip install --upgrade pip`
 - `python -m pip install  -i https://pypi.tuna.tsinghua.edu.cn/simple --upgrade pip`
 
-#### 换源
+### 换源
 
 - Windows/ MacOS 系统临时使用： `pip install -i https://pypi.tuna.tsinghua.edu.cn/simple {包名}`
 
@@ -66,7 +66,7 @@ index-url = https://pypi.tuna.tsinghua.edu.cn/simple/
 trusted-host = pypi.tuna.tsinghua.edu.cn
 ```
 
-#### 批量下载
+### 批量下载
 
 注意执行本条命令时，需要在 requirements.txt 文件所在的目录下执行。
 
@@ -89,7 +89,7 @@ scikit-learn
 tensorflow
 ```
 
-#### Vscode 安装
+### Vscode 安装
 
 [Vscdoe 官网下载网址](https://code.visualstudio.com/download)
 
@@ -101,7 +101,7 @@ tensorflow
 
 Visual Studio 是一个集成的开发环境。
 
-#### Vscode 安装插件
+### Vscode 安装插件
 
 Vscode 左侧菜单通常为：文件、搜索、源代码管理、调试、应用商店等等（不同版本显示不同）
 
@@ -110,7 +110,7 @@ Vscode 左侧菜单通常为：文件、搜索、源代码管理、调试、应�
 - 简体中文包：包名：`Chinese (Simplified) Language Pack for Visual Studio Code`
 - Python 包：包名：`Python`
 
-#### 拓展：Vscode 的个性化设置
+### 拓展：Vscode 的个性化设置
 
 - 主题颜色
 
@@ -138,7 +138,7 @@ python xxx.py 和 python -m xxx.py 是两种加载 py 文件的方式:
 1 叫做直接运行
 2 把模块当作脚本来启动(注意：但是**name**的值为'main' )
 
-#### vscode 使用技巧
+### vscode 使用技巧
 
 跳转到定义： 使用 F12 快捷键或者右键选择 "Go to Definition" 可以跳转到光标所在符号的定义处。
 
@@ -148,9 +148,9 @@ python xxx.py 和 python -m xxx.py 是两种加载 py 文件的方式:
 
 断点调试： 使用 F5 启动调试器，可以设置断点、单步执行、查看变量等。
 
-### 变量与数据类型
+## 变量与数据类型
 
-#### 变量
+### 变量
 
 变量是一个盒子用于存放数据，变量名是盒子的名字，数据是盒子里面的东西。
 
@@ -164,7 +164,7 @@ python xxx.py 和 python -m xxx.py 是两种加载 py 文件的方式:
 
 变量名 1 = 数据 1, 变量名 2 = 数据 2, 变量名 3 = 数据 3
 
-#### Python 变量命名规则
+### Python 变量命名规则
 
 1. 变量名只能包含字母、数字和下划线。变量名可以字母或下划线打头，但不能以数字打头，例如，可将变量命名为 message_1，但不能将其命名为 1_message。
 
@@ -176,7 +176,7 @@ python xxx.py 和 python -m xxx.py 是两种加载 py 文件的方式:
 
 5. 慎用小写字母 l 和大写字母 O，因为它们可能被人错看成数字 1 和 0。
 
-#### 数据类型
+### 数据类型
 
 Python 的最基础的**独立数据类型**有：
 
@@ -202,7 +202,7 @@ Python 的最基础的**独立数据类型**有：
 
 5. 空值：空值是 Python 里一个特殊的值，用 None 表示。None 不能理解为 0，因为 0 是有意义的，而 None 是一个特殊的空值。
 
-#### 介绍字符串的索引
+### 介绍字符串的索引
 
 ```python showLineNumbers
 # 字符串的索引
@@ -216,7 +216,7 @@ s[0]  # g
 s[-2]  # n
 ```
 
-#### 切分操作
+### 切分操作
 
 分片用来从序列中提取出想要的子序列，其用法为：
 
@@ -245,7 +245,7 @@ print(s[::-1])  # gninrom doog
 print(s[:100])
 ```
 
-### 运算符
+## 运算符
 
 Python 的运算符需要掌握如下知识点：
 
@@ -265,7 +265,7 @@ Python 的运算符需要掌握如下知识点：
 
 8. 运算符优先级
 
-#### 算术运算符
+### 算术运算符
 
 | 运算符 | 描述                                            | 实例                                                     |
 | ------ | ----------------------------------------------- | -------------------------------------------------------- |
@@ -276,7 +276,7 @@ Python 的运算符需要掌握如下知识点：
 | %      | 取模 - 返回除法的余数                           | b % a 输出结果 0                                         |
 | \*\*   | 幂 - 返回 x 的 y 次幂                           | a\*\*b 为 10 的 20 次方， 输出结果 100000000000000000000 |
 
-#### 比较（关系）运算符
+### 比较（关系）运算符
 
 | 运算符 | 描述                                                                                                                                  | 实例                                       |
 | ------ | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
@@ -288,7 +288,7 @@ Python 的运算符需要掌握如下知识点：
 | >=     | 大于等于 - 返回 x 是否大于等于 y。                                                                                                    | (a >= b) 返回 False。                      |
 | `<=`   | 小于等于 - 返回 x 是否小于等于 y。                                                                                                    | (a `<= b`) 返回 true。                     |
 
-#### 赋值运算符
+### 赋值运算符
 
 | 运算符 | 描述             | 实例                                  |
 | ------ | ---------------- | ------------------------------------- |
@@ -301,7 +301,7 @@ Python 的运算符需要掌握如下知识点：
 | \*\*=  | 幂赋值运算符     | c **= a 等效于 c = c** a              |
 | //=    | 取整除赋值运算符 | c //= a 等效于 c = c // a             |
 
-#### 逻辑运算符
+### 逻辑运算符
 
 | 运算符 | 逻辑表达式 | 描述                                                                    | 实例                    |
 | ------ | ---------- | ----------------------------------------------------------------------- | ----------------------- |
@@ -309,7 +309,7 @@ Python 的运算符需要掌握如下知识点：
 | or     | x or y     | 布尔"或" - 如果 x 是非 0，它返回 x 的值，否则它返回 y 的计算值。        | (a or b) 返回 10。      |
 | not    | not x      | 布尔"非" - 如果 x 为 True，返回 False 。如果 x 为 False，它返回 True。  | not(a and b) 返回 False |
 
-#### 位运算符
+### 位运算符
 
 | 运算符 | 描述           | 实例                                                                        |
 | ------ | -------------- | --------------------------------------------------------------------------- |
@@ -320,21 +320,21 @@ Python 的运算符需要掌握如下知识点：
 | `<<`   | 左移动运算符   | a `<<` 2 输出结果 240 ，二进制解释： 1111 0000                              |
 | `>>`   | 右移动运算符   | a `>>` 2 输出结果 15 ，二进制解释： 0000 1111                               |
 
-#### 成员运算符
+### 成员运算符
 
 | 运算符 | 描述                                                    | 实例                                              |
 | ------ | ------------------------------------------------------- | ------------------------------------------------- |
 | in     | 如果在指定的序列中找到值返回 True，否则返回 False。     | x 在 y 序列中 , 如果 x 在 y 序列中返回 True。     |
 | not in | 如果在指定的序列中没有找到值返回 True，否则返回 False。 | x 不在 y 序列中 , 如果 x 不在 y 序列中返回 True。 |
 
-#### 身份运算符
+### 身份运算符
 
 | 运算符 | 描述                                        | 实例                                                                                         |
 | ------ | ------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | is     | is 是判断两个标识符是不是引用自一个对象     | x is y, 类似 id(x) == id(y) , 如果引用的是同一个对象则返回 True，否则返回 False              |
 | is not | is not 是判断两个标识符是不是引用自不同对象 | x is not y ， 类似 id(a) != id(b)。如果引用的不是同一个对象则返回结果 True，否则返回 False。 |
 
-#### 运算符优先级
+### 运算符优先级
 
 | 运算符                      | 描述                                                   |
 | --------------------------- | ------------------------------------------------------ |
@@ -352,11 +352,11 @@ Python 的运算符需要掌握如下知识点：
 | in not in                   | 成员运算符                                             |
 | not or and                  | 逻辑运算符                                             |
 
-### 列表
+## 列表
 
 介绍列表的方法及示例演示其使用，包括：长度、修改列表、取值、排序
 
-#### 创建列表
+### 创建列表
 
 ```python showLineNumbers
 empty_list = list()
@@ -392,7 +392,7 @@ print(d)  # [2, 3, u'hello', 2, 3, u'hello']
 d[-1]
 ```
 
-#### 修改列表
+### 修改列表
 
 ```python showLineNumbers
 print(a)
@@ -471,7 +471,7 @@ print(a[3])  # [3,4]
 print(a[3][1])  # 4
 ```
 
-#### 列表方法
+### 列表方法
 
 ```python showLineNumbers
 # 列表中某个元素个数
@@ -483,7 +483,7 @@ print(a.count(1))  # 2
 print(a.index(1))  # 0
 ```
 
-#### 列表添加元素
+### 列表添加元素
 
 ```python showLineNumbers
 # 向列表添加单个元素
@@ -514,7 +514,7 @@ print(a)  # [1, 2, 3, u'a', 4]
 a
 ```
 
-#### 移除元素
+### 移除元素
 
 ```python showLineNumbers
 # l.remove(ob) 会将列表中第一个出现的 ob 删除，如果 ob 不在 l 中会报错。
@@ -530,7 +530,7 @@ b = a.pop(0)  # 1
 print('pop:', b, ' ;result:', a)
 ```
 
-#### 排序
+### 排序
 
 ```python showLineNumbers
 # l.sort() 会将列表中的元素按照一定的规则排序：
@@ -586,7 +586,7 @@ help(a.sort)
 # Type:      builtin_function_or_method
 ```
 
-#### 列表推导式
+### 列表推导式
 
 循环可以用来生成列表：
 
@@ -681,7 +681,7 @@ x = range(1000000)
 %timeit total = sum(i**2 for i in x)
 ```
 
-#### 列表 vs 字符串
+### 列表 vs 字符串
 
 列表是可变的（Mutable）
 
@@ -716,7 +716,7 @@ s = s.replace('world', 'YunYun')
 print(s)  # hello YunYun
 ```
 
-### 元组
+## 元组
 
 与列表相似，元组 tuple 也是个有序序列，但是元组是不可变的，用()生成。
 
@@ -761,12 +761,12 @@ c = a.index(3)
 print(c)  # 索引位置为：2
 ```
 
-#### TIP
+### TIP
 
 1. 可变数据类型: list, dictionary, set, numpy array, user defined objects
 2. 不可变数据类型: integer, float, long, complex, string, tuple, frozenset，强调下 tuple 是不可变的
 
-### 字典
+## 字典
 
 字典 dictionary ，在一些编程语言中也称为 hash ， map ，
 是一种由键值对组成的数据结构。
@@ -778,7 +778,7 @@ a = dict()
 print(type(a))
 ```
 
-#### 操作 dict
+### 操作 dict
 
 ```python showLineNumbers
 # 插入键值
@@ -818,7 +818,7 @@ except KeyError as e:
 #a[0]
 ```
 
-#### dict 的应用示例
+### dict 的应用示例
 
 ```python showLineNumbers
 # 定义四个字典
@@ -891,7 +891,7 @@ print(connections[('Austin', 'New York')])  # 200
 print(connections[('New York', 'Austin')])  # 400
 ```
 
-#### 字典方法
+### 字典方法
 
 get 方法 : d.get(key, default = None)
 
@@ -914,7 +914,7 @@ b = a.get("three", "num 0")
 b  # num 0
 ```
 
-#### pop 方法删除元素
+### pop 方法删除元素
 
 pop 方法可以用来弹出字典中某个键对应的值，同时也可以指定默认参数：
 
@@ -940,7 +940,7 @@ del a["first"]
 print(a)  # {u'second': u'num 2'}
 ```
 
-#### update 方法更新字典
+### update 方法更新字典
 
 之前已经知道，可以通过索引来插入、修改单个键值对，
 但是如果想对多个键值对进行操作，这种方法就显得比较麻烦，好在有 update 方法：
@@ -979,7 +979,7 @@ print('chickens' in barn)  # False
 print('cows' in barn)  # True
 ```
 
-#### keys 方法，values 方法和 items 方法
+### keys 方法，values 方法和 items 方法
 
 - `d.keys()` 返回一个由所有键组成的列表；
 - `d.values()` 返回一个由所有值组成的列表；
@@ -999,14 +999,14 @@ for key, val in barn.items():
     # dogs 5
 ```
 
-### 集合
+## 集合
 
 列表和字符串都是一种有序序列，而集合 set 是一种无序的序列。
 
 因为集合是无序的，所以当集合中存在两个同样的元素的时候，只会保存其中的一个（唯一性）；
 同时为了确保其中不包含同样的元素，集合中放入的元素只能是不可变的对象（确定性）。
 
-#### 创建集合
+### 创建集合
 
 ```python showLineNumbers
 # 可以用set()函数来显示的生成空集合：
@@ -1033,14 +1033,14 @@ s = {}
 print(type(s))  # <type 'dict'>
 ```
 
-#### 集合操作
+### 集合操作
 
 ```python showLineNumbers
 a = {1, 2, 3, 4}
 b = {2, 3, 4, 5}
 ```
 
-##### 并
+#### 并
 
 两个集合的并，返回包含两个集合所有元素的集合（去除重复）。
 可以用方法 a.union(b) 或者操作 a | b 实现。
@@ -1058,7 +1058,7 @@ print(c)
 c == d
 ```
 
-##### 交
+#### 交
 
 两个集合的交，返回包含两个集合共有元素的集合。
 
@@ -1074,7 +1074,7 @@ print(d)
 c == d
 ```
 
-##### 差
+#### 差
 
 a 和 b 的差集，返回只在 a 不在 b 的元素组成的集合。
 
@@ -1087,7 +1087,7 @@ d = a - b
 print(d)
 ```
 
-##### 对称差
+#### 对称差
 
 a 和 b 的对称差集，返回在 a 或在 b 中，但是不同时在 a 和 b 中的元素组成的集合。
 
@@ -1101,7 +1101,7 @@ d = a ^ b
 print(d)
 ```
 
-##### 包含关系
+#### 包含关系
 
 要判断 b 是不是 a 的子集，可以用 b.issubset(a) 方法，
 或者更简单的用操作 b `<=` a ：
@@ -1130,9 +1130,9 @@ print(a < a)  # False
 print(a <= a)  # True
 ```
 
-#### 集合方法
+### 集合方法
 
-##### add 方法向集合添加单个元素
+#### add 方法向集合添加单个元素
 
 跟列表的 append 方法类似，用来向集合添加单个元素。
 
@@ -1147,7 +1147,7 @@ s.add(5)
 print(s)  # set([1, 3, 4, 5])
 ```
 
-##### update 方法向集合添加多个元素
+#### update 方法向集合添加多个元素
 
 跟列表的 extend 方法类似，用来向集合添加多个元素。
 
@@ -1165,7 +1165,7 @@ s.remove(1)
 print(s)  # set([3, 4])
 ```
 
-##### pop 方法弹出元素
+#### pop 方法弹出元素
 
 由于集合没有顺序，不能像列表一样按照位置弹出元素，
 
@@ -1184,7 +1184,7 @@ s.discard(3)
 print(s)  # set([1, 4])
 ```
 
-##### difference_update 方法
+#### difference_update 方法
 
 a.difference_update(b) 从 a 中去除所有属于 b 的元素：
 
@@ -1195,7 +1195,7 @@ a.difference_update(b)
 print(a)  # set([1])
 ```
 
-### 条件语句
+## 条件语句
 
 ```python showLineNumbers
 a = 62
@@ -1218,7 +1218,7 @@ print(not a > 0)  # False
 print(a < 0 or b < 0)  # True
 ```
 
-#### 一个例子
+### 一个例子
 
 ```python showLineNumbers
 year = 1900
@@ -1232,7 +1232,7 @@ else:
 # This is not a leap year.
 ```
 
-#### 判断列表
+### 判断列表
 
 ```python showLineNumbers
 my_list = [1, 2]
@@ -1244,9 +1244,9 @@ else:
 
 ```
 
-### 循环
+## 循环
 
-#### for 循环
+### for 循环
 
 ```python showLineNumbers
 # for 循环
@@ -1256,7 +1256,7 @@ for i in range(100000):
 print(total)  # 4999950000
 ```
 
-#### while 循环
+### while 循环
 
 ```python showLineNumbers
 while <condition>:
@@ -1285,7 +1285,7 @@ while plays:
     print('Perform', play)
 ```
 
-#### continue 语句
+### continue 语句
 
 遇到 continue 的时候，程序会返回到循环的最开始重新执行。
 
@@ -1301,7 +1301,7 @@ for i in values:
 # 2
 ```
 
-#### break 语句
+### break 语句
 
 遇到 break 的时候，程序会跳出循环，不管循环条件是不是满足
 
@@ -1328,11 +1328,11 @@ while command_list:
 
 ```
 
-### 函数
+## 函数
 
 为了减少重复，函数登场。
 
-#### 定义函数
+### 定义函数
 
 在 Python 中可以使用 def 关键字来定义函数，程序中函数的参数就相当于是数学上说的函数的自变量，可以通过 return 关键字来返回一个值，这相当于数学上说的函数的因变量。
 
@@ -1348,7 +1348,7 @@ def add(a, b):
     return c
 ```
 
-#### 使用函数
+### 使用函数
 
 使用函数时，只需要将参数换成特定的值传给函数。
 
@@ -1377,7 +1377,7 @@ add(b='morning', a='good')
 add(2, b=3)  # 5
 ```
 
-#### 设定默认参数
+### 设定默认参数
 
 ```python showLineNumbers
 def quad(x, a=1, b=0, c=0):
@@ -1392,7 +1392,7 @@ quad(2.0)
 quad(2.0, b=3)
 ```
 
-#### 接收不定参数
+### 接收不定参数
 
 使用如下方法，可以使函数接受不定数目的参数,类似 java 的..多个参数：
 
@@ -1413,7 +1413,7 @@ print(add(1, 2, 3, 4, 5))  # 15
 print(add(1, 2))  # 3
 ```
 
-#### 使用关键词传入参数
+### 使用关键词传入参数
 
 ```python showLineNumbers
 def add(x, **kwargs):
@@ -1438,7 +1438,7 @@ def fun1(*args, **kwargs):
 fun1(2, 3, a="bar", b=10)  # (2, 3) {'a': u'bar', 'b': 10}
 ```
 
-#### 返回多个值
+### 返回多个值
 
 ```python showLineNumbers
 # 函数可以返回多个值：
@@ -1480,7 +1480,7 @@ d = {'a': 2, 'b': 5}
 print(add(**d))  # 7
 ```
 
-#### map 方法生成序列
+### map 方法生成序列
 
 map 函数
 
@@ -1522,7 +1522,7 @@ b = [10, 11, 15]
 list(map(add, a, b))  # [12, 14, 19]
 ```
 
-#### reduce
+### reduce
 
 reduce() 函数会对参数序列中元素进行累积。
 
@@ -1537,7 +1537,7 @@ print(sum1)
 print(sum2)
 ```
 
-### 高级函数
+## 高级函数
 
 在 Python 中，函数是一种基本类型的对象，这意味着可以将函数作为参数传给另一个函数。
 
@@ -1569,7 +1569,7 @@ func
 funcs
 ```
 
-#### 函数参数
+### 函数参数
 
 引用传递
 
@@ -1615,7 +1615,7 @@ print(x)
 # [999, 2, 3]
 ```
 
-#### 高阶函数
+### 高阶函数
 
 以函数作为参数，或者返回一个函数的函数是高阶函数，
 常用的例子有 map 和 filter 函数
@@ -1678,7 +1678,7 @@ import os
 os.path.exists('foo.txt')
 ```
 
-#### 匿名函数 lambda
+### 匿名函数 lambda
 
 ```python showLineNumbers
 list(map(square, range(5)))
@@ -1703,7 +1703,7 @@ s2 = sum(x ** 2 for x in range(1, 3))
 print(s2)  # 5
 ```
 
-#### global 变量
+### global 变量
 
 要在函数中修改全局变量的值，需要加上 global 关键字：
 
@@ -1742,7 +1742,7 @@ print(x)
 # 15
 ```
 
-#### 递归
+### 递归
 
 一般对于分治法，要用递归，不过在 python 中不怎么用，更高效的处理非波切利算法：
 
@@ -1759,7 +1759,7 @@ print([fib(i) for i in range(10)])
 
 ```
 
-### 模块
+## 模块
 
 用模块管理函数，Python 中每个文件就代表了一个模块（module），
 
@@ -1796,7 +1796,7 @@ from module2 import foo
 foo()
 ```
 
-#### **name** 属性
+### **name** 属性
 
 有时候我们想将一个 .py 文件既当作脚本，又能当作模块用，
 这个时候可以使用 **name** 这个属性。
@@ -1856,7 +1856,7 @@ import os
 os.remove('ex.py')
 ```
 
-#### 模块导入顺序
+### 模块导入顺序
 
 通常情况下，当使用 import 语句导入模块后，Python 会按照以下顺序查找指定的模块文件：
 
@@ -1876,7 +1876,7 @@ os.remove('ex.py')
 
 > 设置 path 系统环境变量。
 
-#### 垃圾回收机制
+### 垃圾回收机制
 
 如果持续不断加载数据，调用函数模块，计算机的内存会溢出，Python 的垃圾回收机制。是计数机制，当一个对象的引用数为 0 时，它就会被垃圾回收机制回收。
 
@@ -1911,7 +1911,7 @@ sys.getrefcount(a)
 ```
 
 
-### 面向对象编程
+## 面向对象编程
 
 面向对象编程——Object Oriented Programming，简称 OOP，是一种程序设计思想。OOP 把对象作为程序的基本单元，一个对象包含了数据和操作数据的函数。
 
@@ -1923,9 +1923,9 @@ sys.getrefcount(a)
 
 面向对象的抽象程度又比函数要高，因为一个 Class 既包含数据，又包含操作数据的方法。
 
-#### 创建类
+### 创建类
 
-##### 类的特殊方法
+#### 类的特殊方法
 
 Python 使用 \_\_ 开头的名字来定义特殊的方法和属性，它们有：
 
@@ -2010,7 +2010,7 @@ print(my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color)
 my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color
 ```
 
-##### 类的属性
+#### 类的属性
 
 只读属性：
 
@@ -2108,7 +2108,7 @@ print(my_clothes.price)
 print(my_clothes.discount_price)
 ```
 
-#### 继承
+### 继承
 
 类定义的基本形式：
 
@@ -2187,7 +2187,7 @@ print(him_clothes.color)
 print(him_clothes.out_print())
 ```
 
-#### super() 函数
+### super() 函数
 
 super(CurrentClassName, instance)
 
@@ -2211,7 +2211,7 @@ print(her_clothes.color)
 her_clothes.out_print()
 ```
 
-#### **new**() 方法
+### **new**() 方法
 
 **new**()用来创建一个实例，它至少有一个参数 cls，代表当前类。默认情况下**new**()会创建当前类的实例，该方法也可以被重载，重载后也可以创建其他类的实例。
 
@@ -2254,7 +2254,7 @@ if __name__ == '__main__':
 
 可以看出，f 不是 Fun 类的一个实例，而是 Demo 类的一个实例，拥有 Demo 类的字段。因为 Fun 类的**new**方法创建的是一个 Demo 类实例，而非 Fun 类本身。因此 Fun.**new**方法在 return 后调用了 Demo.**init**方法，以完成该实例的初始化。
 
-#### 接口
+### 接口
 
 接口的调用：
 
@@ -2287,7 +2287,7 @@ for obj in objects:
     obj.out()
 ```
 
-#### 类方法
+### 类方法
 
 类方法包括以下几种：
 
@@ -2324,9 +2324,9 @@ demo._get_name()
 demo._MyDemoClass__get_type()
 ```
 
-### 异常
+## 异常
 
-#### try & except 块
+### try & except 块
 
 捕捉不同的错误类型，尝试在下面输入框输入：-1，1，2，q
 
@@ -2348,7 +2348,7 @@ while True:
 
 ```
 
-#### 自定义异常
+### 自定义异常
 
 异常是标准库中的类，这意味着我们可以自定义异常类：
 
@@ -2374,7 +2374,7 @@ while True:
 
 ```
 
-#### finally
+### finally
 
 try/catch 块还有一个可选的关键词 finally。
 
@@ -2394,7 +2394,7 @@ finally:
 
 
 
-### 装饰器
+## 装饰器
 
 如果你有一批变量想统一按一个规则处理，并且需要缩减代码，你需要函数。
 
@@ -2591,7 +2591,7 @@ test2(1,2)
 
 不过这些结构相对复杂，当你理解普通的@修饰符之后，这些自带的你只需要记得用法即可，原理都是一样的。
 
-#### 例子
+### 例子
 
 定义两个装饰器函数，一个将原来的函数值加一，另一个乘二：
 
@@ -2625,7 +2625,7 @@ b = foo(2)
 b  # 5
 ```
 
-#### 修饰器工厂
+### 修饰器工厂
 
 decorators factories 是返回修饰器的函数
 
@@ -2668,7 +2668,7 @@ import os
 os.remove('test.txt')
 ```
 
-#### @classmethod 装饰器
+### @classmethod 装饰器
 
 在 Python 标准库中，有很多自带的装饰器，
 
@@ -2690,7 +2690,7 @@ class Foo(object):
 Foo.bar(10)
 ```
 
-#### @property 装饰器
+### @property 装饰器
 
 有时候，我们希望像 Java 一样支持 getters 和 setters 的方法，
 
@@ -2744,7 +2744,7 @@ foo.x = 2222
 foo.x
 ```
 
-### 迭代器
+## 迭代器
 
 迭代是 Python 最强大的功能之一，是访问集合元素的一种方式。
 
@@ -2769,7 +2769,7 @@ next(it) # 输出迭代器的下一个元素
 next(it) # 再输出下一个元素
 ```
 
-#### enumerate
+### enumerate
 
 列表好处是不需要对下标进行迭代，直接输出列表的值：
 
@@ -2792,7 +2792,7 @@ for i, n in enumerate(x):
     print(i, 'is', n)
 ```
 
-#### 自定义迭代器
+### 自定义迭代器
 
 一个迭代器都有 `__iter__()` 与 `__next__()`
 
@@ -2827,7 +2827,7 @@ for i in ReverseListIterator(x):
 
 只要我们定义了这三个方法(`__init__, __iter__, __next__`)，我们可以返回任意迭代值：
 
-#### 实现 Collatz 猜想
+### 实现 Collatz 猜想
 
 这里我们实现 Collatz 猜想：
 
@@ -2877,7 +2877,7 @@ print(x, y)
 
 解决方法是将迭代器和可迭代对象分开处理。
 
-#### 迭代器和可迭代对象分开处理
+### 迭代器和可迭代对象分开处理
 
 这里提供了一个二分树的中序遍历实现：
 
@@ -2943,7 +2943,7 @@ for x, y in zip(tree, tree):
 
 ```
 
-### 生成器
+## 生成器
 
 在 Python 中，使用了 yield 的函数被称为生成器（generator）。
 
@@ -3039,7 +3039,7 @@ next(x)
 x.__iter__()
 ```
 
-#### return 和 yield 有什么区别？
+### return 和 yield 有什么区别？
 
 yield 是暂停的意思(它有程序中起着类似红绿灯中等红灯的作用)；yield 是创建迭代器，可以用 for 来遍历，有点事件触发的意思
 
@@ -3070,13 +3070,13 @@ print(list(g2(5)))
 #[5, 4, 3, 2, 1, 0, 1, 2, 3, 4]
 ```
 
-##### 迭代器和生成器有什么区别？
+#### 迭代器和生成器有什么区别？
 
 在 Python 中，使用了 yield 的函数被称为生成器（generator）。跟普通函数不同的是，生成器是一个返回迭代器的函数，只能用于迭代操作，更简单点理解生成器就是一个迭代器。在调用生成器运行的过程中，每次遇到 yield 时函数会暂停并保存当前所有的运行信息，返回 yield 的值, 并在下一次执行 next() 方法时从当前位置继续运行。
 
 调用一个生成器函数，返回的是一个迭代器对象：迭代是 Python 最强大的功能之一，是访问集合元素的一种方式。迭代器是一个可以记住遍历的位置的对象。迭代器对象从集合的第一个元素开始访问，直到所有的元素被访问完结束。迭代器只能往前不会后退。迭代器有两个基本的方法：iter() 和 next()
 
-##### **new**和 **init**的区别？
+#### **new**和 **init**的区别？
 
 执行顺序的不同：只有在**new**返回一个 cls 的实例时后面的**init**才能被调用
 
@@ -3084,15 +3084,15 @@ print(list(g2(5)))
 
 返回值的不同：**new**方法会返回一个创建的实例,而**init**什么都不返回
 
-#### 闭包
+### 闭包
 
 闭包可以用在许多地方。它的最大用处有两个：
 
 1.可以读取函数内部的变量 2.让这些变量的值始终保存在内存中 3.单向访问，函数内可以访问，但是全局不能访问
 
-#### 闭包原理（命名空间与作用域）
+### 闭包原理（命名空间与作用域）
 
-##### 命名空间
+#### 命名空间
 
 - 全局命名空间：创建的存储“变量名与值的关系”的空间叫做全局命名空间
 - 局部命名空间：在函数的运行中开辟的临时的空间叫做局部命名空间
@@ -3106,7 +3106,7 @@ print(list(g2(5)))
   使用：
   全局不能使用局部的，局部的可以使用全局的
 
-##### 作用域
+#### 作用域
 
 作用域：就是作用范围，为了函数内的变量不会影响到全局。作用域分为两种：
 
@@ -3117,7 +3117,7 @@ print(list(g2(5)))
 - locals 方法：查看局部作用域的名字【print(locals())】
   `<br>`下面看 2 个示例
 
-##### 闭包失败示例
+#### 闭包失败示例
 
 ```python showLineNumbers
 name = 1 #变量在函数外部,inner可以访问，但是全局也能访问。直接闭包失败
@@ -3133,7 +3133,7 @@ print(p())#输出的__closure__为None ：不是闭包函数
 print(name)
 ```
 
-##### 闭包成功示例
+#### 闭包成功示例
 
 ```python showLineNumbers
 def func():
@@ -3155,13 +3155,13 @@ print(p())
 print(name)
 ```
 
-#### 单例模式
+### 单例模式
 
 单例模式就是确保一个类只有一个实例.当你希望整个系统中,某个类只有一个实例时,单例模式就派上了用场.
 
 比如,某个服务器的配置信息存在在一个文件中,客户端通过 AppConfig 类来读取配置文件的信息.如果程序的运行的过程中,很多地方都会用到配置文件信息,则就需要创建很多的 AppConfig 实例,这样就导致内存中有很多 AppConfig 对象的实例,造成资源的浪费.其实这个时候 AppConfig 我们希望它只有一份,就可以使用单例模式.
 
-#### 使用闭包函数实现单例模式
+### 使用闭包函数实现单例模式
 
 ```python showLineNumbers
 def single(cls, *args, **kwargs):
@@ -3185,7 +3185,7 @@ b = Apple()
 print(id(b))
 ```
 
-#### 也可以直接使用**new**方法实现的单例模式
+### 也可以直接使用**new**方法实现的单例模式
 
 ```python showLineNumbers
 class Single:
@@ -3199,4 +3199,738 @@ s1 = Single()
 s2 = Single()
 print(id(s1))
 print(id(s2))
+```
+
+## 练习
+
+### 后缀表达式
+
+#### 描述
+
+后缀表达式，又称逆波兰式，指的是不包含括号，运算符放在两个运算对象的后面，所有的计算按运算符出现的顺序，严格从左向右进行（不再考虑运算符的优先规则）。
+
+例如：后缀表达式为“2 3 + 4 × 5 -”计算过程如下：
+（1）从左至右扫描，将 2 和 3 压入堆栈；
+（2）遇到 + 运算符，因此弹出 3 和 2（ 3 为栈顶元素，2 为次顶元素，注意与前缀表达式做比较），计算出 3+2 的值，得 5，再将 5 入栈；
+（3）将 4 入栈；
+（4）接下来是 × 运算符，因此弹出 4 和 5，计算出 4 × 5 = 20，将 20 入栈；
+（5）将 5 入栈；
+（6）最后是-运算符，计算出 20-5 的值，即 15，由此得出最终结果。
+
+示例
+
+listx = [15, 7, 1, 1, "+", "-", "/", 3, "*", 2, 1, 1, "+", "+", "-"]
+
+#### 题解
+
+```python  showLineNumbers
+
+# 方法1-python人思维
+while len(listx) > 1:
+    print(listx)
+    for i in range(len(listx)):
+        if str(listx[i]) in '+-*/':
+            if listx[i] == '+':
+                new = listx[i-2] + listx[i-1]
+            if listx[i] == '-':
+                new = listx[i-2] - listx[i-1]
+            if listx[i] == '*':
+                new = listx[i-2] * listx[i-1]
+            if listx[i] == '/':
+                new = listx[i-2] / listx[i-1]
+            del listx[i]
+            del listx[i-1]
+            listx[i-2] = new
+            break
+print(listx)
+
+# 方法2-利用pop 和 append 仿c语言栈操作
+listy = []
+for i in listx:
+    if str(i) not in "+-*/":
+        listy.append(i)  # 入栈
+    else:
+        if i == "+":
+            new = listy.pop() + listy.pop()  # 出栈
+        if i == "-":
+            new = listy.pop() - listy.pop()
+        if i == "*":
+            new = listy.pop() * listy.pop()
+        if i == "/":
+            new = listy.pop() / listy.pop()
+        listy.append(new)
+print(listy)
+```
+
+### 求解密码
+
+#### 描述
+
+Python中的string模块包含了许多字符，请根据以下提示设计一个函数：
+
+参数1：不同的密码组合类型
+参数2：密码长度
+
+输出：所以可能的组合数量
+
+示例：当仅用**小写字母**和**数字**来组成1位密码时，共有36种可能（26+10）
+
+string.ascii_letters 所有字母
+string.ascii_uppercase  大写字母
+string.ascii_lowercase  小写字母
+string.digits   数字
+string.punctuation  标点符号
+string.printable    可打印字符
+string.whitespace   空白字符
+
+#### 题解
+
+```python  showLineNumbers
+import string
+# 方法1 正常Python人思维
+def generate_pwd_list(dic, max_len):
+    """
+    description:生成指定长度的密码序列
+    param {*} dic   字典
+    param {*} pwd_len   最大密码长度
+    return {*}
+    """
+    k = itertools.product(dic, repeat=max_len)  # 迭代器
+    allkey = ("".join(i) for i in k)
+    if max_len == 1:
+        return list(allkey)
+    return generate_pwd_list(dic, max_len - 1) + list(allkey)
+
+
+keys = generate_pwd_list(string.ascii_lowercase + string.digits, 1)
+print(len(keys))
+
+
+# 方法2 递归
+def combi(seq):
+    if not seq:
+        yield []
+    else:
+        for element in seq[0]:
+            for rest in combi(seq[1:]):
+                yield [element] + rest
+
+
+def sets(dic, pwd_len):
+    n = []
+    for i in range(pwd_len):
+        n.append(dic)
+    return list(combi(n))
+
+
+print(len(sets(string.ascii_lowercase + string.digits, 2)))
+
+
+
+# 方法3 迭代器
+
+
+res = []
+
+
+def func(arr, index, temp):
+    if len(temp) == len(arr):
+        res.append(temp[:])
+    else:
+        for i in range(len(arr[index])):
+            temp.append(arr[index][i])
+            func(arr, index + 1, temp)
+            temp.pop()
+
+
+def sets(dic, pwd_len):
+    n = []
+    for i in range(pwd_len):
+        n.append(dic)
+    func(
+        n,
+        0,
+        [],
+    )
+
+
+sets(string.ascii_lowercase + string.digits, 2)
+print(len(res))
+
+
+```
+
+### 电影演员
+
+#### 描述
+
+小明拿到了一个电影+演员的数据名单，他想设计一个程序，要求：
+1.输入演员名
+2.如果演员出演了电影，则打印他+他出演的全部电影。程序结束
+3.如果演员没有出演电影，则打印查无此人。程序继续
+```python  showLineNumbers
+电影 = [
+'妖猫传',['黄轩','染谷将太'],
+'无问西东',['章子怡','王力宏','祖峰'],
+'超时空同居',['雷佳音','佟丽娅','黄轩']]
+```
+#### 题解
+
+```python  showLineNumbers
+
+电影 = [
+'妖猫传',['黄轩','染谷将太'],
+'无问西东',['章子怡','王力宏','祖峰'],
+'超时空同居',['雷佳音','佟丽娅','黄轩']]
+# 如果查到了：打印出演员+【所有的】电影，循环结束
+# 如果没查到，就 循环继续，并且打印【查无此人】
+找到了吗 = 0 
+while True:
+    name = input('你要找的演员')
+    for i in 电影:
+        if name not in i : 
+            a = i #暂存---for 是逐一提取数据，并赋值
+        else:
+            print(name,'出演了',a)
+            找到了吗 += 1        
+    if 找到了吗 != 0 : # 不等于 0 就代表它找到了
+        break
+    print('【查无此人】') # 1号位
+```
+
+### 质数分解
+
+#### 描述
+
+每个数字可以写成多个质数的乘积，给定一个数字，请你分解为多个质数
+
+#### 题解
+
+```python  showLineNumbers
+
+
+def fun(num, list=None):
+    if list is None:
+        list = []
+    for i in range(2, num):
+        while num % i == 0:
+            list.append(i)
+            num = int(num / i)
+            if num > 1:
+                fun(num)
+    return list
+x = 9*5
+print(fun(x))
+```
+
+### 九九乘法表
+
+#### 描述
+
+要求使用循环代码打印一个九九乘法表出来.如下
+
+```bash
+1*1=1 
+
+1*2=2 2*2=4 
+
+1*3=3 2*3=6 3*3=9 
+
+1*4=4 2*4=8 3*4=12 4*4=16 
+
+1*5=5 2*5=10 3*5=15 4*5=20 5*5=25 
+
+1*6=6 2*6=12 3*6=18 4*6=24 5*6=30 6*6=36 
+
+1*7=7 2*7=14 3*7=21 4*7=28 5*7=35 6*7=42 7*7=49 
+
+1*8=8 2*8=16 3*8=24 4*8=32 5*8=40 6*8=48 7*8=56 8*8=64        
+
+1*9=9 2*9=18 3*9=27 4*9=36 5*9=45 6*9=54 7*9=63 8*9=72 9*9=81 
+```
+
+#### 题解
+
+```python  showLineNumbers
+#方法一
+for i in range(1,10):
+    print()
+    for j in range(1,i+1):
+        print('%d*%d=%d' % (j,i,i*j),end=' ')
+
+#方法二
+i=1
+while i<10: #控制行，1到9
+    j=1
+    while j <= i: #控制每行显示的数量，1到9
+        print("%d*%d=%d"%(j,i,i*j),end=' ') #输出
+        j+=1 #每行显示的数量加1
+    print("\n") #每一行结束换行
+    i+=1 #行数加1
+
+```
+
+### 字典排序
+
+#### 描述
+
+将字典数组按字典的某个key排序
+
+#### 题解
+
+```python  showLineNumbers
+# 方法1：
+sorted(d.cop(),key = lambda i:i[k])
+
+# 方法2：
+heappush(h,(i[k],i)) for i in d
+```
+
+### 冒泡排序
+
+#### 描述
+
+给定一个列表，请你对列表的元素进行     从大到小排序   与从小到大排序
+
+#### 题解
+
+```python  showLineNumbers
+
+
+list1 = [13, 22, 6, 99, 11, 0]
+
+for a in range(len(list1)):
+    for b in range(a,len(list1)):
+        if list1[a] < list1[b]:  #如果m大于了n
+           list1[a] ,list1[b] =  list1[b],list1[a]#交换位置
+print(list1)
+```
+
+### 快速排序
+
+#### 描述
+
+快速排序（Quicksort）是对冒泡排序的一种改进算法。
+
+该算法的实现基本可分为以下几步：
+
+在数组中选一个基准数（通常为数组第一个）。
+将数组中小于基准数的数据移到基准数左边，大于基准数的移到右边
+对于基准数左、右两边的数组，不断重复以上两个过程，直到每个子集只有一个元素，即为全部有序。
+
+请你编写它的实现代码。
+
+#### 题解
+
+```python  showLineNumbers
+def partition(arr, low: int, high: int):
+    pivot, j = arr[low], low  # 获取底部元素与 对应的初始下标
+
+    for i in range(low + 1, high + 1):  # 从第2个元素开始，到最后一个元素
+        if arr[i] <= pivot:  # 如果这个元素，小于第1个元素
+            j += 1  # 初始下标+1
+            arr[j], arr[i] = arr[i], arr[j]  # 把这个小元素和标的元素换位置
+    arr[low], arr[j] = arr[j], arr[low]  # arr[low]是等于自己的，现在把他挪到中间位置
+    return j  # 返回这个中间位置
+
+
+def quick_sort_between(arr, low: int, high: int):
+    if high-low < 1:  # 递归结束条件
+        return
+
+    m = partition(arr, low, high)
+    quick_sort_between(arr, low, m - 1) # 二分后自我调用，直到递归结束条件触发
+    quick_sort_between(arr, m + 1, high)
+
+
+def quick_sort(arr):
+    """
+    快速排序(in-place)
+    :param arr: 待排序的List
+    :return: 快速排序是就地排序(in-place)
+    """
+    quick_sort_between(arr, 0, len(arr)-1)  # arr[0] - arr[len(arr)-1]
+
+# 测试数据
+if __name__ == '__main__':
+    arr = [17, 56, 71, 38, 61, 62, 48, 28, 57, 42, 10, 21, 12, 90]  # 长度为10
+    quick_sort(arr)
+    print("快速排序结果：", arr)
+```
+
+### 抽奇数
+
+#### 描述
+
+要求：0-N，每次抽走奇数，打印剩余的那个数字
+
+#### 题解
+
+```python  showLineNumbers
+aList = []
+for i in range(0,2023):
+    aList.append(i)
+
+while len(aList)>1:
+    aList = aList[1::2]
+    print(aList)
+print(aList)
+```
+
+### 平方和
+
+#### 描述
+
+两个数字的平方和是2022，请问这2个数分别是多少
+
+#### 题解
+
+```python  showLineNumbers
+
+for a in range(1,2022):
+    if (2022 - a*a)**0.5 in range(1,2022):
+        print(a)
+```
+
+### 规整的打印考场号
+
+#### 描述
+
+学校有440人参加考试，1号考场有80个座位，要求座位号为0101--0180
+后面每个考场40个座位：
+2号考场考试号要求为0201--0240
+3号考场考试号要求为0301--0340
+后续考场以此类推，请你打印出来这些考场号吧
+
+#### 题解
+
+```python  showLineNumbers
+
+for i in range(1,440):
+    if i <= 80 :
+        print('01{:0>2d}'.format(i))
+    elif i <= 440:
+        if i%40 == 0:
+            print('{:0>2d}{:0>2d}'.format(i//40-1,40))
+        else:
+            print('{:0>2d}{:0>2d}'.format(i//40,i%40))
+```
+
+### 打印时间
+
+#### 描述
+
+请从00:00依次打印出一天的时间
+示例：
+
+- 23 : 52
+- 23 : 53
+- 23 : 54
+
+#### 题解
+
+```python  showLineNumbers
+
+for 时钟 in range(24):
+    for 分钟 in range(60):
+        print(时钟, ':', 分钟)
+
+```
+
+### 数羊问题
+
+#### 描述
+
+编写一段代码，模拟我们数羊到入睡的过程：
+每数五只羊，就提问一次：睡着了吗？
+如果没有睡着，继续循环，并打印“继续数羊”。
+如果睡着了，则停止循环，并打印“终于睡着了”。
+
+#### 题解
+
+```python  showLineNumbers
+
+i = 0
+while True:
+    i += 1
+    left_endpoint = 1 + 5 * ( i - 1 )
+    right_endpoint = 1 + 5 * i
+    for i in range(left_endpoint, right_endpoint):
+        print(str(i)+'只羊')
+    answer = input('睡着了吗？回答是或否：')
+    if answer == '是':
+        break
+    print('继续数羊')
+print('终于睡着了')
+
+#方法二
+睡觉的状态 = '还没睡'
+a = 0
+while 睡觉的状态 != '睡着': # 只要不是睡着，就继续数
+    a +=1
+    print(str(a)+'只羊')
+    if a%9 == 0 : # %是取余数 每次数5只羊
+        睡觉的状态 = input('睡着了嘛？')
+```
+
+### 读取BMP文件
+
+#### 描述
+
+不使用第三方模块的前提下，完成对24位bmp图像的图像数据分析与像素读取。
+程序设计需要体现面向对象编程的特点，以创建类的形式编写。
+
+参考资料：
+
+以一张2*2的24位图的bmp格式图片为例
+
+| Offset | Offset10 | Size | Hex value | Value | Description |
+|---|---|---|---|---|---|
+| BMP Header |  |  |  |  |  |
+| 0h | 0 | 2 | 42 4D | "BM" | ID field \(42h, 4Dh\) |
+| 2h | 2 | 4 | 46 00 00 00 | 70 bytes \(54\+16\) | BMP 文件的大小（54 字节标头 \+ 16 字节数据） |
+| 6h | 6 | 2 | 00 00 | Unused | 特定应用 |
+| 8h | 8 | 2 | 00 00 | Unused | 特定应用 |
+| Ah | 10 | 4 | 36 00 00 00 | 54 bytes \(14\+40\) | 可以找到像素阵列（位图数据）的偏移量 |
+| DIB Header\-Device Independent Bitmaps\-设备无关位图 |  |  |  |  |  |
+| Eh | 14 | 4 | 28 00 00 00 | 40 bytes |  DIB 头中的字节数（从此时开始） |
+| 12h | 18 | 4 | 02 00 00 00 | 2 pixels \(left to right order\) | 位图的宽度（以像素为单位） |
+| 16h | 22 | 4 | 02 00 00 00 | 2 pixels \(bottom to top order\) | 位图的高度（以像素为单位）。从下到上的像素顺序为正。 |
+| 1Ah | 26 | 2 | 01 00 | 1 plane | 使用的颜色平面数量 |
+| 1Ch | 28 | 2 | 18 00 | 24 bits | 每个像素的位数 |
+| 1Eh | 30 | 4 | 00 00 00 00 | 0 | BI\_RGB，未使用像素阵列压缩 |
+| 22h | 34 | 4 | 10 00 00 00 | 16 bytes | 原始位图数据的大小（包括填充） |
+| 26h | 38 | 4 | 13 0B 00 00 | 2835 pixels/metre horizontal | 图像的打印分辨率， |
+| 2Ah | 42 | 4 | 13 0B 00 00 | 2835 pixels/metre vertical | 72 DPI × 39\.3701 inches per metre yields 2834\.6472 |
+| 2Eh | 46 | 4 | 00 00 00 00 | 0 colors | 调色板中的颜色数量 |
+| 32h | 50 | 4 | 00 00 00 00 | 0 important colors | 0 表示所有颜色都很重要 |
+| Start of pixel array \(bitmap data\) |  |  |  |  |  |
+| 36h | 54 | 3 | 00 00 FF | 0 0 255 | Red, Pixel \(x=0, y=1\) |
+| 39h | 57 | 3 | FF FF FF | 255 255 255 | White, Pixel \(x=1, y=1\) |
+| 3Ch | 60 | 2 | 00 00 | 0 0 | Padding for 4 byte alignment \(could be a value other than zero\) |
+| 3Eh | 62 | 3 | FF 00 00 | 255 0 0 | Blue, Pixel \(x=0, y=0\) |
+| 41h | 65 | 3 | 00 FF 00 | 0 255 0 | Green, Pixel \(x=1, y=0\) |
+| 44h | 68 | 2 | 00 00 | 0 0 | Padding for 4 byte alignment \(could be a value other than zero\) |
+
+bit（位）比特是计算机运算的基础，属于二进制的范畴
+
+byte字节是内存的基本单位
+
+8 bit = 1 byte
+
+```python  showLineNumbers
+# 参考知识
+
+data = b'\xff' # b代表这是一个二进制数据，\x代表这是一个十六进制的数据
+
+bin_data = bin(int.from_bytes(data))[2:]  # -> 11111111
+
+int(bin_data, 2) # -> 255
+
+# 打开文件作为可编辑对象
+with open("r.bmp", "rb") as f:
+    d = f.read()
+    data = bytearray(d)
+# 试着把54到246的数据都改成0x00，即黑色。这样整张图片都变成黑色了
+for i in range(54, 246):
+    data[i]= 0x00
+# 保存文件
+with open("black.bmp", "wb") as f:
+    f.write(data)
+```
+
+#### 题解
+
+```python  showLineNumbers
+class Readbmp:
+    """
+    read bmp files
+    图片的格式说明：https://en.wikipedia.org/wiki/BMP_file_format#Example_1
+    """
+
+    def __init__(self, pic_path) -> None:
+        self.pic_path = pic_path
+        self.read_color()
+
+    def read_color(self):
+        if self.pic_path.endswith(".bmp"):
+            self.read_bmp()
+        else:
+            print("不支持的格式")
+
+    def read_bmp(self):
+        bin_datas = []
+        """read file data to bin"""
+        with open(self.pic_path, "rb") as f:
+            while True:
+                if len(bin_datas) == f.tell():
+                    data = f.read(1)
+                    bindata = bin(int.from_bytes(data))[2:]
+                    if len(bindata) < 8:
+                        bindata = (8 - len(bindata)) * "0" + bindata
+                    bin_datas.append(bindata)
+                else:
+                    bin_datas = bin_datas[:-1]
+                    break
+
+        self.bin_pic_head = bin_datas[0:2]  # ID field
+        self.bin_pic_size = bin_datas[2:6]  # Size of the BMP file 文件大小
+        self.bin_pic_exe = bin_datas[6:10]  # 特定应用，默认为0
+        self.bin_pic_address = bin_datas[10:14]  # 图片信息开始地址
+        self.bin_pic_dib = bin_datas[14:18]  # DIB 头中的字节数
+        self.bin_pic_w = bin_datas[18:22]  # 图片像素宽度
+        self.bin_pic_h = bin_datas[22:26]  # 图片像素高度
+        self.bin_pic_color_num = bin_datas[26:28]  # 使用颜色平面数
+        self.bin_pic_color_long = bin_datas[28:30]  # 每个像素位数
+        self.bin_pic_bi = bin_datas[30:34]  # BI_RGB
+        self.bin_pic_big = bin_datas[34:38]  # 原始图像数据大小
+        self.bin_pic_printpix = bin_datas[38:42]  # 打印分辨率
+        self.bin_pic_dpi = bin_datas[42:46]  # DPI
+        self.bin_pic_color_num = bin_datas[46:50]  # 调色板中颜色数量
+        self.bin_pic_color_important = bin_datas[50:54]  # 重要颜色数量
+        self.bin_pic_data = bin_datas[54:]  # 图片数据
+        self.bin_to_pic()
+
+    # 将二进制数据转化成十进制数据
+    def bin_to_dec(self, bin_datas):
+        bin_data = ""
+        for i in reversed(bin_datas):
+            bin_data += i
+        return int(bin_data, 2)
+
+    # 将列表转为3个一组的二维列表
+    def change_data(self, data):
+        data_2d = []
+        x = []
+        for i in data:
+            x.append(int(i, 2))
+            if len(x) == 3:
+                data_2d.append(tuple(x))
+                x = []
+        return data_2d
+
+    # 处理图片数据
+    def bin_to_pic(self):
+        self.pic_head = chr(int(self.bin_pic_head[0], 2)) + chr(
+            int(self.bin_pic_head[1], 2)
+        )
+        self.pic_size = self.bin_to_dec(self.bin_pic_size)
+        self.pic_exe = self.bin_to_dec(self.bin_pic_exe)
+        self.pic_address = self.bin_to_dec(self.bin_pic_address)
+        self.pic_dib = self.bin_to_dec(self.bin_pic_dib)
+        self.pic_w = self.bin_to_dec(self.bin_pic_w)
+        self.pic_h = self.bin_to_dec(self.bin_pic_h)
+        self.pic_color_num = self.bin_to_dec(self.bin_pic_color_num)
+        self.pic_color_long = self.bin_to_dec(self.bin_pic_color_long)
+        self.pic_bi = self.bin_to_dec(self.bin_pic_bi)
+        self.pic_big = self.bin_to_dec(self.bin_pic_big)
+        self.pic_printpix = self.bin_to_dec(self.bin_pic_printpix)
+        self.pic_dpi = self.bin_to_dec(self.bin_pic_dpi)
+        self.pic_color_num = self.bin_to_dec(self.bin_pic_color_num)
+        self.pic_color_important = self.bin_to_dec(self.bin_pic_color_important)
+        self.pic_data = self.change_data(self.bin_pic_data)
+
+    # 打印图片信息
+    def show(self):
+        print(
+            """
+文件ID  {} 
+图像大小(Byte)  {}   
+特定应用  {}   
+图片信息开始地址  {}   
+DIB 头中的字节数 {}   
+图片像素宽度  {}   
+图片像素高度  {}   
+使用颜色平面数  {}   
+每个像素位数  {}   
+BI_RGB  {}   
+原始图像数据大小(Byte) {} 
+打印分辨率  {}   
+DPI  {}   
+调色板中颜色数量  {}   
+重要颜色数量  {}   
+图片数据  {} .... {} 
+""".format(
+                self.pic_head,
+                self.pic_size,
+                self.pic_exe,
+                self.pic_address,
+                self.pic_dib,
+                self.pic_w,
+                self.pic_h,
+                self.pic_color_num,
+                self.pic_color_long,
+                self.pic_bi,
+                self.pic_big,
+                self.pic_printpix,
+                self.pic_dpi,
+                self.pic_color_num,
+                self.pic_color_important,
+                self.pic_data[:5],
+                self.pic_data[-5:],
+            )
+        )
+
+    # 判断颜色
+    def color(self, color):
+        b, g, r = color[0], color[1], color[2]
+        if r == 0 and g == 0 and b == 0:
+            return "黑色"
+        elif r == 0 and g == 0 and b == 255:
+            return "蓝色"
+        elif r == 0 and g == 255 and b == 0:
+            return "绿色"
+        elif r == 255 and g == 0 and b == 0:
+            return "红色"
+        elif r == 255 and g == 255 and b == 255:
+            return "白色"
+        else:
+            return "其他颜色"
+
+    # 统计颜色
+    def count_color(self):
+        color_dict = {}
+        for i in self.pic_data:
+            if i in color_dict:
+                color_dict[i] += 1
+            else:
+                color_dict[i] = 1
+        return color_dict
+
+    # 判断颜色的比例
+    def color_percent(self):
+        color_dict = self.count_color()
+        color_percent_dict = {}
+        for i in color_dict:
+            color_percent_dict[self.color(i)] = int(
+                color_dict[i] / len(self.pic_data) * 100
+            )
+        for i in color_percent_dict:
+            print("{} 占比百分之 {}".format(i, color_percent_dict[i]))
+
+
+
+
+
+p = Readbmp("r.bmp")  # 另存为新文件
+p.color_percent()
+# 红色 占比百分之 100
+"""
+r.bmp是8*8的位图，其中有一个点是红色，其他都是黑色
+"""
+# 打开文件作为可编辑对象
+with open("r.bmp", "rb") as f:
+    d = f.read()
+    data = bytearray(d)
+# 试着把54到246的数据都改成0x00，即黑色。这样整张图片都变成黑色了（也可以只更改某个数据端）
+for i in range(54, 246):
+    data[i]= 0x00
+# 保存文件
+with open("rn.bmp", "wb") as f:
+    f.write(data)
+
+p = Readbmp("rn.bmp")
+p.show()
+p.color_percent()
+# 黑色 占比百分之 100
 ```
