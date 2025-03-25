@@ -15,13 +15,13 @@ Agent 的意义 ：在 AI 时代，Agent 可以利用大模型处理复杂任务
 - 优点：简单易用。
 - 缺点：功能有限，收费昂贵，云端执行非自主（必须联网），不可控。不同的低代码平台有差异，不易迁移。插件大多需要独立的Token,平台可用的大模型也比较有限。
 
-框架开发：LangChain
+框架开发：LangChain、AutoGen等
 
 - 优点：功能强大，可以满足复杂需求。代码可以灵活复用。
 - 缺点：需要一定的技术门槛。
 
 
-### 规则时代
+### Agent之前：规则时代
 ```bash showLineNumbers
 # 规则化的自然语言，一切基于有穷的规则（关键词识别）。
 小爱同学，关灯
@@ -30,6 +30,7 @@ Agent 的意义 ：在 AI 时代，Agent 可以利用大模型处理复杂任务
 
 例如：小爱同学，我要睡觉了。
 ```
+
 如果想要提升模型的智能化能力，只能是工程师编写更多更复杂的关键词判断逻辑才能提升智能水平，且提升幅度有限。不能理解复杂的语义。
 
 ### Agent 1.0 
@@ -84,26 +85,149 @@ Agent 的意义 ：在 AI 时代，Agent 可以利用大模型处理复杂任务
 
 Langchain 的安装与使用可以参考[Langchain 官方文档](https://python.langchain.com/docs/introduction/)
 
-### 模型调用
+## 大模型调用工具
 
-### 提示词
+大模型本身不具备执行能力，需要调用工具。其本质都是将工具封装后传入大模型上下文，然后大模型返回需要调用的工具的名称与参数。再由系统执行。
 
-### 消息修剪
+### 提示词工程
 
-### 记忆层
+```python showLineNumbers
+import openai
+import re
+import datetime
 
-### 工具层
+# 设置 OpenAI API Key
+openai.api_key = "YOUR_API_KEY"
 
-### 社区工具
+# 实际业务函数：获取天气信息
+def get_current_weather(location):
+    # 模拟获取天气的逻辑
+    return f"{location}的当前天气是晴朗。"
 
-#### 自定义工具
+# 新增的工具：获取当前时间
+def get_current_time():
+    now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return f"当前时间是: {now}"
 
-### 图谱
+def prompt_engineered_function_call(user_input):
+    """
+    使用提示词工程实现函数调用：
+    1. 当用户输入中涉及“天气”关键词时，输出调用 get_current_weather 的指令，
+       格式：CALL get_current_weather(location="<城市名称>")
+    2. 当用户输入中涉及“时间”关键词时，输出调用 get_current_time 的指令，
+       格式：CALL get_current_time()
+    3. 如果用户的问题不涉及“天气”或“时间”，则直接回答。
+    """
+    prompt = f"""
+你是一个智能助手，以下是你的工作规则：
+1. 当用户提问包含“天气”关键词时，请按照格式输出函数调用指令，格式如下：
+   CALL get_current_weather(location="<城市名称>")
+2. 当用户提问包含“时间”关键词时，请按照格式输出函数调用指令，格式如下：
+   CALL get_current_time()
+3. 如果用户的问题不涉及“天气”或“时间”，请直接给出答案，不要输出任何函数调用指令。
 
-### 创建节点
+请根据以下用户输入返回结果：
+用户输入：{user_input}
+    """
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  # 或其他支持的模型
+        messages=[
+            {"role": "system", "content": "你是一个智能助手，根据规则输出相应格式。"},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0.2
+    )
+    return response.choices[0].message.content.strip()
 
-### 添加边
+if __name__ == '__main__':
+    user_query = input("请输入查询内容: ")
+    model_reply = prompt_engineered_function_call(user_query)
+    print("模型回复:", model_reply)
+    
+    # 判断模型回复是否为函数调用指令
+    if model_reply.startswith("CALL get_current_weather"):
+        # 解析 location 参数
+        match = re.search(r'location="(.+?)"', model_reply)
+        if match:
+            location = match.group(1)
+            result = get_current_weather(location)
+            print("调用函数结果:", result)
+        else:
+            print("无法解析函数调用参数。")
+    elif model_reply.startswith("CALL get_current_time"):
+        result = get_current_time()
+        print("调用函数结果:", result)
+    else:
+        print("直接回答:", model_reply)
+```
 
-### 添加条件边
+### function calling
 
-### RAG
+```python showLineNumbers
+import openai
+import json
+
+# 请设置你的 OpenAI API Key
+openai.api_key = "YOUR_API_KEY"
+
+# 定义实际业务函数：获取天气信息
+def get_current_weather(location):
+    # 模拟获取天气信息的逻辑
+    return f"{location}的当前天气是晴朗。"
+
+# 定义大模型可调用的函数描述（Function Schema）
+functions = [
+    {
+        "name": "get_current_weather",
+        "description": "获取指定城市的天气",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {"type": "string", "description": "城市名称"}
+            },
+            "required": ["location"]
+        }
+    }
+]
+
+def large_model_integration(user_input):
+    """
+    模拟大模型处理用户输入，
+    若识别到需要调用天气查询函数，则使用函数调用功能。
+    """
+    # 调用大模型接口，启用函数调用
+    response = openai.ChatCompletion.create(
+        model="gpt-4-0613",  # 模型支持函数调用
+        messages=[{"role": "user", "content": user_input}],
+        functions=functions,
+        function_call="auto"  # 模型自动决定是否调用函数
+    )
+
+    message = response["choices"][0]["message"]
+
+    # 判断是否触发了函数调用
+    if message.get("function_call"):
+        func_name = message["function_call"]["name"]
+        arguments = message["function_call"]["arguments"]
+
+        # 解析函数参数
+        args = json.loads(arguments)
+
+        # 根据函数名称调用对应的函数
+        if func_name == "get_current_weather":
+            result = get_current_weather(**args)
+            return f"大模型调用函数 {func_name} 得到结果: {result}"
+        else:
+            return "大模型触发未知函数调用。"
+    else:
+        # 如果大模型没有调用函数，则直接返回回答
+        return message.get("content", "大模型未生成有效回复。")
+
+if __name__ == '__main__':
+    user_query = input("请输入查询内容: ")
+    result = large_model_integration(user_query)
+    print(result)
+
+```
+
+### Mcp

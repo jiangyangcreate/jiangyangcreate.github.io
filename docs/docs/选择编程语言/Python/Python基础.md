@@ -2,12 +2,11 @@
 sidebar_position: 2
 title: Python基础
 ---
-
 ## 安装 Python
 
 [Python 官网下载网址](https://www.python.org/downloads/)
 
-- 本教程使用的是 Python3.13
+- 本教程使用的是 Python3.12
 
 安装过程全部勾选。
 
@@ -18,11 +17,11 @@ title: Python基础
 
 ### pip
 
-在部分系统预装版中，`python`名为`python3`，`pip`为`pip3`
+在部分系统预装版中，`python`名为 `python3`，`pip`为 `pip3`
 
 Python 安装完成后，pip 也会自动安装完成。
 
-后续代码示例以`python`和`pip`为例
+后续代码示例以 `python`和 `pip`为例
 
 ### 更新
 
@@ -32,7 +31,6 @@ Python 安装完成后，pip 也会自动安装完成。
 ### 换源
 
 - Windows/ MacOS 系统临时使用： `pip install -i https://pypi.tuna.tsinghua.edu.cn/simple {包名}`
-
 - Windows 永久使用：
 
 第一步: 在 C:\Users\Administrator 目录下 创建 pip 文件夹
@@ -41,7 +39,7 @@ Python 安装完成后，pip 也会自动安装完成。
 
 第三步：记事本编辑保存 pip.ini 文件内容为以下部分：
 
-```bash showLineNumbers
+```bash
 [global]
 index-url = https://pypi.tuna.tsinghua.edu.cn/simple/
 [install]
@@ -50,7 +48,7 @@ trusted-host = pypi.tuna.tsinghua.edu.cn
 
 - MAC 永久使用：
 
-```bash showLineNumbers
+```bash
 cd ~
 mkdir .pip
 cd .pip
@@ -59,7 +57,7 @@ vi pip.conf
 
 写入以下内容
 
-```bash showLineNumbers
+```bash
 [global]
 index-url = https://pypi.tuna.tsinghua.edu.cn/simple/
 [install]
@@ -71,12 +69,11 @@ trusted-host = pypi.tuna.tsinghua.edu.cn
 注意执行本条命令时，需要在 requirements.txt 文件所在的目录下执行。
 
 - `pip install -r requirements.txt`
-
 - `pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt`
 
 requirements.txt 参考内容
 
-```bash showLineNumbers
+```bash
 opencv-python
 opencv-contrib-python
 imageio
@@ -114,25 +111,25 @@ Vscode 左侧菜单通常为：文件、搜索、源代码管理、调试、应�
 
 - 主题颜色
 
-在设置中点击主题颜色，可以选择自己喜欢的主题颜色。推荐主题颜色为`深色+`
+在设置中点击主题颜色，可以选择自己喜欢的主题颜色。推荐主题颜色为 `深色+`
 
 - 保存时代码自动格式化
 
-安装成功后可以在 Vscode 的设置中搜索`format on save`，勾选即可。
+安装成功后可以在 Vscode 的设置中搜索 `format on save`，勾选即可。
 
 测试：在 Vscode 中新建一个 xxx.py 文件，输入以下内容：
 
-```python showLineNumbers
+```python
 print("hello world")
 ```
 
 运行方式 1：点击右上角的三角形运行按钮
 
-运行方式 2.在编辑器中输入`python xxx.py`运行
+运行方式 2.在编辑器中输入 `python xxx.py`运行
 
-运行方式 3：在编辑器中输入`python -m xxx.py`运行
+运行方式 3：在编辑器中输入 `python -m xxx.py`运行
 
-可以看到输出结果为`hello world`。
+可以看到输出结果为 `hello world`。
 
 python xxx.py 和 python -m xxx.py 是两种加载 py 文件的方式:
 1 叫做直接运行
@@ -167,13 +164,9 @@ python xxx.py 和 python -m xxx.py 是两种加载 py 文件的方式:
 ### Python 变量命名规则
 
 1. 变量名只能包含字母、数字和下划线。变量名可以字母或下划线打头，但不能以数字打头，例如，可将变量命名为 message_1，但不能将其命名为 1_message。
-
 2. 变量名不能包含空格，但可使用下划线来分隔其中的单词。例如，变量名 greeting_message 可行，但变量名 greeting message 会引发错误。
-
 3. 不要将 Python 关键字和函数名用作变量名，即不要使用 Python 保留用于特殊用途的单词，如 print。
-
 4. 变量名应既简短又具有描述性。例如，name 比 n 好，student_name 比 s_n 好，name_length 比 length_of_persons_name 好。
-
 5. 慎用小写字母 l 和大写字母 O，因为它们可能被人错看成数字 1 和 0。
 
 ### 数据类型
@@ -181,9 +174,7 @@ python xxx.py 和 python -m xxx.py 是两种加载 py 文件的方式:
 Python 的最基础的**独立数据类型**有：
 
 1. 整数：Python 可以处理任意大小的整数，当然包括负整数，在程序中的表示方法和数学上的写法一模一样，例如：1，100，-8080，0，等等。
-
 2. 浮点数：浮点数也就是小数，因为浮点数也可能表示为科学计数法（如 1.23e9，或者 12.3e8），所以，浮点数运算结果也可能有误差。
-
 3. 字符串：字符串是以单引号'或双引号"括起来的任意文本，比如'abc'，"xyz"等等。字符串还有一些特殊字符，可以通过转义字符\来表示，比如：
 
    - \n 表示换行
@@ -193,18 +184,16 @@ Python 的最基础的**独立数据类型**有：
    - \U 表示 Unicode 编码
    - \x 表示十六进制数
    - \0 表示八进制数
-
 4. 布尔值：布尔值和布尔代数的表示完全一致，一个布尔值只有 True、False 两种值，要么是 True，要么是 False，在 Python 中，可以直接用 True、False 表示布尔值（请注意大小写），也可以通过布尔运算计算出来：
 
    - and 运算是与运算，只有所有都为 True，and 运算结果才是 True
    - or 运算是或运算，只要其中有一个为 True，or 运算结果就是 True
    - not 运算是非运算，它是一个单目运算符，把 True 变成 False，False 变成 True
-
 5. 空值：空值是 Python 里一个特殊的值，用 None 表示。None 不能理解为 0，因为 0 是有意义的，而 None 是一个特殊的空值。
 
 ### 介绍字符串的索引
 
-```python showLineNumbers
+```python
 # 字符串的索引
 s = 'good morning'
 # 查看类型
@@ -212,7 +201,7 @@ print(type(s))
 s[0]  # g
 ```
 
-```python showLineNumbers
+```python
 s[-2]  # n
 ```
 
@@ -225,21 +214,21 @@ var[lower:upper:step]
 其范围包括 lower ，但不包括 upper ，即 [lower, upper)，
 step 表示取值间隔大小，如果没有默认为 1。
 
-```python showLineNumbers
+```python
 s[-3:]  # ing
 ```
 
-```python showLineNumbers
+```python
 s[:-3]  # good morn
 ```
 
-```python showLineNumbers
+```python
 s[:]  # good morning
 ```
 
 其他切分操作，练习：step
 
-```python showLineNumbers
+```python
 print(s[::2])  # go onn
 print(s[::-1])  # gninrom doog
 print(s[:100])
@@ -250,19 +239,12 @@ print(s[:100])
 Python 的运算符需要掌握如下知识点：
 
 1. 算术运算符
-
 2. 比较（关系）运算符
-
 3. 赋值运算符
-
 4. 逻辑运算符
-
 5. 位运算符
-
 6. 成员运算符
-
 7. 身份运算符
-
 8. 运算符优先级
 
 ### 算术运算符
@@ -271,22 +253,22 @@ Python 的运算符需要掌握如下知识点：
 | ------ | ----------------------------------------------- | -------------------------------------------------------- |
 | +      | 加 - 两个对象相加                               | a + b 输出结果 30                                        |
 | -      | 减 - 得到负数或是一个数减去另一个数             | a - b 输出结果 -10                                       |
-| \*     | 乘 - 两个数相乘或是返回一个被重复若干次的字符串 | a \* b 输出结果 200                                      |
+| \*     | 乘 - 两个数相乘或是返回一个被重复若干次的字符串 | a\* b 输出结果 200                                       |
 | /      | 除 - x 除以 y                                   | b / a 输出结果 2                                         |
 | %      | 取模 - 返回除法的余数                           | b % a 输出结果 0                                         |
 | \*\*   | 幂 - 返回 x 的 y 次幂                           | a\*\*b 为 10 的 20 次方， 输出结果 100000000000000000000 |
 
 ### 比较（关系）运算符
 
-| 运算符 | 描述                                                                                                                                  | 实例                                       |
-| ------ | ------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| ==     | 等于 - 比较对象是否相等                                                                                                               | (a == b) 返回 False。                      |
-| !=     | 不等于 - 比较两个对象是否不相等                                                                                                       | (a != b) 返回 true.                        |
-| `<>`   | 不等于 - 比较两个对象是否不相等                                                                                                       | (a `<>` b) 返回 true。这个运算符类似 != 。 |
-| >      | 大于 - 返回 x 是否大于 y                                                                                                              | (a > b) 返回 False。                       |
-| `<`    | 小于 - 返回 x 是否小于 y。所有比较运算符返回 1 表示真，返回 0 表示假。这分别与特殊的变量 True 和 False 等价。注意，这些变量名的大写。 | (a `<` b) 返回 true。                      |
-| >=     | 大于等于 - 返回 x 是否大于等于 y。                                                                                                    | (a >= b) 返回 False。                      |
-| `<=`   | 小于等于 - 返回 x 是否小于等于 y。                                                                                                    | (a `<= b`) 返回 true。                     |
+| 运算符 | 描述                                                                                                                                  | 实例                                         |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| ==     | 等于 - 比较对象是否相等                                                                                                               | (a == b) 返回 False。                        |
+| !=     | 不等于 - 比较两个对象是否不相等                                                                                                       | (a != b) 返回 true.                          |
+| `<>` | 不等于 - 比较两个对象是否不相等                                                                                                       | (a `<>` b) 返回 true。这个运算符类似 != 。 |
+| >      | 大于 - 返回 x 是否大于 y                                                                                                              | (a > b) 返回 False。                         |
+| `<`  | 小于 - 返回 x 是否小于 y。所有比较运算符返回 1 表示真，返回 0 表示假。这分别与特殊的变量 True 和 False 等价。注意，这些变量名的大写。 | (a `<` b) 返回 true。                      |
+| >=     | 大于等于 - 返回 x 是否大于等于 y。                                                                                                    | (a >= b) 返回 False。                        |
+| `<=` | 小于等于 - 返回 x 是否小于等于 y。                                                                                                    | (a `<= b`) 返回 true。                     |
 
 ### 赋值运算符
 
@@ -295,10 +277,10 @@ Python 的运算符需要掌握如下知识点：
 | =      | 简单的赋值运算符 | c = a + b 将 a + b 的运算结果赋值为 c |
 | +=     | 加法赋值运算符   | c += a 等效于 c = c + a               |
 | -=     | 减法赋值运算符   | c -= a 等效于 c = c - a               |
-| \*=    | 乘法赋值运算符   | c _= a 等效于 c = c_ a                |
+| \*=    | 乘法赋值运算符   | c_= a 等效于 c = c_ a               |
 | /=     | 除法赋值运算符   | c /= a 等效于 c = c / a               |
 | %=     | 取模赋值运算符   | c %= a 等效于 c = c % a               |
-| \*\*=  | 幂赋值运算符     | c **= a 等效于 c = c** a              |
+| \*\*=  | 幂赋值运算符     | c**= a 等效于 c = c** a         |
 | //=    | 取整除赋值运算符 | c //= a 等效于 c = c // a             |
 
 ### 逻辑运算符
@@ -314,11 +296,11 @@ Python 的运算符需要掌握如下知识点：
 | 运算符 | 描述           | 实例                                                                        |
 | ------ | -------------- | --------------------------------------------------------------------------- |
 | &      | 按位与运算符   | a & b 输出结果 12 ，二进制解释： 0000 1100                                  |
-| \|     | 按位或运算符   | a \| b 输出结果 61 ，二进制解释： 0011 1101                                 |
+| \|     | 按位或运算符   | a\| b 输出结果 61 ，二进制解释： 0011 1101                                  |
 | ^      | 按位异或运算符 | a ^ b 输出结果 49 ，二进制解释： 0011 0001                                  |
 | ~      | 按位取反运算符 | ~a 输出结果 -61 ，二进制解释： 1100 0011 ，在一个有符号二进制数的补码形式。 |
-| `<<`   | 左移动运算符   | a `<<` 2 输出结果 240 ，二进制解释： 1111 0000                              |
-| `>>`   | 右移动运算符   | a `>>` 2 输出结果 15 ，二进制解释： 0000 1111                               |
+| `<<` | 左移动运算符   | a `<<` 2 输出结果 240 ，二进制解释： 1111 0000                            |
+| `>>` | 右移动运算符   | a `>>` 2 输出结果 15 ，二进制解释： 0000 1111                             |
 
 ### 成员运算符
 
@@ -336,21 +318,21 @@ Python 的运算符需要掌握如下知识点：
 
 ### 运算符优先级
 
-| 运算符                      | 描述                                                   |
-| --------------------------- | ------------------------------------------------------ |
-| \*\*                        | 指数 (最高优先级)                                      |
-| ~ + -                       | 按位翻转, 一元加号和减号 (最后两个的方法名为 +@ 和 -@) |
-| \* / % //                   | 乘，除，取模和取整除                                   |
-| + -                         | 加法减法                                               |
-| `>> <<`                     | 右移，左移运算符                                       |
-| &                           | 位 'AND'                                               |
-| ^ \|                        | 位运算符                                               |
-| `<= < > >=`                 | 比较运算符                                             |
-| `< >` == !=                 | 等于运算符                                             |
-| = %= /= //= -= += \*= \*\*= | 赋值运算符                                             |
-| is is not                   | 身份运算符                                             |
-| in not in                   | 成员运算符                                             |
-| not or and                  | 逻辑运算符                                             |
+| 运算符                     | 描述                                                   |
+| -------------------------- | ------------------------------------------------------ |
+| \*\*                       | 指数 (最高优先级)                                      |
+| ~ + -                      | 按位翻转, 一元加号和减号 (最后两个的方法名为 +@ 和 -@) |
+| \* / % //                  | 乘，除，取模和取整除                                   |
+| + -                        | 加法减法                                               |
+| `>> <<`                  | 右移，左移运算符                                       |
+| &                          | 位 'AND'                                               |
+| ^\|                        | 位运算符                                               |
+| `<= < > >=`              | 比较运算符                                             |
+| `< >` == !=              | 等于运算符                                             |
+| = %= /= //= -= +=\*= \*\*= | 赋值运算符                                             |
+| is is not                  | 身份运算符                                             |
+| in not in                  | 成员运算符                                             |
+| not or and                 | 逻辑运算符                                             |
 
 ## 列表
 
@@ -358,7 +340,7 @@ Python 的运算符需要掌握如下知识点：
 
 ### 创建列表
 
-```python showLineNumbers
+```python
 empty_list = list()
 print(empty_list)  # 同 empty_list = []
 
@@ -369,7 +351,7 @@ print(empty_list)  # 同 empty_list = []
 
 查看列表长度：
 
-```python showLineNumbers
+```python
 # len 查看列表长度
 a = [1, 2, 3]
 b = [2, 3, 'hello']
@@ -377,24 +359,24 @@ c = a + b
 print(c)  # [1, 2, 3, 2, 3, u'hello']
 ```
 
-```python showLineNumbers
+```python
 len(c)
 ```
 
 Python 字符串可以和列表可以方便扩展：
 
-```python showLineNumbers
+```python
 d = b * 2
 print(d)  # [2, 3, u'hello', 2, 3, u'hello']
 ```
 
-```python showLineNumbers
+```python
 d[-1]
 ```
 
 ### 修改列表
 
-```python showLineNumbers
+```python
 print(a)
 a[0] = 100
 a
@@ -402,14 +384,14 @@ a
 
 这种赋值也适用于分片，例如，将列表的第 2，3 两个元素换掉：
 
-```python showLineNumbers
+```python
 a[1:3] = [200, 300]
 print(a)
 ```
 
 事实上，对于连续的分片（即步长为 1 ），Python 采用的是整段替换的方法，两者的元素个数并不需要相同，
 
-```python showLineNumbers
+```python
 # 例如，将 [11,12] 替换为 [1,2,3,4]：
 a = [10, 11, 12, 13, 14]
 a[1:3] = [1, 2, 3, 4]
@@ -418,7 +400,7 @@ print(a)  # [10, 1, 2, 3, 4, 13, 14]
 
 用这种方法来删除列表中一个连续的分片：
 
-```python showLineNumbers
+```python
 a = [10, 1, 2, 11, 12]
 print(a[1:3])
 a[1:3] = []
@@ -427,7 +409,7 @@ print(a)
 
 对于不连续（间隔 step 不为 1）的片段进行修改时，两者的元素数目必须一致：
 
-```python showLineNumbers
+```python
 a = [10, 11, 12, 13, 14]
 a[::2] = [1, 2, 3]
 print(a)  # [1, 11, 2, 13, 3]
@@ -435,13 +417,13 @@ print(a)  # [1, 11, 2, 13, 3]
 
 Python 提供了删除列表中元素的方法 'del':
 
-```python showLineNumbers
+```python
 a = [100, 'a', 'b', 200]
 del a[0]
 print(a)  # [u'a', u'b', 200]
 ```
 
-```python showLineNumbers
+```python
 # 删除间隔的元素：
 a = ['a', 1, 'b', 2, 'c']
 del a[::2]
@@ -451,7 +433,7 @@ print(a)  # [1, 2]
 用 in 来看某个元素是否在某个序列（不仅仅是列表）中，
 用 not in 来判断是否不在某个序列中。
 
-```python showLineNumbers
+```python
 a = [1, 2, 3, 4, 5]
 print(1 in a)
 print(1 not in a)
@@ -464,7 +446,7 @@ print("'world' not in s : ", 'world' not in s)  # False
 
 列表中可以包含各种对象，甚至可以包含列表：
 
-```python showLineNumbers
+```python
 a = [1, 2, 'six', [3, 4]]
 print(a[3])  # [3,4]
 # a[3]是列表，可以对它再进行索引：
@@ -473,7 +455,7 @@ print(a[3][1])  # 4
 
 ### 列表方法
 
-```python showLineNumbers
+```python
 # 列表中某个元素个数
 a = [1, 1, 2, 3, 4, 5]
 print(len(a))  # 总个数：6
@@ -485,7 +467,7 @@ print(a.index(1))  # 0
 
 ### 列表添加元素
 
-```python showLineNumbers
+```python
 # 向列表添加单个元素
 # a.append(ob) 将元素 ob 添加到列表 a 的最后。
 a = [1, 1, 2, 3, 4, 5]
@@ -498,7 +480,7 @@ print(a)  # [1, 1, 2, 3, 4, 5, 10, [11, 12]]
 
 ```
 
-```python showLineNumbers
+```python
 # 向列表添加序列
 # l.extend(lst) 将序列 lst 的元素依次添加到列表 l 的最后，作用相当于 l += lst。
 a = [1, 2, 3, 4]
@@ -516,7 +498,7 @@ a
 
 ### 移除元素
 
-```python showLineNumbers
+```python
 # l.remove(ob) 会将列表中第一个出现的 ob 删除，如果 ob 不在 l 中会报错。
 a = [1, 1, 2, 3, 4]
 # 移除第一个1
@@ -532,14 +514,14 @@ print('pop:', b, ' ;result:', a)
 
 ### 排序
 
-```python showLineNumbers
+```python
 # l.sort() 会将列表中的元素按照一定的规则排序：
 a = [10, 1, 11, 13, 11, 2]
 a.sort()
 print(a)  # [1, 2, 10, 11, 11, 13]
 ```
 
-```python showLineNumbers
+```python
 # 如果不想改变原来列表中的值，可以使用 sorted 函数：
 a = [10, 1, 11, 13, 11, 2]
 b = sorted(a)
@@ -553,7 +535,7 @@ a.reverse()
 print(a)  # [6, 5, 4, 3, 2, 1]
 ```
 
-```python showLineNumbers
+```python
 # 如果不想改变原来列表中的值，可以使用这样的方法：
 a = [1, 2, 3, 4, 5, 6]
 b = a[::-1]
@@ -564,14 +546,14 @@ a
 
 如果不清楚用法，可以查看帮助： help(a.sort)
 
-```python showLineNumbers
+```python
 a=[1,2,3]
 help(a.sort)
 ```
 
 显示帮助：
 
-```python showLineNumbers
+```python
 # Signature: a.sort(*, key=None, reverse=False)
 # Docstring:
 # Sort the list in ascending order and return None.
@@ -590,7 +572,7 @@ help(a.sort)
 
 循环可以用来生成列表：
 
-```python showLineNumbers
+```python
 values = [2, 2, 3]
 squares = []
 for x in values:
@@ -600,7 +582,7 @@ print(squares)  # [4, 4, 9]
 
 列表推导式可以使用更简单的方法来创建这个列表：
 
-```python showLineNumbers
+```python
 values = [3, 8, 10, 14]
 squares = [x ** 2 for x in values]
 print(squares)  # [9, 64, 100, 196]
@@ -610,35 +592,35 @@ print(squares)  # [9, 64, 100, 196]
 
 假如只想保留列表中不大于 8 的数的平方：
 
-```python showLineNumbers
+```python
 squares = [x ** 2 for x in values if x <= 10]
 print(squares)  # [9, 64, 100]
 ```
 
 平方的结果不大于 100 的：
 
-```python showLineNumbers
+```python
 squares = [x ** 2 for x in values if x ** 2 <= 80]
 print(squares)  # [9, 64]
 ```
 
 使用推导式生成集合和字典：
 
-```python showLineNumbers
+```python
 values = [10, 21, 4, 7, 12]
 square_set = {x ** 2 for x in values if x <= 10}
 
 print(square_set)  # set([16, 49, 100])
 ```
 
-```python showLineNumbers
+```python
 square_dict = {x: x ** 2 for x in values if x <= 10}
 print(square_dict)  # {10: 100, 4: 16, 7: 49}
 ```
 
 计算上面例子中生成的列表中所有元素的和：
 
-```python showLineNumbers
+```python
 total = sum([x ** 2 for x in values if x < 10])
 total  # 65
 ```
@@ -649,14 +631,14 @@ total  # 65
 
 为了解决这种问题，与 range()类似，Python 使用产生式表达式来解决这个问题：
 
-```python showLineNumbers
+```python
 total = sum(x ** 2 for x in values if x < 10)
 total  # 65
 ```
 
 与上面相比，只是去掉了括号，但这里并不会一次性的生成这个列表。
 
-```python showLineNumbers
+```python
 import time
 
 # 比较一下两者的用时：
@@ -667,7 +649,7 @@ total = sum([x ** 3 for x in values if x < 10])
 print("list speed: ", time.time() - t1)
 ```
 
-```python showLineNumbers
+```python
 t2 = time.time()
 total = sum(x ** 3 for x in values if x < 10)
 print("comprehension speed:", time.time() - t2)
@@ -675,7 +657,7 @@ print("comprehension speed:", time.time() - t2)
 
 ipython 下可以输入:
 
-```python showLineNumbers
+```python
 x = range(1000000)
 %timeit total = sum([i**2 for i in x])
 %timeit total = sum(i**2 for i in x)
@@ -685,7 +667,7 @@ x = range(1000000)
 
 列表是可变的（Mutable）
 
-```python showLineNumbers
+```python
 a = [1, 2, 3, 4]
 a[0] = 100
 a.insert(3, 200)
@@ -694,20 +676,20 @@ a  # [100, 2, 3, 200, 4]
 
 字符串是不可变的（Immutable）:
 
-```python showLineNumbers
+```python
 s = "hello world"
 
 # 通过索引改变会报错
 s[0] = 'k'
 ```
 
-```python showLineNumbers
+```python
 s.insert(3, 'm')
 ```
 
 字符串方法只是返回一个新字符串，并不改变原来的值：
 
-```python showLineNumbers
+```python
 print(s.replace('world', 'Mars'))  # hello Mars
 print(s)  # hello world
 
@@ -720,7 +702,7 @@ print(s)  # hello YunYun
 
 与列表相似，元组 tuple 也是个有序序列，但是元组是不可变的，用()生成。
 
-```python showLineNumbers
+```python
 a = (10, 11, 12, 13, 14)
 print(a)
 
@@ -737,13 +719,13 @@ c
 
 采用下列方式定义只有一个元素的元组：
 
-```python showLineNumbers
+```python
 a = (10,)
 print(a)
 print(type(a))  # <type 'tuple'>
 ```
 
-```python showLineNumbers
+```python
 a = [1, 2, 3]
 b = tuple(a)
 print(b)  # (1, 2, 3)
@@ -753,7 +735,7 @@ print(b)  # (1, 2, 3)
 
 例如计算元素个数 count 和元素位置 index ，用法与列表一样。
 
-```python showLineNumbers
+```python
 c = a.count(1)
 print(c)  # 1
 
@@ -771,7 +753,7 @@ print(c)  # 索引位置为：2
 字典 dictionary ，在一些编程语言中也称为 hash ， map ，
 是一种由键值对组成的数据结构。
 
-```python showLineNumbers
+```python
 a = {}
 print(type(a))  # <type 'dict'>
 a = dict()
@@ -780,25 +762,25 @@ print(type(a))
 
 ### 操作 dict
 
-```python showLineNumbers
+```python
 # 插入键值
 a['f'] = 'num 1'
 a['s'] = 'num 2'
 print(a)  # {u's': u'num 2', u'f': u'num 1'}
 ```
 
-```python showLineNumbers
+```python
 # 查看键值
 print(a['s'])  # num 2
 ```
 
-```python showLineNumbers
+```python
 # 更新
 a['f'] = 'num 3'
 print(a)  # {u's': u'num 2', u'f': u'num 3'}
 ```
 
-```python showLineNumbers
+```python
 # 初始化字典
 a = {'first': 'num 1', 'second': 'num 2', 3: 'num 3'}
 print(a['first'])  # num 1
@@ -810,7 +792,7 @@ Python 中不能用支持用数字索引按顺序查看字典中的值，
 
 a[0] 会报错
 
-```python showLineNumbers
+```python
 try:
     print(a[0])
 except KeyError as e:
@@ -820,7 +802,7 @@ except KeyError as e:
 
 ### dict 的应用示例
 
-```python showLineNumbers
+```python
 # 定义四个字典
 e1 = {'mag': 0.05, 'width': 20}
 e2 = {'mag': 0.04, 'width': 25}
@@ -836,7 +818,7 @@ events = {500: e1, 760: e2, 3001: e3, 4180: e4}
 print(events)
 ```
 
-```python showLineNumbers
+```python
 # 另一个例子
 people = [
     {'first': 'Sam', 'last': 'Malone', 'name': 35},
@@ -853,7 +835,7 @@ print(people)
 
 使用 dict 初始化字典：
 
-```python showLineNumbers
+```python
 # 除了通常的定义方式，还可以通过 dict() 转化来生成字典：
 my_dict = dict([('name', 'lili'),
                 ('sex', 'female'),
@@ -868,14 +850,14 @@ print(my_dict)
 
 利用索引直接更新键值对：
 
-```python showLineNumbers
+```python
 my_dict['age'] += 1
 print(my_dict)  # u'age': 33
 ```
 
 dict 可以使用元组作为键值：
 
-```python showLineNumbers
+```python
 # 例如，可以用元组做键来表示从第一个城市飞往第二个城市航班数的多少：
 connections = {}
 connections[('New York', 'Seattle')] = 100
@@ -884,7 +866,7 @@ connections[('New York', 'Austin')] = 400
 connections
 ```
 
-```python showLineNumbers
+```python
 # 元组是有序的，
 # 因此 ('New York', 'Austin') 和 ('Austin', 'New York') 是两个不同的键：
 print(connections[('Austin', 'New York')])  # 200
@@ -898,7 +880,7 @@ get 方法 : d.get(key, default = None)
 之前已经见过，用索引可以找到一个键对应的值，
 但是当字典中没有这个键的时候，Python 会报错
 
-```python showLineNumbers
+```python
 a = {'first': 'num 1', 'second': 'num 2'}
 # error:
 # print(a['third'])
@@ -908,7 +890,7 @@ a = {'first': 'num 1', 'second': 'num 2'}
 print(a.get('third'))  # None
 ```
 
-```python showLineNumbers
+```python
 # 指定默认值参数：
 b = a.get("three", "num 0")
 b  # num 0
@@ -920,20 +902,20 @@ pop 方法可以用来弹出字典中某个键对应的值，同时也可以指�
 
 d.pop(key, default = None)
 
-```python showLineNumbers
+```python
 a = {'first': 'num 1', 'second': 'num 2'}
 c = a.pop('first')
 print(c)  # num 1
 print(a)  # {u'second': u'num 2'}
 ```
 
-```python showLineNumbers
+```python
 # 弹出不存在的键值：
 d = a.pop("third", 'not exist')
 print(d)  # not exist
 ```
 
-```python showLineNumbers
+```python
 # 与列表一样，del 函数可以用来删除字典中特定的键值对，例如：
 a = {'first': 'num 1', 'second': 'num 2'}
 del a["first"]
@@ -945,7 +927,7 @@ print(a)  # {u'second': u'num 2'}
 之前已经知道，可以通过索引来插入、修改单个键值对，
 但是如果想对多个键值对进行操作，这种方法就显得比较麻烦，好在有 update 方法：
 
-```python showLineNumbers
+```python
 my_dict = dict([('name', 'lili'),
                 ('sex', 'female'),
                 ('age', 32),
@@ -956,7 +938,7 @@ my_dict.update(dict_update)
 print(my_dict)
 ```
 
-```python showLineNumbers
+```python
 import pprint
 # {u'marriage': u'single',
 # u'name': u'lucy',
@@ -966,13 +948,13 @@ import pprint
 pprint.pprint(my_dict)  # 华丽丽的显示方式
 ```
 
-```python showLineNumbers
+```python
 my_dict # ipython的dict显示跟pprint的格式一样华丽
 ```
 
 通过关键词 `in` 查询字典中是否有该键：
 
-```python showLineNumbers
+```python
 barn = {'cows': 1, 'dogs': 5, 'cats': 3}
 # in 可以用来判断字典中是否有某个特定的键：
 print('chickens' in barn)  # False
@@ -985,13 +967,13 @@ print('cows' in barn)  # True
 - `d.values()` 返回一个由所有值组成的列表；
 - `d.items()` 返回一个由所有键值对元组组成的列表；
 
-```python showLineNumbers
+```python
 print(barn.keys())  # [u'cows', u'cats', u'dogs']
 print(barn.values())  # [1, 3, 5]
 print(barn.items())  # [(u'cows', 1), (u'cats', 3), (u'dogs', 5)]
 ```
 
-```python showLineNumbers
+```python
 for key, val in barn.items():
     print(key, val)
     # cows 1
@@ -1008,26 +990,26 @@ for key, val in barn.items():
 
 ### 创建集合
 
-```python showLineNumbers
+```python
 # 可以用set()函数来显示的生成空集合：
 a = set()
 print(a)
 print(type(a))
 ```
 
-```python showLineNumbers
+```python
 # 使用一个列表来初始化一个集合：
 a = set([1, 2, 3, 1])
 a  # 集合会自动去除重复元素 1。
 ```
 
-```python showLineNumbers
+```python
 # 集合中的元素是用大括号{}包含起来的，这意味着可以用{}的形式来创建集合：
 a = {1, 2, 3, 1}
 print(a)  # {1, 2, 3}
 ```
 
-```python showLineNumbers
+```python
 # 但是创建空集合的时候只能用set来创建，因为在Python中{}创建的是一个空的字典：
 s = {}
 print(type(s))  # <type 'dict'>
@@ -1035,7 +1017,7 @@ print(type(s))  # <type 'dict'>
 
 ### 集合操作
 
-```python showLineNumbers
+```python
 a = {1, 2, 3, 4}
 b = {2, 3, 4, 5}
 ```
@@ -1045,7 +1027,7 @@ b = {2, 3, 4, 5}
 两个集合的并，返回包含两个集合所有元素的集合（去除重复）。
 可以用方法 a.union(b) 或者操作 a | b 实现。
 
-```python showLineNumbers
+```python
 c = a.union(b)
 print(c)  # {1, 2, 3, 4, 5, 6}
 
@@ -1054,7 +1036,7 @@ d = a | b
 print(c)
 ```
 
-```python showLineNumbers
+```python
 c == d
 ```
 
@@ -1064,7 +1046,7 @@ c == d
 
 可以用方法 a.intersection(b) 或者操作 a & b 实现。
 
-```python showLineNumbers
+```python
 c = a.intersection(b)
 print(c)  # set([2, 3, 4])
 
@@ -1080,7 +1062,7 @@ a 和 b 的差集，返回只在 a 不在 b 的元素组成的集合。
 
 可以用方法 a.difference(b) 或者操作 a - b 实现。
 
-```python showLineNumbers
+```python
 c = a.difference(b)
 print(c)  # set([1])
 d = a - b
@@ -1093,7 +1075,7 @@ a 和 b 的对称差集，返回在 a 或在 b 中，但是不同时在 a 和 b 
 
 可以用方法 a.symmetric_difference(b) 或者操作 a ^ b 实现（异或操作符）。
 
-```python showLineNumbers
+```python
 c = a.symmetric_difference(b)
 print(c)  # set([1, 5])
 
@@ -1106,7 +1088,7 @@ print(d)
 要判断 b 是不是 a 的子集，可以用 b.issubset(a) 方法，
 或者更简单的用操作 b `<=` a ：
 
-```python showLineNumbers
+```python
 a = {1, 2, 3}
 b = {1, 2}
 
@@ -1119,13 +1101,13 @@ print(d)
 
 也可以用 a.issuperset(b) 或者 a >= b 来判断：
 
-```python showLineNumbers
+```python
 print(a >= b)
 ```
 
 方法只能用来测试子集，但是操作符可以用来判断真子集：
 
-```python showLineNumbers
+```python
 print(a < a)  # False
 print(a <= a)  # True
 ```
@@ -1138,7 +1120,7 @@ print(a <= a)  # True
 
 s.add(a) 将元素 a 加入集合 s 中。
 
-```python showLineNumbers
+```python
 s = {1, 3, 4}
 s.add(4)
 print(s)  # set([1, 3, 4])
@@ -1153,12 +1135,12 @@ print(s)  # set([1, 3, 4, 5])
 
 s.update(seq)
 
-```python showLineNumbers
+```python
 s.update([10, 11, 12])
 print(s)  # set([1, 3, 4, 5, 10, 11, 12])
 ```
 
-```python showLineNumbers
+```python
 # remove 方法移除单个元素
 s = {1, 3, 4}
 s.remove(1)
@@ -1171,13 +1153,13 @@ print(s)  # set([3, 4])
 
 所以 pop 方法删除并返回集合中任意一个元素，如果集合中没有元素会报错。
 
-```python showLineNumbers
+```python
 s = {1, 3, 4}
 d = s.pop()
 print(s, d)
 ```
 
-```python showLineNumbers
+```python
 # discard 方法作用与 remove 一样
 s = {1, 3, 4}
 s.discard(3)
@@ -1188,7 +1170,7 @@ print(s)  # set([1, 4])
 
 a.difference_update(b) 从 a 中去除所有属于 b 的元素：
 
-```python showLineNumbers
+```python
 a = {1, 2, 3, 4}
 b = {2, 3, 4, 5}
 a.difference_update(b)
@@ -1197,7 +1179,7 @@ print(a)  # set([1])
 
 ## 条件语句
 
-```python showLineNumbers
+```python
 a = 62
 print("exam score check:")
 if a >= 60:
@@ -1210,7 +1192,7 @@ else:
 
 可以使用 and ， or , not 等关键词结合多个判断条件：
 
-```python showLineNumbers
+```python
 a = 10
 b = -5
 print(a > 0 and b < 0)  # True
@@ -1220,7 +1202,7 @@ print(a < 0 or b < 0)  # True
 
 ### 一个例子
 
-```python showLineNumbers
+```python
 year = 1900
 if year % 400 == 0:
     print("This is a leap year!")
@@ -1234,7 +1216,7 @@ else:
 
 ### 判断列表
 
-```python showLineNumbers
+```python
 my_list = [1, 2]
 # 判断一个列表是否为空。
 if len(my_list) > 0:
@@ -1248,7 +1230,7 @@ else:
 
 ### for 循环
 
-```python showLineNumbers
+```python
 # for 循环
 total = 0
 for i in range(100000):
@@ -1258,7 +1240,7 @@ print(total)  # 4999950000
 
 ### while 循环
 
-```python showLineNumbers
+```python
 while <condition>:
      <statesments>
 
@@ -1266,7 +1248,7 @@ while <condition>:
 
 Python 会循环执行**statesments**，直到**condition**不满足为止。
 
-```python showLineNumbers
+```python
 i = 0
 total = 0
 while i <= 100:
@@ -1277,7 +1259,7 @@ print(total)  # 5050
 
 举个例子，通过 while 遍历集合：
 
-```python showLineNumbers
+```python
 # 空容器会被当成False，因此可以用while循环读取容器的所有元素
 plays = set(['Hamlet', 'Mac', 'King'])
 while plays:
@@ -1289,7 +1271,7 @@ while plays:
 
 遇到 continue 的时候，程序会返回到循环的最开始重新执行。
 
-```python showLineNumbers
+```python
 values = [7, 6, 4, 7, 19, 2, 1]
 for i in values:
     if i % 2 != 0:
@@ -1305,7 +1287,7 @@ for i in values:
 
 遇到 break 的时候，程序会跳出循环，不管循环条件是不是满足
 
-```python showLineNumbers
+```python
 command_list = ['start',
                 '1',
                 '2',
@@ -1336,7 +1318,7 @@ while command_list:
 
 在 Python 中可以使用 def 关键字来定义函数，程序中函数的参数就相当于是数学上说的函数的自变量，可以通过 return 关键字来返回一个值，这相当于数学上说的函数的因变量。
 
-```python showLineNumbers
+```python
 def add(a, b):
     """
     add two nums
@@ -1352,7 +1334,7 @@ def add(a, b):
 
 使用函数时，只需要将参数换成特定的值传给函数。
 
-```python showLineNumbers
+```python
 # Python并没有限定参数的类型，因此可以使用不同的参数类型：
 print(add(2, 3))
 
@@ -1365,30 +1347,30 @@ print(add('foo', 'bar'))  # foobar
 
 另一种则是使用关键词模式，显式地指定参数的值：
 
-```python showLineNumbers
+```python
 add(a=2, b=3)
 ```
 
-```python showLineNumbers
+```python
 add(b='morning', a='good')
 ```
 
-```python showLineNumbers
+```python
 add(2, b=3)  # 5
 ```
 
 ### 设定默认参数
 
-```python showLineNumbers
+```python
 def quad(x, a=1, b=0, c=0):
     return a * x * x + b * x + c
 ```
 
-```python showLineNumbers
+```python
 quad(2.0)
 ```
 
-```python showLineNumbers
+```python
 quad(2.0, b=3)
 ```
 
@@ -1396,7 +1378,7 @@ quad(2.0, b=3)
 
 使用如下方法，可以使函数接受不定数目的参数,类似 java 的..多个参数：
 
-```python showLineNumbers
+```python
 def add(x, *args):
     total = x
     for arg in args:
@@ -1408,14 +1390,14 @@ def add(x, *args):
 
 把第一个参数后面的参数当作元组中的元素。
 
-```python showLineNumbers
+```python
 print(add(1, 2, 3, 4, 5))  # 15
 print(add(1, 2))  # 3
 ```
 
 ### 使用关键词传入参数
 
-```python showLineNumbers
+```python
 def add(x, **kwargs):
     total = x
     for arg, val in kwargs.items():
@@ -1426,11 +1408,11 @@ def add(x, **kwargs):
 
 \*\*kwargs 表示参数数目不定，相当于一个字典，关键词和值对应于键值对。
 
-```python showLineNumbers
+```python
 add(1, a=2, b=3)  # 6
 ```
 
-```python showLineNumbers
+```python
 # 可以接收任意数目的位置参数和键值对参数：
 def fun1(*args, **kwargs):
     print(args, kwargs)
@@ -1440,7 +1422,7 @@ fun1(2, 3, a="bar", b=10)  # (2, 3) {'a': u'bar', 'b': 10}
 
 ### 返回多个值
 
-```python showLineNumbers
+```python
 # 函数可以返回多个值：
 def to_val(x, y):
     r = (x ** 2 + y ** 2) ** 0.5
@@ -1448,23 +1430,23 @@ def to_val(x, y):
     return r, total
 ```
 
-```python showLineNumbers
+```python
 a, b = to_val(3, 4)
 print(a, b)  # 5.0 7
 ```
 
-```python showLineNumbers
+```python
 # 事实上，Python将返回的两个值变成了元组：
 print(to_val(3, 4))  # (5.0, 7)
 ```
 
-```python showLineNumbers
+```python
 # 列表也有相似的功能,可以用来赋值：
 a, b, c = [1, 2, 3]
 print(a, b, c)
 ```
 
-```python showLineNumbers
+```python
 # 可以将参数用元组传入：
 def add(a, b):
     return a + b
@@ -1474,7 +1456,7 @@ print(add(*c))  # 5
 # 这里的*必须要。
 ```
 
-```python showLineNumbers
+```python
 # 还可以用字典传入参数哦：
 d = {'a': 2, 'b': 5}
 print(add(**d))  # 7
@@ -1488,18 +1470,18 @@ map() 会根据提供的函数对指定序列做映射。
 
 map(aFun, aSeq)
 
-```python showLineNumbers
+```python
 def sqr(x):
     return x ** 2
 ```
 
-```python showLineNumbers
+```python
 a = [2, 3, 4]
 result = map(sqr, a)  # [4,9,16]
 type(result)
 ```
 
-```python showLineNumbers
+```python
 # map返回的是个迭代器对象, 可以转化为list显示
 
 list(result)
@@ -1508,7 +1490,7 @@ list(result)
 事实上，根据函数参数的多少，map 可以接受多组序列，
 将其对应的元素作为参数传入函数：
 
-```python showLineNumbers
+```python
 def add(a, b):
     return a + b
 
@@ -1516,7 +1498,7 @@ a = [2, 3, 4]
 list(map(sqr, a))  # [4,9,16]
 ```
 
-```python showLineNumbers
+```python
 a = (2, 3, 4)
 b = [10, 11, 15]
 list(map(add, a, b))  # [12, 14, 19]
@@ -1526,7 +1508,7 @@ list(map(add, a, b))  # [12, 14, 19]
 
 reduce() 函数会对参数序列中元素进行累积。
 
-```python showLineNumbers
+```python
 from functools import reduce
 
 def add(x, y) :            # 两数相加
@@ -1543,7 +1525,7 @@ print(sum2)
 
 将函数作为字典的值储存，将函数作为另一个函数的返回值：
 
-```python showLineNumbers
+```python
 def square(x):
     """Square of x."""
     return x * x
@@ -1561,11 +1543,11 @@ for func in sorted(funcs):
     print(func, funcs[func](x))
 ```
 
-```python showLineNumbers
+```python
 func
 ```
 
-```python showLineNumbers
+```python
 funcs
 ```
 
@@ -1577,7 +1559,7 @@ funcs
 如果我们修改了这个引用所指向内容的值（例如 x[0]=999），
 那么外面的 x 的值也会被改变：
 
-```python showLineNumbers
+```python
 def mod_f(x):
     x[0] = 999
     return x
@@ -1587,11 +1569,11 @@ x = [1, 2, 3]
 x # [1, 2, 3]
 ```
 
-```python showLineNumbers
+```python
 mod_f(x) # [999, 2, 3]
 ```
 
-```python showLineNumbers
+```python
 x # [999, 2, 3]
 ```
 
@@ -1599,7 +1581,7 @@ x # [999, 2, 3]
 
 那么在函数外面的 x 的值不会改变：
 
-```python showLineNumbers
+```python
 def no_mod_f(x):
     x = [4, 5, 6]
     return x
@@ -1624,16 +1606,16 @@ map(f, sq) 函数将 f 作用到 sq 的每个元素上去，并返回结果组�
 
 相当于：[f(s) for s in sq]
 
-```python showLineNumbers
+```python
 map(square, range(5))  # [0, 1, 4, 9, 16]
 ```
 
-```python showLineNumbers
+```python
 # 外面套个list，强转为list类型，是为了打印出函数的值
 list(map(square, range(5)))
 ```
 
-```python showLineNumbers
+```python
 def is_even(x):
     return x % 2 == 0
 
@@ -1641,14 +1623,14 @@ def is_even(x):
 list(filter(is_even, range(5)))  # [0, 2, 4]
 ```
 
-```python showLineNumbers
+```python
 list(map(square, filter(is_even, range(5))))  # [0, 4, 16]
 ```
 
 reduce(f, sq) 函数接受一个二元操作函数 f(x,y)，
 并对于序列 sq 每次合并两个元素：
 
-```python showLineNumbers
+```python
 from functools import reduce
 def my_add(x, y):
     return x + y
@@ -1659,7 +1641,7 @@ reduce(my_add, [1, 2, 3])
 
 返回一个函数：
 
-```python showLineNumbers
+```python
 def get_logger_func(target):
     def write_logger(data):
         with open(target, 'a') as f:
@@ -1672,7 +1654,7 @@ fun_logger = get_logger_func('foo.txt')
 fun_logger('hello')
 ```
 
-```python showLineNumbers
+```python
 # 查看foo.txt 是否生成
 import os
 os.path.exists('foo.txt')
@@ -1680,11 +1662,11 @@ os.path.exists('foo.txt')
 
 ### 匿名函数 lambda
 
-```python showLineNumbers
+```python
 list(map(square, range(5)))
 ```
 
-```python showLineNumbers
+```python
 # 用匿名函数替换为：
 list(map(lambda x: x * x, range(5)))
 ```
@@ -1692,12 +1674,12 @@ list(map(lambda x: x * x, range(5)))
 匿名函数虽然写起来比较方便（省去了定义函数的烦恼），
 但是有时候会比较难于阅读：
 
-```python showLineNumbers
+```python
 s1 = reduce(lambda x, y: x + y, map(lambda x: x ** 2, range(1, 3)))
 print(s1)  # 5
 ```
 
-```python showLineNumbers
+```python
 # 简单的写法：
 s2 = sum(x ** 2 for x in range(1, 3))
 print(s2)  # 5
@@ -1707,7 +1689,7 @@ print(s2)  # 5
 
 要在函数中修改全局变量的值，需要加上 global 关键字：
 
-```python showLineNumbers
+```python
 x = 15
 
 def print_newx():
@@ -1725,7 +1707,7 @@ print(x)
 
 如果不加上这句 global 那么全局变量的值不会改变：
 
-```python showLineNumbers
+```python
 x = 15
 
 
@@ -1746,7 +1728,7 @@ print(x)
 
 一般对于分治法，要用递归，不过在 python 中不怎么用，更高效的处理非波切利算法：
 
-```python showLineNumbers
+```python
 def fib(n):
     """Fib without recursion."""
     a, b = 0, 1
@@ -1769,7 +1751,7 @@ Python 会将所有 .py 结尾的文件认定为 Python 代码文件。
 
 `module1.py`
 
-```python showLineNumbers
+```python
 def foo():
     print('hello, world!')
 
@@ -1777,14 +1759,14 @@ def foo():
 
 `module2.py`
 
-```python showLineNumbers
+```python
 def foo():
     print('goodbye, world!')
 ```
 
 `test.py`
 
-```python showLineNumbers
+```python
 from module1 import foo
 
 # 输出hello, world!
@@ -1801,7 +1783,7 @@ foo()
 有时候我们想将一个 .py 文件既当作脚本，又能当作模块用，
 这个时候可以使用 **name** 这个属性。
 
-```python showLineNumbers
+```python
 PI = 3.14
 
 
@@ -1820,7 +1802,7 @@ def get_sum(lst):
 
 上文保存为 ex.py
 
-```python showLineNumbers
+```python
 with open('ex.py', 'w') as f:
     f.write("""
 PI = 3.14
@@ -1834,13 +1816,13 @@ def get_sum(lst):
 
 使用 ! 调用 shell 命令：
 
-```python showLineNumbers
+```python
 !cat ex.py
 ```
 
 可以从 ex 模块中导入函数 get_sum 和变量：
 
-```python showLineNumbers
+```python
 from ex import PI, get_sum
 
 print(PI)  # 3.14
@@ -1849,7 +1831,7 @@ print(get_sum([2, 3]))  # 5
 # 可以使用 * 导入所有变量, 不提倡，因为可能覆盖一些已有的函数
 ```
 
-```python showLineNumbers
+```python
 # 删除文件：
 import os
 
@@ -1880,7 +1862,7 @@ os.remove('ex.py')
 
 如果持续不断加载数据，调用函数模块，计算机的内存会溢出，Python 的垃圾回收机制。是计数机制，当一个对象的引用数为 0 时，它就会被垃圾回收机制回收。
 
-```python showLineNumbers
+```python
 import sys
 # 生以下四种情况的时候，该对象的引用计数器+1
 a= 999 # 对象被创建  
@@ -1909,7 +1891,6 @@ del a # 删除变量a：a对应的对象的引用计数器-1    (此时引用计
 #.将对象进行销毁，内存归还给操作系统，可用内存就增加。
 sys.getrefcount(a)
 ```
-
 
 ## 面向对象编程
 
@@ -1948,7 +1929,7 @@ __name__
 在产生对象之后，我们可以向对象中添加属性。
 事实上，还可以通过构造方法，在构造对象的时候直接添加属性：
 
-```python showLineNumbers
+```python
 class Clothes(object):
     """
     init_demo
@@ -1964,14 +1945,14 @@ my_clothes.color
 
 传入有参数的值：
 
-```python showLineNumbers
+```python
 your_clothes = Clothes('orange')
 your_clothes.color
 ```
 
 表示方法 `__repr__() 和 __str__()`:
 
-```python showLineNumbers
+```python
 class Clothes(object):
     """
     repr and str demo
@@ -1991,22 +1972,22 @@ class Clothes(object):
 
 `__str__()` 是使用 print 函数显示的结果,类似 java 中的 toString：
 
-```python showLineNumbers
+```python
 my_clothes = Clothes()
 print(my_clothes)
 ```
 
 `__repr__()` 返回的是不使用 print 方法的结果:
 
-```python showLineNumbers
+```python
 my_clothes
 ```
 
-```python showLineNumbers
+```python
 print(my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color)
 ```
 
-```python showLineNumbers
+```python
 my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color
 ```
 
@@ -2014,7 +1995,7 @@ my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color
 
 只读属性：
 
-```python showLineNumbers
+```python
 class Clothes(object):
     def __init__(self, price):
         self.price = price
@@ -2028,14 +2009,14 @@ class Clothes(object):
 这里 discount_price 就是一个只读不写的属性了（注意是属性不是方法）,
 而 price 是可读写的属性：
 
-```python showLineNumbers
+```python
 my_clothes = Clothes(100)
 print(my_clothes.discount_price)  # 80.0
 ```
 
 可以修改 price 属性来改变 discount_price：
 
-```python showLineNumbers
+```python
 my_clothes.price = 200
 print(my_clothes.discount_price)  # 160.0
 ```
@@ -2046,7 +2027,7 @@ my_clothes.discount_price=100 也会报错，因为只读。
 
 对于 @property 生成的只读属性，我们可以使用相应的 @attr.setter 修饰符来使得这个属性变成可写的：
 
-```python showLineNumbers
+```python
 class Clothes(object):
     def __init__(self, price):
         self.price = price
@@ -2063,7 +2044,7 @@ class Clothes(object):
 
 测试一下：
 
-```python showLineNumbers
+```python
 my_clothes = Clothes(100)
 print(my_clothes.discount_price)
 
@@ -2073,7 +2054,7 @@ print(my_clothes.discount_price)
 
 修改 discount_price 属性：
 
-```python showLineNumbers
+```python
 my_clothes.discount_price = 180
 print(my_clothes.price)
 print(my_clothes.discount_price)
@@ -2081,7 +2062,7 @@ print(my_clothes.discount_price)
 
 一个等价的替代如下，用方法：
 
-```python showLineNumbers
+```python
 class Clothes(object):
     def __init__(self, price):
         self.price = price
@@ -2096,7 +2077,7 @@ class Clothes(object):
 
 ```
 
-```python showLineNumbers
+```python
 my_clothes = Clothes(100)
 print(my_clothes.discount_price)
 
@@ -2112,7 +2093,7 @@ print(my_clothes.discount_price)
 
 类定义的基本形式：
 
-```python showLineNumbers
+```python
 class ClassName(ParentClass):
     """class docstring"""
     def method(self):
@@ -2121,7 +2102,7 @@ class ClassName(ParentClass):
 
 里面的 ParentClass 就是用来继承的。
 
-```python showLineNumbers
+```python
 class Clothes(object):
     def __init__(self, color="green"):
         self.color = color
@@ -2130,18 +2111,18 @@ class Clothes(object):
         return self.__class__.__name__, self.color
 ```
 
-```python showLineNumbers
+```python
 my_clothes = Clothes()
 my_clothes.color
 ```
 
-```python showLineNumbers
+```python
 my_clothes.out_print()
 ```
 
 定义一个子类，继承父类的所有方法:
 
-```python showLineNumbers
+```python
 class NikeClothes(Clothes):
     def change_color(self):
         if self.color == "green":
@@ -2150,25 +2131,25 @@ class NikeClothes(Clothes):
 
 继承父类的所有方法：
 
-```python showLineNumbers
+```python
 your_clothes = NikeClothes()
 your_clothes.color
 ```
 
-```python showLineNumbers
+```python
 your_clothes.out_print()
 ```
 
 但有自己的方法：
 
-```python showLineNumbers
+```python
 your_clothes.change_color()
 your_clothes.color
 ```
 
 如果想对父类的方法进行修改，只需要在子类中重定义这个类即可：
 
-```python showLineNumbers
+```python
 class AdidasClothes(Clothes):
     def change_color(self):
         if self.color == "green":
@@ -2195,7 +2176,7 @@ super(CurrentClassName, instance)
 
 刚才 AdidasClothes 可以改写为：
 
-```python showLineNumbers
+```python
 class NewAdidasClothes(Clothes):
     def change_color(self):
         if self.color == "green":
@@ -2215,7 +2196,7 @@ her_clothes.out_print()
 
 **new**()用来创建一个实例，它至少有一个参数 cls，代表当前类。默认情况下**new**()会创建当前类的实例，该方法也可以被重载，重载后也可以创建其他类的实例。
 
-```python showLineNumbers
+```python
 class Fun(object):
     def __init__(self, fun):
         self.fun = fun
@@ -2232,7 +2213,7 @@ if __name__ == '__main__':
 
 可以使用**new**方法创建出其它类的实例。在这种场景下，**new**方法创建后会调用对应类的**init**方法完成初始化：
 
-```python showLineNumbers
+```python
 class Fun(object):
     def __init__(self, fun):
         self.fun = fun
@@ -2258,7 +2239,7 @@ if __name__ == '__main__':
 
 接口的调用：
 
-```python showLineNumbers
+```python
 class Clothes(object):
     def __init__(self, color="green"):
         self.color = color
@@ -2281,7 +2262,7 @@ class AdidasClothes(object):
 
 因为三个类都实现了 out() 方法，因此可以这样使用：
 
-```python showLineNumbers
+```python
 objects = [Clothes(), NikeClothes(), AdidasClothes()]
 for obj in objects:
     obj.out()
@@ -2298,7 +2279,7 @@ for obj in objects:
 
 以 `__` 开头不以 `__` 结尾的属性是更加特殊的方法，调用方式也不同：
 
-```python showLineNumbers
+```python
 class MyDemoClass(object):
     def __init__(self):
         print("special.")
@@ -2313,12 +2294,12 @@ class MyDemoClass(object):
         print("__get_type is really special method.")
 ```
 
-```python showLineNumbers
+```python
 demo = MyDemoClass()
 
 ```
 
-```python showLineNumbers
+```python
 demo.get_value()
 demo._get_name()
 demo._MyDemoClass__get_type()
@@ -2330,7 +2311,7 @@ demo._MyDemoClass__get_type()
 
 捕捉不同的错误类型，尝试在下面输入框输入：-1，1，2，q
 
-```python showLineNumbers
+```python
 import math
 
 while True:
@@ -2354,7 +2335,7 @@ while True:
 
 尝试在文本输入框输入：k，start，q
 
-```python showLineNumbers
+```python
 class CommandError(ValueError):
     print("bad command operation. must input 'start', 'stop', 'pause'")
 
@@ -2383,7 +2364,7 @@ try/catch 块还有一个可选的关键词 finally。
 
 比如文件操作时，常在 finally 关闭文件。
 
-```python showLineNumbers
+```python
 try:
     print(1 / 0)
 except ZeroDivisionError:
@@ -2391,8 +2372,6 @@ except ZeroDivisionError:
 finally:
     print('finally was called.')
 ```
-
-
 
 ## 装饰器
 
@@ -2420,24 +2399,24 @@ finally:
 
 例如这个函数：
 
-```python showLineNumbers
+```python
 def dec(f):
     print('I am decorating function', id(f))
     return f
 ```
 
-```python showLineNumbers
+```python
 def foo(x):
     print(x)  # I am decorating function 45206384
 ```
 
-```python showLineNumbers
+```python
 foo = dec(foo)
 ```
 
 可以替换为：
 
-```python showLineNumbers
+```python
 @dec
 def foo(x):
     print(x)
@@ -2445,7 +2424,7 @@ def foo(x):
 
 那么他有什么实际作用？故事的开始是这样的，你写好了 2 个函数：
 
-```python showLineNumbers
+```python
 def test1():
   print('test1 ..')
 
@@ -2460,7 +2439,7 @@ test2()
 输出要求是：在每次函数调用的前后加上时间。
 于是你写成了下面这个样子
 
-```python showLineNumbers
+```python
 import time
 def test1():
     print('测试开始：现在时间是',time.time())
@@ -2486,7 +2465,7 @@ test2()
 
 我说，这样子，那我可以写成这样？
 
-```python showLineNumbers
+```python
 import time
 
 def a_decorator(func):
@@ -2515,7 +2494,7 @@ a_decorator(test2)
 
 我说，那就写成这样？
 
-```python showLineNumbers
+```python
 import time
 
 def a_decorator(func):
@@ -2550,7 +2529,7 @@ test1()
 
 核心代码（下方的 test 函数）无需知道我（下方的 log 函数）是怎么写的，我也无需知道核心代码是怎么写的，我们就能快速完成协作。
 
-```python showLineNumbers
+```python
 import time
 
 #args 是 arguments 的缩写，表示位置参数；
@@ -2595,7 +2574,7 @@ test2(1,2)
 
 定义两个装饰器函数，一个将原来的函数值加一，另一个乘二：
 
-```python showLineNumbers
+```python
 def plus_one(f):
     def new_func(x):
         return f(x) + 1
@@ -2603,7 +2582,7 @@ def plus_one(f):
     return new_func
 ```
 
-```python showLineNumbers
+```python
 def times_two(f):
     def new_func(x):
         return f(x) * 2
@@ -2613,14 +2592,14 @@ def times_two(f):
 
 定义函数，先乘二再加一：
 
-```python showLineNumbers
+```python
 @plus_one
 @times_two
 def foo(x):
     return int(x)
 ```
 
-```python showLineNumbers
+```python
 b = foo(2)
 b  # 5
 ```
@@ -2633,7 +2612,7 @@ decorators factories 是返回修饰器的函数
 
 例如我们想将 函数 输出的内容写入一个文件去，可以这样做：
 
-```python showLineNumbers
+```python
 def super_loud(filename):
     fp = open(filename, 'w')
 
@@ -2653,7 +2632,7 @@ def super_loud(filename):
     return loud
 ```
 
-```python showLineNumbers
+```python
 @super_loud('test.txt')
 def foo(x):
     print(x)
@@ -2663,7 +2642,7 @@ def foo(x):
 foo(100)
 ```
 
-```python showLineNumbers
+```python
 import os
 os.remove('test.txt')
 ```
@@ -2674,7 +2653,7 @@ os.remove('test.txt')
 
 例如 classmethod 将一个对象方法转换了类方法：
 
-```python showLineNumbers
+```python
 class Foo(object):
     @classmethod
     def bar(cls, x):
@@ -2686,7 +2665,7 @@ class Foo(object):
 
 类方法可以通过 类名.方法 来调用：
 
-```python showLineNumbers
+```python
 Foo.bar(10)
 ```
 
@@ -2696,7 +2675,7 @@ Foo.bar(10)
 
 这时候就可以使用 property 装饰器：
 
-```python showLineNumbers
+```python
 class Foo(object):
     def __init__(self, data):
         self.data = data
@@ -2709,7 +2688,7 @@ class Foo(object):
 
 此时可以使用 .x 这个属性查看数据（不需要加上括号）：
 
-```python showLineNumbers
+```python
 foo = Foo(22)
 print(foo.x)
 ```
@@ -2720,7 +2699,7 @@ foo.x = 1 会报错
 
 如果想让它变成可读写，可以加上一个装饰符 @x.setter：
 
-```python showLineNumbers
+```python
 class Foo(object):
     def __init__(self, data):
         self.data = data
@@ -2734,12 +2713,12 @@ class Foo(object):
         self.data = value
 ```
 
-```python showLineNumbers
+```python
 foo = Foo(1000)
 foo.x
 ```
 
-```python showLineNumbers
+```python
 foo.x = 2222
 foo.x
 ```
@@ -2756,16 +2735,16 @@ foo.x
 
 字符串，列表或元组对象都可用于创建迭代器：
 
-```python showLineNumbers
+```python
 list=[1,2,3,4]
 it = iter(list)    # 创建迭代器对象
 ```
 
-```python showLineNumbers
+```python
 next(it) # 输出迭代器的下一个元素
 ```
 
-```python showLineNumbers
+```python
 next(it) # 再输出下一个元素
 ```
 
@@ -2773,7 +2752,7 @@ next(it) # 再输出下一个元素
 
 列表好处是不需要对下标进行迭代，直接输出列表的值：
 
-```python showLineNumbers
+```python
 x = [2, 4, 6]
 
 for i in x:
@@ -2786,7 +2765,7 @@ for i in x:
 可以将迭代器传给 enumerate 函数，
 这样每次迭代都会返回一组 (index, value) 组成的元组：
 
-```python showLineNumbers
+```python
 x = [2, 4, 6]
 for i, n in enumerate(x):
     print(i, 'is', n)
@@ -2802,7 +2781,7 @@ for i, n in enumerate(x):
 
 自定义一个 list 的取反迭代器：
 
-```python showLineNumbers
+```python
 class ReverseListIterator(object):
     def __init__(self, lst):
         self.list = lst
@@ -2819,7 +2798,7 @@ class ReverseListIterator(object):
             raise StopIteration
 ```
 
-```python showLineNumbers
+```python
 x = range(10)
 for i in ReverseListIterator(x):
     print(i)
@@ -2835,7 +2814,7 @@ for i in ReverseListIterator(x):
 - 偶数 n：返回 n / 2
 - 直到 n 为 1 为止：
 
-```python showLineNumbers
+```python
 class Collatz(object):
     def __init__(self, start):
         self.value = start
@@ -2860,7 +2839,7 @@ for x in Collatz(5):
 
 不过迭代器对象存在状态，**有问题**：
 
-```python showLineNumbers
+```python
 i = Collatz(5)
 # zip() 函数用于将可迭代的对象作为参数，将对象中对应的元素打包成一个个元组，然后返回由这些元组组成的迭代器。
 for x, y in zip(i, i):
@@ -2881,7 +2860,7 @@ print(x, y)
 
 这里提供了一个二分树的中序遍历实现：
 
-```python showLineNumbers
+```python
 class BinaryTree(object):
     def __init__(self, value, left=None, right=None):
         self.value = value
@@ -2910,7 +2889,7 @@ class InorderIterator(object):
 
 测试：
 
-```python showLineNumbers
+```python
 tree = BinaryTree(
     left=BinaryTree(
         left=BinaryTree(1),
@@ -2929,14 +2908,14 @@ tree = BinaryTree(
 )
 ```
 
-```python showLineNumbers
+```python
 for value in tree:
     print(value)
 ```
 
 不会出现之前的问题：
 
-```python showLineNumbers
+```python
 
 for x, y in zip(tree, tree):
     print(x, y)
@@ -2961,7 +2940,7 @@ collatz:
 - 偶数 n：返回 n / 2
 - 直到 n 为 1 为止：
 
-```python showLineNumbers
+```python
 def collatz(n):
     sequence = []
     while n != 1:
@@ -2979,7 +2958,7 @@ for x in collatz(5):
 
 生成器的版本如下：
 
-```python showLineNumbers
+```python
 def collatz(n):
     while n != 1:
         if n % 2 == 0:
@@ -2995,7 +2974,7 @@ for x in collatz(5):
 
 迭代器的版本如下：
 
-```python showLineNumbers
+```python
 class Collatz(object):
     def __init__(self, start):
         self.value = start
@@ -3018,24 +2997,24 @@ for x in collatz(5):
 
 事实上，生成器也是一种迭代器：
 
-```python showLineNumbers
+```python
 x = collatz(5)
 x
 ```
 
 它支持 next 方法，返回下一个 yield 的值：
 
-```python showLineNumbers
+```python
 next(x)
 ```
 
-```python showLineNumbers
+```python
 next(x)
 ```
 
 `__iter__` 方法返回的是它本身：
 
-```python showLineNumbers
+```python
 x.__iter__()
 ```
 
@@ -3055,7 +3034,7 @@ yield 返回的是一个迭代器（yield 本身是生成器-生成器是用来�
 
 yiled from 还可以使一个生成器可以委派子生成器，建立双向通道
 
-```python showLineNumbers
+```python
 
 def g1(x):
    yield range(x, 0, -1)
@@ -3119,7 +3098,7 @@ print(list(g2(5)))
 
 #### 闭包失败示例
 
-```python showLineNumbers
+```python
 name = 1 #变量在函数外部,inner可以访问，但是全局也能访问。直接闭包失败
 def func():
     def inner():
@@ -3135,7 +3114,7 @@ print(name)
 
 #### 闭包成功示例
 
-```python showLineNumbers
+```python
 def func():
     name = 1 #变量在函数内部,inner可以访问,但是全局不能访问。闭包成功！此时加上nonlocal
     def inner():
@@ -3163,7 +3142,7 @@ print(name)
 
 ### 使用闭包函数实现单例模式
 
-```python showLineNumbers
+```python
 def single(cls, *args, **kwargs):
     instance = {}
 
@@ -3187,7 +3166,7 @@ print(id(b))
 
 ### 也可以直接使用**new**方法实现的单例模式
 
-```python showLineNumbers
+```python
 class Single:
     def __new__(cls, *args, **kwargs):
         if not hasattr(cls, '_instance'):
@@ -3223,7 +3202,7 @@ listx = [15, 7, 1, 1, "+", "-", "/", 3, "*", 2, 1, 1, "+", "+", "-"]
 
 #### 题解
 
-```python  showLineNumbers
+```python
 
 # 方法1-python人思维
 while len(listx) > 1:
@@ -3285,7 +3264,7 @@ string.whitespace   空白字符
 
 #### 题解
 
-```python  showLineNumbers
+```python
 import string
 # 方法1 正常Python人思维
 def generate_pwd_list(dic, max_len):
@@ -3368,15 +3347,17 @@ print(len(res))
 1.输入演员名
 2.如果演员出演了电影，则打印他+他出演的全部电影。程序结束
 3.如果演员没有出演电影，则打印查无此人。程序继续
-```python  showLineNumbers
+
+```python
 电影 = [
 '妖猫传',['黄轩','染谷将太'],
 '无问西东',['章子怡','王力宏','祖峰'],
 '超时空同居',['雷佳音','佟丽娅','黄轩']]
 ```
+
 #### 题解
 
-```python  showLineNumbers
+```python
 
 电影 = [
 '妖猫传',['黄轩','染谷将太'],
@@ -3392,7 +3373,7 @@ while True:
             a = i #暂存---for 是逐一提取数据，并赋值
         else:
             print(name,'出演了',a)
-            找到了吗 += 1        
+            找到了吗 += 1      
     if 找到了吗 != 0 : # 不等于 0 就代表它找到了
         break
     print('【查无此人】') # 1号位
@@ -3406,7 +3387,7 @@ while True:
 
 #### 题解
 
-```python  showLineNumbers
+```python
 
 
 def fun(num, list=None):
@@ -3444,14 +3425,14 @@ print(fun(x))
 
 1*7=7 2*7=14 3*7=21 4*7=28 5*7=35 6*7=42 7*7=49 
 
-1*8=8 2*8=16 3*8=24 4*8=32 5*8=40 6*8=48 7*8=56 8*8=64        
+1*8=8 2*8=16 3*8=24 4*8=32 5*8=40 6*8=48 7*8=56 8*8=64      
 
 1*9=9 2*9=18 3*9=27 4*9=36 5*9=45 6*9=54 7*9=63 8*9=72 9*9=81 
 ```
 
 #### 题解
 
-```python  showLineNumbers
+```python
 #方法一
 for i in range(1,10):
     print()
@@ -3478,7 +3459,7 @@ while i<10: #控制行，1到9
 
 #### 题解
 
-```python  showLineNumbers
+```python
 # 方法1：
 sorted(d.cop(),key = lambda i:i[k])
 
@@ -3494,7 +3475,7 @@ heappush(h,(i[k],i)) for i in d
 
 #### 题解
 
-```python  showLineNumbers
+```python
 
 
 list1 = [13, 22, 6, 99, 11, 0]
@@ -3522,7 +3503,7 @@ print(list1)
 
 #### 题解
 
-```python  showLineNumbers
+```python
 def partition(arr, low: int, high: int):
     pivot, j = arr[low], low  # 获取底部元素与 对应的初始下标
 
@@ -3566,7 +3547,7 @@ if __name__ == '__main__':
 
 #### 题解
 
-```python  showLineNumbers
+```python
 aList = []
 for i in range(0,2023):
     aList.append(i)
@@ -3585,7 +3566,7 @@ print(aList)
 
 #### 题解
 
-```python  showLineNumbers
+```python
 
 for a in range(1,2022):
     if (2022 - a*a)**0.5 in range(1,2022):
@@ -3604,7 +3585,7 @@ for a in range(1,2022):
 
 #### 题解
 
-```python  showLineNumbers
+```python
 
 for i in range(1,440):
     if i <= 80 :
@@ -3629,7 +3610,7 @@ for i in range(1,440):
 
 #### 题解
 
-```python  showLineNumbers
+```python
 
 for 时钟 in range(24):
     for 分钟 in range(60):
@@ -3648,7 +3629,7 @@ for 时钟 in range(24):
 
 #### 题解
 
-```python  showLineNumbers
+```python
 
 i = 0
 while True:
@@ -3684,33 +3665,33 @@ while 睡觉的状态 != '睡着': # 只要不是睡着，就继续数
 
 以一张2*2的24位图的bmp格式图片为例
 
-| Offset | Offset10 | Size | Hex value | Value | Description |
-|---|---|---|---|---|---|
-| BMP Header |  |  |  |  |  |
-| 0h | 0 | 2 | 42 4D | "BM" | ID field \(42h, 4Dh\) |
-| 2h | 2 | 4 | 46 00 00 00 | 70 bytes \(54\+16\) | BMP 文件的大小（54 字节标头 \+ 16 字节数据） |
-| 6h | 6 | 2 | 00 00 | Unused | 特定应用 |
-| 8h | 8 | 2 | 00 00 | Unused | 特定应用 |
-| Ah | 10 | 4 | 36 00 00 00 | 54 bytes \(14\+40\) | 可以找到像素阵列（位图数据）的偏移量 |
-| DIB Header\-Device Independent Bitmaps\-设备无关位图 |  |  |  |  |  |
-| Eh | 14 | 4 | 28 00 00 00 | 40 bytes |  DIB 头中的字节数（从此时开始） |
-| 12h | 18 | 4 | 02 00 00 00 | 2 pixels \(left to right order\) | 位图的宽度（以像素为单位） |
-| 16h | 22 | 4 | 02 00 00 00 | 2 pixels \(bottom to top order\) | 位图的高度（以像素为单位）。从下到上的像素顺序为正。 |
-| 1Ah | 26 | 2 | 01 00 | 1 plane | 使用的颜色平面数量 |
-| 1Ch | 28 | 2 | 18 00 | 24 bits | 每个像素的位数 |
-| 1Eh | 30 | 4 | 00 00 00 00 | 0 | BI\_RGB，未使用像素阵列压缩 |
-| 22h | 34 | 4 | 10 00 00 00 | 16 bytes | 原始位图数据的大小（包括填充） |
-| 26h | 38 | 4 | 13 0B 00 00 | 2835 pixels/metre horizontal | 图像的打印分辨率， |
-| 2Ah | 42 | 4 | 13 0B 00 00 | 2835 pixels/metre vertical | 72 DPI × 39\.3701 inches per metre yields 2834\.6472 |
-| 2Eh | 46 | 4 | 00 00 00 00 | 0 colors | 调色板中的颜色数量 |
-| 32h | 50 | 4 | 00 00 00 00 | 0 important colors | 0 表示所有颜色都很重要 |
-| Start of pixel array \(bitmap data\) |  |  |  |  |  |
-| 36h | 54 | 3 | 00 00 FF | 0 0 255 | Red, Pixel \(x=0, y=1\) |
-| 39h | 57 | 3 | FF FF FF | 255 255 255 | White, Pixel \(x=1, y=1\) |
-| 3Ch | 60 | 2 | 00 00 | 0 0 | Padding for 4 byte alignment \(could be a value other than zero\) |
-| 3Eh | 62 | 3 | FF 00 00 | 255 0 0 | Blue, Pixel \(x=0, y=0\) |
-| 41h | 65 | 3 | 00 FF 00 | 0 255 0 | Green, Pixel \(x=1, y=0\) |
-| 44h | 68 | 2 | 00 00 | 0 0 | Padding for 4 byte alignment \(could be a value other than zero\) |
+| Offset                                               | Offset10 | Size | Hex value      | Value                           | Description                                                      |
+| ---------------------------------------------------- | -------- | ---- | -------------- | ------------------------------- | ---------------------------------------------------------------- |
+| BMP Header                                           |          |      |                |                                 |                                                                  |
+| 0h                                                   | 0        | 2    | 42 4D          | "BM"                            | ID field\(42h, 4Dh\)                                             |
+| 2h                                                   | 2        | 4    | 46 00 00 00 | 70 bytes\(54\+16\)              | BMP 文件的大小（54 字节标头\+ 16 字节数据）                      |
+| 6h                                                   | 6        | 2    | 00 00          | Unused                          | 特定应用                                                         |
+| 8h                                                   | 8        | 2    | 00 00          | Unused                          | 特定应用                                                         |
+| Ah                                                   | 10       | 4    | 36 00 00 00    | 54 bytes\(14\+40\)              | 可以找到像素阵列（位图数据）的偏移量                             |
+| DIB Header\-Device Independent Bitmaps\-设备无关位图 |          |      |                |                                 |                                                                  |
+| Eh                                                   | 14       | 4    | 28 00 00 00    | 40 bytes                        | DIB 头中的字节数（从此时开始）                                   |
+| 12h                                                  | 18       | 4    | 02 00 00 00    | 2 pixels\(left to right order\) | 位图的宽度（以像素为单位）                                       |
+| 16h                                                  | 22       | 4    | 02 00 00 00    | 2 pixels\(bottom to top order\) | 位图的高度（以像素为单位）。从下到上的像素顺序为正。             |
+| 1Ah                                                  | 26       | 2    | 01 00          | 1 plane                         | 使用的颜色平面数量                                               |
+| 1Ch                                                  | 28       | 2    | 18 00          | 24 bits                         | 每个像素的位数                                                   |
+| 1Eh                                                  | 30       | 4    | 00 00 00 00    | 0                               | BI\_RGB，未使用像素阵列压缩                                      |
+| 22h                                                  | 34       | 4    | 10 00 00 00    | 16 bytes                        | 原始位图数据的大小（包括填充）                                   |
+| 26h                                                  | 38       | 4    | 13 0B 00 00    | 2835 pixels/metre horizontal    | 图像的打印分辨率，                                               |
+| 2Ah                                                  | 42       | 4    | 13 0B 00 00    | 2835 pixels/metre vertical      | 72 DPI × 39\.3701 inches per metre yields 2834\.6472           |
+| 2Eh                                                  | 46       | 4    | 00 00 00 00    | 0 colors                        | 调色板中的颜色数量                                               |
+| 32h                                                  | 50       | 4    | 00 00 00 00    | 0 important colors              | 0 表示所有颜色都很重要                                           |
+| Start of pixel array\(bitmap data\)                  |          |      |                |                                 |                                                                  |
+| 36h                                                  | 54       | 3    | 00 00 FF       | 0 0 255                         | Red, Pixel\(x=0, y=1\)                                           |
+| 39h                                                  | 57       | 3    | FF FF FF       | 255 255 255                     | White, Pixel\(x=1, y=1\)                                         |
+| 3Ch                                                  | 60       | 2    | 00 00          | 0 0                             | Padding for 4 byte alignment\(could be a value other than zero\) |
+| 3Eh                                                  | 62       | 3    | FF 00 00       | 255 0 0                         | Blue, Pixel\(x=0, y=0\)                                          |
+| 41h                                                  | 65       | 3    | 00 FF 00       | 0 255 0                         | Green, Pixel\(x=1, y=0\)                                         |
+| 44h                                                  | 68       | 2    | 00 00          | 0 0                             | Padding for 4 byte alignment\(could be a value other than zero\) |
 
 bit（位）比特是计算机运算的基础，属于二进制的范畴
 
@@ -3718,7 +3699,7 @@ byte字节是内存的基本单位
 
 8 bit = 1 byte
 
-```python  showLineNumbers
+```python
 # 参考知识
 
 data = b'\xff' # b代表这是一个二进制数据，\x代表这是一个十六进制的数据
@@ -3741,7 +3722,7 @@ with open("black.bmp", "wb") as f:
 
 #### 题解
 
-```python  showLineNumbers
+```python
 class Readbmp:
     """
     read bmp files
