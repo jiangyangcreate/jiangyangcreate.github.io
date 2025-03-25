@@ -15,7 +15,7 @@
 
 
 <link rel="stylesheet" href="/katex/katex.min.css"><link rel="stylesheet" href="/assets/css/styles.42d90032.css">
-<script src="/assets/js/runtime~main.5f042b5a.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.230869f0.js" defer="defer"></script>
 <script src="/assets/js/main.fc841f7d.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -27,7 +27,7 @@
 <ul>
 <li>Python 1.x: 1994 年发布,这是 Python 语言的早期版本,它包括整数、浮点数、复数、字符串、列表、元组、字典等基本数据类型,以及 if、while、for 等控制语句,但没有函数、模块、类等高级语法。</li>
 <li>Python 2.x: 2000 年发布,这是 Python 语言的中期版本,它在 1.x 的基础上增加了函数、模块、类等高级语法,但是保留了 1.x 版本的许多不合理的语法,所以 Python 2.x 版本有“坑人”的嫌疑。</li>
-<li>Python 3.x: 2008 年发布,这是 Python 语言的最新版本,它在 2.x 的基础上修复了许多已知的问题,并且还简化了语法,使得 Python 语言更加优雅。但是,由于 Python 3.x 不兼容 Python 2.x,导致 Python 2.x 的程序不能直接运行在 Python 3.x 上,所以 Python 3.x 的普及进程比较缓慢。</li>
+<li>Python 3.x: 2008 年发布,这是 Python 语言的最新版本,它在 2.x 的基础上修复了许多已知的问题,并且还简化了语法,使得 Python 语言更加优雅。目前提到Python，默认指的是Python 3。</li>
 </ul>
 <p>Python 语言的应用领域非常广泛,主要有以下几个方面:</p>
 <ul>
@@ -36,10 +36,10 @@
 <li>人工智能: Python 语言可以使用 TensorFlow、PyTorch 等工具来进行人工智能开发。</li>
 <li>Web 开发: Python 语言可以使用 Django、Flask 等框架来进行 Web 开发。</li>
 </ul>
-<p>在生活中,人们使用汉语、英语、法语、德语、日语等不同的语言跟不同国家的人进行交流。在使用计算机时，人们不能  直接使用英语等人类的语言和计算机交流，而是使用编程语言(Programming Language)将人们的想法编写成程序，再通过执行程序控制计算机去解决各种问题。我们将这个编程语言与计算机之间的“翻译员”称为编程环境，简称“环境”。</p>
+<p>在生活中,人们使用汉语、英语、法语、德语、日语等不同的语言跟不同国家的人进行交流。在使用计算机时，人们不能直接使用英语等人类的语言和计算机交流，而是使用编程语言(Programming Language)将人们 的想法编写成程序，再通过执行程序控制计算机去解决各种问题。我们将这个编程语言与计算机之间的“翻译员”称为编程环境，简称“环境”。</p>
 <p>我们可能会需要多个环境（例如：python3.9）去复现别人论文的代码，另一方面我们又需要一个最新的python 环境去开发新的代码。 这就导致了一个问题，如何管理这些依赖，如何保证不同的模块库之间的兼容性，如何保证不同的模块库之间的可复用性。</p>
 <p>常见的部分主流方案如下：</p>
-<table><thead><tr><th>工具</th><th>优点</th><th>缺点</th><th>适用场景</th></tr></thead><tbody><tr><td><code>venv</code></td><td>轻量级，不需要额外安装复杂的工具。</td><td>不能管理非Python的依赖，例如cuda版本。不能创建源版本以外的Python环境。</td><td>传统的机器学习</td></tr><tr><td><code>conda</code></td><td>功能强大，可以管理外部依赖。可以创建跨Python大版本的环境。</td><td>体积较大。迁移不方便。</td><td>深度学习</td></tr><tr><td><code>docker</code></td><td>可以创建一个隔离的环境，并且可以方便的进行迁移。 可以创建任意新环境，包括不同的操作的系统。</td><td>体积最大，需要学习和理解Docker的概念。复用简单方便。</td><td>需要迁移的环境</td></tr></tbody></table>
+<table><thead><tr><th>特性</th><th>venv</th><th>uv</th><th>conda</th><th>docker</th></tr></thead><tbody><tr><td>支持不同大版本Python环境</td><td>❌ 仅限创建环境时的Python版本</td><td>⚠️ 依赖系统已安装的Python版本</td><td>✅ 可在同一系统上创建不同Python版本环境</td><td>✅ 可创建任意版本Python的容器</td></tr><tr><td>管理外部依赖（如cuda）</td><td>❌ 只能管理Python包</td><td>❌ 专注于Python包管理</td><td>✅ 可管理cuda等非Python依赖</td><td>✅ 完全控制所有系统和应用依赖</td></tr><tr><td>跨平台支持</td><td>⚠️ 环境不可直接迁移到不同操作系统</td><td>⚠️ 配置可跨平台但环境需重建</td><td>✅ 可使用相同配置文件在不同系统创建环境</td><td>✅ 容器可在任何支持Docker的平台运行</td></tr><tr><td>适用场景</td><td>简单的Python项目开发</td><td>需要快速安装依赖的项目</td><td>数据科学和深度学习项目</td><td>需要完全一致环境的生产部署</td></tr><tr><td>体积和资源消耗</td><td>轻量级</td><td>轻量级</td><td>中等</td><td>较大</td></tr></tbody></table>
 <p>这里我建议先使用传统的单环境开发，后续需要迁移环境时，再使用<code>conda</code>或者<code>docker</code>。</p>
 <p>推荐阅读</p>
 <ul>
