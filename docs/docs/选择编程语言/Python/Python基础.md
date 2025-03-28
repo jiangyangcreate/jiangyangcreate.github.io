@@ -1858,6 +1858,67 @@ os.remove('ex.py')
 
 > 设置 path 系统环境变量。
 
+具体区别可以创建下面的文件解构来了解：
+
+```bash
+top/
+├── __init__.py
+├── second.py
+└── second_copy.py
+```
+
+```python title="second.py"
+import sys
+print(sys.argv)
+from .second_copy import *
+```
+
+```python title="second_copy.py"
+import sys
+print(sys.argv)
+```
+
+两种运行脚本的方式，以及对应的输出：
+
+1. **使用 `python -m top.second` 运行**：
+   ```
+   PS C:\Users\jiang\Desktop> python -m top.second
+   ['C:\\Users\\jiang\\Desktop\\top\\second.py']
+   ['C:\\Users\\jiang\\Desktop\\top\\second.py']
+   ```
+   - 输出两次相同的 `sys.argv`，显示脚本的完整路径。
+   - 没有错误，脚本正常运行。
+
+2. **直接运行 `python top\second.py`**：
+   ```
+   PS C:\Users\jiang\Desktop> python top\second.py
+   ['top\\second.py']
+   Traceback (most recent call last):
+     File "C:\Users\jiang\Desktop\top\second.py", line 3, in <module>
+       from .second_copy import *
+   ImportError: attempted relative import with no known parent package
+   ```
+   - 仅输出了 `sys.argv` 一次，显示的是相对路径 `top\second.py`。
+   - 然后抛出了 `ImportError`，提示“尝试进行相对导入，但没有已知的父包”。
+
+#### 为什么会有这样的差异？
+问题的核心在于 Python 如何处理这两种运行方式，以及它们对模块结构和相对导入的影响。
+
+##### 1. `python -m top.second` 的行为
+- **运行方式**：使用 `-m` 标志告诉 Python 将 `top.second` 作为一个模块运行。这里，`top` 被识别为一个包，`second` 是该包中的一个模块。
+- **包上下文**：Python 会正确设置包的层次结构。由于当前工作目录是 `C:\Users\jiang\Desktop`，Python 知道 `top` 是一个包，并且 `second.py` 是其中的模块。
+- **相对导入**：在 `second.py` 中，`from .second_copy import *` 是一个相对导入，`.` 表示当前包（即 `top`）。因为 Python 已经建立了包上下文，它能找到同一目录下的 `second_copy.py`，导入成功。
+- **`sys.argv` 的值**：在这种模式下，`sys.argv[0]` 被设置为脚本的完整路径，即 `C:\\Users\\jiang\\Desktop\\top\\second.py`。  
+  - 首先，`second.py` 打印这个值。
+  - 然后，导入 `second_copy.py` 时，`second_copy.py` 也打印 `sys.argv`，因为 `sys.argv` 是全局的，不会因模块不同而改变，所以输出两次相同的结果。
+
+##### 2. `python top\second.py` 的行为
+- **运行方式**：直接通过文件路径运行 `second.py`，即将其作为独立的脚本执行，而不是作为一个包中的模块。
+- **包上下文缺失**：在这种情况下，Python 不会将 `top` 视为一个包，而是直接运行 `second.py` 作为主模块（`__main__`）。因此，没有定义任何“父包”。
+- **相对导入失败**：`second.py` 中的 `from .second_copy import *` 依赖于包结构，但由于缺少包上下文，Python 不知道 `.` 代表什么，导致抛出 `ImportError: attempted relative import with no known parent package`。
+- **`sys.argv` 的值**：在这里，`sys.argv[0]` 是命令行中提供的路径，即 `top\second.py`（相对于当前工作目录 `C:\Users\jiang\Desktop`）。  
+  - `second.py` 打印这个值后，尝试执行相对导入时失败，因此程序终止，`second_copy.py` 的代码未被执行。
+
 ### 垃圾回收机制
 
 如果持续不断加载数据，调用函数模块，计算机的内存会溢出，Python 的垃圾回收机制。是计数机制，当一个对象的引用数为 0 时，它就会被垃圾回收机制回收。
