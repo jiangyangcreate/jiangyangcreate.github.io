@@ -46,9 +46,19 @@ $
 
 以此类推
 
+### 动画演示
+
+下面的动画使用10*10的网格模拟图片，通过修改网格颜色表示分类。
+
+通过绿色表示样本分类1，深绿色表示其簇中心点，蓝色表示样本分类2，深蓝色表示其簇中心点。
+
+初始簇中心点1在左上角，簇中心点2在中间。
+
+每次迭代停顿5秒。
+
 <details>
 <summary>点击查看动画</summary>
-``` jsx live
+``` jsx live 
 function KMeansAnimation() {
   const gridSize = 10;
   
@@ -59,6 +69,7 @@ function KMeansAnimation() {
   ]);
   const [step, setStep] = React.useState(0);
   const [iteration, setIteration] = React.useState(0);
+  const [ready, setReady] = React.useState(false);
   
   React.useEffect(() => {
     const generateAllGridPoints = () => {
@@ -76,6 +87,13 @@ function KMeansAnimation() {
     };
     
     setDataPoints(generateAllGridPoints());
+    
+    // 初始化后等待5秒再开始第一次迭代
+    const initialTimer = setTimeout(() => {
+      setReady(true);
+    }, 5000);
+    
+    return () => clearTimeout(initialTimer);
   }, []);
   
   const distance = (point1, point2) => {
@@ -83,7 +101,7 @@ function KMeansAnimation() {
   };
   
   React.useEffect(() => {
-    if (dataPoints.length === 0) return;
+    if (dataPoints.length === 0 || !ready) return;
     
     const timer = setTimeout(() => {
       if (step === 0) {
@@ -116,11 +134,17 @@ function KMeansAnimation() {
         
         setStep(0);
         setIteration(prev => prev + 1);
+        
+        // 每次迭代完成后暂停5秒
+        setReady(false);
+        setTimeout(() => {
+          setReady(true);
+        }, 5000);
       }
     }, 1000);
     
     return () => clearTimeout(timer);
-  }, [step, dataPoints, centroids]);
+  }, [step, dataPoints, centroids, ready]);
   
   const renderGrid = () => {
     const grid = [];
@@ -167,7 +191,10 @@ function KMeansAnimation() {
   return (
     <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px'}}>
       <h2 style={{fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '16px'}}>K-Means 聚类算法可视化</h2>
-      <div style={{marginBottom: '16px'}}>迭代次数: {iteration}</div>
+      <div style={{marginBottom: '16px'}}>
+        迭代次数: {iteration}
+        {!ready && <span style={{marginLeft: '10px', color: '#718096'}}>等待中...</span>}
+      </div>
       <div style={{
         display: 'grid',
         gridTemplateColumns: 'repeat(10, 1fr)',
@@ -197,8 +224,6 @@ function KMeansAnimation() {
     </div>
   );
 }
-
-export default KMeansAnimation;
 ```
 </details>
 
@@ -380,3 +405,22 @@ plt.title('Quantized image (64 colors, Random)')
 plt.imshow(recreate_image(codebook_random, labels_random, w, h))
 
 ```
+
+### DBscan
+
+[DBSCAN (Density-Based Spatial Clustering of Applications with Noise) ](https://scikit-learn.org/stable/modules/generated/sklearn.cluster.DBSCAN.html#)
+
+是一种流行的密度聚类算法。它的主要特点是：
+
+1. 基于密度的聚类方法，能够发现任意形状的聚类
+2. 不需要预先指定聚类数量
+3. 能够识别噪声点
+4. 通过两个参数控制：邻域半径ε和最小点数MinPts
+
+DBSCAN的基本原理是找出密度连接的区域，形成聚类。它将数据点分为三类：
+- 核心点：在其ε-邻域内至少有MinPts个点
+- 边界点：在某个核心点的ε-邻域内，但其自身ε-邻域内的点数少于MinPts
+- 噪声点：既不是核心点也不是边界点的点
+
+DBSCAN算法特别适合处理包含噪声和形状不规则聚类的数据集，广泛应用于空间数据库、地理信息系统、图像处理等领域。
+
