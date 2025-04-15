@@ -46,31 +46,162 @@ $
 
 以此类推
 
-```python showLineNumbers
-from sklearn.cluster import KMeans
-import numpy as np
+<details>
+<summary>点击查看动画</summary>
+``` jsx live
+function KMeansAnimation() {
+  const gridSize = 10;
+  
+  const [dataPoints, setDataPoints] = React.useState([]);
+  const [centroids, setCentroids] = React.useState([
+    { x: 0, y: 0 },
+    { x: 5, y: 5 }
+  ]);
+  const [step, setStep] = React.useState(0);
+  const [iteration, setIteration] = React.useState(0);
+  
+  React.useEffect(() => {
+    const generateAllGridPoints = () => {
+      const points = [];
+      for (let i = 0; i < gridSize; i++) {
+        for (let j = 0; j < gridSize; j++) {
+          points.push({
+            x: i,
+            y: j,
+            cluster: null
+          });
+        }
+      }
+      return points;
+    };
+    
+    setDataPoints(generateAllGridPoints());
+  }, []);
+  
+  const distance = (point1, point2) => {
+    return Math.sqrt(Math.pow(point1.x - point2.x, 2) + Math.pow(point1.y - point2.y, 2));
+  };
+  
+  React.useEffect(() => {
+    if (dataPoints.length === 0) return;
+    
+    const timer = setTimeout(() => {
+      if (step === 0) {
+        const newDataPoints = dataPoints.map(point => {
+          const dist1 = distance(point, centroids[0]);
+          const dist2 = distance(point, centroids[1]);
+          return {
+            ...point,
+            cluster: dist1 <= dist2 ? 0 : 1
+          };
+        });
+        setDataPoints(newDataPoints);
+        setStep(1);
+      } else if (step === 1) {
+        const cluster0Points = dataPoints.filter(p => p.cluster === 0);
+        const cluster1Points = dataPoints.filter(p => p.cluster === 1);
+        
+        if (cluster0Points.length > 0 && cluster1Points.length > 0) {
+          const newX0 = Math.round(cluster0Points.reduce((sum, p) => sum + p.x, 0) / cluster0Points.length);
+          const newY0 = Math.round(cluster0Points.reduce((sum, p) => sum + p.y, 0) / cluster0Points.length);
+          
+          const newX1 = Math.round(cluster1Points.reduce((sum, p) => sum + p.x, 0) / cluster1Points.length);
+          const newY1 = Math.round(cluster1Points.reduce((sum, p) => sum + p.y, 0) / cluster1Points.length);
+          
+          setCentroids([
+            { x: newX0, y: newY0 },
+            { x: newX1, y: newY1 }
+          ]);
+        }
+        
+        setStep(0);
+        setIteration(prev => prev + 1);
+      }
+    }, 1000);
+    
+    return () => clearTimeout(timer);
+  }, [step, dataPoints, centroids]);
+  
+  const renderGrid = () => {
+    const grid = [];
+    
+    for (let y = 0; y < gridSize; y++) {
+      for (let x = 0; x < gridSize; x++) {
+        const pointAtPosition = dataPoints.find(p => p.x === x && p.y === y);
+        
+        const isCentroid0 = centroids[0].x === x && centroids[0].y === y;
+        const isCentroid1 = centroids[1].x === x && centroids[1].y === y;
+        
+        let cellStyle = {
+          width: '32px',
+          height: '32px',
+          border: '1px solid #cbd5e0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        };
+        
+        if (pointAtPosition) {
+          if (pointAtPosition.cluster === 0) {
+            cellStyle.backgroundColor = '#9ae6b4';
+          } else if (pointAtPosition.cluster === 1) {
+            cellStyle.backgroundColor = '#90cdf4';
+          }
+        }
+        
+        if (isCentroid0) {
+          cellStyle.backgroundColor = '#276749';
+        } else if (isCentroid1) {
+          cellStyle.backgroundColor = '#2b6cb0';
+        }
+        
+        grid.push(
+          <div key={`${x}-${y}`} style={cellStyle}></div>
+        );
+      }
+    }
+    
+    return grid;
+  };
+  
+  return (
+    <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '16px'}}>
+      <h2 style={{fontSize: '1.25rem', fontWeight: 'bold', marginBottom: '16px'}}>K-Means 聚类算法可视化</h2>
+      <div style={{marginBottom: '16px'}}>迭代次数: {iteration}</div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(10, 1fr)',
+        gap: '4px',
+        marginBottom: '16px'
+      }}>
+        {renderGrid()}
+      </div>
+      <div style={{marginTop: '16px', display: 'flex', gap: '24px'}}>
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <div style={{width: '16px', height: '16px', backgroundColor: '#9ae6b4', marginRight: '8px'}}></div>
+          <span>簇1数据点</span>
+        </div>
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <div style={{width: '16px', height: '16px', backgroundColor: '#276749', marginRight: '8px'}}></div>
+          <span>簇1中心点</span>
+        </div>
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <div style={{width: '16px', height: '16px', backgroundColor: '#90cdf4', marginRight: '8px'}}></div>
+          <span>簇2数据点</span>
+        </div>
+        <div style={{display: 'flex', alignItems: 'center'}}>
+          <div style={{width: '16px', height: '16px', backgroundColor: '#2b6cb0', marginRight: '8px'}}></div>
+          <span>簇2中心点</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
-# 创建一些示例数据
-X = np.array([[1, 2], [2, 3], [2, 5], [3, 2], [3, 3], [4, 5]])
-
-# 创建K均值模型
-k = 2  # 指定要分为的簇的数量
-model = KMeans(n_clusters=k)
-
-# 拟合模型
-# .fit()方法用于训练模型，即让模型从数据中学习
-model.fit(X)
-
-# 获取簇中心点
-cluster_centers = model.cluster_centers_
-
-# 预测每个样本所属的簇
-labels = model.labels_
-
-print("簇中心点:", cluster_centers)
-print("样本所属簇:", labels)
-
+export default KMeansAnimation;
 ```
+</details>
+
 
 ### 简单示例
 

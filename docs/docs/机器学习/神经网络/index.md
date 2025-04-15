@@ -3,9 +3,7 @@ sidebar_position: 3
 title: 🚧神经网络入门
 ---
 
-## PyTorch
-
-### skorch
+## skorch
 
 至此，我们已经学习了 scikit-learn 的很多算法。完成了传统机器学习的任务。
 
@@ -116,6 +114,32 @@ for i in range(3):
 显而易见，在处理更多数据时，skorch 的训练时间小于 sklearn 的训练时间。数据越多，skorch 的优势越明显。
 
 接下来，你可以使用 skorch 来复现更多之前的项目，同时熟悉Pytorch的用法。接下来我们会开始使用pytorch来完成更多复杂和有趣的任务。
+
+
+## PyTorch
+
+PyTorch 可以利用计算加速设备（例如GPU、NPU），为了达成这一目的，PyTorch 的安装会绑定对应的cuda版本，PyTorch 使用 cuda 的接口来操作底层硬件。
+
+:::info
+
+**CUDA**：NVIDIA 专为自家 GPU 设计的 C++ 并行计算框架，其运行依赖于 NVIDIA 显卡驱动程序。它允许开发者利用 GPU 强大的并行计算能力加速各类计算密集型任务。
+
+**cuDNN**：专门为深度学习计算优化的高性能神经网络库，提供了高度优化的实现，用于常见深度学习操作如卷积、池化、归一化等。
+
+**CUDA Toolkit (NVIDIA 官方版)**：完整的 CUDA 开发环境，包含：
+- NVIDIA 显卡驱动程序
+- 完整的 CUDA 开发工具链（编译器、IDE、调试器等）
+- 各种 CUDA 加速库及其头文件
+- 文档和示例代码
+
+**CUDA Toolkit (PyTorch 版)**：精简版 CUDA 工具包，主要包含：
+- 运行 CUDA 功能所需的核心动态链接库
+- 不包含驱动程序、开发工具及完整文档
+- 专为支持 PyTorch 等框架的 CUDA 功能而设计
+
+**NVCC**：NVIDIA CUDA 编译器，是 CUDA Toolkit 的核心组件，负责将 CUDA 代码编译为可在 NVIDIA GPU 上执行的二进制代码。
+:::
+
 
 
 ### PyTorch 数据集
