@@ -145,15 +145,12 @@ token_indices = torch.tensor(indices)
 token_embeddings = embedding(token_indices) # 并行计算
 
 print(token_embeddings)
-```
+'''
 
 在实际的Transformer模型中，词嵌入通常是模型训练的一部分，会根据任务目标不断优化调整。这种基于查表的方式比循环判断更高效，可以并行处理整个序列的所有词，大大提高了计算速度。
 
-## 位置编码
-
-词嵌入只考虑了词的语义信息，但在序列中，词的位置也很重要。Transformer通过位置编码（Positional Encoding）来捕捉序列中词的位置信息：
-
-```python
+词嵌入只考虑了词的语义信息，但在序列中，词的位置也很重要。Transformer通过位置编码（Positional Encoding）来捕捉序列中词的位置信息
+'''
 def get_positional_encoding(seq_len, d_model):
     pe = np.zeros((seq_len, d_model))
     for pos in range(seq_len):
@@ -163,11 +160,12 @@ def get_positional_encoding(seq_len, d_model):
                 pe[pos, i + 1] = np.cos(pos / (10000 ** (i / d_model)))
     return pe
 
-# 示例：生成长度为5，维度为4的位置编码
-positional_encoding = get_positional_encoding(5, 4)
+# 示例：生成长度为(根据输入的序列长度)，维度为4的位置编码
+seq_len = len(tokens)
+positional_encoding = get_positional_encoding(seq_len,embedding_dim)
 print(positional_encoding)
 
-# 将位置编码加到词嵌入上
+# 将位置编码加到词嵌入上(不会改变形状)
 final_embeddings = token_embeddings + torch.tensor(positional_encoding, dtype=torch.float)
 ```
 
