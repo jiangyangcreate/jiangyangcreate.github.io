@@ -1,11 +1,3 @@
-<!--
- * @Author: jiangyangcreate jiangyangcreate@gmail.com
- * @Date: 2025-03-27 17:13:15
- * @LastEditors: jiangyangcreate jiangyangcreate@gmail.com
- * @LastEditTime: 2025-04-22 08:43:38
- * @FilePath: \jiangyangcreate.github.io\docs\docs\机器学习\index.md
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
--->
 ---
 sidebar_position: 7
 title: 🚧机器学习
