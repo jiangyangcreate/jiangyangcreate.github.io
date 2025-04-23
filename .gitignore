@@ -9,6 +9,7 @@
 **.cache-loader
 
 *table.py
+*table.ipynb
 
 # Misc
 .DS_Store
