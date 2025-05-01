@@ -35,7 +35,7 @@ export default function HoverText({ text, explanation }) {
             boxShadow: '0 2px 10px rgba(0, 0, 0, 0.2)',
             zIndex: 1000,
             width: '250px',
-            textAlign: 'center',
+            textAlign: 'left',
             fontSize: '0.9rem',
             animation: 'fadeIn 0.3s ease-in-out',
           }}
