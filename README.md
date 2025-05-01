@@ -6,7 +6,7 @@
 
 **设计理念：美丽优于丑陋，清晰优于模糊。简洁优于复杂，复杂优于繁琐。**
 
-遵循这一理念，我打造了这个精巧而引人注目的个人博客站点。
+遵循这一理念，我打造了这个精巧、引人注目、不断更新维护的个人博客站点。
 
 > 网站性能分析报告：[点此测试](https://pagespeed.web.dev/)
 
@@ -16,9 +16,7 @@
 
 - 集成 React Photo Album，布局优雅，点击照片可放大并展示照片描述、拍摄地、照片尺寸等信息。[访问 照片墙](https://jiangmiemie.com/gallery/)
 
-- 集成 mermaid 与 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown](https://jiangmiemie.com/docs/编程外的基础/Markdown备忘录/)
-
-- 集成 markmap ，用markdown绘制易维护的交互式思维导图。[访问 交互式思维导图](https://jiangmiemie.com/read/)
+- 集成 mermaid 、markmap、 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown](https://jiangmiemie.com/docs/编程外的基础/Markdown/)
 
 - 集成 giscus，使用 GitHub 账号评论，还能一键分享至 twitter。[访问 博客页](https://jiangmiemie.com/blog/)
 
