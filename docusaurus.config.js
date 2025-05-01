@@ -169,7 +169,7 @@ module.exports = {
     },
     colorMode: {
       defaultMode: "light", //定义首次访问的颜色
-      disableSwitch: true, //隐藏明暗切换按钮
+      disableSwitch: false, //隐藏明暗切换按钮
       respectPrefersColorScheme: true, //跟随用户系统默认
     },
     //配置标准的明暗主题

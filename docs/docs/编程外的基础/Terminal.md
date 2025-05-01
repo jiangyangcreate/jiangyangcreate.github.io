@@ -14,6 +14,16 @@ Terminals
 ## 远程连接
 
 SSH 是 Linux 系统的登录工具，现在广泛用于服务器登录和各种加密通信。
+:::info
+
+Linux 内核衍生版本众多，譬如 ubuntu、debian、centos、fedora、archlinux 等。
+
+不同版本之间存在差异，譬如 ubuntu 大版本号之外，小版本号也很重要，此外有时候版本号和代号会混用，譬如 ros 2（一种机器人操作系统） 只能使用 Ubuntu 的 noble 即 Ubuntu 24.04。
+
+下面是最近 Ubuntu 的版本号和代号：
+- 24.10 的代号是 oracular
+- 24.04 代号是 noble
+:::
 
 假设本机的账户与密码默认都是 linaro
 

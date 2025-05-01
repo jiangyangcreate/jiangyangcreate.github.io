@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box";
-import { PhotoAlbum } from "react-photo-album";
+import PhotoAlbum from "react-photo-album";
 import Layout from "@theme/Layout";
 import React, {
   useState,
