@@ -289,7 +289,7 @@
 <p>例如一个伙伴上传了文件，另一个伙伴可以从这个地址下载文件。这个项目我做了一次较大的调整，原本是用python编写的屏幕和麦克风捕获，为了跨平台使用的同时保持代码的简洁，使用了JS重构了代码，使用通用的浏览器获取本地权限的方式，希望这个项目对你有帮助。</p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="安装依赖">安装依赖<a href="https://jiangmiemie.com/blog/2024/5/31/#%E5%AE%89%E8%A3%85%E4%BE%9D%E8%B5%96" class="hash-link" aria-label="Direct link to 安装依赖" title="Direct link to 安装依赖">​</a></h2>
 <div class="language-bash codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:#000000;--prism-background-color:#ffffff"><div class="codeBlockContent_biex"><pre tabindex="0" class="prism-code language-bash codeBlock_bY9V thin-scrollbar" style="color:#000000;background-color:#ffffff"><code class="codeBlockLines_e6Vv"><span class="token-line" style="color:#000000"><span class="token plain">pip install flask</span><br></span></code></pre><div class="buttonGroup__atx"><button type="button" aria-label="Copy code to clipboard" title="Copy" class="clean-btn"><span class="copyButtonIcons_eSgA" aria-hidden="true"><svg viewBox="0 0 24 24" class="copyButtonIcon_y97N"><path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z"></path></svg><svg viewBox="0 0 24 24" class="copyButtonSuccessIcon_LjdS"><path fill="currentColor" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z"></path></svg></span></button></div></div></div>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="项目目录结构">项目目录结构<a href="https://jiangmiemie.com/blog/2024/5/31/#%E9%A1%B9%E7%9B%AE%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84" class="hash-link" aria-label="Direct link to 项目目录结构" title="Direct link to �项目目录结构">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="项目目录结构">项目目录结构<a href="https://jiangmiemie.com/blog/2024/5/31/#%E9%A1%B9%E7%9B%AE%E7%9B%AE%E5%BD%95%E7%BB%93%E6%9E%84" class="hash-link" aria-label="Direct link to 项目目录结构" title="Direct link to 项目目录结构">​</a></h2>
 <p>项目下的文件夹：</p>
 <p>templates 文件夹中包含一个 upload.html 文件，用于页面展示。</p>
 <p>uploads 文件夹用于保存上传的文件。</p>
@@ -756,7 +756,7 @@
 <p>双周更理论上能够很好的保持足够的输入，但实际操作中更容易遇到一整周都很忙的情况。</p>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="月更">月更<a href="https://jiangmiemie.com/blog/2023/12/30/#%E6%9C%88%E6%9B%B4" class="hash-link" aria-label="Direct link to 月更" title="Direct link to 月更">​</a></h3>
 <p>月更是我坚持最久的更新方式，一个月足以输入足够的知识和内容。</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="载体选择">载体选择<a href="https://jiangmiemie.com/blog/2023/12/30/#%E8%BD%BD%E4%BD%93%E9%80%89%E6%8B%A9" class="hash-link" aria-label="Direct link to 载体选择" title="Direct link to 载体选择">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="载体选择">载体选择<a href="https://jiangmiemie.com/blog/2023/12/30/#%E8%BD%BD%E4%BD%93%E9%80%89%E6%8B%A9" class="hash-link" aria-label="Direct link to 载体选择" title="Direct link to 载�体选择">​</a></h2>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="纯文字">纯文字<a href="https://jiangmiemie.com/blog/2023/12/30/#%E7%BA%AF%E6%96%87%E5%AD%97" class="hash-link" aria-label="Direct link to 纯文字" title="Direct link to 纯文字">​</a></h3>
 <p>纯文字的内容往往更能加载更快、获得国际流量的青睐、非常易于检索。</p>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="多媒体">多媒体<a href="https://jiangmiemie.com/blog/2023/12/30/#%E5%A4%9A%E5%AA%92%E4%BD%93" class="hash-link" aria-label="Direct link to 多媒体" title="Direct link to 多媒体">​</a></h3>
@@ -1072,7 +1072,7 @@ A 住在公司附近，每天加班 1 小时，每个月可以拿到 1000 的加
 <p>最后就是外套,我对外套倒是没有那么排斥,但是很讨厌羽绒服,老棉衣.
 这些短小的服装以至于稍微一活动就露出肢体,寒冷便顺着露出的肢体刺入血肉之中.</p>
 <p>这给我的感觉就是:棉衣与棉裤很不可靠,也许是我身高较高,所以合适的衣服本就难买,更别提棉衣裤.还是深圳好.</p>
-<h2 class="anchor anchorWithStickyNavbar_LWe7" id="搬家指南">搬家指南<a href="https://jiangmiemie.com/blog/2021/12/30/#%E6%90%AC%E5%AE%B6%E6%8C%87%E5%8D%97" class="hash-link" aria-label="Direct link to 搬家指南" title="Direct link to 搬家指南">​</a></h2>
+<h2 class="anchor anchorWithStickyNavbar_LWe7" id="搬家指南">搬家指南<a href="https://jiangmiemie.com/blog/2021/12/30/#%E6%90%AC%E5%AE%B6%E6%8C%87%E5%8D%97" class="hash-link" aria-label="Direct link to 搬�家指南" title="Direct link to 搬家指南">​</a></h2>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="1知道你有多少物品">1.知道你有多少物品<a href="https://jiangmiemie.com/blog/2021/12/30/#1%E7%9F%A5%E9%81%93%E4%BD%A0%E6%9C%89%E5%A4%9A%E5%B0%91%E7%89%A9%E5%93%81" class="hash-link" aria-label="Direct link to 1.知道你有多少物品" title="Direct link to 1.知道你有多少物品">​</a></h3>
 <ul>
 <li>盘点物品数量</li>
