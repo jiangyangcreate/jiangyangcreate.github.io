@@ -1,6 +1,6 @@
 ---
 sidebar_position: 3
-title: 🚧神经网络入门
+title: 神经网络
 ---
 
 ## skorch

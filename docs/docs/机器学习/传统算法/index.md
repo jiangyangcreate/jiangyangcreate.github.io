@@ -1,6 +1,6 @@
 ---
 sidebar_position: 2
-title: 传统算法入门
+title: 传统算法
 ---
 
 ## scikit-learn 数据的来源？
