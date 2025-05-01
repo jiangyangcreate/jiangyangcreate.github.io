@@ -8,10 +8,6 @@
 **.docusaurus
 **.cache-loader
 
-*table.py
-*table.ipynb
-**data
-
 # Misc
 .DS_Store
 .env.local
