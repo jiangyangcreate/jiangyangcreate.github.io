@@ -7,14 +7,18 @@ export default function HoverText({ text, explanation }) {
     <span style={{ position: 'relative', display: 'inline-block' }}>
       <span
         style={{ 
-          textDecoration: 'underline', 
-          cursor: 'pointer',
-          color: '#1877F2'
+          background: 'linear-gradient(transparent 70%, #FFFF00 30%)',
         }}
         onMouseEnter={() => setIsHovering(true)}
         onMouseLeave={() => setIsHovering(false)}
       >
         {text}
+        <sup style={{ 
+          color: 'red',
+          fontSize: '0.7em',
+          marginLeft: '2px',
+          fontWeight: 'bold'
+        }}>?</sup>
       </span>
       
       {isHovering && (
@@ -33,6 +37,7 @@ export default function HoverText({ text, explanation }) {
             width: '250px',
             textAlign: 'center',
             fontSize: '0.9rem',
+            animation: 'fadeIn 0.3s ease-in-out',
           }}
         >
           {explanation}
@@ -40,4 +45,4 @@ export default function HoverText({ text, explanation }) {
       )}
     </span>
   );
-} 
+}

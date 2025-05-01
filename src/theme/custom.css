@@ -8,6 +8,7 @@
   --ifm-color-primary-lightest: #a16800;
   --ifm-color-primary-font: #000000;
   --ifm-code-font-size: 95%;
+  --highlight-color: hsl(50, 100%, 50%);
   --site-announcement-bar-stripe-color1: hsl(167deg 68% 85%);
   --site-announcement-bar-stripe-color2: hsl(167deg 68% 95%);
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
@@ -804,12 +805,6 @@ button,
   --ifm-navbar-height: 4rem;
 }
 :root {
-  --ifm-color-primary-dark: #c32323;
-  --ifm-color-primary-darker: #b82121;
-  --ifm-color-primary-darkest: #981c1c;
-  --ifm-color-primary-light: #dc3e3e;
-  --ifm-color-primary-lighter: #de4949;
-  --ifm-color-primary-lightest: #e46969;
   --ifm-code-font-size: 95%;
   --ifm-code-background: var(--global-colors-sky70);
 }
@@ -1596,4 +1591,15 @@ blockquote {
 
 input::placeholder {
   color: gray
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px) translateX(-50%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) translateX(-50%);
+  }
 }
