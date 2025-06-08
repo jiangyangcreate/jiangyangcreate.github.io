@@ -1190,14 +1190,17 @@ else:
     print("student not pass")
 ```
 
-可以使用 and ， or , not 等关键词结合多个判断条件：
+可以使用 and ， or , not , any , all等关键词结合多个判断条件：
 
 ```python
 a = 10
 b = -5
+c = 0
 print(a > 0 and b < 0)  # True
 print(not a > 0)  # False
 print(a < 0 or b < 0)  # True
+print(all([a,b,c])) # False,都为真时为真
+print(any([a,b,c])) # True,有一个为真时为真
 ```
 
 ### 一个例子
