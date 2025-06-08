@@ -76,11 +76,27 @@ scp -r /path/to/local/directory username@remote_host:/path/to/remote/directory
 
 在使用 `scp` 命令时，可能会提示你输入远程主机的密码。
 
-## 程序多开
+## 环境变量
 
-下面这个代码指向一个 window 下的 WeChat 可执行文件，若路径有效，则可以同时启动两个微信登录界面
+想象一下你有一个"电子便利贴"，电脑可以在上面记录一些重要信息（比如你的名字、文件路径等）。这些便利贴就是环境变量，任何程序都可以查看这些便利贴。
 
-```bash showLineNumbers
+临时环境变量关闭窗口后就会消失。仅Shell可见变量其他程序看不到，譬如python程序的os.getenv方法。
+
+| 特性 | Windows (PowerShell) | Linux/Mac (Bash) |
+|------|----------------------|------------------|
+| **进程可见(临时)变量** | `$env:VAR = "值"` | `export VAR="值"` |
+| **仅Shell可见(临时)变量** | `$VAR = "值"` | `VAR="值"` |
+| **纯数字设置** | `$env:AGE = 30` | `export AGE=30` |
+| **永久生效方法** | 系统属性 → 环境变量 | 写入 `~/.bashrc` 或 `~/.zshrc` |
+| **值含空格时** | 必须加引号 | 必须加引号 |
+| **特殊字符处理** | 需引号保护 | 需引号保护 |
+| **本质数据类型** | 始终是字符串 | 始终是字符串 |
+
+注意：终端的命令通过空格和反斜杠来区分参数或者换行，示例中的引号并不是字符串的引号，而是为了避免空格和反斜杠引发歧义。<Highlight >环境变量本质都是字符串，建议新手始终使用引号包裹环境变量。</Highlight >
+
+不光是环境变量，其他命令的变量也遵循这个引号使用规则，下面这个代码指向一个 window 下的 WeChat 可执行文件，若路径有效，则可以同时启动两个微信登录界面。
+
+```powershell showLineNumbers
 start  C:\"Program Files (x86)"\Tencent\WeChat\WeChat.exe
 start  C:\"Program Files (x86)"\Tencent\WeChat\WeChat.exe
 ```

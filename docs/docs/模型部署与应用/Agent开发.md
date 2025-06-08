@@ -218,6 +218,16 @@ MCP 是 工具调用的一种新范式，是传统API接口加上适合AI阅读�
 
 参考文章： https://www.aimodels.fyi/papers/arxiv/why-do-multi-agent-llm-systems-fail
 
+## 框架分析
+
+langchain
+
+langgraph、langgraph-swarm
+
+AutoGen
+
+MG
+
 ## 案例分析
 
 ### 构建能主动提问的智能体
