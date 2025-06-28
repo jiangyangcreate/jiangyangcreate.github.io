@@ -5,7 +5,33 @@ title: Terminal
 
 Terminals
 
-也称为命令行或控制台，使我们能够在我们的计算机上完成和自动化任务，而无需图形用户界面。 终端起源于 1950 年代到 1960 年代左右，从那时起，它一直是所有操作系统的一个不变特征——从台式机到隐藏在云中的服务器，再到像 Raspberry PI Zero 这样的微型计算机，甚至手机。 在大多数情况下，终端、命令行意味着同一件事。
+也称为命令行或控制台，使我们能够在计算机上完成和自动化任务，而无需图形用户界面。终端起源于 1950 年代到 1960 年代左右，从那时起就一直是所有操作系统的重要组成部分——从台式机到隐藏在云中的服务器，再到像 Raspberry PI Zero 这样的微型计算机，甚至手机。在大多数情况下，终端、命令行意味着同一件事。
+
+面试中命令行通常特指类Unix系统，如Linux、macOS、Ubuntu等，这些系统与生产环境保持一致。
+
+如果你是 Windows 10 版本 2004 及更高版本（内部版本 19041 及更高版本）或 Windows 11 ：推荐使用 <HoverText text="WSL（Windows Subsystem for Linux）" explanation="可以在 Windows 上直接使用 Linux 应用程序、实用工具和 Bash 命令行工具（未经修改），无需传统虚拟机或双包设置的开销。"/>
+
+## WSL 安装
+
+```bash showLineNumbers
+# 安装wsl
+wsl --install
+
+# 查看可用的Linux发行版列表
+wsl --list --online
+
+# 安装指定的Linux发行版
+wsl --install -d <distro-name>
+# 示例：wsl --install -d Ubuntu-24.04
+
+# 列出已安装的发行版的名称、运行状态、wsl版本
+wsl -l -v
+
+# 设置默认发行版（配置后输入wsl命令即可进入）
+wsl --set-default <distro-name>
+```
+
+如果你不属于以上系统，推荐购买云服务器并选择Linux系统配置，然后使用SSH连接到服务器。
 
 [网道 bash 教程](https://wangdoc.com/bash/intro)是开源的 bash 文档，教科书式的篇章划分能帮助学习者系统的了解终端命令。
 
