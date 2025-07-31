@@ -1,6 +1,6 @@
 ---
-sidebar_position: 3
-title: 内存数据库
+sidebar_position: 6
+title: Redis
 ---
 
 ## 内存数据库(Redis)
