@@ -27,6 +27,94 @@ title: opencv
 
 OpenCv作为开源软件，自然有大量的教程，我读过一些纸质书籍，也看过一些开源教程，总体来说，对于入门与进阶来说，需要的是细致的基础讲解、完整的处理流程，非常推荐官方的[OpenCV-Python教程](https://opencv-python-tutorials.readthedocs.io/)。
 
+
+### 图像读取与显示
+
+```python showLineNumbers
+# 导入库
+import cv2
+# 读取图片, 读取的图片为BGR格式, 如果需要读取为RGB格式, 则需要使用cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+# 如果读取失败, 则返回None
+img = cv2.imread('imgs/img/10.jpg')
+print(img.shape) 
+# 打印图像的形状，(height, width, channels) 其中channels为3、4，表示通道数为RGB、RGBA（A是透明度），如果是灰度、二值图，通道数为1的情况会报错。
+
+# 显示图片, 参数：img: 图像对象, 'Image': 窗口名称
+# 如果窗口名称重复，则不会创建新的窗口，而是将图像显示在已有的窗口中
+cv2.imshow('Image', img)
+# 等待按键按下，0表示无限等待，其他数字表示等待时间（毫秒）
+# 这个方法会阻塞程序，直到按键按下，返回值为按键的ASCII码。如果设置了中文输入法，键盘的捕获会被输入法占用，导致无法正常等待按键按下。
+key = cv2.waitKey(0)    
+# 如果按键为q，则退出
+if key == ord('q'):
+    # 关闭指定窗口
+    cv2.destroyWindow('Image') 
+# 关闭所有窗口
+cv2.destroyAllWindows()
+```
+
+### 图像绘制
+
+```python showLineNumbers
+# 导入库
+import cv2
+# 读取图片
+img = cv2.imread('imgs/img/10.jpg')
+# 绘制直线
+# 参数：img: 图像对象, (100, 100): 起点坐标, (200, 200): 终点坐标, (0, 0, 255): 颜色, 2: 线宽
+cv2.line(img, (100, 100), (200, 200), (0, 0, 255), 2)
+# 绘制矩形
+# 参数：img: 图像对象, (100, 100): 左上角坐标, (200, 200): 右下角坐标, (0, 0, 255): 颜色, 2: 线宽
+cv2.rectangle(img, (100, 100), (200, 200), (0, 0, 255), 2)
+# 绘制圆形
+# 参数：img: 图像对象, (150, 150): 圆心坐标, 50: 半径, (0, 0, 255): 颜色, 2: 线宽
+cv2.circle(img, (150, 150), 50, (0, 0, 255), 2)
+# 绘制多边形
+# 参数：img: 图像对象, [pts]: 顶点列表, True: 是否闭合, (0, 0, 255): 颜色, 2: 线宽
+pts = np.array([[100, 100], [200, 100], [200, 200], [100, 200]])
+cv2.polylines(img, [pts], True, (0, 0, 255), 2)
+# 绘制椭圆
+# 参数：img: 图像对象, (150, 150): 椭圆中心坐标, (100, 50): 椭圆长轴和短轴长度, 0: 椭圆旋转角度, 0: 椭圆起始角度, 360: 椭圆结束角度, (0, 0, 255): 颜色, 2: 线宽
+cv2.ellipse(img, (150, 150), (100, 50), 0, 0, 360, (0, 0, 255), 2)
+# 显示图片
+cv2.imshow('Image', img)
+# 等待按键按下
+cv2.waitKey(0)
+# 关闭所有窗口
+cv2.destroyAllWindows()
+```
+
+#### 绘制中文
+
+cv2的在图片上的绘制语法主要缺陷为无法绘制中文，需要使用PIL库来绘制中文。
+
+```python showLineNumbers
+import cv2
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+# 打开图片
+img = Image.open('imgs/img/10.jpg')  # 替换为你的图片路径
+# 设置字体（确保路径正确，Windows下常见字体路径如下）
+font_path = "simhei.ttf"  # 黑体
+font_size = 60
+font = ImageFont.truetype(font_path, font_size)
+# 要绘制的文字
+text = "机器视觉"
+# 创建绘图对象
+draw = ImageDraw.Draw(img)
+# 计算文字尺寸
+text_width, text_height = draw.textsize(text, font=font)
+# 计算图片中心
+img_width, img_height = img.size
+x = (img_width - text_width) // 2
+y = (img_height - text_height) // 2
+# 绘制文字（可设置颜色和描边等）
+draw.text((x, y), text, font=font, fill=(255, 0, 0))  # 红色
+# 保存或显示图片
+img.show()
+# img.save('output.jpg')
+```
+
 ### 案例-人脸识别：录入并识别不同人脸
 
 - 这段程序首先会读取摄像头，并自动截取一定数量的人脸用作训练。
