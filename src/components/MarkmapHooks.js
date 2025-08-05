@@ -10,7 +10,7 @@ import { deriveOptions } from "markmap-view";
 export default function MarkmapHooks({ initialMarkdown }) {
   const jsonOptions = {
     color: ["#DD551E"],
-    initialExpandLevel: 3, //限制展开级别
+    initialExpandLevel: 1, //限制展开级别
     maxWidth: 500,
   };
 

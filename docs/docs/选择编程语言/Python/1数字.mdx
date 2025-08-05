@@ -1,0 +1,527 @@
+---
+sidebar_position: 1
+title: 数字与运算符
+---
+
+存在三种不同的数字类型: 整数, 浮点数 和 复数。 此外，布尔值属于整数的子类型。 
+
+整数具有无限的精度。
+
+浮点数通常使用 C 中的 double 来实现；有关你的程序运行所在机器上浮点数的精度和内部表示法可在 sys.float_info 中查看。 
+
+复数包含实部和虚部，分别以一个浮点数表示。 要从一个复数 z 中提取这两个部分，可使用 z.real 和 z.imag。
+
+## 整数
+
+整数属于不可变类型，即一旦创建，其值不能被修改。当变量重新赋值时，其实指向了新的内存地址。
+
+### 整数的定义
+
+大部分同学只学习了十进制下定义整数，其实Python定义整数时支持四种进制格式：
+
+```python showLineNumbers
+# 十进制整数除了单独的0外，不能以0开头，否则会报语法错误
+a = 17
+# 16进制 使用 0x 或 0X 前缀
+b = 0x11       
+# 二进制 使用 0b 或 0B 前缀
+c = 0b10001   
+# 八进制 使用 0o 或 0O 前缀
+d = 0o21
+
+print(a == b) # True
+print(a == c) # True
+print(a == d) # True
+
+print(0x11 is 17) # True 驻留机制
+print(0x11 is 0b10001) # True
+print(0x11 is 0o21) # True
+
+# 对于负数，定义时使用 - 前缀 ,正数定义时可省略 + 前缀
+e = -17
+f = -0x11
+g = -0b10001
+h = -0o21
+
+print(e == f) # True
+print(e == g) # True
+print(e == h) # True
+```
+
+:::info
+x 总是等于 +x 吗？
+
+在Python中，几乎所有情况下`x` 总是等于 `+x`。
+
+特殊情况1：自定义类
+
+如果类重载了 `__pos__` 方法，`+x` 的行为可以自定义，这时 `x` 可能不等于 `+x`。例如Python的`collections.Counter`类重载了 `__pos__` 方法，所以`+Counter()` 的行为可以自定义。
+
+特殊情况2：decimal
+Decimal 类型的“设计是基于考虑人类习惯的浮点数模型，并且因此具有以下最高指导原则 —— 计算机必须提供与人们在学校所学习的算术相一致的算术。” —— 摘自 decimal 算术规范描述。
+
+Decimal 数字可以完全精确地表示。 相比之下，1.1 和 2.2 这样的数字在二进制浮点形式下没有精确的表示。 最终用户通常不希望 1.1 + 2.2 像在二进制浮点形式下那样被显示为 3.3000000000000003。
+
+```python showLineNumbers
+import decimal
+
+ctx = decimal.getcontext()
+ctx.prec = 40
+one_third = decimal.Decimal('1') / decimal.Decimal('3')
+print(one_third)
+
+print(one_third == +one_third) # True
+
+ctx.prec = 28
+print(one_third == +one_third) # False
+```
+:::
+
+### int方法
+可以通过`int()`函数将字符串或数字转换为整数。
+
+```python showLineNumbers
+# 将字符串转换为整数
+print(int('123')) # 123
+
+# 将浮点数转换为整数，会舍弃小数部分
+print(int(123.55)) # 123
+
+# 将字符串转换为十六进制整数
+print(int('11', base=16)) # 17
+```
+
+
+## 浮点数
+
+只要进行了除法运算，就会产生浮点数。即便除数、被除数都是整数,也没有余数，商也会是浮点数。
+
+```python showLineNumbers
+print(10 / 2) # 5.0
+```
+
+### 浮点数的内部表示
+
+Python的浮点数遵循IEEE 754双精度标准，使用64位存储：
+- 1位符号位
+- 11位指数位
+- 52位尾数位
+
+```python showLineNumbers
+import sys
+print(sys.float_info)
+# float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308,
+#           min=2.2250738585072014e-308, min_exp=-1021, min_10_exp=-307,
+#           dig=15, mant_dig=53, epsilon=2.220446049250313e-16,
+#           radix=2, rounds=1)
+```
+
+### 精度问题的根本原因
+
+浮点数精度问题源于二进制无法精确表示某些十进制小数：
+
+```python showLineNumbers
+# 经典的浮点数精度问题
+print(0.1 + 0.2)  # 0.30000000000000004
+print(0.1 + 0.2 == 0.3)  # False
+
+# 查看实际存储的值
+from decimal import Decimal
+print(Decimal(0.1))  # 0.1000000000000000055511151231257827021181583404541015625
+print(Decimal(0.2))  # 0.200000000000000011102230246251565404236316680908203125
+
+# 更复杂的例子
+total = 0.0
+for i in range(10):
+    total += 0.1
+print(total)  # 0.9999999999999999
+print(total == 1.0)  # False
+```
+
+### 浮点数比较的最佳实践
+
+永远不要直接比较浮点数是否相等，使用容差比较：
+
+```python showLineNumbers
+import math
+
+def float_equals(a, b, tolerance=1e-9):
+    """安全的浮点数比较"""
+    return abs(a - b) < tolerance
+
+# 使用内置的isclose函数（推荐）
+print(math.isclose(0.1 + 0.2, 0.3))  # True
+print(math.isclose(0.1 + 0.2, 0.3, rel_tol=1e-09, abs_tol=0.0))  # True
+
+# 自定义容差
+def robust_equals(a, b, rel_tol=1e-09, abs_tol=1e-12):
+    return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
+
+# 处理大数和小数的比较
+large_num1 = 1000000.1
+large_num2 = 1000000.2
+print(robust_equals(large_num1, large_num2, rel_tol=1e-6))  # False
+
+small_num1 = 1e-12
+small_num2 = 2e-12
+print(robust_equals(small_num1, small_num2, abs_tol=1e-11))  # True
+```
+
+### 特殊值处理
+
+Python浮点数包含几个特殊值，需要特别处理：
+
+```python showLineNumbers
+import math
+
+# 无穷大
+pos_inf = float('inf')
+neg_inf = float('-inf')
+print(math.isinf(pos_inf))  # True
+print(pos_inf > 1e308)      # True
+
+# NaN (Not a Number)
+nan_val = float('nan')
+print(math.isnan(nan_val))  # True
+print(nan_val == nan_val)   # False! NaN不等于任何值，包括自己
+
+# 检查有限数
+print(math.isfinite(42.0))    # True
+print(math.isfinite(pos_inf)) # False
+print(math.isfinite(nan_val)) # False
+
+# 实际应用中的特殊值处理
+def safe_divide(a, b):
+    """安全除法，处理特殊情况"""
+    if b == 0:
+        if a > 0:
+            return float('inf')
+        elif a < 0:
+            return float('-inf')
+        else:
+            return float('nan')  # 0/0的情况
+    return a / b
+
+print(safe_divide(10, 0))   # inf
+print(safe_divide(-10, 0))  # -inf
+print(safe_divide(0, 0))    # nan
+```
+
+### 精确十进制运算 - decimal模块
+
+对于需要精确计算的场景（金融计算等），使用decimal模块：
+
+```python showLineNumbers
+from decimal import Decimal, getcontext, ROUND_HALF_UP
+
+# 设置精度
+getcontext().prec = 28
+
+# 精确的十进制运算
+price = Decimal('19.95')
+tax_rate = Decimal('0.08')
+tax = price * tax_rate
+total = price + tax
+
+print(f"Price: {price}")
+print(f"Tax: {tax}")
+print(f"Total: {total}")
+
+# 金融计算示例
+def calculate_compound_interest(principal, rate, time, n=1):
+    """复利计算"""
+    principal = Decimal(str(principal))
+    rate = Decimal(str(rate))
+    time = Decimal(str(time))
+    n = Decimal(str(n))
+    
+    amount = principal * (1 + rate / n) ** (n * time)
+    return amount
+
+result = calculate_compound_interest(1000, 0.05, 10, 12)
+print(f"Compound interest result: {result}")
+
+# 四舍五入控制
+getcontext().rounding = ROUND_HALF_UP
+value = Decimal('2.675')
+print(value.quantize(Decimal('0.01')))  # 2.68
+```
+
+### 性能考虑和优化
+
+```python showLineNumbers
+import time
+import numpy as np
+from decimal import Decimal
+
+def benchmark_float_operations():
+    """浮点数运算性能测试"""
+    
+    # 标准float性能
+    start = time.time()
+    total = 0.0
+    for i in range(1000000):
+        total += i * 0.001
+    float_time = time.time() - start
+    
+    # Decimal性能
+    start = time.time()
+    total = Decimal('0')
+    decimal_001 = Decimal('0.001')
+    for i in range(1000000):
+        total += Decimal(i) * decimal_001
+    decimal_time = time.time() - start
+    
+    # NumPy向量化操作
+    start = time.time()
+    arr = np.arange(1000000) * 0.001
+    numpy_total = np.sum(arr)
+    numpy_time = time.time() - start
+    
+    print(f"Float time: {float_time:.4f}s")
+    print(f"Decimal time: {decimal_time:.4f}s")
+    print(f"NumPy time: {numpy_time:.4f}s")
+    print(f"Decimal is {decimal_time/float_time:.1f}x slower than float")
+    print(f"NumPy is {float_time/numpy_time:.1f}x faster than float")
+
+# benchmark_float_operations()
+```
+
+### 实际项目中的常见陷阱
+
+```python showLineNumbers
+import json
+from decimal import Decimal
+
+# 陷阱0: 金融业浮点数直接计算
+def add_float(a, b):
+    return a + b
+
+print(add_float(0.1, 0.2)) # 0.30000000000000004
+
+# 陷阱1: JSON序列化精度丢失
+def json_precision_issue():
+    """JSON序列化可能导致精度问题"""
+    original = {"price": 19.95, "tax": 1.596}
+    json_str = json.dumps(original)
+    restored = json.loads(json_str)
+    
+    print(f"Original: {original}")
+    print(f"Restored: {restored}")
+    print(f"Equal: {original == restored}")  # 可能为False
+    
+    # 解决方案：使用字符串存储精确值
+    safe_data = {"price": "19.95", "tax": "1.596"}
+    return safe_data
+
+# 陷阱2: 循环累加误差
+def accumulation_error_demo():
+    """循环累加导致的误差积累"""
+    # 错误的方式
+    total = 0.0
+    for _ in range(1000000):
+        total += 0.1
+    print(f"Wrong way: {total}")  # 不等于100000.0
+    
+    # 正确的方式1：使用整数运算
+    total_cents = 0
+    for _ in range(1000000):
+        total_cents += 10  # 以分为单位
+    total = total_cents / 100
+    print(f"Correct way 1: {total}")
+    
+    # 正确的方式2：使用Decimal
+    total = Decimal('0')
+    for _ in range(1000000):
+        total += Decimal('0.1')
+    print(f"Correct way 2: {total}")
+
+# 陷阱3: 浮点数作为字典键
+def float_key_problem():
+    """浮点数作为字典键的问题"""
+    d = {}
+    key1 = 0.1 + 0.2
+    key2 = 0.3
+    
+    d[key1] = "value1"
+    print(d.get(key2))  # None，因为key1 != key2
+    
+    # 解决方案：使用字符串或量化的值
+    d_safe = {}
+    d_safe[str(round(key1, 10))] = "value1"
+    print(d_safe.get(str(round(key2, 10))))  # "value1"
+
+# 陷阱4: 范围判断
+def range_check_issue():
+    """浮点数范围判断的陷阱"""
+    values = []
+    x = 0.0
+    while x <= 1.0:
+        values.append(x)
+        x += 0.1
+        if len(values) > 20:  # 防止无限循环
+            break
+    
+    print(f"Values count: {len(values)}")  # 可能是11个而不是期望的10个
+    print(f"Last value: {values[-1]}")
+    print(f"Last value <= 1.0: {values[-1] <= 1.0}")
+```
+
+## 复数
+
+复数（Complex Number）是数学中的一种数，表示为$z=a+ib$
+
+其中`a`和`b`是实数，`i`是虚数单位，是可以与实数在一起按照同样的运算律进行四则运算，满足$i^2=-1$的数。
+
+复数是Python的内置数字类型，在科学计算、信号处理、控制系统等领域有广泛应用。这里只介绍复数的基本操作。
+
+### 复数的创建和表示
+
+Python支持多种方式创建复数：
+
+```python showLineNumbers
+# 方法1: 使用j或J作为虚数单位
+z1 = 3 + 4j
+z2 = 3 + 4J  # j和J等价
+z3 = 4j      # 纯虚数
+z4 = 3 + 0j  # 实数的复数表示
+
+# 方法2: 使用complex()函数
+z5 = complex(3, 4)      # 3+4j
+z6 = complex('3+4j')    # 从字符串创建
+z7 = complex(3)         # 3+0j
+
+# 方法3: 从极坐标创建
+import cmath
+r, theta = 5, cmath.pi/4  # 模长和幅角
+z8 = cmath.rect(r, theta)  # 转换为直角坐标
+
+print(f"z1 = {z1}")  # (3+4j)
+print(f"z8 = {z8}")  # (3.5355339059327378+3.5355339059327373j)
+```
+
+### 复数的属性和基本操作
+
+```python showLineNumbers
+z = 3 + 4j
+
+# 基本属性
+print(f"实部: {z.real}")    # 3.0
+print(f"虚部: {z.imag}")    # 4.0
+print(f"共轭: {z.conjugate()}")  # (3-4j)
+```
+
+## 布尔类型
+
+布尔类型是整数类型的子类，只有True和False两种值。
+
+`bool(x)` 函数可以将任意值转换为布尔值。
+
+如果`x`是数字类型，则判断`x`是否为0，为0则返回False，否则返回True。
+
+如果`x`是布尔类型，则返回`x`。
+
+默认情况下，用户定义的类的实例都为True。除非实现了`__bool__`或`__len__`方法。
+
+简单来说，`bool(x)`调用`x.__bool__()`方法，如果`__bool__`方法返回False，则`bool(x)`返回False，否则返回True。
+
+如果没有实现`__bool__`方法，则调用`__len__`方法，如果`__len__`方法返回0，则`bool(x)`返回False，否则返回True。
+
+所以常见的数值布尔值为False的有：
+```python showLineNumbers
+# 是数字类型且为0的值
+0、0.0、0j
+# 是布尔类型且为False的值
+False
+# 实现了__bool__方法且返回False的值
+None
+# 没有实现__bool__方法且__len__方法返回0的值
+空字符串、空列表等空序列。
+```
+其他的数值布尔值为True。
+
+### 布尔运算
+
+##### and运算真值表
+
+| A | B | A and B |
+|---|---|---------|
+| `True` | `True` | `True` |
+| `True` | `False` | `False` |
+| `False` | `True` | `False` |
+| `False` | `False` | `False` |
+
+##### or运算真值表
+
+| A | B | A or B |
+|---|---|--------|
+| `True` | `True` | `True` |
+| `True` | `False` | `True` |
+| `False` | `True` | `True` |
+| `False` | `False` | `False` |
+
+##### not运算真值表
+
+| A | not A |
+|---|-------|
+| `True` | `False` |
+| `False` | `True` |
+
+
+#### 布尔类型数字性质
+
+```python showLineNumbers
+# 布尔值参与运算时，可被当作整数使用，True为1，False为0
+print(True is 1)  # False 因为True和1是不同的对象
+print(True == 1)  # True 因为True和1的值相等
+
+print(True + True)   # 2
+print(False * 10)    # 0
+print(True / 2)      # 0.5
+
+# 布尔值的类型关系
+print(isinstance(True, int))   # True
+print(isinstance(True, bool))  # True
+print(type(True))              # <class 'bool'>
+
+# 布尔值在列表中的计数
+values = [True, False, True, True, False]
+true_count = sum(values)  # 3
+false_count = len(values) - true_count  # 2
+print(f"True的个数: {true_count}, False的个数: {false_count}")
+```
+
+## 数字相关的默认函数
+
+### round函数
+
+四舍五入函数，如果与两个倍数同样接近，则选用偶数。因此，`round(0.5)` 和 `round(-0.5)` 均得出 `0` 而 `round(1.5)` 则为 `2`
+
+```python showLineNumbers
+# 四舍五入转化
+print(round(123.55)) # 124
+
+# 四舍五入转化，并指定小数位数
+print(round(123.555,2)) # 123.56
+```
+
+:::tip
+浮点数执行 round() 的行为可能会令人惊讶：例如，round(2.675, 2) 将给出 2.67 而不是期望的 2.68。 
+
+这不算是程序错误：这一结果是由于大多数十进制小数实际上都不能以浮点数精确地表示。
+:::
+
+### abs函数
+
+返回一个数字的绝对值。 参数可以是整数、浮点数或任何实现了 __abs__() 的对象。 
+
+如果参数是一个复数，则返回它的模。
+
+```python showLineNumbers
+print(abs(-10)) # 10
+print(abs(10.5)) # 10.5
+print(abs(10j)) # 10.0
+```
+
+
+
