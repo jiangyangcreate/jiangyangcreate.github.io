@@ -2,7 +2,27 @@
 sidebar_position: 3
 title: 元组
 ---
+:::info
+扩展解包操作让元组和其他可迭代对象的解包更加灵活。使用`*`操作符可以捕获多个值，让函数调用和赋值操作更加优雅。
 
+```python
+# 基本解包
+a, b, c = (1, 2, 3)
+
+# 扩展解包
+first, *middle, last = (1, 2, 3, 4, 5)
+# first=1, middle=[2, 3, 4], last=5
+
+# 函数参数解包
+def func(a, b, c):
+    return a + b + c
+
+args = (1, 2, 3)
+result = func(*args)  # 等同于 func(1, 2, 3)
+```
+
+[PEP 3132 – 扩展可迭代对象解包](https://peps.python.org/pep-3132/)
+:::
 ## 元组
 
 与列表相似，元组 tuple 也是个有序序列，用`,`生成，有些教程中会额外使用`()`来包裹数据，让数据看起来更清晰。

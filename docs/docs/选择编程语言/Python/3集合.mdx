@@ -2,6 +2,24 @@
 sidebar_position: 3
 title: 集合
 ---
+
+:::info
+集合字面量语法让集合的创建变得更加直观和高效。使用花括号`{}`创建集合，体现了Python"应该有一种显而易见的方法来做事"的原则。
+
+```python
+# 旧方式
+colors = set(['red', 'green', 'blue'])
+
+# 新语法 - 更清晰直观
+colors = {'red', 'green', 'blue'}
+
+# 集合推导式
+squares = {x**2 for x in range(5)}
+```
+
+[PEP 3106 – 在2.6中重新激活集合字面量](https://peps.python.org/pep-3106/)
+:::
+
 ## 集合
 
 列表和字符串都是一种有序序列，而集合 set 是一种无序的序列。

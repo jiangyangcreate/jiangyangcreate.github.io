@@ -2,6 +2,23 @@
 sidebar_position: 3
 title: 列表
 ---
+:::info
+列表推导式体现了Python"优美优于丑陋"的哲学。它提供了一种简洁的方式来创建列表，让代码更加Pythonic。
+
+```python
+# 传统方式
+result = []
+for x in range(10):
+    if x % 2 == 0:
+        result.append(x**2)
+
+# Pythonic方式
+result = [x**2 for x in range(10) if x % 2 == 0]
+```
+
+[PEP 202 – 列表推导式](https://peps.python.org/pep-0202/)
+:::
+
 ## 列表
 
 介绍列表的方法及示例演示其使用，包括：长度、修改列表、取值、排序

@@ -2,6 +2,25 @@
 sidebar_position: 30
 title: 打包发布
 ---
+:::info
+pyproject.toml为Python项目提供了统一的配置文件格式，取代了传统的setup.py。它让项目配置更加清晰和标准化。
+
+```toml
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "my-package"
+version = "1.0.0"
+description = "A sample package"
+```
+
+[PEP 621 – 在pyproject.toml中存储项目元数据](https://peps.python.org/pep-0621/)
+:::
+
+
+
 ## Python 发布包
 
 截至2025年8月，UV 已经成为最现代化和高效的 Python 包管理工具，它集成了包管理、虚拟环境和打包发布功能，比传统的 pip + setuptools 方案更快更简单。

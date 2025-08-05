@@ -1,6 +1,6 @@
 # 数据类型
 
-### 👍enum 模块
+## 👍enum 模块
 
 基本示例
 
@@ -77,3 +77,71 @@ else:
    for state in TrafficLight:
        print(state)
    ```
+
+
+## typing 模块
+
+`typing` 模块提供高级类型支持：
+
+```python
+from typing import List, Dict, Tuple, Optional, Union
+
+# 容器类型
+names: List[str] = ["Alice", "Bob"]
+person: Dict[str, Union[str, int]] = {"name": "Alice", "age": 30}
+
+# 可选类型
+def get_age(name: str) -> Optional[int]:
+    if name == "Alice":
+        return 30
+    return None
+
+# 类型别名
+UserId = int
+user_id: UserId = 1001
+```
+
+### 泛型 (Generic)
+
+创建可复用的类型安全容器：
+
+```python
+from typing import TypeVar, Generic, List
+
+T = TypeVar('T')
+
+class Stack(Generic[T]):
+    def __init__(self) -> None:
+        self._items: List[T] = []
+    
+    def push(self, item: T) -> None:
+        self._items.append(item)
+    
+    def pop(self) -> T:
+        return self._items.pop()
+
+# 使用
+int_stack: Stack[int] = Stack()
+int_stack.push(42)
+```
+
+### Literal 字面量类型
+
+限制值只能是特定的字面量：
+
+```python
+from typing import Literal
+
+def set_mode(mode: Literal["read", "write", "append"]) -> None:
+    print(f"Mode set to: {mode}")
+
+set_mode("read")    # 正确
+set_mode("delete")  # 类型检查器会报错
+
+# 多种类型的字面量
+def process_flag(flag: Literal[True, False, 0, 1]) -> None:
+    pass
+```
+
+
+

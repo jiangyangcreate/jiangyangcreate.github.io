@@ -2,6 +2,20 @@
 sidebar_position: 20
 title: 类与对象
 ---
+:::info
+数据类自动生成常用的方法如`__init__`、`__repr__`等，减少样板代码，让开发者专注于业务逻辑。
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Person:
+    name: str
+    age: int
+```
+
+[PEP 557 – 数据类](https://peps.python.org/pep-0557/)
+:::
 
 ## 面向对象编程
 

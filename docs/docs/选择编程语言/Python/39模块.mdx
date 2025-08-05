@@ -3,6 +3,21 @@ sidebar_position: 39
 title: 模块
 ---
 
+:::info
+绝对导入和相对导入为Python包的组织提供了清晰的规则。明确的导入方式让代码的依赖关系更加清晰，避免了命名冲突。
+
+```python
+# 绝对导入
+from mypackage.submodule import function
+
+# 相对导入
+from .submodule import function
+from ..parentmodule import other_function
+```
+
+[PEP 328 – 导入：多行和绝对/相对导入](https://peps.python.org/pep-0328/)
+:::
+
 ## 模块
 
 用模块管理函数，Python 中每个文件就代表了一个模块（module），

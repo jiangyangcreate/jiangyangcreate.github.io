@@ -3,7 +3,11 @@ sidebar_position: 1
 title: 变量
 description: 变量的创建、命名规则、别名、相等性、一致性、驻留机制、对象的判断
 ---
+:::info
+错误绝不应该悄无声息地过去。除非明确地被静默。面对歧义，拒绝猜测的诱惑。
 
+[PEP 20 – Python之禅](https://peps.python.org/pep-0020/)
+:::
 ## 变量
 
 ### 变量的创建
@@ -131,3 +135,92 @@ print(id(a) == id(b)) # False
 | `isinstance()` | 判断对象是否是某个类型 | `isinstance(a, type)`，如果 type 是实例 a 的父类也会返回 True。如 `isinstance(1, object)` 是 True，因为 `object` 是所有类的父类 |
 
 Python 官方编码规范 PEP 8 明确建议：使用 is 和 is not 来比较单例对象（如 None），而不是 ==。不会被 `__eq__`重写影响。
+
+:::info
+type 有另外一个截然不同的用法，它是一个元类，用于创建类。
+
+```python
+type(MyClass, (object,), {x: 1})
+# 等价于
+class MyClass(object):
+    x = 1
+```
+
+type 和 object 的关系
+
+Python 中所有类都是 `type` 的实例，而 `type` 本身也是类：
+- `object` 是所有类的基类
+- `type` 是 `object` 的子类，也是自身的元类
+
+```python
+# type 和 object 的关系验证
+print(issubclass(type, object))  # True
+print(isinstance(object, type))  # True
+print(isinstance(type, type))    # True
+```
+
+关键点：
+1. `type` 是创建类的类 (元类)
+2. `object` 是所有类的基类
+3. 类既是 `type` 的实例，又是 `object` 的子类
+:::
+
+
+## 变量注解与类型提示
+
+类型注解是Python 3.5+ 引入的特性，用于在代码中添加类型信息。
+
+语法为 `variable: type`,可以当作一种文档注释，用于描述变量、函数参数和返回值的类型。同时和注释一样，不会影响运行时行为，即便输入的参数类型不匹配，也不会报错。
+
+当然，类型注解也可以用于类、函数、方法、模块等。
+
+```python
+# 基本类型注解
+name: str = "Alice"
+age: int = 30
+
+# 函数参数和返回值注解
+def greet(name: str, age: int = 25) -> str:  # 带默认值的参数
+    return f"{name} is {age} years old"
+
+greet("Alice", '30') # 即便输入的参数类型不匹配，也不会报错。
+```
+
+:::info
+变量注解提供了一种在运行时可访问的标准方式来指定变量的类型。注解不会在运行时强制执行，但可以被类型检查器、IDE和文档工具使用。
+
+[PEP 526 – 变量注解](https://peps.python.org/pep-0526/)
+
+类型提示是Python静态类型检查的基础。它们帮助开发者在开发时发现潜在问题，提高代码质量，而不影响Python的动态特性。
+
+[PEP 484 – 类型提示](https://peps.python.org/pep-0484/)
+:::
+
+### 高级类型注解
+
+Python 3.10+ 支持更简洁的语法：
+
+```python
+# 联合类型 (替代 Union)
+def process(data: str | int) -> None:
+    pass
+
+# 可选类型 (替代 Optional)
+def find_user(id: int) -> str | None:
+    pass
+```
+
+如果你希望定义两个数据相加，数据可以都是字符串类型，也可以都是数字类型，但是唯独不能一个字符串类型，一个数字类型。
+
+```python
+# 不能很好的表达这个需求
+def add_str_or_int(a: int | str, b: int | str) -> int | str:
+    return a + b
+
+
+# 泛型可以很好的表达这个需求（3.12 的语法）
+def add_str_or_int[T:(int , str)](a: T, b: T) -> T:
+    return a + b
+```
+
+更多类型注解的内容可以查看python的内置模块`typing`和第三方模块`pydantic`。

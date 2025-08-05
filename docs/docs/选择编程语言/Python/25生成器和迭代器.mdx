@@ -2,7 +2,19 @@
 sidebar_position: 25
 title: 生成器和迭代器
 ---
+:::info
+生成器让Python能够以内存高效的方式处理大量数据。它们实现了惰性求值，只在需要时计算值，体现了Python对性能和内存使用的关注。
 
+```python
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+```
+
+[PEP 255 – 简单生成器](https://peps.python.org/pep-0255/)
+:::
 ## 迭代器
 
 迭代是 Python 最强大的功能之一，是访问集合元素的一种方式。
