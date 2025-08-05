@@ -1,0 +1,442 @@
+# 文件
+
+### os 模块
+
+库、包、模块的包含关系为：多个模块组成为包、多个包组成为库。
+
+在实际开发中不做严格区分。
+
+Python 标准库：Python 内置的库，不需要安装，直接导入即可使用。
+
+以 Python 的内置 os 模块为例，是与操作系统进行交互的模块，主要有如下功能：
+
+#### 文件路径操作
+
+- os.remove(path) 或 os.unlink(path) ：删除指定路径的文件。路径可以是全名，也可以是当前工作目录下的路径。
+- os.removedirs：删除文件，并删除中间路径中的空文件夹
+- os.chdir(path)：将当前工作目录改变为指定的路径
+- os.getcwd()：返回当前的工作目录
+- os.curdir：表示当前目录的符号
+- os.rename(old, new)：重命名文件
+- os.renames(old, new)：重命名文件，如果中间路径的文件夹不存在，则创建文件夹
+- os.listdir(path)：返回给定目录下的所有文件夹和文件名，不包括 '.' 和 '..' 以及子文件夹下的目录。（'.' 和 '..' 分别指当前目录和父目录）
+- os.mkdir(name)：产生新文件夹
+- os.makedirs(name)：产生新文件夹，如果中间路径的文件夹不存在，则创建文件夹
+
+导入该模块：
+
+```python showLineNumbers
+import os
+```
+
+产生文件：
+
+```python showLineNumbers
+f = open('test.file', 'w')
+f.close()
+print('test.file' in os.listdir(os.curdir))
+```
+
+重命名文件:
+
+```python showLineNumbers
+os.rename("test.file", "test.new.file")
+print("test.file" in os.listdir(os.curdir))
+print("test.new.file" in os.listdir(os.curdir))
+```
+
+```python showLineNumbers
+# 删除文件
+os.remove("test.new.file")
+```
+
+#### 系统常量
+
+- windows 为 \r\n
+- unix 为 \n
+
+```python showLineNumbers
+os.linesep
+```
+
+```python showLineNumbers
+# 当前操作系统的路径分隔符：
+os.sep
+```
+
+当前操作系统的环境变量中的分隔符（';' 或 ':'）：
+
+- windows 为 ;
+- unix 为:
+
+```python showLineNumbers
+os.pathsep
+```
+
+os.environ 是一个存储所有环境变量的值的字典，可以修改。
+
+```python showLineNumbers
+os.environ
+```
+
+#### os.path 模块
+
+```python showLineNumbers
+import os.path
+```
+
+- os.path.isfile(path) ：检测一个路径是否为普通文件
+- os.path.isdir(path)：检测一个路径是否为文件夹
+- os.path.exists(path)：检测路径是否存在
+- os.path.isabs(path)：检测路径是否为绝对路径
+
+windows 系统：
+
+```python showLineNumbers
+print(os.path.isfile("C:/Windows"))
+print(os.path.isdir("C:/Windows"))
+print(os.path.exists("C:/Windows"))
+print(os.path.isabs("C:/Windows"))
+```
+
+unix 系统：
+
+```python showLineNumbers
+print(os.path.isfile("/Users"))
+print(os.path.isdir("/Users"))
+print(os.path.exists("/Users"))
+print(os.path.isabs("/Users"))
+```
+
+#### split 和 join
+
+- os.path.split(path)：拆分一个路径为 (head, tail) 两部分
+- os.path.join(a, \*p)：使用系统的路径分隔符，将各个部分合成一个路径
+
+```python showLineNumbers
+head, tail = os.path.split("c:/tem/b.txt")
+print(head, tail)
+```
+
+```python showLineNumbers
+a = "c:/tem"
+b = "b.txt"
+os.path.join(a, b)
+```
+
+```python showLineNumbers
+def get_files(dir_path):
+    '''
+    列出文件夹下的所有文件
+    :param dir_path: 父文件夹路径
+    :return:
+    '''
+    for parent, dirname, filenames in os.walk(dir_path):
+        for filename in filenames:
+            print("parent is:", parent)
+            print("filename is:", filename)
+            print("full name of the file is:", os.path.join(parent, filename))
+```
+
+列出当前文件夹的所有文件：
+
+```python showLineNumbers
+dir = os.curdir
+get_files(dir)
+```
+
+#### Byte Code 编译
+
+Python, Java 等语言先将代码编译为 byte code（不是机器码），然后再处理：
+
+> .py -> .pyc -> interpreter
+
+eval(statement, glob, local)
+
+使用 eval 函数动态执行代码，返回执行的值。
+
+exec(statement, glob, local)
+
+使用 exec 可以添加修改原有的变量:
+
+```python showLineNumbers
+a = 1
+exec('b = a + 10')
+print(b)
+```
+
+```python showLineNumbers
+local = dict(a=2)
+glob = {}
+exec("b = a+1", glob, local)
+
+print(local)
+```
+
+compile 函数生成 byte code：
+compile(str, filename, mode)
+
+```python showLineNumbers
+a = 1
+b = compile('a+2', '', 'eval')
+print(eval(b))
+```
+
+```python showLineNumbers
+a = 1
+c = compile("b=a+4", "", 'exec')
+exec(c)
+print(b)
+```
+
+```python showLineNumbers
+# abstract syntax trees
+import ast
+
+tree = ast.parse('a+10', '', 'eval')
+ast.dump(tree)
+```
+
+```python showLineNumbers
+a = 1
+c = compile(tree, '', 'eval')
+d = eval(c)
+print(d)
+```
+
+```python showLineNumbers
+# 安全的使用方法 literal_eval ，只支持基本值的操作：
+b = ast.literal_eval('[10.0, 2, True, "foo"]')
+print(b)
+```
+
+### open
+
+#### 写文件
+
+我们使用 open 函数的写入模式来写文件：
+
+```python showLineNumbers
+f = open('test.txt', 'w')
+f.write('hello world.')
+f.close()
+```
+
+```python showLineNumbers
+print(open('test.txt').read())
+```
+
+使用 w 模式时，如果文件不存在会被创建
+
+除了写入模式，还有追加模式 a
+
+读写模式 w+
+
+```python showLineNumbers
+f = open('test.txt', 'w+')
+f.write('hello world. morning.')
+f.seek(3)
+print(f.read())  # hello world.
+f.close()
+```
+
+#### 读文件
+
+使用 open 函数 来读文件，使用文件名的字符串作为输入参数：
+
+默认打开文件是 ‘r’ 读模式
+
+```python showLineNumbers
+f = open("test.txt")
+
+# 默认以读的方式打开文件，如果文件不存在会报错。
+# 可以使用 read 方法来读入文件中的所有内容：
+text = f.read()
+print(text)
+```
+
+按照行读入内容，readlines 方法返回一个列表，每个元素代表文件中每一行的内容：
+
+```python showLineNumbers
+f = open("test.txt")
+lines = f.readlines()
+print(lines)
+f.close()
+```
+
+```python showLineNumbers
+# 事实上，我们可以将 f 放在一个循环中，得到它每一行的内容：
+f = open('test.txt')
+for line in f:
+    print(line)
+f.close()
+```
+
+#### 上下文管理器
+
+```python showLineNumbers
+with open('my_file.txt', 'w') as fp:
+    data = fp.write("Hello world")
+```
+
+这等效于下面的代码，但是要更简便：
+
+```python showLineNumbers
+fp = open('my_file.txt', 'w')
+try:
+    # do stuff with f
+    data = fp.write("Hello world")
+finally:
+    fp.close()
+```
+
+#### 自定义上下文管理器
+
+比如可以这样定义一个简单的上下文管理器：
+
+```python showLineNumbers
+class ContextManager(object):
+    def __enter__(self):
+        print("Entering")
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+
+with ContextManager():
+    print("inside operate")
+```
+
+#### **enter** 的返回值
+
+如果在 **enter** 方法下添加了返回值，
+
+那么我们可以使用 as 把这个返回值传给某个参数：
+
+```python showLineNumbers
+class ContextManager2(object):
+    def __enter__(self):
+        print("Entering")
+        return "my value"
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+
+with ContextManager2() as val:
+    print(val)
+
+```
+
+一个通常的做法是将 **enter** 的返回值设为这个上下文管理器对象本身，
+文件对象就是这样做的.
+
+```python showLineNumbers
+class ContextManager3(object):
+    def __enter__(self):
+        print("Entering")
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+```
+
+#### 错误处理
+
+上下文管理器对象将错误处理交给 **exit** 进行，可以将错误类型，
+错误值和 traceback 等内容作为参数传递给 **exit** 函数：
+
+```python showLineNumbers
+class ContextManager4(object):
+    def __enter__(self):
+        print("Entering")
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+        if exc_type is not None:
+            print("  Exception:", exc_value)
+            return True  # 不想让错误抛出，只需要将 __exit__ 的返回值设为 True
+
+
+with ContextManager4():
+    print(1 / 0)
+
+```
+
+```python showLineNumbers
+import os
+os.remove('my_file.txt')
+```
+
+#### 二进制文件
+
+二进制读写模式 b：
+
+```python showLineNumbers
+import os
+
+f = open('binary.bin', 'wb')
+f.write(os.urandom(10))
+f.close()
+```
+
+```python showLineNumbers
+f = open('binary.bin', 'rb')
+print(repr(f.read()))
+f.close()
+```
+
+#### with 方法
+
+事实上，Python 提供了更安全的方法，当 with 块的内容结束后，
+Python 会自动调用它的 close 方法，确保读写的安全：
+
+```python showLineNumbers
+with open('new_file.txt', 'w') as f:
+    for i in range(3000):
+        x = 1.0 / (i - 1000)
+        f.write('hello world: ' + str(i) + '\n')
+```
+
+与 try/exception/finally 效果相同，但更简单。
+
+查看文件写的结果，虽然触发 error，但已经写的内容是成功的。
+
+```python showLineNumbers
+!tail new_file.txt
+```
+
+```python showLineNumbers
+!wc -l new_file.txt
+```
+
+```python showLineNumbers
+# 删除文件：
+import os
+os.remove('test.txt')
+os.remove('binary.bin')
+os.remove('new_file.txt')
+```
+
+
+### 🚧tempfile 模块
+
+tempfile 模块是 Python 标准库中的一个模块，用于创建和操作临时文件和目录。它可以帮助程序员在运行时生成临时文件，并且在程序结束时自动删除这些文件，从而避免留下不必要的临时文件。tempfile 模块特别适用于那些需要在运行时创建临时文件来存储中间数据的应用场景。
+
+### 🚧pathlib 模块
+
+### 🚧shutil 模块
+
+### 🚧sys 模块
+
+
+### 🚧pickle 模块
+
+pickle 模块是 Python 标准库中的一个模块，用于序列化和反序列化 Python 对象。它可以将 Python 对象转换为字节流，并将其保存到文件中，或者从文件中读取字节流并转换回 Python 对象。
+
+### 🚧sqlite3 模块
+
+sqlite3 模块是 Python 标准库中的一个模块，用于访问 SQLite 数据库。SQLite 是一个轻量级的关系型数据库管理系统，它不需要单独的服务器进程或配置，适合于嵌入式系统和小型应用程序。
+
+

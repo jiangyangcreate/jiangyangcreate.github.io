@@ -1,0 +1,81 @@
+# 网络与通信
+
+### 🚧webbrowser 模块
+
+### urllib 模块
+
+urllib 是一个收集了多个涉及 URL 的模块的自带包：可以打开和读取 URL、 抛出异常、解析 URL、解析 robots.txt 文件是最底层的模块。虽然仅支持 HTTP1.0 仅同步 ，但是解码和解析功能是真的很好用
+
+[urllib 模块代码文档](https://docs.python.org/zh-cn/3/library/urllib.html?highlight=urllib#module-urllib)
+
+#### urllib 发送请求
+
+```python showLineNumbers
+import urllib.request
+
+url = 'https://www.python.org'
+# 方式一
+response = urllib.request.urlopen(url)
+print(type(response))  # <class 'http.client.HTTPResponse'>
+# 方式二
+request = urllib.request.Request(url)
+res = urllib.request.urlopen(url)
+print(type(res))  # <class 'http.client.HTTPResponse'>
+print(response.read())                  # 获取响应体 二进制字符串
+print(response.getheaders())
+# 结果为
+[('Connection', 'close'), ('Content-Length', '50064'), ('Server', 'nginx'), ('Content-Type', 'text/html; charset=utf-8'), ('X-Frame-Options', 'DENY'), ('Via', '1.1 vegur, 1.1 varnish, 1.1 varnish'), ('Accept-Ranges', 'bytes'), ('Date', 'Tue, 17 Jan 2023 14:37:33 GMT'), ('Age', '1938'), ('X-Served-By', 'cache-iad-kiad7000025-IAD, cache-nrt-rjtf7700057-NRT'), ('X-Cache', 'HIT, HIT'), ('X-Cache-Hits', '263, 1190'), ('X-Timer', 'S1673966254.566369,VS0,VE0'), ('Vary', 'Cookie'), ('Strict-Transport-Security', 'max-age=63072000; includeSubDomains')]
+```
+
+#### urllib 异常处理
+
+URLError 是 OSError 的一个子类，所有请求问题都会被捕获。
+
+HTTPError 是 URLError 的一个子类，服务器上 HTTP 的响应会返回一个状态码，根据这个 HTTP 状态码来决定是否捕获，比如常见的 404 错误等。
+
+```python showLineNumbers
+from urllib import request
+from urllib import error
+
+if __name__ == "__main__":
+    url = "http://www.iloveyou.com/"#一个不存在的连接
+    req = request.Request(url)
+    try:
+        response = request.urlopen(req)
+        print(response.read())
+    except error.URLError as e:
+        print(e) # <urlopen error [Errno 11002] getaddrinfo failed>
+```
+
+#### urllib 解析 URL
+
+你肯定经历过复制网址出现乱码，这是因为网址必须以通用码的形式传送，而且还要避免几个特殊字符，因此网址要经编码，汉字经过编码后自然就是不可辨认的乱码了。
+
+那么浏览器的地址栏中，网址为什么看起来是中文呢？这大概是浏览器的“人性化”处理，将编码好的中文网址还原出来“暂时”显示在地址栏中。
+
+知道原理就能清楚的解码啦，你可以通过 encode 和 decode 方法进行操作解码和转码，只不过要考虑汉字中有%等特殊字符和/x 与%互转的情况，所以，直接用 quote 函数吧，别重复造轮子。
+
+```python showLineNumbers
+from urllib.parse import unquote
+from urllib.parse import quote
+
+url = 'https://www.baidu.com/s?ie=UTF-8&wd=%E7%A7%91%E6%8A%80&%E6%8A%80%E6%9C%AF'
+print(unquote(url))
+# 结果为https://www.baidu.com/s?ie=UTF-8&wd=科技&技术
+
+
+print( 'https://www.baidu.com/s?ie=UTF-8&wd='+quote('科技&技术'))
+# 结果为'https://www.baidu.com/s?ie=UTF-8&wd=%E7%A7%91%E6%8A%80&%E6%8A%80%E6%9C%AF'
+```
+
+#### urllib 解析 robots.txt 文件
+
+```python showLineNumbers
+import urllib.robotparser
+rp = urllib.robotparser.RobotFileParser()
+rp.set_url("http://www.musi-cal.com/robots.txt")
+rp.read()
+
+print(rp.can_fetch("*", "http://www.musi-cal.com/")) #判断网页是否可以抓取，'*'表示适用于所有爬虫
+# True
+```

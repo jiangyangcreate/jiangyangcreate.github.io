@@ -1,0 +1,71 @@
+---
+sidebar_position: 3
+title: 异常
+---
+## 异常
+
+### try & except 块
+
+捕捉不同的错误类型，尝试在下面输入框输入：-1，1，2，q
+
+```python
+import math
+
+while True:
+    try:
+        text = input('>')
+        if text[0] == 'q':
+            break
+        x = float(text)
+        y = 1 / math.log10(x)
+        print("1/log10({0}) = {1}".format(x, y))
+    except ValueError:
+        print("value must bigger than 0")
+    except ZeroDivisionError:
+        print("the value must not be 1")
+
+```
+
+### 自定义异常
+
+异常是标准库中的类，这意味着我们可以自定义异常类：
+
+尝试在文本输入框输入：k，start，q
+
+```python
+class CommandError(ValueError):
+    print("bad command operation. must input 'start', 'stop', 'pause'")
+
+
+
+valid_commands = {'start', 'stop', 'pause'}
+while True:
+    command = input('>')
+    if command == 'q':
+        break
+    try:
+        if command.lower() not in valid_commands:
+            raise CommandError('Invalid command: %s' % command)
+        print('input command:', command)
+    except CommandError:
+        print("bad command string: %s" % command)
+
+```
+
+### finally
+
+try/catch 块还有一个可选的关键词 finally。
+
+不管 try 块有没有异常， finally 块的内容总是会被执行，
+而且会在抛出异常前执行，因此可以用来作为安全保证，
+
+比如文件操作时，常在 finally 关闭文件。
+
+```python
+try:
+    print(1 / 0)
+except ZeroDivisionError:
+    print('divide by 0.')
+finally:
+    print('finally was called.')
+```

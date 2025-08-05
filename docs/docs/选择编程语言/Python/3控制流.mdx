@@ -1,0 +1,162 @@
+---
+sidebar_position: 3
+title: 控制流
+---
+
+## 条件判断
+
+条件判断是编程中非常基础且重要的概念，它允许我们根据不同的条件执行不同的代码块。
+
+### 基本语法
+
+```python showLineNumbers
+if condition:
+    # 当条件为真时执行的代码块
+elif condition:
+    # 当条件为假时执行的代码块
+else:
+    # 当条件都不满足时执行的代码块
+```
+
+### 示例
+
+```python
+a = 62
+print("exam score check:")
+if a >= 60:
+    print("student pass")
+elif a == 0:
+    print("student 0: not pass")
+else:
+    print("student not pass")
+```
+
+可以使用 and ， or , not , any , all等关键词结合多个判断条件：
+
+```python showLineNumbers
+a = 10
+b = -5
+c = 0
+print(a > 0 and b < 0)  # True
+print(not a > 0)  # False
+print(a < 0 or b < 0)  # True
+print(all([a,b,c])) # False,都为真时为真
+print(any([a,b,c])) # True,有一个为真时为真
+```
+
+### 一个例子
+
+```python showLineNumbers
+year = 1900
+if year % 400 == 0:
+    print("This is a leap year!")
+# 两个条件都满足才执行
+elif year % 4 == 0 and year % 100 != 0:
+    print("This is a leap year!")
+else:
+    print("This is not a leap year.")
+# This is not a leap year.
+```
+
+### 判断列表
+
+```python
+my_list = [1, 2]
+# 判断一个列表是否为空。
+if len(my_list) > 0:
+    print("the first element is: ", my_list[0])
+else:
+    print("no element.")
+
+```
+
+
+### 三元表达式（条件表达式）
+
+```python
+expression1 if condition else expression2
+```
+
+三元表达式是一种简洁的条件赋值方式，相当于简化版的 if-else 语句。
+
+## for 循环
+
+```python
+# for 循环
+total = 0
+for i in range(100000):
+    total += i
+print(total)  # 4999950000
+```
+
+## while 循环
+
+```python
+while <condition>:
+     <statesments>
+
+```
+
+Python 会循环执行**statesments**，直到**condition**不满足为止。
+
+```python
+i = 0
+total = 0
+while i <= 100:
+    total += i
+    i += 1
+print(total)  # 5050
+```
+
+举个例子，通过 while 遍历集合：
+
+```python
+# 空容器会被当成False，因此可以用while循环读取容器的所有元素
+plays = set(['Hamlet', 'Mac', 'King'])
+while plays:
+    play = plays.pop()
+    print('Perform', play)
+```
+
+### continue 语句
+
+遇到 continue 的时候，程序会返回到循环的最开始重新执行。
+
+```python
+values = [7, 6, 4, 7, 19, 2, 1]
+for i in values:
+    if i % 2 != 0:
+        # 忽略奇数
+        continue
+    print(i)
+# 6
+# 4
+# 2
+```
+
+### break 语句
+
+遇到 break 的时候，程序会跳出循环，不管循环条件是不是满足
+
+```python
+command_list = ['start',
+                '1',
+                '2',
+                '3',
+                '4',
+                'stop',
+                'restart',
+                '5',
+                '6']
+while command_list:
+    command = command_list.pop(0)
+    if command == 'stop':
+        break
+    print(command)
+# start
+# 1
+# 2
+# 3
+# 4
+
+```

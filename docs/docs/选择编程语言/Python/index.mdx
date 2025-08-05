@@ -536,3 +536,129 @@ print("hello world")
 | `python xxx.py` | 直接运行 | `'__main__'` |
 | `python -m xxx.py` | 把模块当作脚本来启动 | `'__main__'` |
 
+
+### 代码调式
+
+#### 断点设置
+
+在IDE中点击行号左侧设置断点，程序执行到断点时会暂停，允许检查变量状态和程序流程。
+
+#### 调试控制命令
+
+| 命令 | 功能 | 使用场景 |
+|------|------|----------|
+| **Continue (F5)** | 继续执行到下一个断点或程序结束 | 跳过已检查的代码段 |
+| **Step Over (F10)** | 逐行执行，函数调用作为一步 | 关注主流程，不深入函数内部 |
+| **Step Into (F11)** | 逐行执行，进入函数内部 | 需要调试函数内部逻辑 |
+| **Step Out (Shift+F11)** | 执行完当前函数并返回调用处 | 快速退出函数调试 |
+
+
+#### 调试流程演示
+
+```python title="数据处理与单例模式调试示例"
+class DataProcessor:
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls):  # 断点1: 观察单例创建
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def __init__(self):
+        if not DataProcessor._initialized:
+            self.data = []  # 断点2: 确保初始化只执行一次
+            DataProcessor._initialized = True
+            print("DataProcessor initialized")
+    
+    def process_data(self, items):
+        """处理数据列表"""
+        results = []
+        for item in items:  # 断点3: 循环调试起点
+            processed = self._transform_item(item)
+            results.append(processed)
+            self._log_progress(len(results))  # 断点4: 观察进度
+        return results
+    
+    def _transform_item(self, item):
+        """转换单个数据项"""
+        return item * 2 + 1
+        
+    def _log_progress(self, count):  # 断点5: 内部方法调试
+        print(f"Processed {count} items")
+
+def main():
+    processor1 = DataProcessor()  # 断点6: 第一次实例化
+    processor2 = DataProcessor()  # 断点7: 验证单例模式
+    
+    print(f"Same instance: {processor1 is processor2}")
+    
+    test_data = [1, 2, 3, 4, 5]
+    result = processor1.process_data(test_data)
+    print(f"Results: {result}")
+
+if __name__ == "__main__":
+    main()
+```
+
+
+**在断点1处开始调试：**
+
+1. **Step Into (F11)**: 进入`__new__`方法内部，观察单例模式的实现逻辑
+2. **Step Over (F10)**: 在断点6处，将`DataProcessor()`作为一步执行，直接看到实例创建结果
+3. **Continue (F5)**: 从断点6直接跳转到断点7，验证单例模式
+4. **Step Into → Step Out**: 在断点3进入循环，然后在断点4使用Step Out快速完成`_log_progress`方法
+
+#### 条件断点设置
+
+条件断点只在满足特定条件时才会暂停程序执行，极大提高调试效率。
+
+- 右键点击断点（红色圆点）
+- 选择"Edit Breakpoint" 或 "Add Conditional Breakpoint"
+- 输入条件表达式（如 `item > 3` 或 `len(results) == 2`）
+
+
+```python title="条件断点应用场景" 
+def process_large_dataset(data):
+    results = []
+    error_count = 0
+    
+    for i, item in enumerate(data):
+        try:
+            # 条件断点1: i >= 100 (只在处理第100项后暂停)
+            processed = complex_calculation(item)
+            results.append(processed)
+            
+        except ValueError as e:
+            error_count += 1
+            # 条件断点2: error_count > 5 (错误超过5次时暂停)
+            log_error(f"Error processing item {i}: {e}")
+            
+        # 条件断点3: item['priority'] == 'high' (只调试高优先级项)
+        if item.get('priority') == 'high':
+            special_handling(item)
+    
+    return results
+
+def analyze_performance(metrics):
+    # 条件断点4: metrics['response_time'] > 1000 (响应时间过长时暂停)
+    if metrics['response_time'] > threshold:
+        optimize_query()
+```
+
+**常用条件表达式：**
+
+| 场景 | 条件表达式 | 说明 |
+|------|------------|------|
+| 循环特定位置 | `i == 50` | 在第50次迭代时暂停 |
+| 变量达到阈值 | `count > 100` | 计数器超过100时暂停 |
+| 字符串匹配 | `name == "admin"` | 特定用户名时暂停 |
+| 列表长度 | `len(items) >= 10` | 列表达到指定长度时暂停 |
+| 对象属性 | `user.role == "admin"` | 特定角色时暂停 |
+| 复合条件 | `age > 18 and status == "active"` | 多条件组合 |
+
+
+## 推荐阅读
+- [Python 3.12 官方文档](https://docs.python.org/3.12/)
+- [流畅的Python](https://weread.qq.com/web/reader/b64322b0813ab8ee3g018675/)
+- [码农高天 不基础的python基础](https://space.bilibili.com/245645656/lists/346060?type=season)

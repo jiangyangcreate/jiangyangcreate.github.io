@@ -1,0 +1,288 @@
+---
+sidebar_position: 30
+title: 打包发布
+---
+## Python 发布包
+
+截至2025年8月，UV 已经成为最现代化和高效的 Python 包管理工具，它集成了包管理、虚拟环境和打包发布功能，比传统的 pip + setuptools 方案更快更简单。
+
+### 安装 UV
+
+```bash
+# Windows (PowerShell)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 或者通过 pip 安装
+pip install uv
+```
+
+### 目录结构
+
+```bash showLineNumbers
+your_project/
+├── .github/（可选）
+│  └── workflows/（可选）
+│      └── python-publish.yml（可选）
+│
+├── src/（推荐结构）
+│   └── your_package/（包名）
+│       ├── __init__.py
+│       └── module.py
+│
+├── tests/（可选）
+│   └── test_module.py
+│
+├── README.md（可选）
+├── LICENSE（可选）
+├── pyproject.toml
+└── uv.lock（UV 生成的锁文件）
+```
+
+### pyproject.toml 示例
+
+```toml showLineNumbers title="pyproject.toml"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "exboard"
+version = "1.0.12"
+authors = [
+  { name="Allen", email="jiangyangcreate@gmail.com" },
+]
+description = "A exboard package for AIBOX"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "schedule>=1.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jiangyangcreate/exboard"
+Issues = "https://github.com/jiangyangcreate/exboard/issues"
+
+# UV 特定配置
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+]
+```
+
+### 使用 UV 进行项目管理
+
+#### 初始化项目
+```bash
+# 创建新项目
+uv init your_project
+cd your_project
+
+# 或在现有项目中初始化
+uv init
+```
+
+#### 添加依赖
+```bash
+# 添加运行时依赖
+uv add schedule
+
+# 添加开发依赖
+uv add --dev pytest black ruff
+
+# 从 requirements.txt 添加
+uv add -r requirements.txt
+```
+
+#### 管理虚拟环境
+```bash
+# UV 会自动创建和管理虚拟环境
+uv run python your_script.py
+
+# 激活虚拟环境
+uv shell
+
+# 安装项目（开发模式）
+uv pip install -e .
+```
+
+### 打包发布
+
+#### 本地打包
+```bash
+# 构建包（生成 wheel 和 sdist）
+uv build
+
+# 只构建 wheel
+uv build --wheel
+
+# 只构建源码分发
+uv build --sdist
+```
+
+该命令将在 `dist/` 目录下生成 `.tar.gz` 和 `.whl` 文件。
+
+#### 发布到 PyPI
+```bash
+# 安装 twine（如果需要）
+uv add --dev twine
+
+# 上传到 PyPI
+uv run twine upload dist/*
+
+# 上传到测试 PyPI
+uv run twine upload --repository testpypi dist/*
+```
+
+#### 配置 PyPI 凭据
+编辑用户目录下的 `.pypirc` 文件：
+
+```ini showLineNumbers title="~/.pypirc"
+[pypi]
+username = __token__
+password = your_api_token
+
+[testpypi]
+repository = https://test.pypi.org/legacy/
+username = __token__
+password = your_test_api_token
+```
+
+### 通过 GitHub Actions 自动发布
+
+```yaml showLineNumbers title=".github/workflows/python-publish.yml"
+name: Upload Python Package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install UV
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: Set up Python
+      run: uv python install 3.11
+    
+    - name: Install dependencies
+      run: |
+        uv sync --all-extras --dev
+    
+    - name: Run tests
+      run: |
+        uv run pytest
+    
+    - name: Build package
+      run: |
+        uv build
+    
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+```
+
+### UV 的优势
+
+| 特性 | UV | 传统方法 (pip + setuptools) |
+|------|----|-----------------------------|
+| **速度** | 极快（Rust 编写） | 较慢 |
+| **依赖解析** | 快速准确 | 可能冲突 |
+| **锁文件** | 自动生成 `uv.lock` | 需手动管理 |
+| **虚拟环境** | 自动管理 | 需手动创建 |
+| **项目初始化** | `uv init` 一键创建 | 需手动配置 |
+| **构建工具** | 内置支持多种后端 | 需额外安装 |
+
+### 常用 UV 命令
+
+```bash
+# 项目管理
+uv init                    # 初始化项目
+uv add package            # 添加依赖
+uv remove package         # 移除依赖
+uv sync                   # 同步依赖
+
+# 运行和构建
+uv run script.py          # 运行脚本
+uv run pytest            # 运行测试
+uv build                  # 构建包
+
+# 环境管理
+uv venv                   # 创建虚拟环境
+uv shell                  # 激活环境
+uv python install 3.11   # 安装 Python 版本
+```
+
+### PyPI 密钥配置
+
+在 PyPI 中获取 API Token：
+
+1. 访问：https://pypi.org/manage/account/token/
+2. 选择 "Add API token"
+3. 设置名称和权限范围
+4. 复制生成的 token
+
+在 GitHub 项目中添加密钥：
+
+```bash
+Settings -> Secrets and variables -> Actions -> New repository secret
+
+Name: PYPI_API_TOKEN
+Value: 刚刚复制的 API token
+```
+
+这样当我们在 GitHub 上**创建 release** 时，会自动将包上传到 PyPI。注意不是 push 代码自动上传。
+
+### 迁移现有项目到 UV
+
+```bash
+# 从 requirements.txt 迁移
+uv add -r requirements.txt
+
+# 从 poetry 迁移
+uv add $(poetry show --only=main --quiet | cut -d' ' -f1)
+
+# 从 pipenv 迁移
+uv add $(pipenv requirements | grep -v '^-')
+```
+
+UV 提供了更现代化、更高效的 Python 包管理体验，强烈推荐在新项目中使用！
+
+
+## 封装程序为可执行文件
+
+官方文档：[https://www.pyinstaller.org/](https://www.pyinstaller.org/)
+
+命令行：
+
+```bash showLineNumbers
+# 直接封装
+pyinstaller -F app.py
+# 指定图标
+pyinstaller -F -i app.ico app.py
+# 指定图标 不展示终端框
+pyinstaller -F -i app.ico app.py --noconsole
+# 将数据文件添加到捆绑包中，中间使用分号分隔，前面是源目录地址，后面是目的目录地址
+pyinstaller -F -i app.ico app.py --add-data="C:\mediapipe\modules;mediapipe/modules" --noconsole
+```

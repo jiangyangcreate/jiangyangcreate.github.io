@@ -1,0 +1,103 @@
+---
+sidebar_position: 30
+title: 调用C
+---
+## Python 调用 C
+
+Python 的底层是 C 写的（实际上大部分高级编程语言都是 C 写的）因此Python可以调用以下C/C++文件类型：
+- C源代码文件（.c）
+- C++源代码文件（.cpp、.cxx、.cc）
+- 编译后的共享库（Linux/Unix的.so、Windows的.dll、macOS的.dylib）
+- 编译后的静态库（Linux/Unix的.a、Windows的.lib）
+
+因此互相调用的逻辑主要是：数据类型转换、编译库的链接、接收返回值。
+
+python+c/c++混合编程如：
+
+> 原生的 Python.h
+
+> cython
+
+> pybind11：pytorch 也采用该方法
+
+> ctypes、cffi、SWIG、Boost.Pytho 等
+
+但不论是哪个方法，大致的流程都是：转换数据类型->编译代码->生成编译后的文件（.pyd .pyc .pyo .so .dll 等）
+
+```bash showLineNumbers
+冷知识：
+
+python的import不止能导入.py后缀结尾的文件
+
+pyc是由py文件经过编译后生成的二进制文件，py文件变成pyc文件后，加载的速度有所提高，并且可以实现源码隐藏。
+
+pyo是优化编译后的程序，也可以提高加载速度，针对嵌入式系统，把需要的模块编译成pyo文件可以减少容量。
+
+.so和.dll分别是Linux和window的动态库
+
+这些都可以被import导入，所以我们只需要编译C代码，然后import导入即可。
+
+```
+
+
+### 代码编写
+
+一个求某个数可以分解为多少个质数之和代码,其中最核心的代码是判断一个数是否为质数。我们使用C语言实现这个被频繁调用的功能。
+
+```c showLineNumbers title="prime.c"
+#include <math.h>
+
+int is_prime(int n) {
+    if (n < 2) return 0;
+    for (int i = 2; i <= (int)sqrt(n); i++) {
+        if (n % i == 0) return 0;
+    }
+    return 1;
+}
+```
+
+编译：`gcc -shared -o prime.so prime.c`
+
+```python showLineNumbers
+import ctypes
+import timeit
+
+# 加载C动态库
+prime_lib = ctypes.CDLL('./prime.so')
+is_prime = prime_lib.is_prime
+is_prime.argtypes = [ctypes.c_int]
+is_prime.restype = ctypes.c_int
+
+def count_prime_pairs(n):
+    count = 0
+    for i in range(2, n // 2 + 1):
+        if is_prime(i) and is_prime(n - i):
+            count += 1
+    return count
+
+def is_prime_py(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+def count_prime_pairs_py(n):
+    count = 0
+    for i in range(2, n // 2 + 1):
+        if is_prime_py(i) and is_prime_py(n - i):
+            count += 1
+    return count
+
+if __name__ == "__main__":
+    n = int(input("输入一个正整数: "))
+    print("C混合版结果:", count_prime_pairs(n))
+    print("纯Python结果:", count_prime_pairs_py(n))
+
+    # 性能对比
+    py_time = timeit.timeit(lambda: count_prime_pairs_py(n), number=100)
+    c_time = timeit.timeit(lambda: count_prime_pairs(n), number=100)
+    print(f"Pure Python: {py_time:.4f} seconds")
+    print(f"Python+C: {c_time:.4f} seconds")
+```

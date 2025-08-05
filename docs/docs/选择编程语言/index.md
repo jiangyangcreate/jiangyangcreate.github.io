@@ -23,3 +23,7 @@ title: 选择编程语言
 以下是我常用的语言：
 
 <DocCardList />
+
+正式学习编程语言之前，推荐先学习:<HoverText text="8小时计算机科学速成课" explanation="帮你快速认知计算机组成原理、计算机网络、操作系统、人工智能等计算机科学的基础知识。适合0基础认知计算机科学。"/>
+
+<iframe src="//player.bilibili.com/player.html?isOutside=true&aid=21376839&bvid=BV1EW411u7th&cid=38442945&p=1" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"></iframe>
