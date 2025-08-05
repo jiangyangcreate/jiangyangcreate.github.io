@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: 数字与运算符
+title: 数字
 ---
 
 存在三种不同的数字类型: 整数, 浮点数 和 复数。 此外，布尔值属于整数的子类型。 
@@ -93,6 +93,10 @@ print(int('11', base=16)) # 17
 
 
 ## 浮点数
+
+:::info
+Python基础知识的面试重点曾经是浮点数，现在慢慢变成装饰器、元类、闭包与单例等高级特性。
+:::
 
 只要进行了除法运算，就会产生浮点数。即便除数、被除数都是整数,也没有余数，商也会是浮点数。
 
@@ -493,6 +497,51 @@ print(f"True的个数: {true_count}, False的个数: {false_count}")
 
 ## 数字相关的默认函数
 
+### abs函数
+
+返回一个数字的绝对值。 参数可以是整数、浮点数或任何实现了 __abs__() 的对象。 
+
+如果参数是一个复数，则返回它的模。
+
+```python showLineNumbers
+print(abs(-10)) # 10
+print(abs(10.5)) # 10.5
+print(abs(10j)) # 10.0
+```
+
+### max 和 min函数
+
+max 返回可迭代对象中的最大值，接受多个参数。函数参数为`max(arg1, arg2, *args, key=None)`
+
+min 返回可迭代对象中的最小值，接受多个参数。函数参数为`min(arg1, arg2, *args, key=None)`
+
+二者语法一致、参数一致，只是行为相反。
+
+```python showLineNumbers
+print(max(1, 2, 3)) # 3
+print(max([1], [2], [3])) # [3]
+print(max([[1]], [[2]], [[3]])) # [[3]]
+```
+
+可以通过指定key参数，来自定义比较规则。例如，绝对值。
+
+```python showLineNumbers
+lists = [-2,1]
+print(max(lists)) # 1
+
+def _sort(value):
+    return abs(value)
+print(max(lists,key=_sort)) # -2
+```
+
+### sum函数
+
+返回可迭代对象中所有元素的和。函数参数为`sum(iterable, /, start=0)`
+
+```python showLineNumbers
+print(sum((1, 2, 3))) # 6
+```
+
 ### round函数
 
 四舍五入函数，如果与两个倍数同样接近，则选用偶数。因此，`round(0.5)` 和 `round(-0.5)` 均得出 `0` 而 `round(1.5)` 则为 `2`
@@ -511,16 +560,39 @@ print(round(123.555,2)) # 123.56
 这不算是程序错误：这一结果是由于大多数十进制小数实际上都不能以浮点数精确地表示。
 :::
 
-### abs函数
 
-返回一个数字的绝对值。 参数可以是整数、浮点数或任何实现了 __abs__() 的对象。 
+### divmod函数
 
-如果参数是一个复数，则返回它的模。
+以两个（非复数）数字为参数，在作整数除法时，返回商和余数。
+
+若操作数为混合类型，则适用二进制算术运算符的规则。
 
 ```python showLineNumbers
-print(abs(-10)) # 10
-print(abs(10.5)) # 10.5
-print(abs(10j)) # 10.0
+print(divmod(7, 3)) # (2, 1)
+
+print(divmod(6, 3)) # (2, 0)
+
+print(divmod(6.0, 3.0)) # (2.0, 0.0)
+
+print(divmod(-6, 3)) # (-2, 0)
+
+print(divmod(6.5, 3)) # (2.0, 0.5)
+```
+
+### pow函数
+
+函数参数为`pow(base, exp, mod=None)`
+
+计算`base`的`exp`次幂。如果`mod`存在，则再对结果进行取模，其结果等效于`pow(base, exp) % mod`。
+
+```python showLineNumbers
+print(pow(2, 3)) # 8
+# 等价于
+print(2**3) # 8
+
+print(pow(2, 3, 5)) # 3
+# 等价于
+print((2**3) % 5) # 3
 ```
 
 

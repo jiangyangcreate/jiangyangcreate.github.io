@@ -67,9 +67,14 @@ quad(2.0)
 quad(2.0, b=3)
 ```
 
-### 接收不定参数
+### 不定长参数
 
-使用如下方法，可以使函数接受不定数目的参数,类似 java 的..多个参数：
+位置不定长参数：`*args`
+
+表示参数数目不定，可以看成一个元组
+
+
+使用如下方法，可以使函数接受不定数目的参数,把第一个参数后面的参数当作元组中的元素。
 
 ```python
 def add(x, *args):
@@ -77,18 +82,14 @@ def add(x, *args):
     for arg in args:
         total += arg
     return total
-```
 
-\*args 表示参数数目不定，可以看成一个元组，
-
-把第一个参数后面的参数当作元组中的元素。
-
-```python
 print(add(1, 2, 3, 4, 5))  # 15
 print(add(1, 2))  # 3
 ```
 
-### 使用关键词传入参数
+关键字不定长参数：`**kwargs`
+
+表示参数数目不定，可以看成一个字典
 
 ```python
 def add(x, **kwargs):
@@ -97,13 +98,11 @@ def add(x, **kwargs):
         print("adding ", arg)
         total += val
     return total
-```
 
-\*\*kwargs 表示参数数目不定，相当于一个字典，关键词和值对应于键值对。
-
-```python
 add(1, a=2, b=3)  # 6
 ```
+
+混合使用
 
 ```python
 # 可以接收任意数目的位置参数和键值对参数：
@@ -111,6 +110,48 @@ def fun1(*args, **kwargs):
     print(args, kwargs)
 
 fun1(2, 3, a="bar", b=10)  # (2, 3) {'a': u'bar', 'b': 10}
+```
+
+### 函数参数分隔符
+
+`/` - 位置专用参数分隔符
+
+作用：`/` 之前的参数只能通过位置传递，不能使用关键字。
+
+`*` - 关键字专用参数分隔符
+
+作用：`*` 之后的参数只能通过关键字传递，不能使用位置
+
+```python showLineNumbers
+def func1(a, b, /):
+    """a和b只能通过位置传递，防止将来参数名变更破坏兼容性。"""
+    return a + b
+
+# 正确调用
+print(func1(1, 2))        # ✅ 3
+
+# 错误调用
+# print(func1(a=1, b=2))  # ❌ TypeError: 只能位置传递
+
+def func2(*, x, y):
+    """x和y只能通过关键字传递，强制描述可以提高代码可读性和维护性。"""
+    return x * y
+
+# 正确调用
+print(func2(x=3, y=4))    # ✅ 12
+
+# 错误调用
+# print(func2(3, 4))      # ❌ TypeError: 只能关键字传递
+
+def func3(pos_only, /, *, kwd_only):
+    """
+    pos_only: 只能位置传递
+    kwd_only: 只能关键字传递
+    """
+    return f"{pos_only}-{kwd_only}"
+
+print(func3(1,  kwd_only=3))           # ✅ "1-3"
+# 其他调用都为错误调用
 ```
 
 ### 返回多个值
