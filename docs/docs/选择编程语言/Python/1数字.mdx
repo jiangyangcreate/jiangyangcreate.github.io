@@ -54,6 +54,10 @@ h = -0o21
 print(e == f) # True
 print(e == g) # True
 print(e == h) # True
+
+# 为了提高可读性，各进制都可以在数字中使用下划线 _ 分隔。
+print(1_000_000)    # 1000000
+print(0b1010_1010)  # 170
 ```
 
 :::info
@@ -95,42 +99,71 @@ print(int('123')) # 123
 # 将浮点数转换为整数，会舍弃小数部分
 print(int(123.55)) # 123
 
-# 将字符串转换为十六进制整数
+# 将字符串转换为十六进制整数,base表示进制
 print(int('11', base=16)) # 17
 ```
 
-
 ## 浮点数
 
-:::info
-Python基础知识的面试重点曾经是浮点数，现在慢慢变成装饰器、元类、闭包与单例等高级特性。
-:::
-
-只要进行了除法运算，就会产生浮点数。即便除数、被除数都是整数,也没有余数，商也会是浮点数。
-
-```python showLineNumbers
-print(10 / 2) # 5.0
-```
-
-### 浮点数的内部表示
-
-Python的浮点数遵循IEEE 754双精度标准，使用64位存储：
-- 1位符号位
-- 11位指数位
-- 52位尾数位
+Python的浮点数遵循IEEE 754双精度标准，使用64位存储，下面的代码输出清楚的说明了这点
 
 ```python showLineNumbers
 import sys
 print(sys.float_info)
-# float_info(max=1.7976931348623157e+308, max_exp=1024, max_10_exp=308,
-#           min=2.2250738585072014e-308, min_exp=-1021, min_10_exp=-307,
-#           dig=15, mant_dig=53, epsilon=2.220446049250313e-16,
-#           radix=2, rounds=1)
+"""
+sys.float_info(
+    # 表示当前系统能够表示的最大浮点数，值为 1.7976931348623157e+308。这是双精度浮点数的最大值（IEEE 754 标准）。
+    max=1.7976931348623157e+308, 
+    # 表示浮点数能够表示的最大指数值（以 2 为底），值为 1024。这是双精度浮点数的最大指数值。
+    max_exp=1024, 
+    # 表示浮点数能够表示的最大指数值（以 10 为底），值为 308。这是双精度浮点数在十进制下的最大指数值。
+    max_10_exp=308, 
+    # 表示当前系统能够表示的最小正浮点数（非零），值为 2.2250738585072014e-308。这是双精度浮点数的最小正数。
+    min=2.2250738585072014e-308, 
+    # 表示浮点数能够表示的最小指数值（以 2 为底），值为 -1021。这是双精度浮点数的最小指数值。
+    min_exp=-1021, 
+    # 表示浮点数能够表示的最小指数值（以 10 为底），值为 -307。这是双精度浮点数在十进制下的最小指数值。
+    min_10_exp=-307,
+    # 表示浮点数在十进制下的有效数字位数，值为 15。这意味着双精度浮点数可以精确表示大约 15 位十进制数字。 
+    dig=15, 
+    # 表示浮点数的尾数位数（以 2 为底），值为 53。这是双精度浮点数的尾数位数（包括隐含的 1）。
+    mant_dig=53, 
+    # 表示 1.0 和下一个可表示的浮点数之间的差值，值为 2.220446049250313e-16。这是双精度浮点数的机器精度。
+    epsilon=2.220446049250313e-16,
+    # 表示浮点数的基数（进制），值为 2。这意味着浮点数是基于二进制的。 
+    radix=2, 
+    # 表示浮点数的舍入模式，值为 1。这表示当前系统使用的是“舍入到最近偶数”的舍入模式（IEEE 754 默认模式）
+    rounds=1
+    ) 
+"""
 ```
 
-### 精度问题的根本原因
+### 浮点数的定义
 
-浮点数精度问题源于二进制无法精确表示某些十进制小数：
+```python showLineNumbers
+# 只要进行了除法运算，就会产生浮点数。即便除数、被除数都是整数,也没有余数，商也会是浮点数。
+print(10 / 2) # 5.0
+
+# 使用科学计数法定义的都是浮点数，e 或 E 表示 10 的幂次。
+print(1e1)   # 10.0
+print(2.5e3) # 2500.0
+print(1E-2)  # 0.01
+```
+
+### float方法
+```python showLineNumbers
+# 使用float可以将其他数据类型转化为浮点数
+float(1)
+
+# 无穷大
+float('inf')
+# 负无穷大
+float('-inf')
+```
+
+### 精度问题
+
+浮点数精度问题源于二进制无法精确表示某些十进制小数，这并非Python语言的问题，是二进制处理器的问题：
 
 ```python showLineNumbers
 # 经典的浮点数精度问题
@@ -148,168 +181,40 @@ for i in range(10):
     total += 0.1
 print(total)  # 0.9999999999999999
 print(total == 1.0)  # False
-```
 
-### 浮点数比较的最佳实践
-
-永远不要直接比较浮点数是否相等，使用容差比较：
-
-```python showLineNumbers
-import math
-
-def float_equals(a, b, tolerance=1e-9):
-    """安全的浮点数比较"""
-    return abs(a - b) < tolerance
-
-# 使用内置的isclose函数（推荐）
-print(math.isclose(0.1 + 0.2, 0.3))  # True
-print(math.isclose(0.1 + 0.2, 0.3, rel_tol=1e-09, abs_tol=0.0))  # True
-
-# 自定义容差
+# 因此永远不要直接比较浮点数是否相等，使用容差比较（允许容纳极小的误差）
 def robust_equals(a, b, rel_tol=1e-09, abs_tol=1e-12):
+    """
+    比较两个数值是否在给定的相对或绝对误差范围内相等。
+
+    参数:
+        a (float): 待比较的第一个数值。
+        b (float): 待比较的第二个数值。
+        rel_tol (float, optional): 相对误差容限，用于处理较大数值时的比例误差。默认为 1e-09。
+        abs_tol (float, optional): 绝对误差容限，用于处理接近零时的微小误差。默认为 1e-12。
+
+    返回:
+        bool: 如果 `a` 和 `b` 在给定的误差范围内相等，则返回 `True`，否则返回 `False`。
+
+    示例:
+        >>> robust_equals(1.0, 1.000000001)
+        True
+        >>> robust_equals(1.0, 1.0001)
+        False
+    """
     return abs(a - b) <= max(rel_tol * max(abs(a), abs(b)), abs_tol)
 
-# 处理大数和小数的比较
-large_num1 = 1000000.1
-large_num2 = 1000000.2
-print(robust_equals(large_num1, large_num2, rel_tol=1e-6))  # False
-
-small_num1 = 1e-12
-small_num2 = 2e-12
-print(robust_equals(small_num1, small_num2, abs_tol=1e-11))  # True
-```
-
-### 特殊值处理
-
-Python浮点数包含几个特殊值，需要特别处理：
-
-```python showLineNumbers
+print(robust_equals(1.0, 1.0001)) # False
+# 等价于使用内置的isclose函数（推荐）
 import math
-
-# 无穷大
-pos_inf = float('inf')
-neg_inf = float('-inf')
-print(math.isinf(pos_inf))  # True
-print(pos_inf > 1e308)      # True
-
-# NaN (Not a Number)
-nan_val = float('nan')
-print(math.isnan(nan_val))  # True
-print(nan_val == nan_val)   # False! NaN不等于任何值，包括自己
-
-# 检查有限数
-print(math.isfinite(42.0))    # True
-print(math.isfinite(pos_inf)) # False
-print(math.isfinite(nan_val)) # False
-
-# 实际应用中的特殊值处理
-def safe_divide(a, b):
-    """安全除法，处理特殊情况"""
-    if b == 0:
-        if a > 0:
-            return float('inf')
-        elif a < 0:
-            return float('-inf')
-        else:
-            return float('nan')  # 0/0的情况
-    return a / b
-
-print(safe_divide(10, 0))   # inf
-print(safe_divide(-10, 0))  # -inf
-print(safe_divide(0, 0))    # nan
+print(math.isclose(1.0, 1.0001, rel_tol=1e-09,abs_tol=1e-12))# False
 ```
-
-### 精确十进制运算 - decimal模块
-
-对于需要精确计算的场景（金融计算等），使用decimal模块：
-
-```python showLineNumbers
-from decimal import Decimal, getcontext, ROUND_HALF_UP
-
-# 设置精度
-getcontext().prec = 28
-
-# 精确的十进制运算
-price = Decimal('19.95')
-tax_rate = Decimal('0.08')
-tax = price * tax_rate
-total = price + tax
-
-print(f"Price: {price}")
-print(f"Tax: {tax}")
-print(f"Total: {total}")
-
-# 金融计算示例
-def calculate_compound_interest(principal, rate, time, n=1):
-    """复利计算"""
-    principal = Decimal(str(principal))
-    rate = Decimal(str(rate))
-    time = Decimal(str(time))
-    n = Decimal(str(n))
-    
-    amount = principal * (1 + rate / n) ** (n * time)
-    return amount
-
-result = calculate_compound_interest(1000, 0.05, 10, 12)
-print(f"Compound interest result: {result}")
-
-# 四舍五入控制
-getcontext().rounding = ROUND_HALF_UP
-value = Decimal('2.675')
-print(value.quantize(Decimal('0.01')))  # 2.68
-```
-
-### 性能考虑和优化
-
-```python showLineNumbers
-import time
-import numpy as np
-from decimal import Decimal
-
-def benchmark_float_operations():
-    """浮点数运算性能测试"""
-    
-    # 标准float性能
-    start = time.time()
-    total = 0.0
-    for i in range(1000000):
-        total += i * 0.001
-    float_time = time.time() - start
-    
-    # Decimal性能
-    start = time.time()
-    total = Decimal('0')
-    decimal_001 = Decimal('0.001')
-    for i in range(1000000):
-        total += Decimal(i) * decimal_001
-    decimal_time = time.time() - start
-    
-    # NumPy向量化操作
-    start = time.time()
-    arr = np.arange(1000000) * 0.001
-    numpy_total = np.sum(arr)
-    numpy_time = time.time() - start
-    
-    print(f"Float time: {float_time:.4f}s")
-    print(f"Decimal time: {decimal_time:.4f}s")
-    print(f"NumPy time: {numpy_time:.4f}s")
-    print(f"Decimal is {decimal_time/float_time:.1f}x slower than float")
-    print(f"NumPy is {float_time/numpy_time:.1f}x faster than float")
-
-# benchmark_float_operations()
-```
-
-### 实际项目中的常见陷阱
+{/* 
+### 浮点数陷阱与解决方案
 
 ```python showLineNumbers
 import json
 from decimal import Decimal
-
-# 陷阱0: 金融业浮点数直接计算
-def add_float(a, b):
-    return a + b
-
-print(add_float(0.1, 0.2)) # 0.30000000000000004
 
 # 陷阱1: JSON序列化精度丢失
 def json_precision_issue():
@@ -377,7 +282,7 @@ def range_check_issue():
     print(f"Values count: {len(values)}")  # 可能是11个而不是期望的10个
     print(f"Last value: {values[-1]}")
     print(f"Last value <= 1.0: {values[-1] <= 1.0}")
-```
+``` */}
 
 ## 复数
 
