@@ -483,7 +483,6 @@ print(keyword.kwlist)
 - help(): 帮助文档
 `} />
 
-
 #### 输入输出
 
 为了学习曲线更加平滑，我们先简单学习下Python的输入输出。
@@ -536,6 +535,258 @@ print(a[...])
 # 判断...是否是Ellipsis
 print(... is Ellipsis) # 输出True
 ```
+
+### 标准库
+
+标准库就是内置的模块库，不需要安装，直接导入就可以使用。
+
+<MarkmapHooks initialMarkdown={`
+## Python 3.12 标准库
+
+### 文本处理服务
+- string: 常用字符串操作
+- re: 正则表达式操作
+- difflib: 计算增量的工具
+- textwrap: 文本包装和填充
+- unicodedata: Unicode数据库
+- stringprep: 互联网字符串预处理
+- readline: GNU readline接口
+- rlcompleter: GNU readline补全函数
+
+### 二进制数据服务
+- struct: 将字节解释为打包的二进制数据
+- codecs: 编解码器注册表和基类
+
+### 数据类型
+- datetime: 基本日期和时间类型
+- zoneinfo: IANA时区支持
+- calendar: 通用日历相关函数
+- collections: 容器数据类型
+- collections.abc: 容器抽象基类
+- heapq: 堆队列算法
+- bisect: 数组二分算法
+- array: 高效数值数组
+- weakref: 弱引用
+- types: 动态类型创建和内置类型名称
+- copy: 浅拷贝和深拷贝操作
+- pprint: 数据美观打印
+- reprlib: 替代repr()实现
+- enum: 枚举支持
+- graphlib: 图结构操作功能
+
+### 数值和数学模块
+- numbers: 数值抽象基类
+- math: 数学函数
+- cmath: 复数数学函数
+- decimal: 十进制定点和浮点算术
+- fractions: 有理数
+- random: 生成伪随机数
+- statistics: 数学统计函数
+
+### 函数编程模块
+- itertools: 创建迭代器的函数
+- functools: 高阶函数和可调用对象操作
+- operator: 标准运算符作为函数
+
+### 文件和目录访问
+- pathlib: 面向对象的文件系统路径
+- os.path: 常见路径名操作
+- stat: 解释stat()结果
+- filecmp: 文件和目录比较
+- tempfile: 生成临时文件和目录
+- glob: Unix风格路径名模式扩展
+- fnmatch: Unix文件名模式匹配
+- linecache: 随机访问文本行
+- shutil: 高级文件操作
+
+### 数据持久化
+- pickle: Python对象序列化
+- copyreg: 注册pickle支持函数
+- shelve: Python对象持久化
+- marshal: 内部Python对象序列化
+- dbm: Unix"数据库"接口
+- sqlite3: SQLite数据库的DB-API 2.0接口
+
+### 数据压缩和归档
+- zlib: 与gzip兼容的压缩
+- gzip: gzip文件支持
+- bz2: bzip2压缩支持
+- lzma: 使用LZMA算法压缩
+- zipfile: ZIP归档工作
+- tarfile: 读写tar归档文件
+
+### 文件格式
+- csv: CSV文件读写
+- configparser: 配置文件解析器
+- tomllib: 解析TOML文件
+- netrc: netrc文件处理
+- plistlib: 生成和解析Apple .plist文件
+
+### 加密服务
+- hashlib: 安全哈希和消息摘要
+- hmac: 消息认证的键控哈希
+- secrets: 生成管理机密的安全随机数
+
+### 通用操作系统服务
+- os: 各种操作系统接口
+- io: 流处理核心工具
+- time: 时间访问和转换
+- logging: Python日志记录工具及其配置和处理器
+- platform: 访问底层平台标识数据
+- errno: 标准errno系统符号
+- ctypes: Python外部函数库
+
+### 命令行接口库
+- argparse: 命令行选项、参数和子命令解析器
+- optparse: 命令行选项解析器
+- getpass: 便携式密码输入
+- fileinput: 迭代多个输入流的行
+- curses: 字符单元显示的终端处理及相关工具
+
+### 并发执行
+- threading: 基于线程的并行
+- multiprocessing: 基于进程的并行及共享内存
+- concurrent.futures: 启动并行任务
+- subprocess: 子进程管理
+- sched: 事件调度器
+- queue: 同步队列类
+- contextvars: 上下文变量
+- _thread: 低级线程API
+
+### 网络和进程间通信
+- asyncio: 异步I/O
+- socket: 低级网络接口
+- ssl: socket对象的TLS/SSL包装
+- select: 等待I/O完成
+- selectors: 高级I/O多路复用
+- signal: 异步事件的信号处理器
+- mmap: 内存映射文件支持
+
+### 互联网数据处理
+- email: 电子邮件和MIME处理包
+- json: JSON编码器和解码器
+- mailbox: 操作各种格式的邮箱
+- mimetypes: 将文件名映射到MIME类型
+- base64: Base16、Base32、Base64、Base85数据编码
+- binascii: 二进制和ASCII之间的转换
+- quopri: 编码和解码MIME quoted-printable数据
+
+### 结构化标记处理工具
+- html: 超文本标记语言支持及其解析器和实体
+- xml: XML处理模块，包括ElementTree、DOM、SAX等
+
+### 互联网协议和支持
+- webbrowser: 方便的网络浏览器控制器
+- wsgiref: WSGI实用程序和参考实现
+- urllib: URL处理、打开、解析等
+- http: HTTP模块，包括客户端和服务器
+- ftplib: FTP协议客户端
+- poplib: POP3协议客户端
+- imaplib: IMAP4协议客户端
+- smtplib: SMTP协议客户端
+- uuid: RFC 4122 UUID对象
+- socketserver: 网络服务器框架
+- xmlrpc: XML-RPC服务器和客户端模块
+- ipaddress: IPv4/IPv6操作库
+
+### 多媒体服务
+- wave: 读写WAV文件
+- colorsys: 颜色系统间的转换
+
+### 国际化
+- gettext: 多语言国际化服务
+- locale: 国际化服务
+
+### 程序框架
+- turtle: 海龟图形
+- cmd: 支持面向行的命令解释器
+- shlex: 简单词法分析
+
+### 图形用户界面
+- tkinter: Python的Tcl/Tk接口及相关组件和工具
+- IDLE: Python编辑器和外壳
+
+### 开发工具
+- typing: 类型提示支持
+- pydoc: 文档生成器和在线帮助系统
+- doctest: 测试交互式Python示例
+- unittest: 单元测试框架及mock对象库
+- test: Python回归测试包及其工具
+
+### 调试和性能分析
+- bdb: 调试器框架
+- faulthandler: 转储Python回溯
+- pdb: Python调试器
+- cProfile, profile: Python分析器
+- timeit: 测量小代码片段的执行时间
+- trace: 跟踪Python语句执行
+- tracemalloc: 跟踪内存分配
+
+### 软件打包和分发
+- ensurepip: 引导pip安装程序
+- venv: 创建虚拟环境
+- zipapp: 管理可执行Python zip归档
+
+### Python运行时服务
+- sys: 系统特定的参数和函数
+- sys.monitoring: 执行事件监控
+- sysconfig: 访问Python配置信息
+- builtins: 内置对象
+- __main__: 顶级代码环境
+- warnings: 警告控制
+- dataclasses: 数据类
+- contextlib: with语句上下文实用程序
+- abc: 抽象基类
+- atexit: 退出处理程序
+- traceback: 打印或检索堆栈回溯
+- __future__: Future语句定义
+- gc: 垃圾收集器接口
+- inspect: 检查活动对象
+- site: 站点特定配置钩子
+
+### 自定义Python解释器
+- code: 解释器基类
+- codeop: 编译Python代码
+
+### 导入模块
+- zipimport: 从Zip归档导入模块
+- pkgutil: 包扩展实用程序
+- modulefinder: 查找脚本使用的模块
+- runpy: 定位和执行Python模块
+- importlib: import的实现，包括资源和元数据访问
+
+### Python语言服务
+- ast: 抽象语法树
+- symtable: 访问编译器符号表
+- token: Python解析树使用的常量
+- keyword: 测试Python关键字
+- tokenize: Python源代码分词器
+- tabnanny: 检测模糊缩进
+- pyclbr: Python模块浏览器支持
+- py_compile: 编译Python源文件
+- compileall: 字节编译Python库
+- dis: Python字节码反汇编器
+- pickletools: pickle开发者工具
+
+### Windows特定服务
+- msvcrt: MS VC++运行时的有用例程
+- winreg: Windows注册表访问
+- winsound: Windows声音播放接口
+
+### Unix特定服务
+- posix: 最常见的POSIX系统调用
+- pwd: 密码数据库
+- grp: 组数据库
+- termios: POSIX风格的tty控制
+- tty: 终端控制函数
+- pty: 伪终端实用程序
+- fcntl: fcntl和ioctl系统调用
+- resource: 资源使用信息
+- syslog: Unix系统日志库例程
+
+### 已弃用模块
+- getopt: C风格的命令行选项解析器
+`} />
 
 ## 运算符
 

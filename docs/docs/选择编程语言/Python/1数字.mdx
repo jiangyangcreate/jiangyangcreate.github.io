@@ -2,38 +2,35 @@
 sidebar_position: 1
 title: 数字
 ---
-
 :::info
-Python的数字类型应该形成一个层次结构，每个类型都有明确定义的接口。这种设计让代码更加清晰，也让数值计算更加可靠。
+本提案定义了一个抽象基类（ABC）的层次结构（PEP 3119），用于表示类似数字的类。
 
-`int` → `Rational` → `Real` → `Complex` → `Number`
+它提议了一个层次结构，其中 `Number :> Complex :> Real :> Rational :> Integral`
 
 [PEP 3141 – 数字类型层次结构](https://peps.python.org/pep-3141/)
 :::
 
-存在三种不同的数字类型: 整数, 浮点数 和 复数。 此外，布尔值属于整数的子类型。 
+存在三种不同的数字类型：整数、浮点数和复数。 此外，布尔值属于整数的子类型。 
 
 整数具有无限的精度。
 
-浮点数通常使用 C 中的 double 来实现；有关你的程序运行所在机器上浮点数的精度和内部表示法可在 sys.float_info 中查看。 
+浮点数通常使用 C 中的 double 来实现；有关你的程序运行所在机器上浮点数的精度和内部表示法可在 `sys.float_info` 中查看。 
 
-复数包含实部和虚部，分别以一个浮点数表示。 要从一个复数 z 中提取这两个部分，可使用 z.real 和 z.imag。
+复数包含实部和虚部，分别以一个浮点数表示。 要从一个复数 z 中提取这两个部分，可使用 `z.real` 和 `z.imag`。
+
+整个数字类(整数、浮点数、复数、布尔值)都属于**不可变类型(Immutable Type)**，即一旦创建，其值不能被修改。当变量重新赋值时，其实指向了新的内存地址。
 
 ## 整数
 
-整数属于不可变类型，即一旦创建，其值不能被修改。当变量重新赋值时，其实指向了新的内存地址。
-
-### 整数的定义
-
-大部分同学只学习了十进制下定义整数，其实Python定义整数时支持四种进制格式：
+初学者通常只掌握十进制整数的定义方法，其实 Python 定义整数时支持四种进制格式：
 
 ```python showLineNumbers
 # 十进制整数除了单独的0外，不能以0开头，否则会报语法错误
 a = 17
 # 16进制 使用 0x 或 0X 前缀
-b = 0x11       
+b = 0x11
 # 二进制 使用 0b 或 0B 前缀
-c = 0b10001   
+c = 0b10001
 # 八进制 使用 0o 或 0O 前缀
 d = 0o21
 
@@ -45,7 +42,7 @@ print(0x11 is 17) # True 驻留机制
 print(0x11 is 0b10001) # True
 print(0x11 is 0o21) # True
 
-# 对于负数，定义时使用 - 前缀 ,正数定义时可省略 + 前缀
+# 对于负数，定义时使用 - 前缀，正数定义时可省略 + 前缀
 e = -17
 f = -0x11
 g = -0b10001
@@ -60,8 +57,8 @@ print(1_000_000)    # 1000000
 print(0b1010_1010)  # 170
 ```
 
-:::info
-x 总是等于 +x 吗？
+:::note
+x 不总是等于 +x 
 
 在Python中，几乎所有情况下`x` 总是等于 `+x`。
 
@@ -72,24 +69,26 @@ x 总是等于 +x 吗？
 特殊情况2：decimal
 Decimal 类型的“设计是基于考虑人类习惯的浮点数模型，并且因此具有以下最高指导原则 —— 计算机必须提供与人们在学校所学习的算术相一致的算术。” —— 摘自 decimal 算术规范描述。
 
-Decimal 数字可以完全精确地表示。 相比之下，1.1 和 2.2 这样的数字在二进制浮点形式下没有精确的表示。 最终用户通常不希望 1.1 + 2.2 像在二进制浮点形式下那样被显示为 3.3000000000000003。
+Decimal 通过设置精度上下文，实现在精度内，数字可以完全精确地表示。 
+
+相比之下，1.1 和 2.2 这样的数字在二进制浮点形式下没有精确的表示。 最终用户通常不希望 1.1 + 2.2 像在二进制浮点形式下那样被显示为 3.3000000000000003。
 
 ```python showLineNumbers
 import decimal
 
 ctx = decimal.getcontext()
-ctx.prec = 40
+ctx.prec = 40 # 设置精度为40
 one_third = decimal.Decimal('1') / decimal.Decimal('3')
 print(one_third)
 
 print(one_third == +one_third) # True
 
-ctx.prec = 28
+ctx.prec = 28 # 设置精度为28
 print(one_third == +one_third) # False
 ```
 :::
 
-### int方法
+### int函数
 可以通过`int()`函数将字符串或数字转换为整数。
 
 ```python showLineNumbers
@@ -99,13 +98,55 @@ print(int('123')) # 123
 # 将浮点数转换为整数，会舍弃小数部分
 print(int(123.55)) # 123
 
-# 将字符串转换为十六进制整数,base表示进制
+# 将字符串转换为十六进制整数，base表示进制
 print(int('11', base=16)) # 17
 ```
 
 ## 浮点数
 
-Python的浮点数遵循IEEE 754双精度标准，使用64位存储，下面的代码输出清楚的说明了这点
+```python showLineNumbers
+# 只要进行了除法运算，就会产生浮点数。即便除数、被除数都是整数，也没有余数，商也会是浮点数。
+print(10 / 2) # 5.0
+
+# 使用科学计数法定义的都是浮点数，e 或 E 表示 10 的幂次。
+print(1e1)   # 10.0
+print(2.5e3) # 2500.0
+print(1E-2)  # 0.01
+```
+
+### float函数
+
+```python showLineNumbers
+# 使用float可以将其他数据类型转化为浮点数
+float(1)
+```
+
+:::tip
+浮点数存在一些特殊值，包括无穷大、负无穷大和NaN。
+
+无穷大表示超出浮点数表示范围的值，NaN表示未定义或无法表示的浮点运算结果。
+
+无穷大的运算遵循数学运算规则，NaN参与的运算结果为NaN，但NaN不等于任何值，包括自己，实际业务中往往是剔除或众数补全。
+
+```python showLineNumbers
+# 无穷大
+float('inf')
+# 负无穷大
+float('-inf')
+# NaN
+float('nan')
+
+# NaN与任何值（包括自己）都不相等，也是唯一不等于自身的值
+print(float('nan') == float('nan')) # False
+print(float('nan') is float('nan')) # False
+```
+:::
+
+### 精度问题
+
+浮点数精度问题源于二进制无法精确表示某些十进制的小数部分，这并非 Python 语言的问题，是由于二进制浮点表示的固有限制。
+
+Python 的浮点数遵循 IEEE 754 双精度标准，使用64位存储，下面的代码输出清楚地说明了这一点。
 
 ```python showLineNumbers
 import sys
@@ -136,36 +177,7 @@ sys.float_info(
     rounds=1
     ) 
 """
-```
 
-### 浮点数的定义
-
-```python showLineNumbers
-# 只要进行了除法运算，就会产生浮点数。即便除数、被除数都是整数,也没有余数，商也会是浮点数。
-print(10 / 2) # 5.0
-
-# 使用科学计数法定义的都是浮点数，e 或 E 表示 10 的幂次。
-print(1e1)   # 10.0
-print(2.5e3) # 2500.0
-print(1E-2)  # 0.01
-```
-
-### float方法
-```python showLineNumbers
-# 使用float可以将其他数据类型转化为浮点数
-float(1)
-
-# 无穷大
-float('inf')
-# 负无穷大
-float('-inf')
-```
-
-### 精度问题
-
-浮点数精度问题源于二进制无法精确表示某些十进制小数，这并非Python语言的问题，是二进制处理器的问题：
-
-```python showLineNumbers
 # 经典的浮点数精度问题
 print(0.1 + 0.2)  # 0.30000000000000004
 print(0.1 + 0.2 == 0.3)  # False
@@ -207,10 +219,12 @@ def robust_equals(a, b, rel_tol=1e-09, abs_tol=1e-12):
 print(robust_equals(1.0, 1.0001)) # False
 # 等价于使用内置的isclose函数（推荐）
 import math
-print(math.isclose(1.0, 1.0001, rel_tol=1e-09,abs_tol=1e-12))# False
+print(math.isclose(1.0, 1.0001, rel_tol=1e-09, abs_tol=1e-12)) # False
 ```
-{/* 
+
 ### 浮点数陷阱与解决方案
+
+浮点数所有陷阱的根源都是因为浮点数无法精确表示所有数，因此需要使用其他方式来存储数据，最常见的解决方案是使用`Decimal`类型、字符串或整数。
 
 ```python showLineNumbers
 import json
@@ -218,18 +232,26 @@ from decimal import Decimal
 
 # 陷阱1: JSON序列化精度丢失
 def json_precision_issue():
-    """JSON序列化可能导致精度问题"""
-    original = {"price": 19.95, "tax": 1.596}
-    json_str = json.dumps(original)
-    restored = json.loads(json_str)
-    
-    print(f"Original: {original}")
-    print(f"Restored: {restored}")
-    print(f"Equal: {original == restored}")  # 可能为False
-    
-    # 解决方案：使用字符串存储精确值
-    safe_data = {"price": "19.95", "tax": "1.596"}
-    return safe_data
+    # 前因：字符串转Json、float会出现精度丢失现象，因此需要使用精度无限的整数或字符串来存储数据
+    response = '{"abc": 4.4257052820783003}'
+
+    print(float("4.4257052820783003")) # 4.4257052820783 精度丢失
+    print(json.loads(response))        # {'abc': 4.4257052820783} 精度丢失
+    print(json.dumps(json.loads(response))) # 精度丢失是永久的，之后无法还原
+
+    # 推荐写法
+    class DecimalEncoder(json.JSONEncoder):
+        """重新序列化Decimal需要自定义编码器"""
+        def default(self, obj):
+            if isinstance(obj, Decimal):
+                # 将Decimal转换为字符串,精度不会丢失 如果使用float(obj)依然会丢失精度
+                return str(obj)
+            return super().default(obj)
+    # 使用Decimal解析字符串，精度不会丢失
+    decimal_json_str = json.loads(response, parse_float=Decimal)
+    # 使用自定义编码器重新序列化，确保转化后的数据精度不会丢失
+    print(json.dumps(decimal_json_str, cls=DecimalEncoder)) 
+    # {"abc": "4.4257052820783003"} 这是精度保持正常的输出结果
 
 # 陷阱2: 循环累加误差
 def accumulation_error_demo():
@@ -263,7 +285,7 @@ def float_key_problem():
     d[key1] = "value1"
     print(d.get(key2))  # None，因为key1 != key2
     
-    # 解决方案：使用字符串或量化的值
+    # 解决方案：使用精度无限的字符串或整数
     d_safe = {}
     d_safe[str(round(key1, 10))] = "value1"
     print(d_safe.get(str(round(key2, 10))))  # "value1"
@@ -276,13 +298,12 @@ def range_check_issue():
     while x <= 1.0:
         values.append(x)
         x += 0.1
-        if len(values) > 20:  # 防止无限循环
-            break
-    
-    print(f"Values count: {len(values)}")  # 可能是11个而不是期望的10个
-    print(f"Last value: {values[-1]}")
-    print(f"Last value <= 1.0: {values[-1] <= 1.0}")
-``` */}
+
+    print(f"Values count: {len(values)}")  # 是11个而不是期望的10个
+    print(f"Last value: {values[-1]}") # 0.9999999999999999
+    print(f"Last value <= 1.0: {values[-1] <= 1.0}") # True
+
+```
 
 ## 复数
 
@@ -292,7 +313,7 @@ def range_check_issue():
 
 复数是Python的内置数字类型，在科学计算、信号处理、控制系统等领域有广泛应用。这里只介绍复数的基本操作。
 
-### 复数的创建和表示
+### complex函数
 
 Python支持多种方式创建复数：
 
@@ -307,14 +328,6 @@ z4 = 3 + 0j  # 实数的复数表示
 z5 = complex(3, 4)      # 3+4j
 z6 = complex('3+4j')    # 从字符串创建
 z7 = complex(3)         # 3+0j
-
-# 方法3: 从极坐标创建
-import cmath
-r, theta = 5, cmath.pi/4  # 模长和幅角
-z8 = cmath.rect(r, theta)  # 转换为直角坐标
-
-print(f"z1 = {z1}")  # (3+4j)
-print(f"z8 = {z8}")  # (3.5355339059327378+3.5355339059327373j)
 ```
 
 ### 复数的属性和基本操作
@@ -332,6 +345,8 @@ print(f"共轭: {z.conjugate()}")  # (3-4j)
 
 布尔类型是整数类型的子类，只有True和False两种值。
 
+### bool函数
+
 `bool(x)` 函数可以将任意值转换为布尔值。
 
 如果`x`是数字类型，则判断`x`是否为0，为0则返回False，否则返回True。
@@ -344,10 +359,12 @@ print(f"共轭: {z.conjugate()}")  # (3-4j)
 
 如果没有实现`__bool__`方法，则调用`__len__`方法，如果`__len__`方法返回0，则`bool(x)`返回False，否则返回True。
 
-所以常见的数值布尔值为False的有：
+所以常见的布尔值为False的有：
 ```python showLineNumbers
 # 是数字类型且为0的值
-0、0.0、0j
+0
+0.0
+0j
 # 是布尔类型且为False的值
 False
 # 实现了__bool__方法且返回False的值
@@ -408,7 +425,7 @@ false_count = len(values) - true_count  # 2
 print(f"True的个数: {true_count}, False的个数: {false_count}")
 ```
 
-## 数字相关的默认函数
+## 内置函数
 
 ### abs函数
 
@@ -509,4 +526,12 @@ print((2**3) % 5) # 3
 ```
 
 
+## 相关库推荐
 
+- numbers: 数值抽象基类
+- <Highlight color="green">math: 数学函数</Highlight>
+- cmath: 复数数学函数
+- <Highlight color="green">decimal: 十进制定点和浮点算术</Highlight>
+- fractions: 有理数
+- <Highlight color="green">random: 生成伪随机数</Highlight>
+- statistics: 数学统计函数

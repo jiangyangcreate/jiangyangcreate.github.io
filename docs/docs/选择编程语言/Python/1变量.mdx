@@ -67,7 +67,7 @@ g = [1,2,3]
 print(a == g) # True
 print(a is g) # False
 
-# 比较特别是None,None是Python中表示空值。且为单例常量，即整个程序中只有一个 None 对象
+# 比较特别是None,None是Python中表示空值。且为单例常量，即整个程序中只有一个 None 对象。
 # Python3.12中5个单例常量：Ellipsis, False, None, NotImplemented, True
 a = None
 b = None
@@ -123,6 +123,24 @@ print(id(a) == id(b)) # False
 
 新创建的变量`b`的内存地址与`a`不同，但是`a`和`b`的值相等。即`a`和`b`相等但不一致。
 
+:::tip
+驻留机制和临时对象的内存重用有时候看起来一样，但实际不同。
+
+内存重用是第一次创建时分配到了内存，而如果一个对象被创建后，没有被引用，那么它会被垃圾回收机制回收。
+
+此时如果再次创建该对象，会重新分配内存地址。此时会重用第一次的内存地址。
+
+```python
+print("\n=== 临时对象行为 ===")
+print(f"hash(float('nan')): {hash(float('nan'))}") #202868087451
+print(f"hash(float('nan')): {hash(float('nan'))}") #202868087451
+print(f"id(float('nan')): {id(float('nan'))}") # 3245889399216
+print(f"id(float('nan')): {id(float('nan'))}") # 3245889399216
+```
+
+这段代码你只需要添加两个变量，并将数据赋值给变量，然后打印变量的内存地址和哈希值，就会发现有了引用之后，内存地址和哈希值不同。
+:::
+
 除了判断相等性、同一性，我们有时需要检查某个对象属于哪个类型或两个对象是否是同个类型，下面使用内置函数和运算符来判断。
 
 ### 对象的判断
@@ -136,7 +154,7 @@ print(id(a) == id(b)) # False
 
 Python 官方编码规范 PEP 8 明确建议：使用 is 和 is not 来比较单例对象（如 None），而不是 ==。不会被 `__eq__`重写影响。
 
-:::info
+:::tip
 type 有另外一个截然不同的用法，它是一个元类，用于创建类。
 
 ```python
@@ -201,11 +219,11 @@ greet("Alice", '30') # 即便输入的参数类型不匹配，也不会报错。
 Python 3.10+ 支持更简洁的语法：
 
 ```python
-# 联合类型 (替代 Union)
+# 联合类型，表示一个值可以是多种类型中的任意一种。
 def process(data: str | int) -> None:
     pass
 
-# 可选类型 (替代 Optional)
+# 可选类型，表示一个值可以是某种特定类型或者 None。
 def find_user(id: int) -> str | None:
     pass
 ```
@@ -223,4 +241,24 @@ def add_str_or_int[T:(int , str)](a: T, b: T) -> T:
     return a + b
 ```
 
-更多类型注解的内容可以查看python的内置模块`typing`和第三方模块`pydantic`。
+## 内置函数
+
+### help函数
+
+`help()`是Python的内置函数，用于获取对象、模块、函数等的帮助文档和使用说明。它是Python自带的交互式帮助系统。
+
+```python showLineNumbers
+# 用法1，仅输入help()，会进入交互式帮助系统
+help()
+
+# 用法2，输入help(对象)，会显示对象的文档字符串和相关信息
+# 这个对象可以是模块、类、函数、方法、变量、常量等。会显示函数的docstring。
+help(str)
+```
+
+## 相关库推荐
+
+- pydoc: 文档生成器和在线帮助系统
+- doctest: 测试交互式Python示例
+- <Highlight color="green">typing: 对类型提示的支持</Highlight>
+- <Highlight color="#60d74a">pydantic: **第三方**数据验证模块</Highlight>

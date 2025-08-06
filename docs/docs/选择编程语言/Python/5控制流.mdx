@@ -235,3 +235,26 @@ while True:
         print("bad command string: %s" % command)
 
 ```
+
+### frame对except的影响
+
+以下代码在 Python3.12.9 中依然存在。
+
+```python showLineNumbers
+e = 1
+try:
+    0/0 # 此处会抛出错误，因为0不能被0除
+except Exception as e:
+    # 此处会对覆盖e，并删除e
+    print(f'error info :{e}！')
+print(e)
+'''
+输出：
+error info :division by zero！
+Traceback (most recent call last):
+  File "c:\Users\jiang\Desktop\todo\1.py", line 7, in <module>
+    print(e)
+          ^
+NameError: name 'e' is not defined
+'''
+```
