@@ -2,10 +2,124 @@
 sidebar_position: 2
 title: 字符串
 ---
-:::info
-f-string提供了一种简洁、可读性强的字符串格式化方法。它在运行时计算表达式，比传统的%格式化和str.format()更快、更直观。
 
-```python
+:::info
+模板字符串为开发者提供了在字符串组合前访问字符串及其插值值的能力。这为 Python 语言带来了原生的灵活字符串处理功能，并支持安全检查、Web 模板、特定领域语言等。
+
+预计Python 3.14 支持模板字符串。
+
+[PEP 750 – Template Strings](https://peps.python.org/pep-0750/)
+:::
+
+
+## 字符串
+
+直接使用引号定义字符串是最常见的方式，定义字符串可以使用单引号、双引号、三个引号。引号可以嵌套使用。
+
+当字符串内包含引号时，需要用<Highlight>不同的引号包裹</Highlight>或<Highlight>转义字符</Highlight>。
+
+```python showLineNumbers
+print("Hello, world!") # 单引号
+print('Hello, world!') # 双引号
+print("""Hello, world!""") # 三个双引号
+print('''Hello, world!''') # 三个单引号
+
+# 当你想要定义一个包含单引号的字符串时，可以用双引号包裹
+print("It's a nice day!") # It's a nice day!
+
+# 反之，当字符串包含双引号时，可以用单引号包裹
+print('He said, "Hello!"') # He said, "Hello!"
+
+# 对于多行字符串，三引号允许内部包含单双引号
+print("""He said, "It's a nice day!" """) # He said, "It's a nice day!"
+
+# 对于三引号字符串，和上面的包裹案例，也可以使用转义字符来定义
+print("""We can use \"\"\" to define string """) # We can use """ to define string
+print("He said, \"It's a nice day!\"") # He said, "It's a nice day!"
+print("He said, \"Hello!\"") # He said, "Hello!"
+print("It\'s a nice day!") # It's a nice day!
+
+# 连续定义多个字符串（中间有无空格均）可触发字符串字面值合并
+string = "1""2"
+print(string)
+# 输出：
+# 12
+```
+
+:::tip
+
+字符串属于不可变序列对象。
+
+不可变的，这意味着每次修改都会创建新字符串。
+
+序列对象，表示拥有一些共性方法：
+- 加法拼接，返回新的字符串
+- 索引，返回单个字符
+- 切片，返回新的字符串
+- 可遍历，每次返回单个字符
+
+```python showLineNumbers
+s = 'good morning'
+# 字符串的索引
+s[0]  # g
+s[-2]  # n
+
+# 字符串的切片
+s[-3:]  # ing
+s[:-3]  # good morn
+s[:]  # good morning
+
+# 字符串的拼接
+s[:-3] + s[-3:]  # good morninging
+
+# 需要注意避免在循环中使用 `+` 操作符（每次拼接都会创建新字符串）
+# 推荐使用列表收集，最后使用`str.join()` 连接字符串。
+# 低效方式
+s = ""
+for i in range(10000):
+    s += str(i)  # 创建新字符串每次迭代
+
+# 高效方式
+parts = []
+for i in range(10000):
+    parts.append(str(i))
+s = "".join(parts)
+```
+:::
+
+### str函数
+str() 函数用于将其他类型的数据转换为字符串类型。这在需要将数字、列表或其他对象作为字符串处理时非常有用。
+
+```python showLineNumbers
+# 将整数转换为字符串
+num = 123
+str_num = str(num)
+print(str_num)  # 输出: '123'
+print(type(str_num))  # 输出: <class 'str'>
+
+# 将列表转换为字符串
+lst = [1, 2, 3]
+str_lst = str(lst)
+print(str_lst)  # 输出: '[1, 2, 3]'
+
+# 将浮点数转换为字符串
+float_num = 3.14
+str_float = str(float_num)
+print(str_float)  # 输出: '3.14'
+```
+
+str() 函数会调用对象的 `__str__()` 方法来生成字符串表示形式。对于自定义类，可以重写 `__str__()` 来控制转换结果。
+
+### 字符串插值
+
+:::info
+f-string提供了一种简洁、可读性强的字符串格式化方法。
+
+它在运行时计算表达式，比传统的`%`格式化和`str.format()`更快、更直观。
+
+而且支持调试表达式、函数调用。
+
+```python showLineNumbers
 name = "world"
 print(f"Hello, {name}!")  # Hello, world!
 ```
@@ -13,49 +127,261 @@ print(f"Hello, {name}!")  # Hello, world!
 [PEP 498 – 字面字符串插值](https://peps.python.org/pep-0498/)
 :::
 
-### 介绍字符串的索引
+```python showLineNumbers
+# 嵌入表达式
+x = 10
+y = 20
+result = f"{x} add {y} is {x + y}"
+print(result)  # 输出: 10 add 20 is 30
 
-```python
-# 字符串的索引
-s = 'good morning'
-# 查看类型
-print(type(s))
-s[0]  # g
+# 支持函数、属性、方法的调用
+name="jack"
+info = f"{name}'s name first letter is {name[0].upper()} , the name length is {len(name)}"
+print(info)  # 输出: jack's name first letter is J , the name length is 4
 ```
 
-```python
-s[-2]  # n
+### 格式说明符
+
+在 str.format() 和 f-strings 中，可以使用格式说明符来控制输出的格式。这对于数字、日期和字符串的精确格式化非常实用。
+
+```python showLineNumbers
+# 使用 f-strings时，可以直接将值写入，但是推荐先定义变量，代码可读性更好
+
+# 保留两位整数，不足时左侧补零
+print(f"{5:02d}") # 输出: 05
+# 推荐写法：
+value = 5
+print(f"{value:02d}")  
+
+# 保留两位小数，不足末位补0
+pi = 3.14159
+print(f"{pi:.2f}")  # 输出: 3.14
+
+# 调试表达式，等价于print(f"var={var}")
+var = 42
+print(f"{var=}")  # 输出: var=42
+
+
+# 为了便于观察，我在末尾添加了竖线|
+hello = "hello|"
+name = "bob|"
+# 右对齐,表示字符串长度为10，不足时用空格填充
+print("{:>10}".format(hello)) 
+print("{:>10}".format(name)) 
+# 输出：
+#    hello|
+#      bob|
+
+# 居中对齐，表示字符串长度为10，不足时用空格填充
+print("{:^10}".format(hello)) 
+print("{:^10}".format(name)) 
+# 输出：
+#   hello|  
+#    bob| 
+
+# 居左对齐（默认），表示字符串长度为10，不足时用空格填充
+print("{:<10}".format(hello)) 
+print("{:<10}".format(name)) 
+# 输出：
+# hello|    
+# bob|     
+
+# 左右对齐
+class Datebase:
+    url = '127.0.0.1'
+    password = '123456'
+
+print(f"""
+{"test url:":<20}{Datebase.url:>20} 
+{"test password:":<20}{Datebase.password:>20}
+""")
+# 输出：
+# test url:                      127.0.0.1 
+# test password:                    123456
+# 
 ```
 
-### 切分操作
+### Unicode 和编码转义字符
 
-分片用来从序列中提取出想要的子序列，其用法为：
+#### 基本概念
+- **bytes**: Python 中的字节串类型，用于表示二进制数据。
+- **ASCII**: 最古老的编码标准，只包含128个字符。
+- **Unicode**: 一种字符编码标准，为世界上大多数字符分配唯一的代码点。
+- **UTF-8**: 最常见的 Unicode 编码形式，全称 Unicode Transformation Format 8，向后兼容 ASCII。
+- **码表**: 字符与编码的映射表，数字与字符一一对应。
 
-var[lower:upper:step]
+下面的示例中，我刻意避免使用字符，为了不让你误解字符串的定义。
 
-其范围包括 lower ，但不包括 upper ，即 [lower, upper)，
-step 表示取值间隔大小，如果没有默认为 1。
+```python showLineNumbers
+# 直接定义，表示Unicode的明文
+s = "Hello, 世界!"
+print(s)  # 输出: Hello, 世界!
 
-```python
-s[-3:]  # ing
+# 间接定义，表示Unicode码表的第4e16个文字和第754c个文字，小u后面接4位16进制的数字，即支持16-bit
+u = 'Hello, \u4e16\u754c!'
+print(u)  # 输出: Hello, 世界!
+
+# 如果你要表示的文字在码表中相当靠后，则可以使用大U定义，大U后面接8位16进制的数字，即支持32-bit
+U = 'Hello, \U00004e16\U0000754c!'
+print(U)  # 输出: Hello, 世界!
+
+# 编码为 bytes
+b = s.encode('utf-8')
+print(b)  # 输出: b'Hello, \xe4\xb8\x96\xe7\x95\x8c!'
+
+# 解码回字符串
+decoded = b.decode('utf-8')
+print(decoded)  # 输出: Hello, 世界!
+
+# 处理编码错误
+try:
+    b.decode('ascii')
+except UnicodeDecodeError as e:
+    print(f"Error: {e}")  # 输出: Error: 'ascii' codec can't decode byte ... 
 ```
 
-```python
-s[:-3]  # good morn
+转义字符用于在字符串中插入一些特殊字符。
+
+这些符号往往以反斜杠`\`开头,例如`\'`表示单引号、`\"`表示双引号、`\n`表示换行符。
+
+```python showLineNumbers
+# \<newline>表示斜杠后面接新的一行，会忽略换行。可用于长字符串的定义。
+# 连续2个反斜杠\\表示一个反斜杠且不触发转义。例如下面的\\n会被忽略，最终输出\n
+print("PEP8 中推荐每行不超过79个字符，如果一个字符串过长，\
+可以使用\\换行。\\n是最常见的转义符，表示换行。") 
+# 输出：
+# PEP8 中推荐每行不超过79个字符，如果一个字符串过长，可以使用\换行。\n是最常见的转义符，表示换行。
 ```
 
-```python
-s[:]  # good morning
+部分转义字符直接对应ASCII码表中的字符。
+
+:::tip
+
+如果响铃符号在Vscode中不触发，可以试试在终端中体验。
+
+下面写法是等价的。都代表 ASCII 码值为 7 的字符。
+
+`\a`表示 ASCII 响铃字符的助记符（mnemonic escape sequence）。
+
+它旨在让代码更具可读性，让人一眼就知道这个转义序列的意图是发出响铃。
+
+```python showLineNumbers
+print('\a') # 助记符
+print('\x07') # 16进制
+print('\7') # 8进制
+print('\07') # 8进制
+print('\007') # 8进制
+print("\u0007") # Unicode 16进制
+print("\U00000007") # Unicode 16进制
+```
+与数字定义进制相比，字符串转义序列仅支持8进制、16进制，指向ASCII码表中的字符。
+
+8进制定义需要以`\`开头，不超过三位。最大值为`\377`。
+
+16进制定义时，需要以`\x`开头，不超过两位。最大值为`\xff`。
+:::
+
+#### 反转义
+
+转义字符有时会添乱。你当然知道通过`\\`来忽略转义字符，把字符串改为 `"c:\\desktop\\new"` 即可，但当字符串很长时，我更推荐使用`r`来定义原始字符串。
+
+```python showLineNumbers
+path = "c:\desktop\new"
+print(path)
+# 输出：
+# c:\desktop
+# ew
+
+# 使用\\来忽略转义字符,不适合长字符串
+path = "c:\\desktop\\new"
+print(path)
+# 输出：
+# c:\desktop\new
+
+# 使用r来定义原始字符串，适合长字符串
+path = r"c:\desktop\new"
+print(path)
+# 输出：
+# c:\desktop\new
 ```
 
-其他切分操作，练习：step
 
-```python
-print(s[::2])  # go onn
-print(s[::-1])  # gninrom doog
-print(s[:100])
-```
 
-### 字符串方法
+## 字符串方法
 
-Python中字符串类型的方法相当多。
+Python中字符串类型的方法相当多。你可以根据自己的节奏选择学习。
+
+<MarkmapHooks initialMarkdown={`
+
+## 字符串方法分类
+
+### 字符串转换
+- capitalize: 将字符串的第一个字符大写，其余字符小写
+- casefold: 将字符串转换为小写，用于大小写不敏感的比较
+- lower: 将字符串中的所有大写字符转换为小写
+- upper: 将字符串中的所有小写字符转换为大写
+- swapcase: 将字符串中的大写字符转换为小写，小写字符转换为大写
+- title: 将字符串中的每个单词的首字母大写，其余字母小写
+
+### 字符串对齐
+- center: 将字符串居中对齐，使用指定字符填充空位
+- ljust: 将字符串左对齐，使用指定字符填充空位
+- rjust: 将字符串右对齐，使用指定字符填充空位
+- zfill: 将字符串左填充零，使其长度达到指定宽度
+
+### 字符串查找
+- find: 返回子字符串在字符串中首次出现的位置，未找到返回 -1
+- rfind: 返回子字符串在字符串中最后一次出现的位置，未找到返回 -1
+- index: 返回子字符串在字符串中首次出现的位置，未找到抛出 ValueError
+- rindex: 返回子字符串在字符串中最后一次出现的位置，未找到抛出 ValueError
+- startswith: 检查字符串是否以指定前缀开头
+- endswith: 检查字符串是否以指定后缀结尾
+
+### 字符串分割
+- split: 将字符串按指定分隔符分割，返回一个列表
+- rsplit: 从右侧开始将字符串按指定分隔符分割，返回一个列表
+- splitlines: 将字符串按行分割，返回一个列表
+- partition: 将字符串在指定分隔符首次出现的位置分割，返回一个三元组
+- rpartition: 将字符串在指定分隔符最后一次出现的位置分割，返回一个三元组
+
+### 字符串替换
+- replace: 将字符串中的旧子字符串替换为新子字符串，可指定替换次数
+- translate: 根据给定的转换表对字符串中的字符进行替换
+
+### 字符串格式化
+- format: 使用格式化字符串，将参数插入到字符串中
+- format_map: 类似于 format，但直接使用映射对象
+- __format__: 用于自定义字符串的格式化行为
+
+### 字符串检查
+- isalnum: 检查字符串是否只包含字母或数字
+- isalpha: 检查字符串是否只包含字母
+- isascii: 检查字符串是否只包含 ASCII 字符
+- isdecimal: 检查字符串是否只包含十进制数字
+- isdigit: 检查字符串是否只包含数字
+- isidentifier: 检查字符串是否是有效的标识符
+- islower: 检查字符串是否全部为小写
+- isnumeric: 检查字符串是否只包含数值字符
+- isprintable: 检查字符串是否只包含可打印字符
+- isspace: 检查字符串是否只包含空白字符
+- istitle: 检查字符串是否为标题格式
+- isupper: 检查字符串是否全部为大写
+
+### 字符串删除
+- strip: 删除字符串首尾的指定字符
+- lstrip: 删除字符串左侧的指定字符
+- rstrip: 删除字符串右侧的指定字符
+- removeprefix: 删除字符串开头的指定前缀
+- removesuffix: 删除字符串结尾的指定后缀
+
+### 字符串编码与解码
+- encode: 将字符串编码为字节串
+- decode: 将字节串解码为字符串
+
+### 其他
+- join: 将可迭代对象中的字符串拼接成一个字符串
+- maketrans: 创建一个转换表，用于 translate
+- count: 返回子字符串在字符串中出现的次数
+- expandtabs: 将字符串中的制表符替换为空格
+
+`} />
