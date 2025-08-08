@@ -136,9 +136,13 @@ float('-inf')
 # NaN
 float('nan')
 
-# NaN与任何值（包括自己）都不相等，也是唯一不等于自身的值
+# NaN与任何值（包括自己）都不相等，也是唯一不等于自身的值,
 print(float('nan') == float('nan')) # False
 print(float('nan') is float('nan')) # False
+
+# 可以通过这点判断是否为NaN
+is_nan = lambda x: x != x
+print(is_nan(float('nan'))) # True
 ```
 :::
 

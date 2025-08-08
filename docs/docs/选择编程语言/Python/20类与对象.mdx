@@ -29,7 +29,17 @@ class Person:
 
 面向对象的抽象程度又比函数要高，因为一个 Class 既包含数据，又包含操作数据的方法。
 
-### 创建类
+### class
+
+python通过class关键字定义一个类，并创建一个实例。
+
+```python showLineNumbers
+class ClassName:
+    """class docstring"""
+    pass
+
+instance = ClassName()
+```
 
 #### 类的特殊方法
 
@@ -293,7 +303,7 @@ print(him_clothes.color)
 print(him_clothes.out_print())
 ```
 
-### super() 函数
+### super函数
 
 super(CurrentClassName, instance)
 
@@ -315,6 +325,18 @@ her_clothes = NewAdidasClothes()
 print(her_clothes.color)
 
 her_clothes.out_print()
+```
+
+### type函数
+
+```python
+
+```
+
+### object
+
+```python
+
 ```
 
 ### **new**() 方法
@@ -429,5 +451,51 @@ demo.get_value()
 demo._get_name()
 demo._MyDemoClass__get_type()
 ```
+
+
+### 自定义异常类
+
+异常是标准库中的类，这意味着我们可以自定义异常类：
+
+尝试在文本输入框输入：k，start，q
+
+```python
+class CommandError(ValueError):
+    print("bad command operation. must input 'start', 'stop', 'pause'")
+
+valid_commands = {'start', 'stop', 'pause'}
+while True:
+    command = input('>')
+    if command == 'q':
+        break
+    try:
+        if command.lower() not in valid_commands:
+            raise CommandError('Invalid command: %s' % command)
+        print('input command:', command)
+    except CommandError:
+        print("bad command string: %s" % command)
+
+```
+
+
+### with
+
+## 内置函数
+
+### type函数、isinstance函数、issubclass函数
+
+### dir函数、hasattr函数、delattr函数、setattr函数、getattr函数、vars函数
+
+表格说明：
+| 函数 | 说明 |
+| --- | --- |
+| dir | 获取对象的所有属性和方法 |
+| hasattr | 检查对象是否具有某个属性 |
+| delattr | 删除对象的属性 |
+| setattr | 设置对象的属性 |
+| getattr | 获取对象的属性 |
+| vars | 获取对象的属性字典 |
+
+
 
 ## 元类编程

@@ -56,6 +56,7 @@ print(string)
 - 切片，返回新的字符串
 - 可遍历，每次返回单个字符
 - 可使用in判断是否包含
+- 可使用len函数获取长度
 
 ```python showLineNumbers
 s = 'good morning'
@@ -80,6 +81,9 @@ for i in s:
 # in判断
 'a' in 'abc'  # True
 'z' in 'abc'  # False
+
+# 使用len函数获取长度
+len(s)  # 13
 
 # 需要注意避免在循环中使用 `+` 操作符（每次拼接都会创建新字符串）
 # 推荐使用列表收集，最后使用`str.join()` 连接字符串。
@@ -715,6 +719,7 @@ print("Hello, {}!".format("world")) # Hello, world!
 print("Hello, {name}!".format(name="world")) # Hello, world!
 print("Hello, {0}! {1}!".format("world", "python")) # Hello, world! python!
 ```
+
 
 ## 相关库推荐
 

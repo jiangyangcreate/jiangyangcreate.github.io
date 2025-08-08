@@ -143,6 +143,16 @@ print(f"id(float('nan')): {id(float('nan'))}") # 3245889399216
 
 除了判断相等性、同一性，我们有时需要检查某个对象属于哪个类型或两个对象是否是同个类型，下面使用内置函数和运算符来判断。
 
+### del
+
+del 关键字用于删除对象，通常用于立刻释放内存，代码调试等场景。
+
+```python showLineNumbers
+a = 1 # 创建一个整数对象
+del a
+print(a) # NameError: name 'a' is not defined
+```
+
 ### 对象的判断
 
 | 方法 | 用途 | 示例与说明 |
@@ -151,6 +161,7 @@ print(f"id(float('nan')): {id(float('nan'))}") # 3245889399216
 | `is` | 判断两个对象是否是同一个对象 | `a is b` 等价于 `id(a) == id(b)`，比较的是对象的内存地址 |
 | `type()` | 判断对象的类型 | `type(a) == type(b)` 两个都是同个类的实例则相等。如 `type(1) == int` |
 | `isinstance()` | 判断对象是否是某个类型 | `isinstance(a, type)`，如果 type 是实例 a 的父类也会返回 True。如 `isinstance(1, object)` 是 True，因为 `object` 是所有类的父类 |
+| `issubclass()` | 判断类是否是某个类的子类 | `issubclass(type, type)`，如果 type 是实例 a 的父类也会返回 True。如 `issubclass(int, object)` 是 True，因为 `object` 是所有类的父类 |
 
 Python 官方编码规范 PEP 8 明确建议：使用 is 和 is not 来比较单例对象（如 None），而不是 ==。不会被 `__eq__`重写影响。
 
@@ -256,7 +267,7 @@ help()
 help(str)
 ```
 
-### input函数、print函数、open函数
+### input函数、print函数
 
 Python 使用 `input()`函数来捕获用户的键盘输入，捕获的数据为字符串类型。
 
@@ -329,6 +340,17 @@ for i in range(10):
 # 陆续输出 :0123456789
 ```
 
+### id函数、hash函数
+
+id函数用于获取对象的内存地址。id函数返回的值是对象的内存地址的整数表示，用于快速查找和比较对象。
+
+hash函数用于获取对象的哈希值。哈希值是对象的唯一标识，只有不可变对象才有哈希值，同id函数一样用于快速查找和比较对象。
+
+```python
+a = (1,2,3)
+print(id(a))
+print(hash(a))
+```
 
 ## 相关库推荐
 

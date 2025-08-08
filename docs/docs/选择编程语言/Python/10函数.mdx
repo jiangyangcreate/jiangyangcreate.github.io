@@ -9,11 +9,11 @@ API的行为在任何两个连续版本之间不得以不兼容的方式更改�
 [PEP 387 – 向后兼容性政策](https://peps.python.org/pep-0387/)
 :::
 
-## 自定义函数
+## 函数
 
 为了减少重复，自定义函数登场。
 
-### 定义函数
+### def
 
 在 Python 中可以使用 def 关键字来定义函数，程序中函数的参数就相当于是数学上说的函数的自变量，可以通过 return 关键字来返回一个值，这相当于数学上说的函数的因变量。
 
@@ -23,10 +23,9 @@ def add(a, b):
     add two nums
     :param a: first num
     :param b: second num
-    :return: result
+    :return: None
     """
-    c = a + b
-    return c
+    print(a + b)
 ```
 
 ### 使用函数
@@ -58,7 +57,45 @@ add(b='morning', a='good')
 add(2, b=3)  # 5
 ```
 
-### 设定默认参数
+### return
+
+return 语句用于从函数中返回值。如果函数没有 return 语句，则返回 None。
+
+```python showLineNumbers
+def add(a, b):
+    return a + b
+
+print(add(2, 3))  # 5
+```
+
+### yield
+
+yield 语句用于从函数中返回一个生成器。
+
+```python showLineNumbers
+def fibonacci(n):
+    a, b = 0, 1
+    for _ in range(n):
+        yield a
+        a, b = b, a + b
+```
+
+### lambda
+
+lambda 表达式用于创建匿名函数。
+
+```python showLineNumbers
+def add(a, b):
+    return a + b
+# 等价于
+add = lambda a, b: a + b
+
+print(add(2, 3))  # 5
+```
+
+### 函数的参数类型
+
+#### 位置参数与默认参数
 
 ```python
 def quad(x, a=1, b=0, c=0):
@@ -73,7 +110,7 @@ quad(2.0)
 quad(2.0, b=3)
 ```
 
-### 不定长参数
+#### 不定长参数
 
 位置不定长参数：`*args`
 
@@ -118,7 +155,7 @@ def fun1(*args, **kwargs):
 fun1(2, 3, a="bar", b=10)  # (2, 3) {'a': u'bar', 'b': 10}
 ```
 
-### 函数参数分隔符
+#### 函数参数分隔符
 
 `/` - 位置专用参数分隔符
 
@@ -160,49 +197,10 @@ print(func3(1,  kwd_only=3))           # ✅ "1-3"
 # 其他调用都为错误调用
 ```
 
-### 返回多个值
 
-```python
-# 函数可以返回多个值：
-def to_val(x, y):
-    r = (x ** 2 + y ** 2) ** 0.5
-    total = x + y
-    return r, total
-```
+## 内置函数
 
-```python
-a, b = to_val(3, 4)
-print(a, b)  # 5.0 7
-```
-
-```python
-# 事实上，Python将返回的两个值变成了元组：
-print(to_val(3, 4))  # (5.0, 7)
-```
-
-```python
-# 列表也有相似的功能,可以用来赋值：
-a, b, c = [1, 2, 3]
-print(a, b, c)
-```
-
-```python
-# 可以将参数用元组传入：
-def add(a, b):
-    return a + b
-
-c = (2, 3)
-print(add(*c))  # 5
-# 这里的*必须要。
-```
-
-```python
-# 还可以用字典传入参数哦：
-d = {'a': 2, 'b': 5}
-print(add(**d))  # 7
-```
-
-### map 方法生成序列
+### map 函数
 
 map 函数
 
@@ -244,11 +242,11 @@ b = [10, 11, 15]
 list(map(add, a, b))  # [12, 14, 19]
 ```
 
-### reduce
+### reduce 函数
 
 reduce() 函数会对参数序列中元素进行累积。
 
-```python
+```python showLineNumbers
 from functools import reduce
 
 def add(x, y) :            # 两数相加
@@ -259,210 +257,6 @@ print(sum1)
 print(sum2)
 ```
 
-## 高级函数
-
-在 Python 中，函数是一种基本类型的对象，这意味着可以将函数作为参数传给另一个函数。
-
-将函数作为字典的值储存，将函数作为另一个函数的返回值：
-
-```python
-def square(x):
-    """Square of x."""
-    return x * x
-
-
-def cube(x):
-    """Cube of x."""
-    return x * x * x
-
-
-# 函数的作为字典的值
-funcs = {'square': square, 'cube': cube, }
-x = 2
-for func in sorted(funcs):
-    print(func, funcs[func](x))
-```
-
-```python
-func
-```
-
-```python
-funcs
-```
-
-### 函数参数
-
-引用传递
-
-传递给函数 f 的是一个指向 x 所包含内容的引用，
-如果我们修改了这个引用所指向内容的值（例如 x[0]=999），
-那么外面的 x 的值也会被改变：
-
-```python
-def mod_f(x):
-    x[0] = 999
-    return x
-
-x = [1, 2, 3]
-
-x # [1, 2, 3]
-```
-
-```python
-mod_f(x) # [999, 2, 3]
-```
-
-```python
-x # [999, 2, 3]
-```
-
-过如果我们在函数中赋给 x 一个新的值（例如另一个列表），
-
-那么在函数外面的 x 的值不会改变：
-
-```python
-def no_mod_f(x):
-    x = [4, 5, 6]
-    return x
-
-
-x = [1, 2, 3]
-
-print(x)
-print(mod_f(x))
-print(x)
-# [1, 2, 3]
-# [999, 2, 3]
-# [999, 2, 3]
-```
-
-### 高阶函数
-
-以函数作为参数，或者返回一个函数的函数是高阶函数，
-常用的例子有 map 和 filter 函数
-
-map(f, sq) 函数将 f 作用到 sq 的每个元素上去，并返回结果组成的列表，
-
-相当于：[f(s) for s in sq]
-
-```python
-map(square, range(5))  # [0, 1, 4, 9, 16]
-```
-
-```python
-# 外面套个list，强转为list类型，是为了打印出函数的值
-list(map(square, range(5)))
-```
-
-```python
-def is_even(x):
-    return x % 2 == 0
-
-
-list(filter(is_even, range(5)))  # [0, 2, 4]
-```
-
-```python
-list(map(square, filter(is_even, range(5))))  # [0, 4, 16]
-```
-
-reduce(f, sq) 函数接受一个二元操作函数 f(x,y)，
-并对于序列 sq 每次合并两个元素：
-
-```python
-from functools import reduce
-def my_add(x, y):
-    return x + y
-
-
-reduce(my_add, [1, 2, 3])
-```
-
-返回一个函数：
-
-```python
-def get_logger_func(target):
-    def write_logger(data):
-        with open(target, 'a') as f:
-            f.write(data + '\n')
-
-    return write_logger
-
-
-fun_logger = get_logger_func('foo.txt')
-fun_logger('hello')
-```
-
-```python
-# 查看foo.txt 是否生成
-import os
-os.path.exists('foo.txt')
-```
-
-### 匿名函数 lambda
-
-```python
-list(map(square, range(5)))
-```
-
-```python
-# 用匿名函数替换为：
-list(map(lambda x: x * x, range(5)))
-```
-
-匿名函数虽然写起来比较方便（省去了定义函数的烦恼），
-但是有时候会比较难于阅读：
-
-```python
-s1 = reduce(lambda x, y: x + y, map(lambda x: x ** 2, range(1, 3)))
-print(s1)  # 5
-```
-
-```python
-# 简单的写法：
-s2 = sum(x ** 2 for x in range(1, 3))
-print(s2)  # 5
-```
-
-### global 变量
-
-要在函数中修改全局变量的值，需要加上 global 关键字：
-
-```python
-x = 15
-
-def print_newx():
-    global x
-    x = 18
-    print(x)
-
-
-print_newx()
-print(x)
-
-# 18
-# 18
-```
-
-如果不加上这句 global 那么全局变量的值不会改变：
-
-```python
-x = 15
-
-
-def print_newx2():
-    x = 18
-    print(x)
-
-
-print_newx2()
-print(x)
-
-
-# 18
-# 15
-```
 
 ### 递归
 
@@ -480,558 +274,24 @@ def fib(n):
 print([fib(i) for i in range(10)])
 
 ```
+## 内置函数
 
-## 装饰器
+### map 函数
 
-装饰器也叫修饰器
-
-如果你有一批变量想统一按一个规则处理，并且需要缩减代码，你需要函数。
-
-如果你有一批函数想统一按一个规则处理，并且需要缩减代码，你需要装饰器（Decorator）
-
-理清下面 2 点：
-
-函数
-
-- 接受参数
-- 做点事情
-- 返回结果
-
-装饰器
-
-- 接受函数作为参数
-- 做点事情
-- 返回一个函数
-
-用 @ 来使用装饰器
-
-使用 @ 符号来将某个函数替换为装饰符之后的函数：
-
-例如这个函数：
-
-```python
-def dec(f):
-    print('I am decorating function', id(f))
-    return f
-
-def foo(x):
-    print(x)  # I am decorating function 45206384
-
-foo = dec(foo)
-```
-
-可以替换为：
-
-```python
-def dec(f):
-    print('I am decorating function', id(f))
-    return f
-
-@dec
-def foo(x):
-    print(x)
-```
-
-那么他有什么实际作用？故事的开始是这样的，你写好了 2 个函数：
-
-```python
-def test1():
-  print('test1 ..')
-
-def test2():
-  print('test2 ..')
-
-test1()
-test2()
-```
-
-当你准备把它放到服务器上，这个时候领导提醒你要输出日志，不然查错跑断腿。
-输出要求是：在每次函数调用的前后加上时间。
-于是你写成了下面这个样子
-
-```python
-import time
-def test1():
-    print('测试开始：现在时间是',time.time())
-    print('test1 ..')
-    print('测试结束：现在时间是',time.time())
-
-def test2():
-    print('测试开始：现在时间是',time.time())
-    print('test2 ..')
-    print('测试结束：现在时间是',time.time())
-
-test1()
-test2()
-```
-
-领导说，他有 3 个问题：
-
-- 首先代码 1 和代码 2 是一样的，也就是说把同样的代码写了 2 遍，这一点也不程序员！
-- 而且，你修改了你的核心代码，使得它变得很长。后面要再删也很麻烦，万一手抖删错了就完了。
-- 最后，在大项目合作中，可能 test 代码是 A 同事写的，输出日志代码是 B 同事写的，代码保密，每个程序员只能拿到部分片段，所以你根本不知道对方的代码，要提供一个通用的打印日志的方式。
-
-思考下，可以怎么修改能既不修改源代码，又对代码结构影响最小呢？
-
-我说，这样子，那我可以写成这样？
-
-```python
-import time
-
-def a_decorator(func):
-    print('测试开始：现在时间是',time.time())
-    func()
-    print('测试结束：现在时间是',time.time())
-
-def test1():
-    print('test1 ..')
-
-def test2():
-    print('test2 ..')
-
-a_decorator(test1)
-a_decorator(test2)
-```
-
-领导说：有进步，但是原本调用 test1()的语法被你改成了 a_decorator(test1)，这要是再多几个功能不得把我绕晕了啊。
-
-看来函数嵌套掌握的不熟啊，给你点提示，我带你透过现象看本质
-
-- 变量的本质：就是变量指向的内存地址
-- 函数名的本质：就是函数的内存地址
-- 变量可以作为函数的参数，因此函数名可以用做函数的参数
-- 变量可以作为函数的返回值，同理，函数名也可以作为函数的返回值
-
-我说，那就写成这样？
-
-```python
-import time
-
-def a_decorator(func):
-    def wrap_the_func():
-        print('测试开始：现在时间是',time.time())
-        func()
-        print('测试结束：现在时间是',time.time())
-    return wrap_the_func
-
-def test1():
-    print('test1 ..')
-
-def test2():
-    print('test2 ..')
-
-test1 = a_decorator(test1) #这里a_decorator(test1) 代指wrap_the_func()，把这个wrap_the_func()函数的地址赋值给test1，由于代码从上而下执行，从而替换掉原本test1的指向。
-test2 = a_decorator(test2)
-
-test1()
-test1()
-```
-
-领导说：这倒数 3、4 行看着很碍眼，且会占据命名空间，你不会修饰符吗？我教你啊。
-
-- 我们先定义一个函数（名字随便起，这里只是用 a_decorator 做示例）
-- 然后简单的设置下这个函数运行逻辑，
-- 最后在原有的函数的头上加@函数名就行啦
-
-直接使用@函数修饰符是很方便的，你也看出来所谓【@函数修饰符】其实就是【函数】嵌入。
-
-这里我再假设你的函数是带参数的。我也用修饰符写一下吧。好好看，好好学。
-
-核心代码（下方的 test 函数）无需知道我（下方的 log 函数）是怎么写的，我也无需知道核心代码是怎么写的，我们就能快速完成协作。
-
-### 装饰器经典写法
-
-#### 注释函数
-
-```python
-def mark(func):
-    return lambda : print('该函数已被弃用，请使用xxxx方法')
-
-
-@mark
-def t():
-    print('t')
-
-t() # 仅打印该函数已被弃用，请使用xxxx方法
-```
-
-
-#### 改写函数名称
-
-知名的`pytest`模块就是通过装饰器指定测试函数
-
-```python 
-def pytest(func):
-    def test(*args, **kwargs):
-        return func(*args, **kwargs)
-    return test
-
-@pytest
-def get_url():
-    print('url')
-
-# 获取本地变量所有函数
-for k,v in locals().copy().items():
-    # 如果f是函数
-    if callable(v):
-        if v.__doc__ and v.__name__.startswith('test'):
-            v()
-```
-
-如果不想改写函数名称等属性，可以使用`functools`模块
-
-```python 
-from functools import wraps
- 
-def my_decorator(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-    return wrapper
- 
-@my_decorator
-def say_hello(name):
-    """A function that says hello"""
-    print(f'Hello, {name}!')
- 
-print(say_hello.__name__)   # 输出 'say_hello'
-print(say_hello.__doc__)    # 输出 'A function that says hello'
-
-```
-
-#### 记录运行时间
-
-```python
-import time
-
-#args 是 arguments 的缩写，表示位置参数；
-#kwargs 是 keyword arguments 的缩写，表示关键字参数。
-#这其实就是 Python 中可变参数的两种形式，
-#并且 *args 必须放在 **kwargs 的前面，因为位置参数在关键字参数的前面。
-
-def log(func):
-  def wrapper(*args,**kwargs):
-    print('测试开始：现在时间是',time.time())
-    ret = func(*args,**kwargs)
-    print('测试结束：现在时间是',time.time())
-    return ret
-  return wrapper
-
-@log
-def test1(s):
-  print('test1 ..', s)
-  return s
-@log
-def test2(s1, s2):
-  print('test2 ..', s1, s2)
-  return s1 + s2
-
-test1(1)
-test2(1,2)
-```
-
-#### 单例模式
-
-```python
-def singleton(cls):
-    instances = {}
-    '''
-    instances 是在 singleton 装饰器函数中定义的局部变量。
-    由于 wrapper 函数引用了 instances，instances 成为了 wrapper 的闭包变量。
-    闭包变量的生命周期会延长到 wrapper 函数的存在期间，即使 singleton 函数已经执行完毕。
-    '''
-    def wrapper(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-
-    return wrapper
-
-@singleton
-class MyClass:
-    def __init__(self, name):
-        self.name = name
-
-    def greet(self):
-        print(f"Hello, {self.name}!")
-
-# 测试单例模式
-obj1 = MyClass("Alice")
-obj2 = MyClass("Bob")
-
-print(obj1 is obj2)  # 输出 True，说明是同一个实例
-obj1.greet()         # 输出 "Hello, Alice!"
-obj2.greet()         # 输出 "Hello, Alice!"（因为 obj2 实际上是 obj1）
-```
-
-
-#### 赋予函数新功能
-
-```python 
-import getpass
-
-def login_auth(func):
-    is_login = {'is_login':False,} #判断如果有一个函数成功等候后面的函数就不需要登录了
-    def login(*args, **kwargs):
-        if not is_login['is_login']:
-            is_login['is_login'] = func(*args, **kwargs)  
-        print('验证失败') if not is_login['is_login'] else print('验证成功')
-    return login
-
-@login_auth
-def user_login():
-    name = input('username：')
-    password = getpass.getpass('password:')  # 输入不会显示，更安全
-    return (name,password) == ('kevin', '123')
-user_login()
-user_login()
-```
-
-### 多重装饰器
-
-定义两个装饰器函数，一个将原来的函数值加一，另一个乘二：
-
-```python
-def plus_one(f):
-    def new_func(x):
-        return f(x) + 1
-
-    return new_func
-```
-
-```python
-def times_two(f):
-    def new_func(x):
-        return f(x) * 2
-
-    return new_func
-```
-
-定义函数，先乘二再加一：
-
-```python
-@plus_one
-@times_two
-def foo(x):
-    return int(x)
-```
-
-```python
-b = foo(2)
-b  # 5
-```
-
-### 修饰器工厂
-
-decorators factories 是返回修饰器的函数
-
-它的作用在于产生一个可以接受参数的修饰器，
-
-例如我们想将 函数 输出的内容写入一个文件去，可以这样做：
-
-```python
-def super_loud(filename):
-    fp = open(filename, 'w')
-
-    def loud(f):
-        def new_func(*args, **kw):
-            fp.write(str(args))
-            fp.writelines('\n')
-            fp.write('calling with' + str(args) + str(kw))
-            # 确保内容被写入
-            fp.flush()
-            fp.close()
-            rtn = f(*args, **kw)
-            return rtn
-
-        return new_func
-
-    return loud
-
-@super_loud('test.txt')
-def foo(x):
-    print(x)
-
-
-# 调用 foo 就会在文件中写入内容：
-foo(100)
-
-import os
-os.remove('test.txt')
-```
-
-也可以用作多次执行某个函数
-
-```python 
-def moretime(times):
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            for _ in range(times):
-                func(*args, **kwargs)
-        return wrapper
-    return decorator
-
-@moretime(times = 5)
-def test2():
-    print(2)
-
-test2()
-```
-
-于是你回想起之前 Python 也提供了一些自带函数，例如：print()、input()
-
-那会不会也有一些自带的【@函数修饰符】呢？还真有，常见的包括：@property、@classmethod、@staticmethod 还有 typing 里面各种用于测试的函数。
-
-默认的self结构，可以通过self访问类的属性、方法。但是需要先实例化。
-
-@staticmethod (静态方法)不需要 self 参数，也不需要 cls 参数。它们与类或实例没有任何绑定，只是类中的一个普通函数。静态方法通常用于与类相关，但不依赖于实例或类属性的操作。调用时不需要实例化类。
-
-@classmethod (类方法)使用 cls 作为第一个参数，表示调用该方法的类本身，而不是实例。它可以访问类级别的属性和方法。调用时可以实例化类，也可以不实例化类。
-
-不过这些结构相对复杂，当你理解普通的@修饰符之后，这些自带的你只需要记得用法即可，原理都是一样的。
-
-
-### @classmethod 装饰器
-
-在 Python 标准库中，有很多自带的装饰器，
-
-例如 classmethod 将一个对象方法转换了类方法：
-
-```python
-class Foo(object):
-    @classmethod
-    def bar(cls, x):
-        print('the input is', x)
-
-    def __init__(self):
-        pass
-```
-
-类方法可以通过 类名.方法 来调用：
-
-```python
-Foo.bar(10)
-```
-
-### @property 装饰器
-
-有时候，我们希望像 Java 一样支持 getters 和 setters 的方法，
-
-这时候就可以使用 property 装饰器：
-
-```python
-class Foo(object):
-    def __init__(self, data):
-        self.data = data
-
-    @property
-    def x(self):
-        return self.data
-
-```
-
-此时可以使用 .x 这个属性查看数据（不需要加上括号）：
-
-```python
-foo = Foo(22)
-print(foo.x)
-```
-
-这样做的好处在于，这个属性是只读的：
-
-foo.x = 1 会报错
-
-如果想让它变成可读写，可以加上一个装饰符 @x.setter：
-
-```python
-class Foo(object):
-    def __init__(self, data):
-        self.data = data
-
-    @property
-    def x(self):
-        return self.data
-
-    @x.setter
-    def x(self, value):
-        self.data = value
-```
-
-```python
-foo = Foo(1000)
-foo.x
-```
-
-```python
-foo.x = 2222
-foo.x
-```
-
-
-### 命名空间与闭包
-
-- 全局命名空间：创建的存储“变量名与值的关系”的空间叫做全局命名空间
-- 局部命名空间：在函数的运行中开辟的临时的空间叫做局部命名空间
-- 内置命名空间：内置命名空间中存放了 python 解释器为我们提供的名字：input,print,str,list,tuple...它们都是我们熟悉的，拿过来就可以用的方法。
-
-三种命名空间之间的加载顺序和取值顺序：
-
-- 加载顺序：内置（程序运行前加载）-->全局（从上到下顺序加载进来的）-->局部（调用的时候加载）--->内置
-- 取值：在局部调用：局部命名空间--->全局命名空间--->内置命名空间
-- 在全局范围找：全局----内置----局部
-  使用：
-  全局不能使用局部的，局部的可以使用全局的
-
-#### 作用域
-
-作用域：就是作用范围，为了函数内的变量不会影响到全局。作用域分为两种：
-
-- 全局作用域：全局命名空间与内置命名空间的名字都属于全局范围在整个文件的任意位置都能被引用，全局有效
-- 局部作用域：局部命名空间，只能在局部范围内生效
-  站在全局看：使用名字的时候：如果全局有，用全局的。如果全局没有，用内置的。
-- globals 方法：查看全局作用域的名字【print(globals())】
-- locals 方法：查看局部作用域的名字【print(locals())】
-
-闭包的特别之处在于，生命周期的延长。普通函数内部的变量会随着函数被调用而创建，函数执行结束而被销毁。
-
-而闭包可以让函数内部的变量变成函数对象的属性，生命周期与函数定义本身绑定。每次函数执行结束不会被销毁，只有函数被删除才会被销毁。
-
-#### 闭包失败示例
-
-```python
-name = 1 #变量在函数外部,inner可以访问，但是全局也能访问。直接闭包失败
-def func():
-    def inner():
-        print(name)
-        print(inner.__closure__)
-        return name
-    return inner
-
-p = func()
-print(p())#输出的__closure__为None ：不是闭包函数
-print(name)
-```
-
-#### 闭包成功示例
+map 函数用于将一个函数应用到序列的每个元素上，并返回一个迭代器对象。
 
 ```python showLineNumbers
-def func():
-    name = 1 #变量在函数内部,inner可以访问,但是全局不能访问。闭包成功！此时加上nonlocal
-    def inner():
-        nonlocal name
-        # nonlocal非局部声明变量 是python3.2的语法,简单说就是让内部函数中的变量在上一层函数中生效
-        # 非局部声明变量指代的已有标识符是最近外面函数的已声明变量，但是不包括全局变量。这个是很重要的，因为绑定的默认行为是首先搜索本地命名空间。nonlocal声明的变量只对局部起作用，离开封装函数，那么该变量就无效。
-        name += 1
-        print(inner.__closure__)
-        return name
-    return inner
+def sqr(x):
+    return x ** 2
 
-p = func()
-print(p())
-print(p())
-print(p())
-
-print(name)
+a = [2, 3, 4]
+result = map(sqr, a)  # [4,9,16]
+type(result)
 ```
 
+## 推荐库
+
+- functools: 提供高阶函数和装饰器
+- itertools: 提供迭代器工具
+- operator: 提供操作符函数
+- typing: 提供类型提示

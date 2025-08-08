@@ -1,0 +1,81 @@
+---
+sidebar_position: 29
+title: 文件操作
+---
+
+### open函数
+
+### memoryview函数
+
+函数主要用于需要高性能和低内存开销的场景，特别是在处理大型二进制数据时。它提供了一个窗口，让你能够直接、高效地访问和操作底层对象的内存，而不需要为数据创建昂贵的副本。
+
+```python showLineNumbers
+import struct
+
+record_size = 4 + 8 # 12 bytes
+
+with open("data.bin", "rb") as f:
+    # 假设我们只关心文件中的第100条记录
+    f.seek(99 * record_size) # 定位到第100条记录的起始位置
+
+    # 读取12个字节，并将其转换为 bytes 对象
+    record_bytes = f.read(record_size)
+
+    # 从 bytes 对象中解包数据
+    record_id, value = struct.unpack('<if', record_bytes) # 注意：这里会创建一个新的 bytes 对象
+
+    print(f"Record ID: {record_id}, Value: {value}")
+```
+
+这种方式在处理一条记录时是没问题的，但如果我们需要循环读取大量记录，并对它们进行修改，效率会很低，因为它每次都涉及到文件读取和字节对象的创建。
+
+现在，我们使用 memoryview 来优化这个过程。我们一次性读取一个较大的块（例如100条记录），然后通过 memoryview 来“遍历”这个内存块，而不用创建新的 bytes 对象。
+
+```python showLineNumbers
+import struct
+import array
+
+# 假设 data.bin 文件已经存在并有足够的数据
+# 我们可以先创建一个模拟的 data.bin 文件
+with open("data.bin", "wb") as f:
+    for i in range(1000):
+        # 写入一个 int32 (i) 和一个 float64 (i * 1.5)
+        f.write(struct.pack('<id', i, i * 1.5))
+
+
+# 实际应用，读取并处理文件
+record_size = 12 # 4字节 (int) + 8字节 (double)
+num_records_to_read = 100
+
+with open("data.bin", "rb") as f:
+    # 一次性读取100条记录的字节数据到内存
+    buffer = f.read(num_records_to_read * record_size)
+
+    # 将 buffer 转换为一个可变的 bytearray，以便我们能通过 memoryview 修改它
+    byte_data = bytearray(buffer)
+
+    # 创建一个 memoryview 对象，指向这个 byte_data
+    # 重要的是，我们使用 struct 模块的格式字符串来指定 memoryview 的格式
+    # 这让 memoryview 知道如何解析这块内存
+    mv = memoryview(byte_data)
+
+    # 使用 struct 模块的格式字符串来创建一个结构化的 memoryview
+    # 这里的 'i' 是 int32, 'd' 是 double64
+    # 这使得我们可以像访问数组一样访问数据，但背后是 memoryview
+    # 'd' 表示双精度浮点数
+    structured_mv = mv.cast('id', shape=[num_records_to_read])
+
+    # 现在我们可以像访问数组一样，高效地访问和修改数据
+    for i in range(num_records_to_read):
+        record_id, value = structured_mv[i]
+        print(f"Record {i}: ID={record_id}, Value={value}")
+
+        # 如果需要，我们可以直接修改内存中的值
+        # 例如，将所有值的浮点数部分增加10
+        structured_mv[i] = (record_id, value + 10.0)
+
+# 现在，如果我们将 byte_data 写回文件，修改就已经生效了
+# 或者在内存中处理完后，将整个 byte_data 对象传递给其他函数，而不用担心数据拷贝
+```
+
+

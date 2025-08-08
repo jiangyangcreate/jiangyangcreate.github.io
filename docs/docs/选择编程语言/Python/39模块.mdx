@@ -24,6 +24,8 @@ from ..parentmodule import other_function
 
 Python 会将所有 .py 结尾的文件认定为 Python 代码文件。
 
+### import,from,as
+
 在使用函数的时候我们通过 import 关键字导入指定的模块：
 
 `module1.py`
@@ -55,7 +57,7 @@ from module2 import foo
 foo()
 ```
 
-### **name** 属性
+### name属性
 
 有时候我们想将一个 .py 文件既当作脚本，又能当作模块用，
 这个时候可以使用 **name** 这个属性。
@@ -230,3 +232,6 @@ del a # 删除变量a：a对应的对象的引用计数器-1    (此时引用计
 sys.getrefcount(a)
 ```
 
+## 内置函数
+
+### `__import__`函数

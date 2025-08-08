@@ -1,0 +1,966 @@
+---
+sidebar_position: 3
+title: 序列
+---
+:::info
+列表推导式体现了Python"优美优于丑陋"的哲学。它提供了一种简洁的方式来创建列表，让代码更加Pythonic。
+
+```python
+# 传统方式
+result = []
+for x in range(10):
+    if x % 2 == 0:
+        result.append(x**2)
+
+# Pythonic方式
+result = [x**2 for x in range(10) if x % 2 == 0]
+```
+
+[PEP 202 – 列表推导式](https://peps.python.org/pep-0202/)
+:::
+
+## 列表
+
+介绍列表的方法及示例演示其使用，包括：长度、修改列表、取值、排序
+
+### list函数
+
+```python
+empty_list = list()
+print(empty_list)  # 同 empty_list = []
+
+'''
+[]是解析后的list，所以[]比list()更快
+'''
+```
+
+查看列表长度：
+
+```python
+# len 查看列表长度
+a = [1, 2, 3]
+b = [2, 3, 'hello']
+c = a + b
+print(c)  # [1, 2, 3, 2, 3, u'hello']
+```
+
+```python
+len(c)
+```
+
+Python 字符串可以和列表可以方便扩展：
+
+```python
+d = b * 2
+print(d)  # [2, 3, u'hello', 2, 3, u'hello']
+```
+
+```python
+d[-1]
+```
+
+### 修改列表
+
+```python
+print(a)
+a[0] = 100
+a
+```
+
+这种赋值也适用于分片，例如，将列表的第 2，3 两个元素换掉：
+
+```python
+a[1:3] = [200, 300]
+print(a)
+```
+
+事实上，对于连续的分片（即步长为 1 ），Python 采用的是整段替换的方法，两者的元素个数并不需要相同，
+
+```python
+# 例如，将 [11,12] 替换为 [1,2,3,4]：
+a = [10, 11, 12, 13, 14]
+a[1:3] = [1, 2, 3, 4]
+print(a)  # [10, 1, 2, 3, 4, 13, 14]
+```
+
+用这种方法来删除列表中一个连续的分片：
+
+```python
+a = [10, 1, 2, 11, 12]
+print(a[1:3])
+a[1:3] = []
+print(a)
+```
+
+对于不连续（间隔 step 不为 1）的片段进行修改时，两者的元素数目必须一致：
+
+```python
+a = [10, 11, 12, 13, 14]
+a[::2] = [1, 2, 3]
+print(a)  # [1, 11, 2, 13, 3]
+```
+
+Python 提供了删除列表中元素的方法 'del':
+
+```python
+a = [100, 'a', 'b', 200]
+del a[0]
+print(a)  # [u'a', u'b', 200]
+```
+
+```python
+# 删除间隔的元素：
+a = ['a', 1, 'b', 2, 'c']
+del a[::2]
+print(a)  # [1, 2]
+```
+
+用 in 来看某个元素是否在某个序列（不仅仅是列表）中，
+用 not in 来判断是否不在某个序列中。
+
+```python
+a = [1, 2, 3, 4, 5]
+print(1 in a)
+print(1 not in a)
+
+# 也可以作用于字符串：
+s = 'hello world'
+print("'he' in s : ", 'he' in s)  # True
+print("'world' not in s : ", 'world' not in s)  # False
+```
+
+列表中可以包含各种对象，甚至可以包含列表：
+
+```python
+a = [1, 2, 'six', [3, 4]]
+print(a[3])  # [3,4]
+# a[3]是列表，可以对它再进行索引：
+print(a[3][1])  # 4
+```
+
+### 列表方法
+
+```python
+# 列表中某个元素个数
+a = [1, 1, 2, 3, 4, 5]
+print(len(a))  # 总个数：6
+# 元素1出现的个数
+print(a.count(1))  # 2
+# l.index(ob) 返回列表中元素 ob 第一次出现的索引位置，如果 ob 不在 l 中会报错。
+print(a.index(1))  # 0
+```
+
+### 列表添加元素
+
+```python
+# 向列表添加单个元素
+# a.append(ob) 将元素 ob 添加到列表 a 的最后。
+a = [1, 1, 2, 3, 4, 5]
+a.append(10)
+print(a)  # [1, 1, 2, 3, 4, 5, 10]
+
+# append每次只添加一个元素，并不会因为这个元素是序列而将其展开：
+a.append([11, 12])
+print(a)  # [1, 1, 2, 3, 4, 5, 10, [11, 12]]
+
+```
+
+```python
+# 向列表添加序列
+# l.extend(lst) 将序列 lst 的元素依次添加到列表 l 的最后，作用相当于 l += lst。
+a = [1, 2, 3, 4]
+a.extend([6, 7, 1])
+print(a)  # [1, 2, 3, 4, 6, 7, 1]
+
+# 插入元素
+# l.insert(idx, ob) 在索引 idx 处插入 ob ，之后的元素依次后移。
+a = [1, 2, 3, 4]
+# 在索引 3 插入 'a'
+a.insert(3, 'a')
+print(a)  # [1, 2, 3, u'a', 4]
+a
+```
+
+### 移除元素
+
+```python
+# l.remove(ob) 会将列表中第一个出现的 ob 删除，如果 ob 不在 l 中会报错。
+a = [1, 1, 2, 3, 4]
+# 移除第一个1
+a.remove(1)
+print(a)  # [1, 2, 3, 4]
+
+# 弹出元素
+# l.pop(idx) 会将索引 idx 处的元素删除，并返回这个元素。
+a = [1, 2, 3, 4]
+b = a.pop(0)  # 1
+print('pop:', b, ' ;result:', a)
+```
+
+### 排序
+
+```python
+# l.sort() 会将列表中的元素按照一定的规则排序：
+a = [10, 1, 11, 13, 11, 2]
+a.sort()
+print(a)  # [1, 2, 10, 11, 11, 13]
+```
+
+```python
+# 如果不想改变原来列表中的值，可以使用 sorted 函数：
+a = [10, 1, 11, 13, 11, 2]
+b = sorted(a)
+print(a)  # [10, 1, 11, 13, 11, 2]
+print(b)  # [1, 2, 10, 11, 11, 13]
+
+# 列表反向
+# list.reverse() 会将列表中的元素从后向前排列。
+a = [1, 2, 3, 4, 5, 6]
+a.reverse()
+print(a)  # [6, 5, 4, 3, 2, 1]
+```
+
+```python
+# 如果不想改变原来列表中的值，可以使用这样的方法：
+a = [1, 2, 3, 4, 5, 6]
+b = a[::-1]
+print(a)
+print(b)
+a
+```
+
+如果不清楚用法，可以查看帮助： help(a.sort)
+
+```python
+a=[1,2,3]
+help(a.sort)
+```
+
+显示帮助：
+
+```python
+# Signature: a.sort(*, key=None, reverse=False)
+# Docstring:
+# Sort the list in ascending order and return None.
+#
+# The sort is in-place (i.e. the list itself is modified) and stable (i.e. the
+# order of two equal elements is maintained).
+#
+# If a key function is given, apply it once to each list item and sort them,
+# ascending or descending, according to their function values.
+#
+# The reverse flag can be set to sort in descending order.
+# Type:      builtin_function_or_method
+```
+
+### 列表推导式
+
+列表推导式有自己独立的作用域：
+- i是列表推导式内部的局部变量 - 它只在`[i for i in range(10)]`这个表达式内部有效
+- 作用域隔离 - 列表推导式的变量不会"泄漏"到外层函数
+- 自包含 - 列表推导式可以访问外层作用域的变量，但它自己的循环变量是独立的
+
+
+循环可以用来生成列表：
+
+```python
+values = [2, 2, 3]
+squares = []
+for x in values:
+    squares.append(x ** 2)
+print(squares)  # [4, 4, 9]
+```
+
+列表推导式可以使用更简单的方法来创建这个列表：
+
+```python
+values = [3, 8, 10, 14]
+squares = [x ** 2 for x in values]
+print(squares)  # [9, 64, 100, 196]
+```
+
+可以加入条件筛选，在上面的例子中，
+
+假如只想保留列表中不大于 8 的数的平方：
+
+```python
+squares = [x ** 2 for x in values if x <= 10]
+print(squares)  # [9, 64, 100]
+```
+
+平方的结果不大于 100 的：
+
+```python
+squares = [x ** 2 for x in values if x ** 2 <= 80]
+print(squares)  # [9, 64]
+```
+
+
+### 列表 vs 字符串
+
+列表是可变的（Mutable）
+
+```python
+a = [1, 2, 3, 4]
+a[0] = 100
+a.insert(3, 200)
+a  # [100, 2, 3, 200, 4]
+```
+
+字符串是不可变的（Immutable）:
+
+```python
+s = "hello world"
+
+# 通过索引改变会报错
+s[0] = 'k'
+```
+
+```python
+s.insert(3, 'm')
+```
+
+字符串方法只是返回一个新字符串，并不改变原来的值：
+
+```python
+print(s.replace('world', 'Mars'))  # hello Mars
+print(s)  # hello world
+
+# 如果想改变字符串的值，可以用重新赋值的方法：
+s = s.replace('world', 'YunYun')
+print(s)  # hello YunYun
+```
+
+
+:::info
+字典推导式让字典的创建变得更加简洁和直观。它遵循了Python"应该有一种，最好只有一种显而易见的方法来做事"的原则。
+
+```python
+squares = {x: x**2 for x in range(5)}
+# {0: 0, 1: 1, 2: 4, 3: 9, 4: 16}
+```
+
+[PEP 274 – 字典推导式](https://peps.python.org/pep-0274/)
+:::
+
+## 字典
+
+字典 dictionary ，在一些编程语言中也称为 hash ， map ，
+是一种由键值对组成的数据结构。
+
+```python
+a = {}
+print(type(a))  # <type 'dict'>
+a = dict()
+print(type(a))
+```
+
+### dict函数
+
+```python
+# 插入键值
+a['f'] = 'num 1'
+a['s'] = 'num 2'
+print(a)  # {u's': u'num 2', u'f': u'num 1'}
+```
+
+```python
+# 查看键值
+print(a['s'])  # num 2
+```
+
+```python
+# 更新
+a['f'] = 'num 3'
+print(a)  # {u's': u'num 2', u'f': u'num 3'}
+```
+
+```python
+# 初始化字典
+a = {'first': 'num 1', 'second': 'num 2', 3: 'num 3'}
+print(a['first'])  # num 1
+print(a[3])  # num 3
+```
+
+Python 中不能用支持用数字索引按顺序查看字典中的值，
+而且数字本身也有可能成为键值，这样会引起混淆:
+
+a[0] 会报错
+
+```python
+try:
+    print(a[0])
+except KeyError as e:
+    print('error:', e)
+#a[0]
+```
+
+dict 的应用示例
+
+```python
+# 定义四个字典
+e1 = {'mag': 0.05, 'width': 20}
+e2 = {'mag': 0.04, 'width': 25}
+e3 = {'mag': 0.05, 'width': 80}
+e4 = {'mag': 0.03, 'width': 30}
+
+# 以字典作为值传入新的字典
+events = {500: e1, 760: e2, 3001: e3, 4180: e4}
+# {760: {u'width': 25, u'mag': 0.04},
+# 3001: {u'width': 80, u'mag': 0.05},
+# 500: {u'width': 20, u'mag': 0.05},
+# 4180: {u'width': 30, u'mag': 0.03}}
+print(events)
+```
+
+```python
+# 另一个例子
+people = [
+    {'first': 'Sam', 'last': 'Malone', 'name': 35},
+    {'first': 'Woody', 'last': 'Boyd', 'name': 21},
+    {'first': 'Norm', 'last': 'Peterson', 'name': 34},
+    {'first': 'Diane', 'last': 'Chambers', 'name': 33}
+]
+# [{'first': 'Sam', 'last': 'Malone', 'name': 35},
+#  {'first': 'Woody', 'last': 'Boyd', 'name': 21},
+#  {'first': 'Norm', 'last': 'Peterson', 'name': 34},
+#  {'first': 'Diane', 'last': 'Chambers', 'name': 33}]
+print(people)
+```
+
+使用 dict 初始化字典：
+
+```python
+# 除了通常的定义方式，还可以通过 dict() 转化来生成字典：
+my_dict = dict([('name', 'lili'),
+                ('sex', 'female'),
+                ('age', 32),
+                ('address', 'beijing')])
+# {u'age': 32,
+# u'address': u'beijing',
+# u'name': u'lili',
+# u'sex': u'female'}
+print(my_dict)
+```
+
+利用索引直接更新键值对：
+
+```python
+my_dict['age'] += 1
+print(my_dict)  # u'age': 33
+```
+
+dict 可以使用元组作为键值：
+
+```python
+# 例如，可以用元组做键来表示从第一个城市飞往第二个城市航班数的多少：
+connections = {}
+connections[('New York', 'Seattle')] = 100
+connections[('Austin', 'New York')] = 200
+connections[('New York', 'Austin')] = 400
+connections
+```
+
+```python
+# 元组是有序的，
+# 因此 ('New York', 'Austin') 和 ('Austin', 'New York') 是两个不同的键：
+print(connections[('Austin', 'New York')])  # 200
+print(connections[('New York', 'Austin')])  # 400
+```
+
+### 字典的内置方法
+
+#### get 方法
+
+get 方法 : d.get(key, default = None)
+
+之前已经见过，用索引可以找到一个键对应的值，
+但是当字典中没有这个键的时候，Python 会报错
+
+```python
+a = {'first': 'num 1', 'second': 'num 2'}
+# error:
+# print(a['third'])
+
+# get 返回字典中键 key 对应的值，
+# 如果没有这个键，返回 default 指定的值（默认是 None ）。
+print(a.get('third'))  # None
+```
+
+```python
+# 指定默认值参数：
+b = a.get("three", "num 0")
+b  # num 0
+```
+
+#### pop 方法删除元素
+
+pop 方法可以用来弹出字典中某个键对应的值，同时也可以指定默认参数：
+
+d.pop(key, default = None)
+
+```python
+a = {'first': 'num 1', 'second': 'num 2'}
+c = a.pop('first')
+print(c)  # num 1
+print(a)  # {u'second': u'num 2'}
+```
+
+```python
+# 弹出不存在的键值：
+d = a.pop("third", 'not exist')
+print(d)  # not exist
+```
+
+```python
+# 与列表一样，del 函数可以用来删除字典中特定的键值对，例如：
+a = {'first': 'num 1', 'second': 'num 2'}
+del a["first"]
+print(a)  # {u'second': u'num 2'}
+```
+
+#### update 方法更新字典
+
+之前已经知道，可以通过索引来插入、修改单个键值对，
+但是如果想对多个键值对进行操作，这种方法就显得比较麻烦，好在有 update 方法：
+
+```python
+my_dict = dict([('name', 'lili'),
+                ('sex', 'female'),
+                ('age', 32),
+                ('address', 'beijing')])
+# 把 ‘lili' 改成 'lucy'，同时插入 'single' 到 'marriage'
+dict_update = {'name': 'lucy', 'marriage': 'single'}
+my_dict.update(dict_update)
+print(my_dict)
+```
+
+```python
+import pprint
+# {u'marriage': u'single',
+# u'name': u'lucy',
+# u'address': u'beijing',
+# u'age': 32,
+# u'sex': u'female'}
+pprint.pprint(my_dict)  # 华丽丽的显示方式
+```
+
+```python
+my_dict # ipython的dict显示跟pprint的格式一样华丽
+```
+
+通过关键词 `in` 查询字典中是否有该键：
+
+```python
+barn = {'cows': 1, 'dogs': 5, 'cats': 3}
+# in 可以用来判断字典中是否有某个特定的键：
+print('chickens' in barn)  # False
+print('cows' in barn)  # True
+```
+
+#### keys 方法，values 方法和 items 方法
+
+- `d.keys()` 返回一个由所有键组成的列表；
+- `d.values()` 返回一个由所有值组成的列表；
+- `d.items()` 返回一个由所有键值对元组组成的列表；
+
+```python
+print(barn.keys())  # [u'cows', u'cats', u'dogs']
+print(barn.values())  # [1, 3, 5]
+print(barn.items())  # [(u'cows', 1), (u'cats', 3), (u'dogs', 5)]
+```
+
+```python
+for key, val in barn.items():
+    print(key, val)
+    # cows 1
+    # cats 3
+    # dogs 5
+```
+
+
+
+:::info
+集合字面量语法让集合的创建变得更加直观和高效。使用花括号`{}`创建集合，体现了Python"应该有一种显而易见的方法来做事"的原则。
+
+```python
+# 旧方式
+colors = set(['red', 'green', 'blue'])
+
+# 新语法 - 更清晰直观
+colors = {'red', 'green', 'blue'}
+
+# 集合推导式
+squares = {x**2 for x in range(5)}
+```
+
+[PEP 3106 – 在2.6中重新激活集合字面量](https://peps.python.org/pep-3106/)
+:::
+
+## 集合
+
+### 创建集合
+
+```python
+# 可以用set()函数来显示的生成空集合：
+a = set()
+print(a)
+print(type(a))
+```
+
+```python
+# 使用一个列表来初始化一个集合：
+a = set([1, 2, 3, 1])
+a  # 集合会自动去除重复元素 1。
+```
+
+```python
+# 集合中的元素是用大括号{}包含起来的，这意味着可以用{}的形式来创建集合：
+a = {1, 2, 3, 1}
+print(a)  # {1, 2, 3}
+```
+
+```python
+# 但是创建空集合的时候只能用set来创建，因为在Python中{}创建的是一个空的字典：
+s = {}
+print(type(s))  # <type 'dict'>
+```
+
+### 集合操作
+
+```python
+a = {1, 2, 3, 4}
+b = {2, 3, 4, 5}
+```
+
+#### 并
+
+两个集合的并，返回包含两个集合所有元素的集合（去除重复）。
+可以用方法 a.union(b) 或者操作 a | b 实现。
+
+```python
+c = a.union(b)
+print(c)  # {1, 2, 3, 4, 5, 6}
+
+# 操作 a | b 实现
+d = a | b
+print(c)
+```
+
+```python
+c == d
+```
+
+#### 交
+
+两个集合的交，返回包含两个集合共有元素的集合。
+
+可以用方法 a.intersection(b) 或者操作 a & b 实现。
+
+```python
+c = a.intersection(b)
+print(c)  # set([2, 3, 4])
+
+d = a & b
+print(d)
+
+c == d
+```
+
+#### 差
+
+a 和 b 的差集，返回只在 a 不在 b 的元素组成的集合。
+
+可以用方法 a.difference(b) 或者操作 a - b 实现。
+
+```python
+c = a.difference(b)
+print(c)  # set([1])
+d = a - b
+print(d)
+```
+
+#### 对称差
+
+a 和 b 的对称差集，返回在 a 或在 b 中，但是不同时在 a 和 b 中的元素组成的集合。
+
+可以用方法 a.symmetric_difference(b) 或者操作 a ^ b 实现（异或操作符）。
+
+```python
+c = a.symmetric_difference(b)
+print(c)  # set([1, 5])
+
+d = a ^ b
+print(d)
+```
+
+#### 包含关系
+
+要判断 b 是不是 a 的子集，可以用 b.issubset(a) 方法，
+或者更简单的用操作 b `<=` a ：
+
+```python
+a = {1, 2, 3}
+b = {1, 2}
+
+c = b.issubset(a)
+print(c)  # True
+
+d = (b <= a)
+print(d)
+```
+
+也可以用 a.issuperset(b) 或者 a >= b 来判断：
+
+```python
+print(a >= b)
+```
+
+方法只能用来测试子集，但是操作符可以用来判断真子集：
+
+```python
+print(a < a)  # False
+print(a <= a)  # True
+```
+
+### 集合方法
+
+#### add 方法向集合添加单个元素
+
+跟列表的 append 方法类似，用来向集合添加单个元素。
+
+s.add(a) 将元素 a 加入集合 s 中。
+
+```python
+s = {1, 3, 4}
+s.add(4)
+print(s)  # set([1, 3, 4])
+
+s.add(5)
+print(s)  # set([1, 3, 4, 5])
+```
+
+#### update 方法向集合添加多个元素
+
+跟列表的 extend 方法类似，用来向集合添加多个元素。
+
+s.update(seq)
+
+```python
+s.update([10, 11, 12])
+print(s)  # set([1, 3, 4, 5, 10, 11, 12])
+```
+
+```python
+# remove 方法移除单个元素
+s = {1, 3, 4}
+s.remove(1)
+print(s)  # set([3, 4])
+```
+
+#### pop 方法弹出元素
+
+由于集合没有顺序，不能像列表一样按照位置弹出元素，
+
+所以 pop 方法删除并返回集合中任意一个元素，如果集合中没有元素会报错。
+
+```python
+s = {1, 3, 4}
+d = s.pop()
+print(s, d)
+```
+
+```python
+# discard 方法作用与 remove 一样
+s = {1, 3, 4}
+s.discard(3)
+print(s)  # set([1, 4])
+```
+
+#### difference_update 方法
+
+a.difference_update(b) 从 a 中去除所有属于 b 的元素：
+
+```python
+a = {1, 2, 3, 4}
+b = {2, 3, 4, 5}
+a.difference_update(b)
+print(a)  # set([1])
+```
+
+
+## 不可变集合
+
+列表和字符串都是一种有序序列，而集合 set 是一种无序的序列。
+
+因为集合是无序的，所以当集合中存在两个同样的元素的时候，只会保存其中的一个（唯一性）；
+同时为了确保其中不包含同样的元素，集合中放入的元素只能是不可变的对象（确定性）。
+
+### frozenset
+
+frozenset 是不可变集合，因此可以作为字典的键，也可以作为其他集合的元素。
+
+```python
+a = frozenset([1, 2, 3, 4, 5])
+print(a)
+```
+
+
+:::info
+扩展解包操作让元组和其他可迭代对象的解包更加灵活。使用`*`操作符可以捕获多个值，让函数调用和赋值操作更加优雅。
+
+```python
+# 基本解包
+a, b, c = (1, 2, 3)
+
+# 扩展解包
+first, *middle, last = (1, 2, 3, 4, 5)
+# first=1, middle=[2, 3, 4], last=5
+
+# 函数参数解包
+def func(a, b, c):
+    return a + b + c
+
+args = (1, 2, 3)
+result = func(*args)  # 等同于 func(1, 2, 3)
+```
+
+[PEP 3132 – 扩展可迭代对象解包](https://peps.python.org/pep-3132/)
+:::
+## 元组
+
+与列表相似，元组 tuple 也是个有序序列，用`,`生成，有些教程中会额外使用`()`来包裹数据，让数据看起来更清晰。
+
+```python showLineNumbers
+# 创建空元组
+a = ()
+# 等价于
+a = tuple()
+print(type(a)) # <class 'tuple'>
+
+# 将其他序列转化成元组
+a = [1, 2, 3]
+b = tuple(a)
+print(b)  # (1, 2, 3)
+
+# 创建多个元素的元组
+a = 10, 11, 12, 13, 14
+# 通常也可以写作 a = (10, 11, 12, 13, 14)
+print(a)
+
+# 创建单个元素的元组
+b = 10,
+# 或者是 b = (10,)
+print(b) # (10,)
+print(type(b))  # <class 'tuple'>
+
+
+# 可以索引，切片：
+c = a[0]
+print(c)
+
+c = a[1:3]
+print(c)  # (11, 12)
+
+# 不可变对象的优化
+# 原则上来说下面的代码执行结果应该都是False，但是Python对不可变对象进行了驻留优化，所以结果都是True。
+import copy
+a= (1,2,3)
+b = a[:]
+c = tuple(a)
+d = copy.deepcopy(a) # 深拷贝不总是创建一个新的对象
+print(a is b) # True
+print(a is c) # True
+print(a is d) # True
+
+# 可变对象的结果是符合预期的
+import copy
+a= [1,2,3]
+b = a[:]
+c = list(a)
+d = copy.deepcopy(a)
+print(a is b) # False
+print(a is c) # False
+print(a is d) # False
+```
+
+大部分教程中指出元组是不可变的，但是严格来说，元组只是每个元素的id不能被改变。
+
+前面我们学习过：数据一旦被创建，修改数据后，其内存地址不会改变。因为如果内存地址发生了改变，变量的指向就会异常。
+
+下面展示了元组每个元素的id不会改变，但是元素的值可以被改变。
+
+```python showLineNumbers
+a = [1,2,3]
+print(id(a)) # 2060220698944
+
+a.append(4)
+print(a) # [1, 2, 3, 4]
+print(id(a)) # 2060220698944
+
+tuples = (1, 2, [1,2,3])
+tuples[2][0].append(4)
+print(tuples)  # (1, 2, [1,2,3,4])
+```
+
+
+## 内置函数
+
+### len函数
+
+len() 函数通过调用序列的`__len__()`方法，返回序列的长度。
+
+```python showLineNumbers
+print(len("Hello, world!")) # 13
+print(len([1, 2, 3])) # 3
+print(len((1, 2, 3))) # 3
+print(len({1, 2, 3})) # 3
+print(len(range(10))) # 10
+print(len(b)) # 3
+```
+
+
+### slice函数
+
+slice函数用于创建一个切片对象，切片对象可以用于切片操作。
+
+```python showLineNumbers
+a = [1, 2, 3, 4, 5]
+b = slice(1, 3)
+print(a[b])  # [2, 3]
+```
+
+
+
+### sorted函数
+
+sorted函数用于对序列进行排序。
+
+```python showLineNumbers
+a = [1, 2, 3]
+b = sorted(a)
+
+# 返回一个新的排序后的列表
+print(b)  # [1, 2, 3]
+```
+
+### reversed函数
+
+reversed函数用于反转序列。
+
+```python
+a = [1, 2, 3]
+b = reversed(a)
+print(b)  # [3, 2, 1]
+```
+
+### filter 函数
+
+filter 函数用于过滤序列，返回一个迭代器对象。
+
+```python showLineNumbers
+def is_even(x):
+    return x % 2 == 0
+
+list(filter(is_even, range(10)))  # [0, 2, 4, 6, 8]
+```
