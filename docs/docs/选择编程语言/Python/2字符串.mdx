@@ -4,13 +4,11 @@ title: 字符串
 ---
 
 :::info
-模板字符串为开发者提供了在字符串组合前访问字符串及其插值值的能力。这为 Python 语言带来了原生的灵活字符串处理功能，并支持安全检查、Web 模板、特定领域语言等。
+读代码比写代码更难。
 
-预计Python 3.14 支持模板字符串。
-
-[PEP 750 – Template Strings](https://peps.python.org/pep-0750/)
+[PEP 3000 – Python 3000](https://peps.python.org/pep-3000/)
+[Joel on Software: Things You Should Never Do, Part I](https://www.joelonsoftware.com/2000/04/06/things-you-should-never-do-part-i/)
 :::
-
 
 ## 字符串
 
@@ -140,9 +138,25 @@ info = f"{name}'s name first letter is {name[0].upper()} , the name length is {l
 print(info)  # 输出: jack's name first letter is J , the name length is 4
 ```
 
+:::info
+模板字符串为开发者提供了在字符串组合前访问字符串及其插值值的能力。这为 Python 语言带来了原生的灵活字符串处理功能，并支持安全检查、Web 模板、特定领域语言等。
+
+预计Python 3.14 支持模板字符串。
+
+```python showLineNumbers
+name = "World"
+template = t"Hello {name}"
+assert template.interpolations[0].value == "World"
+```
+
+[PEP 750 – Template Strings](https://peps.python.org/pep-0750/)
+:::
+
 ### 格式说明符
 
 在 str.format() 和 f-strings 中，可以使用格式说明符来控制输出的格式。这对于数字、日期和字符串的精确格式化非常实用。
+
+#### 数字格式化
 
 ```python showLineNumbers
 # 使用 f-strings时，可以直接将值写入，但是推荐先定义变量，代码可读性更好
@@ -162,6 +176,42 @@ var = 42
 print(f"{var=}")  # 输出: var=42
 
 
+# 对于数字，用逗号或下划线作为组分隔符
+data = 123456789
+print(f'{data:,}') # 123,456,789
+print(f'{data:_}') # 123_456_789
+
+# 表示为百分数，保留两位小数
+points = 19
+total = 22
+print(f'{points/total:.2%}') # 86.36%
+# 等价于
+print(f'{0.8636363636363636:.2%}') # 86.36%
+
+# 对于数字，格式也支持转化为其他进制
+num = 42
+print(f"int: {num:d};  hex: {num:x};  oct: {num:o};  bin: {num:b}")
+# 输出：int: 42;  hex: 2a;  oct: 52;  bin: 101010
+
+print(f"int: {num:d};  hex: {num:#x};  oct: {num:#o};  bin: {num:#b}")
+# 输出：int: 42;  hex: 0x2a;  oct: 0o52;  bin: 0b101010
+
+# 总是显示符号
+print(f'{3.14:+f}; {-3.14:+f}') 
+# 输出：+3.140000; -3.140000
+
+# 对正数显示一个空格
+print(f'{3.14: f}; {-3.14: f}') 
+# 输出： 3.140000; -3.140000
+
+# 只显示负号 -- 等同于 '{:f}; {:f}'
+print(f'{3.14:-f}; {-3.14:-f}') 
+# 输出：3.140000; -3.140000
+```
+
+#### 文本对齐
+
+```python showLineNumbers
 # 为了便于观察，我在末尾添加了竖线|
 hello = "hello|"
 name = "bob|"
@@ -199,16 +249,36 @@ print(f"""
 # test url:                      127.0.0.1 
 # test password:                    123456
 # 
+
+# 带有填充的对齐
+# text表示文本，第一处align表示填充字符，第二处align表示对齐方式，16表示长度
+for align, text in zip('<^>', ['left', 'center', 'right']):
+    print(f'{text:{align}{align}16}')
+# 输出：
+# left<<<<<<<<<<<<
+# ^^^^^^center^^^^^
+# >>>>>>>>>>right
 ```
 
-### Unicode 和编码转义字符
+#### 使用特定类型的专属格式化
 
-#### 基本概念
+```python showLineNumbers
+import datetime
+d = datetime.datetime(2008, 12, 3, 12, 15, 58)
+print('{:%Y-%m-%d %H:%M:%S}'.format(d)) # 2008-12-03 12:15:58
+# # 2008-12-03 是Python3.0.0的发布日期。
+```
+
+### Unicode 和转义字符
+
+Python3 的字符就是`Unicode`字符。
+
+#### Unicode
 - **bytes**: Python 中的字节串类型，用于表示二进制数据。
 - **ASCII**: 最古老的编码标准，只包含128个字符。
 - **Unicode**: 一种字符编码标准，为世界上大多数字符分配唯一的代码点。
-- **UTF-8**: 最常见的 Unicode 编码形式，全称 Unicode Transformation Format 8，向后兼容 ASCII。
-- **码表**: 字符与编码的映射表，数字与字符一一对应。
+- **UTF-8**: 最常见的 Unicode 编码形式，全称 Unicode Transformation Format 8，<HoverText text="向后兼容 ASCII" explanation="ASCII 码值为 0-127 的字符，在 UTF-8 中与 ASCII 完全相同。"/>。
+- **码表**: 字符与编码的映射表，表头包含显示字符、编码值、描述。
 
 下面的示例中，我刻意避免使用字符，为了不让你误解字符串的定义。
 
@@ -217,6 +287,7 @@ print(f"""
 s = "Hello, 世界!"
 print(s)  # 输出: Hello, 世界!
 
+# 如果你的电脑无法安装任何输入法，那么你只能使用Unicode码点来表示非英文字符。
 # 间接定义，表示Unicode码表的第4e16个文字和第754c个文字，小u后面接4位16进制的数字，即支持16-bit
 u = 'Hello, \u4e16\u754c!'
 print(u)  # 输出: Hello, 世界!
@@ -224,6 +295,12 @@ print(u)  # 输出: Hello, 世界!
 # 如果你要表示的文字在码表中相当靠后，则可以使用大U定义，大U后面接8位16进制的数字，即支持32-bit
 U = 'Hello, \U00004e16\U0000754c!'
 print(U)  # 输出: Hello, 世界!
+
+# 单纯依靠十六进制码点来表示字符好比网站访问靠IP地址，非常不便。因此Unicode提供了名称来表示字符，就和网站域名一样。
+# 你更愿意访问http://142.251.42.100:443/ 还是 https://www.baidu.com/ 呢？
+# Unicode 名称此时此刻相当于某种助记符，比如雪人、欧元符号。
+print('\N{SNOWMAN}\N{EURO SIGN}')
+# 输出：☃€
 
 # 编码为 bytes
 b = s.encode('utf-8')
@@ -240,20 +317,34 @@ except UnicodeDecodeError as e:
     print(f"Error: {e}")  # 输出: Error: 'ascii' codec can't decode byte ... 
 ```
 
-转义字符用于在字符串中插入一些特殊字符。
-
-这些符号往往以反斜杠`\`开头,例如`\'`表示单引号、`\"`表示双引号、`\n`表示换行符。
+:::tip
+查询字符的名称可以使用`unicodedata`模块。但是注意，\N后面的内容不支持拼接显示。
 
 ```python showLineNumbers
-# \<newline>表示斜杠后面接新的一行，会忽略换行。可用于长字符串的定义。
-# 连续2个反斜杠\\表示一个反斜杠且不触发转义。例如下面的\\n会被忽略，最终输出\n
-print("PEP8 中推荐每行不超过79个字符，如果一个字符串过长，\
-可以使用\\换行。\\n是最常见的转义符，表示换行。") 
-# 输出：
-# PEP8 中推荐每行不超过79个字符，如果一个字符串过长，可以使用\换行。\n是最常见的转义符，表示换行。
-```
+import unicodedata
 
-部分转义字符直接对应ASCII码表中的字符。
+# 查询字符 '世界' 的 Unicode 名称(Unicode 名称是字符的官方名称，相当于字符的身份证号)
+# 解读一下输出结果你就会发现，汉字的命名规则是：CJK UNIFIED IDEOGRAPH-XXXX，其中XXXX是字符的编码值。
+print(unicodedata.name('世'),unicodedata.name('界'))
+# 输出：CJK UNIFIED IDEOGRAPH-4E16 CJK UNIFIED IDEOGRAPH-754C
+print('\N{CJK UNIFIED IDEOGRAPH-4E16}\N{CJK UNIFIED IDEOGRAPH-754C}')
+# 输出：世界
+
+# 不支持拼接显示，包含字面值合并、加法拼接等
+name = 'CJK UNIFIED IDEOGRAPH-4E16'
+print(f'\N{name}')
+```
+:::
+
+#### 转义字符
+
+转义字符是一种在编程语言和标记语言中使用的特殊字符序列,它是一种语法层面的约定。官方翻译为转义序列。
+
+比如你的键盘没有Tab键，那么你可以输入`\t`来表示Tab。
+
+转义字符也是字符串的一部分，因此也属于`Unicode`字符。
+
+部分转义字符直接对应<HoverText text="ASCII码表中的字符" explanation="即 Unicode 字符的前128个字符"/>。
 
 :::tip
 
@@ -273,38 +364,107 @@ print('\07') # 8进制
 print('\007') # 8进制
 print("\u0007") # Unicode 16进制
 print("\U00000007") # Unicode 16进制
+print('\N{BEL}') # 直接使用Unicode名称
 ```
-与数字定义进制相比，字符串转义序列仅支持8进制、16进制，指向ASCII码表中的字符。
+与数字定义进制相比，字符串转义序列仅支持8进制、16进制，转义后指向码表中的字符。
 
 8进制定义需要以`\`开头，不超过三位。最大值为`\377`。
 
 16进制定义时，需要以`\x`开头，不超过两位。最大值为`\xff`。
 :::
 
-#### 反转义
-
-转义字符有时会添乱。你当然知道通过`\\`来忽略转义字符，把字符串改为 `"c:\\desktop\\new"` 即可，但当字符串很长时，我更推荐使用`r`来定义原始字符串。
+转义字符往往以反斜杠`\`开头,下面的示例展示了转义字符、反转义字符的用法。
 
 ```python showLineNumbers
-path = "c:\desktop\new"
-print(path)
-# 输出：
-# c:\desktop
-# ew
+path_str = r'"c:\desktop\new"'
+path = r'c:\desktop\new'
+literal_bs = r"ABC\bD"
+literal_ff = r"第一页内容\f第二页内容"
+literal_nl = r"这一行\n下一行"
+literal_cr = r"ABC\rD"
+literal_tab = r"列1\t列2\t列3"
+literal_vt = r"上\v下"
+newline = r"PEP8 中推荐每行不超过79个字符，如果一个字符串过长，\
+可以使用\换行。"
 
-# 使用\\来忽略转义字符,不适合长字符串
-path = "c:\\desktop\\new"
-print(path)
-# 输出：
-# c:\desktop\new
+letter = f"""
+亲爱的读者：
 
-# 使用r来定义原始字符串，适合长字符串
-path = r"c:\desktop\new"
-print(path)
+\t你好！这是一封用常见转义字符排版并介绍它们的信。
+
+\t1) \\t ASCII 水平制表符（TAB）
+\t   文本写法: "{literal_tab}"
+\t   输出效果: 列1\t列2\t列3
+
+\t2) \\n ASCII 换行符（LF）
+\t   文本写法: "{literal_nl}"
+\t   输出效果: 这一行
+\t           下一行
+
+\t3) \\f ASCII 换页符（FF）和\\v ASCII 垂直制表符（VT）
+\t   文本写法: "{literal_ff}" 和"{literal_vt}"
+\t   输出效果: 最早用于打印机换页和垂直定位，目前已经很少使用了，在一些终端/编辑器中表现和换行符一致。
+
+\t4) \\r ASCII 回车符（CR）和 \\b ASCII 退格符（BS）
+\t   文本写法: "{literal_cr}" 和 "{literal_bs}"
+\t   输出效果: \\r将光标移到当前行的最开始，因此"ABC\\rD" 实际显示常为 "DBC"
+\t   输出效果: \\b将光标移到当前行的前一个字符的位置，因此"ABC\\bD" 实际显示常为 "ABD"
+
+\t5) \\<newline>表示斜杠后面接新的一行，会忽略换行。可用于长字符串的定义。
+\t   文本写法: "{newline}"
+\t   输出效果: PEP8 中推荐每行不超过79个字符，如果一个字符串过长，可以使用\换行。
+
+\t6) 转义字符有时会添乱。\\ + \\ 表示一个反斜杠且不触发转义。但是长文本下我更推荐r来定义原始字符串。
+\t   原始字符：{path_str}
+\t   输出效果：c:\\desktop\new
+\t   改进写法1："c:\\\\desktop\\\\new" # 输出：{path}
+\t   改进写法2：r"c:\\desktop\\new" # 输出：{path}
+
+此致\n\t敬礼！
+"""
+
+print(letter)
 # 输出：
-# c:\desktop\new
+
+"""
+亲爱的读者：
+
+        你好！这是一封用常见转义字符排版并介绍它们的信。
+
+        1) \t ASCII 水平制表符（TAB）
+           文本写法: "列1\t列2\t列3"
+           输出效果: 列1        列2     列3
+
+        2) \n ASCII 换行符（LF）
+           文本写法: "这一行\n下一行"
+           输出效果: 这一行
+                   下一行
+
+        3) \f ASCII 换页符（FF）和\v ASCII 垂直制表符（VT）
+           文本写法: "第一页内容\f第二页内容" 和"上\v下"
+           输出效果: 最早用于打印机换页和垂直定位，目前已经很少使用了，在一些终端/编辑器中表现和换行符一致。
+
+        4) \r ASCII 回车符（CR）和 \b ASCII 退格符（BS）
+           文本写法: "ABC\rD" 和 "ABC\bD"
+           输出效果: \r将光标移到当前行的最开始，因此"ABC\rD" 实际显示常为 "DBC"
+           输出效果: \b将光标移到当前行的前一个字符的位置，因此"ABC\bD" 实际显示常为 "ABD"
+
+        5) \<newline>表示斜杠后面接新的一行，会忽略换行。可用于长字符串的定义。
+           文本写法: "PEP8 中推荐每行不超过79个字符，如果一个字符串过长，\
+可以使用\换行。"
+           输出效果: PEP8 中推荐每行不超过79个字符，如果一个字符串过长，可以使用\换行。
+
+        6) 转义字符有时会添乱。\ + \ 表示一个反斜杠且不触发转义。但是长文本下我更推荐r来定义原始字符串。
+           原始字符："c:\desktop\new"
+           输出效果：c:\desktop
+ew
+           改进写法1："c:\\desktop\\new" # 输出：c:\desktop\new
+           改进写法2：r"c:\desktop\new" # 输出：c:\desktop\new
+
+此致
+        敬礼！
+"""
 ```
-
 
 
 ## 字符串方法
@@ -385,3 +545,25 @@ Python中字符串类型的方法相当多。你可以根据自己的节奏选�
 - expandtabs: 将字符串中的制表符替换为空格
 
 `} />
+
+## 内置函数
+
+### ord() 函数和 chr() 函数
+
+ord() 函数和 chr() 函数是Python中用于处理字符串和Unicode字符的函数。
+
+ord() 函数用于将一个字符转换为它的Unicode码值。
+
+chr() 函数用于将一个Unicode码值转换为对应的字符。
+
+```python showLineNumbers
+print(ord('A')) # 65
+print(chr(65)) # A
+
+print(ord('Z')) # 90
+print(chr(90)) # Z
+
+for _ in range(ord('A'), ord('Z')+1):
+    print(chr(_),end=' ')
+# 输出：A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
+```

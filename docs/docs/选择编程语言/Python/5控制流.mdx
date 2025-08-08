@@ -258,3 +258,21 @@ Traceback (most recent call last):
 NameError: name 'e' is not defined
 '''
 ```
+
+下面的代码更有可能在生产环境中出现，原理相同，报错信息同样为：`NameError: name 'e' is not defined`
+
+```python showLineNumbers
+try:
+    e = eval(input("please input 0/0:"))
+except Exception as e:
+    pass
+finally:
+    print(e)
+```
+
+
+
+
+
+
+
