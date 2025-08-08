@@ -256,6 +256,80 @@ help()
 help(str)
 ```
 
+### input函数、print函数、open函数
+
+Python 使用 `input()`函数来捕获用户的键盘输入，捕获的数据为字符串类型。
+
+使用`print()`函数来输出（默认输出到终端控制台），输出内容也为字符串类型。
+
+```python showLineNumbers
+# 终端会显示“请输入你的名字：”，你只需要输入任意内容后回车，name变量会接收输入的内容。
+name = input("请输入你的名字：")
+# input内也可以不传参数，name = input()
+# 除了终端没有显示外，效果相同。
+
+print(type(name)) # <class 'str'>
+print(f"你好，{name}！")
+# 输出
+# 等价于
+print("你好，" + name + "！")
+# 等价于
+print("你好，",name,"！")
+```
+
+`print(*objects, sep=' ', end='\n', file=None, flush=False)`函数用法非常多，可以输出多个参数，也可以指定输出到文件。
+
+- `sep`：指定分隔符，缺省默认为空格,常设置为逗号、分号、冒号、换行符等等
+- `end`：指定输出结尾符号，缺省默认为换行符\n
+- `file`：指定输出到文件，缺省默认为None，即输出到终端控制台
+- `flush`：指定是否立即刷新输出，缺省默认为False，即不立即刷新输出
+
+```python showLineNumbers
+# 打印任何不同的类型，打印内容会自动转换为字符串，多个参数输出的结果默认以空格分隔
+print(1,'1',True,None)
+# 输出: 1 1 True None
+
+# 指定分隔符，缺省默认为空格,常设置为逗号、分号、冒号、换行符等等
+print(1,2,3,4,5,sep=",") 
+# 输出: 1,2,3,4,5
+
+# 指定输出结尾符号，缺省默认为换行符\n
+print("Hello, World!")
+print("Hello, World!",end="\n")
+# 输出
+# Hello, World!
+# Hello, World!
+#
+print("Hello, World!", end="")
+print("Hello, World!", end="———— by Allen")
+# 输出
+# Hello, World!Hello, World!———— by Allen
+
+# 输出到文件
+f = open("test.txt", "w") # 打开文件
+print('Hello, World!', file=f) # 输出到文件
+f.close() # 关闭文件
+# 运行后，我们可以在当前目录下看到一个`test.txt`文件，内容为`Hello, World!`。
+
+# 立即刷新输出
+# 缓冲区是计算机内存中的一块临时存储区域。在 Python 中，print() 函数默认会将文本发送到这个缓冲区，而不是直接输出到屏幕。
+# 这样做是为了提高效率，因为直接操作 I/O 设备（如屏幕或硬盘）比操作内存要慢得多。
+# Python 会等到缓冲区满了，或者遇到换行符 \n 时，才将缓冲区里的所有内容一次性发送出去。
+# print末尾默认会自动添加换行符\n，一旦我们指定不同的end参数，往往会结合flush参数使用。
+# 为了便于观察，我们使用time.sleep()函数来让程序暂停1秒。
+import time
+for i in range(10):
+    print(i,end="")
+    time.sleep(1)
+# 一次性输出 :0123456789
+import time
+for i in range(10):
+    print(i,end="",flush=True)
+    time.sleep(1)
+# 陆续输出 :0123456789
+```
+
+
 ## 相关库推荐
 
 - pydoc: 文档生成器和在线帮助系统

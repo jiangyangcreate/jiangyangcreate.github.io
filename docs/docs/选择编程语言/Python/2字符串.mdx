@@ -12,15 +12,15 @@ title: 字符串
 
 ## 字符串
 
-直接使用引号定义字符串是最常见的方式，定义字符串可以使用单引号、双引号、三个引号。引号可以嵌套使用。
+直接使用引号定义字符串是最常见的方式，定义字符串可以使用单引号、双引号、三重引号。可以在不同类型的引号内部包含其他引号。
 
 当字符串内包含引号时，需要用<Highlight>不同的引号包裹</Highlight>或<Highlight>转义字符</Highlight>。
 
 ```python showLineNumbers
-print("Hello, world!") # 单引号
-print('Hello, world!') # 双引号
-print("""Hello, world!""") # 三个双引号
-print('''Hello, world!''') # 三个单引号
+print("Hello, world!") # 双引号
+print('Hello, world!') # 单引号
+print("""Hello, world!""") # 三重引号
+print('''Hello, world!''') # 三重引号
 
 # 当你想要定义一个包含单引号的字符串时，可以用双引号包裹
 print("It's a nice day!") # It's a nice day!
@@ -37,11 +37,11 @@ print("He said, \"It's a nice day!\"") # He said, "It's a nice day!"
 print("He said, \"Hello!\"") # He said, "Hello!"
 print("It\'s a nice day!") # It's a nice day!
 
-# 连续定义多个字符串（中间有无空格均）可触发字符串字面值合并
-string = "1""2"
+# 连续定义多个字符串（中间有无空格均可）触发字符串字面值合并
+string = "1""2" '3'
 print(string)
 # 输出：
-# 12
+# 123
 ```
 
 :::tip
@@ -55,6 +55,7 @@ print(string)
 - 索引，返回单个字符
 - 切片，返回新的字符串
 - 可遍历，每次返回单个字符
+- 可使用in判断是否包含
 
 ```python showLineNumbers
 s = 'good morning'
@@ -68,7 +69,17 @@ s[:-3]  # good morn
 s[:]  # good morning
 
 # 字符串的拼接
-s[:-3] + s[-3:]  # good morninging
+s[:-3] + s[-3:]  # good morning
+
+# 遍历
+for i in s:
+    print(i,end=' ')
+# 输出：
+# g o o d   m o r n i n g
+
+# in判断
+'a' in 'abc'  # True
+'z' in 'abc'  # False
 
 # 需要注意避免在循环中使用 `+` 操作符（每次拼接都会创建新字符串）
 # 推荐使用列表收集，最后使用`str.join()` 连接字符串。
@@ -82,6 +93,13 @@ parts = []
 for i in range(10000):
     parts.append(str(i))
 s = "".join(parts)
+
+# 进阶方式,流式写入
+import io
+s = io.StringIO()
+for i in range(10000):
+    s.write(str(i))
+s = s.getvalue()
 ```
 :::
 
@@ -273,11 +291,17 @@ print('{:%Y-%m-%d %H:%M:%S}'.format(d)) # 2008-12-03 12:15:58
 
 Python3 的字符就是`Unicode`字符。
 
+:::info
+Unicode 字符串类型已更改为支持多种内部表示，具体取决于字符的最大 Unicode 序数（1、2 或 4 字节）。这将允许在常见情况下使用空间高效的表示，但在所有系统上都能访问完整的 UCS-4。
+
+[PEP 393的灵活字符串表示](https://peps.python.org/pep-0393/)
+:::
+
 #### Unicode
 - **bytes**: Python 中的字节串类型，用于表示二进制数据。
 - **ASCII**: 最古老的编码标准，只包含128个字符。
 - **Unicode**: 一种字符编码标准，为世界上大多数字符分配唯一的代码点。
-- **UTF-8**: 最常见的 Unicode 编码形式，全称 Unicode Transformation Format 8，<HoverText text="向后兼容 ASCII" explanation="ASCII 码值为 0-127 的字符，在 UTF-8 中与 ASCII 完全相同。"/>。
+- **UTF-8**: 全称 Unicode Transformation Format 8，<HoverText text="向后兼容 ASCII" explanation="ASCII 码值为 0-127 的字符，在 UTF-8 中与 ASCII 完全相同。"/>。是最常见的 Unicode 编码形式，UTF-8是变长编码，1-4字节表示一个Unicode码点。
 - **码表**: 字符与编码的映射表，表头包含显示字符、编码值、描述。
 
 下面的示例中，我刻意避免使用字符，为了不让你误解字符串的定义。
@@ -466,10 +490,9 @@ ew
 """
 ```
 
+### 字符串附加方法
 
-## 字符串方法
-
-Python中字符串类型的方法相当多。你可以根据自己的节奏选择学习。
+Python中字符串类型的附加方法相当多。你可以根据自己的节奏选择学习。
 
 <MarkmapHooks initialMarkdown={`
 
@@ -548,7 +571,7 @@ Python中字符串类型的方法相当多。你可以根据自己的节奏选�
 
 ## 内置函数
 
-### ord() 函数和 chr() 函数
+### ord函数、chr函数
 
 ord() 函数和 chr() 函数是Python中用于处理字符串和Unicode字符的函数。
 
@@ -567,3 +590,156 @@ for _ in range(ord('A'), ord('Z')+1):
     print(chr(_),end=' ')
 # 输出：A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 ```
+
+### bin函数、oct函数、hex函数
+
+这一组函数用于将**整数**转换为二进制、八进制、十六进制**字符串**。
+
+如果想要转换回去，可以使用`int()`函数，并指定进制。
+
+```python showLineNumbers
+num = 10
+bin_num = bin(num)
+print(bin_num) # 0b1010
+print(type(bin_num)) # <class 'str'>
+oct_num = oct(num)
+print(oct_num) # 0o12
+print(type(oct_num)) # <class 'str'>
+hex_num = hex(num)
+print(hex_num) # 0xa
+print(type(hex_num)) # <class 'str'>
+
+num_bin = int(bin_num,2)
+num_oct = int(oct_num,8)
+num_hex = int(hex_num,16)
+print(num_bin) # 10
+print(type(num_bin)) # <class 'int'>
+print(num_oct) # 10
+print(type(num_oct)) # <class 'int'>
+print(num_hex) # 10
+print(type(num_hex)) # <class 'int'>
+```
+
+### bytes函数、bytearray函数
+
+bytes() 函数和 bytearray() 函数用于将**字符串**转换为**字节串**。
+
+当你索引或迭代一个字符串时，你得到的是一个 str 类型的单个字符。
+
+当你索引或迭代一个字节序列时，你得到的是一个 int 类型，表示该字节的数值（0 到 255）
+
+```python showLineNumbers
+s = 'Hello, 世界!'
+bytes_s = bytes(s,encoding='utf-8')
+print(bytes_s) # b'Hello, \xe4\xb8\x96\xe7\x95\x8c!'
+print(type(bytes_s)) # <class 'bytes'>
+# bytes 属于不可变对象
+
+bytearray_s = bytearray(s,encoding='utf-8')
+print(bytearray_s) # bytearray(b'Hello, \xe4\xb8\x96\xe7\x95\x8c!')
+print(type(bytearray_s)) # <class 'bytearray'>
+# bytearray 属于可变对象，适合原地修改
+```
+
+:::tip
+* **位 (bit)**：计算机中**存储**数据的最小单位，只能表示 0 或 1。
+* **字节 (byte)**：计算机中**处理**数据的最小单位，等于 8 个位。
+* `b'...'`：在 Python 中，这表示一个**字节串**，用于处理原始的二进制数据。
+
+如果你尝试用普通字符串模式 ('r') 去读取一个<HoverText text="非文本文件" explanation="例如图片、音频、视频等文件格式，它们的内部结构都是由原始字节构成的。这些字节没有对应的“字符”意义，它们代表的是颜色信息、编码参数等等。"/>，Python 就会报错，因为它会试图将这些原始字节解释成文本，但很多字节序列在文本编码中是无效的。
+
+```python showLineNumbers
+# 假设我们有一个图片文件叫 'images.webp'
+# 计算机读取这个文件时，读取的是原始的字节数据
+# 我们可以用 'rb' 模式来模拟这个过程，'r' 表示读取，'b' 表示以二进制(bytes)模式读取
+
+# 报错
+with open('images.webp', 'r') as f: pass
+
+# 正确
+try:
+    with open('images.webp', 'rb') as f:
+        # data 变量现在是一个字节串 (bytes)
+        data = f.read()
+        
+        print(f"文件大小：{len(data)} 字节")
+        print(f"数据类型：{type(data)}")
+        
+        # 打印部分字节数据，你会看到它不是人类可读的字符串
+        # 而是十六进制的原始数据，这就是图片文件的本质
+        print(f"部分字节数据（前20个）：{data[:20]}")
+
+except FileNotFoundError:
+    print("找不到 images.webp 文件，请确保文件存在。")
+
+# 输出：
+# 文件大小：12345 字节
+# 数据类型：<class 'bytes'>
+# 部分字节数据（前20个）：b'RIFF\x86\xba\x00\x00WEBPVP8 z\xba\x00\x00'
+```
+:::
+
+### ascii函数
+
+当你在处理需要与其他系统或语言（特别是那些只支持 ASCII 的系统）交互的数据时，ascii() 可以确保你的数据表示形式是兼容的。
+
+因为`ascii()` 的输出结果是完全由 ASCII 字符组成的，因此可以在任何只支持 ASCII 的环境中安全地传输和存储。
+
+```python showLineNumbers
+data = {'name': '张三', 'age': 30}
+# ascii(data) 将所有非 ASCII 字符转义
+print(ascii(data))
+# 输出：{'name': '\\u5f20\\u4e09', 'age': 30}
+```
+
+### repr函数
+
+repr() 函数返回一个明确的、可用于重新创建对象的表达式。通常调用对象的 `__repr__()` 方法。
+
+```python showLineNumbers
+# 普通打印无法区分数字和字符串
+print(1,"1") # 1 1
+
+# repr 可以区分数字和字符串，输出内容可以用于重新创建对象
+print(repr(1),repr("1"))# 1 '1'
+```
+
+### format函数
+
+format() 函数用于格式化字符串。它早于f-string、更早于%格式化字符串出现。
+
+支持的格式化方式与f-string相同，但不支持使用函数。
+
+```python showLineNumbers
+print("Hello, {}!".format("world")) # Hello, world!
+print("Hello, {name}!".format(name="world")) # Hello, world!
+print("Hello, {0}! {1}!".format("world", "python")) # Hello, world! python!
+```
+
+## 相关库推荐
+
+- <Highlight color="green">io.StringIO：把内存中的一个字符串，当成一个文件来处理。</Highlight>
+
+:::info
+假设你有一个函数，它要求传入一个文件对象作为参数，但你并不想真的在磁盘上创建一个文件。这时，你可以用 io.StringIO 创建一个内存中的“假文件”。
+
+```python showLineNumbers
+import io
+
+def process_file(file_object):
+    """一个需要文件对象作为参数的函数"""
+    content = file_object.read()
+    # 假设这里对文件内容进行了一些处理
+    return content.upper()
+
+# 使用 io.StringIO 创建一个内存中的文件
+text_data = "hello world from memory"
+string_file = io.StringIO(text_data)
+
+# 将内存中的文件对象传递给函数
+result = process_file(string_file)
+
+print(result)
+# 输出：HELLO WORLD FROM MEMORY
+```
+:::

@@ -483,31 +483,6 @@ print(keyword.kwlist)
 - help(): 帮助文档
 `} />
 
-#### 输入输出
-
-为了学习曲线更加平滑，我们先简单学习下Python的输入输出。
-
-Python 的输入输出使用 `input()`函数来捕获用户的键盘输入，使用`print()`函数来输出（默认输出到终端控制台）。
-
-```python showLineNumbers
-name = input("请输入你的名字：") # 输入
-print(f"你好，{name}！") # 输出
-# 等价于
-print("你好，" + name + "！")
-# 等价于
-print("你好，",name,"！")
-```
-
-接下来我们尝试打开一个文件，将数据输出到文件中。
-
-```python showLineNumbers
-f = open("test.txt", "w") # 打开文件
-print('Hello, World!', file=f) # 输出到文件
-f.close() # 关闭文件
-```
-
-运行后，我们可以在当前目录下看到一个`test.txt`文件，内容为`Hello, World!`。
-
 
 ### 内置常量
 
