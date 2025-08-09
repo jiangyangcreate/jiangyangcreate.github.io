@@ -235,3 +235,21 @@ sys.getrefcount(a)
 ## 内置函数
 
 ### `__import__`函数
+
+函数签名：`__import__(name, globals=None, locals=None, fromlist=(), level=0) -> module`
+
+参数说明：
+- `name`：要导入的模块名
+- `globals`：全局命名空间
+- `locals`：局部命名空间
+- `fromlist`：要导入的属性列表
+- `level`：导入级别
+
+返回值：
+- 返回导入的模块
+
+```python showLineNumbers
+math = __import__('math')
+
+print(math.sqrt(16)) # 4.0
+```

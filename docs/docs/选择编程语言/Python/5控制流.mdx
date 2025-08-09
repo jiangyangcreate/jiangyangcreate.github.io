@@ -243,6 +243,18 @@ finally:
 
 any函数和all函数用于判断一个序列中的元素是否都为真或有一个为真。通常与if语句一起使用。
 
+any函数签名：`any(iterable) -> bool`
+
+all函数签名：`all(iterable) -> bool`
+
+参数说明：
+- `iterable`：要判断的序列
+
+返回值：
+- any函数返回一个布尔值，如果序列中有一个元素为真，则返回True，否则返回False
+- all函数返回一个布尔值，如果序列中所有元素都为真，则返回True，否则返回False
+
+
 ```python showLineNumbers
 a = 10
 b = -5
@@ -253,11 +265,15 @@ print(any([a,b,c])) # True,有一个为真时为真
 
 ### range函数
 
-range函数的参数有三个：
+range函数签名：`range(start, stop, step) -> range`
 
-- 起始值（可省略，默认为0）
-- 结束值
-- 步长(可省略，默认为1，可正可负)
+参数说明：
+- `start`：起始值（可省略，默认为0）
+- `stop`：结束值
+- `step`：步长(可省略，默认为1，可正可负)
+
+返回值：
+- 返回一个range对象
 
 ```python showLineNumbers
 for _ in range(10, 20, 2):
@@ -277,7 +293,16 @@ for _ in range(10,0,-2):
 
 ### enumerate函数
 
-enumerate函数用于遍历序列，同时获取索引和值。
+enumerate函数用于遍历序列，同时获取序列的序号和值。
+
+enumerate函数签名：`enumerate(iterable, start=0) -> enumerate`
+
+参数说明：
+- `iterable`：要遍历的序列
+- `start`：起始序号（可省略，默认为0）
+
+返回值：
+- 返回一个enumerate对象
 
 ```python showLineNumbers
 for i, v in enumerate(['tic', 'tac', 'toe']):
@@ -285,11 +310,25 @@ for i, v in enumerate(['tic', 'tac', 'toe']):
 # 0 tic
 # 1 tac
 # 2 toe
+
+for i, v in enumerate(['tic', 'tac', 'toe'], start=1):
+    print(i, v)
+# 1 tic
+# 2 tac
+# 3 toe
 ```
 
 ### zip函数
 
 zip函数用于将多个序列的元素一一配对，返回一个zip对象。
+
+zip函数签名：`zip(iterable1, iterable2, ...) -> zip`
+
+参数说明：
+- `iterable1, iterable2, ...`：要配对的序列
+
+返回值：
+- 返回一个zip对象
 
 ```python
 list_a = [1, 2, 3]

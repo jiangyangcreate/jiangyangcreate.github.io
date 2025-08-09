@@ -7,11 +7,52 @@ title: 代码执行与调试
 
 ### breakpoint函数
 
+函数签名：`breakpoint(*args, **kws)`
+
+参数说明：
+- `args`：要传递给断点的参数
+- `kws`：要传递给断点的关键字参数
+
+返回值：
+- 无返回值
+
+
+
 ### compile函数
 
-### eval函数
+函数签名：`compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1) -> code`
 
-### exec函数
+参数说明：
+- `source`：要编译的源代码
+- `filename`：要编译的文件名
+- `mode`：要编译的模式
+- `flags`：要编译的标志
+- `dont_inherit`：是否不继承父类
+- `optimize`：优化级别
+
+返回值：
+- 返回编译后的代码对象
 
 
 
+### eval函数和exec函数
+
+eval函数签名：`eval(expression, globals=None, locals=None) -> value`
+exec函数签名：`exec(object, globals=None, locals=None) -> value`
+
+
+参数说明：
+- `expression`：要执行的表达式
+- `globals`：全局命名空间
+- `locals`：局部命名空间
+
+返回值：
+- 返回表达式的值
+
+```python showLineNumbers
+code = compile("print('Hello, World!')", 'test.py', 'exec')
+exec(code) # 执行编译后的代码、代码块
+
+eval("1 + 1") # 执行表达式，返回2
+
+```

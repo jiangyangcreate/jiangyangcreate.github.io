@@ -93,6 +93,16 @@ print(one_third == +one_third) # False
 ### int函数
 可以通过`int()`函数将字符串或数字转换为整数。
 
+int函数签名：`int(x, base=10) -> int`
+
+参数说明：
+- `x`：要转换的字符串或数字
+- `base`：进制，默认为10
+
+返回值：
+- 返回一个整数
+
+
 ```python showLineNumbers
 # 将字符串转换为整数
 print(int('123')) # 123
@@ -118,11 +128,23 @@ print(1E-2)  # 0.01
 
 ### float函数
 
+可以通过`float()`函数将字符串或数字转换为浮点数。
+
+float函数签名：`float(x) -> float`
+
+参数说明：
+- `x`：要转换的字符串或数字
+
+返回值：
+- 返回一个浮点数
+
 ```python showLineNumbers
-# 使用float可以将其他数据类型转化为浮点数
-print(float(1))  # 1.0
+# 将字符串转换为浮点数
 print(float('3.14'))  # 3.14
-print(float('inf'))  # inf
+
+# 将整数转换为浮点数
+print(float(1))  # 1.0
+
 ```
 
 :::tip
@@ -323,19 +345,27 @@ def range_check_issue():
 
 ### complex函数
 
-Python支持多种方式创建复数：
+complex函数签名：`complex(real, imag=0) -> complex`
+
+参数说明：
+- `real`：实部
+- `imag`：虚部，默认为0
+
+返回值：
+- 返回一个复数
+
 
 ```python showLineNumbers
-# 方法1: 使用j或J作为虚数单位
-z1 = 3 + 4j
-z2 = 3 + 4J  # j和J等价
-z3 = 4j      # 纯虚数
-z4 = 3 + 0j  # 实数的复数表示
+# 使用complex()函数创建复数
+z1 = complex(3, 4)      # 3+4j
+z2 = complex('3+4j')    # 从字符串创建
+z3 = complex(3)         # 3+0j
 
-# 方法2: 使用complex()函数
-z5 = complex(3, 4)      # 3+4j
-z6 = complex('3+4j')    # 从字符串创建
-z7 = complex(3)         # 3+0j
+# 使用j或J作为虚数单位
+z4 = 3 + 4j
+z5 = 3 + 4J  # j和J等价
+z6 = 4j      # 纯虚数
+z7 = 3 + 0j  # 实数的复数表示
 ```
 
 ### 复数的属性和基本操作
@@ -356,6 +386,14 @@ print(f"共轭: {z.conjugate()}")  # (3-4j)
 ### bool函数
 
 `bool(x)` 函数可以将任意值转换为布尔值。
+
+函数签名：`bool(x) -> bool`
+
+参数说明：
+- `x`：要转换的值
+
+返回值：
+- 返回一个布尔值
 
 如果`x`是数字类型，则判断`x`是否为0，为0则返回False，否则返回True。
 
@@ -445,7 +483,13 @@ print(f"True的个数: {true_count}, False的个数: {false_count}")
 
 返回一个数字的绝对值。 参数可以是整数、浮点数或任何实现了 __abs__() 的对象。 
 
-如果参数是一个复数，则返回它的模。
+函数签名：`abs(x) -> number`
+
+参数说明：
+- `x`：要计算绝对值的数字
+
+返回值：
+- 返回一个数字的绝对值。如果参数是一个复数，则返回它的模。
 
 ```python showLineNumbers
 print(abs(-10))     # 10
@@ -455,11 +499,17 @@ print(abs(3+4j))    # 5.0 - 复数的模长，即sqrt(3²+4²)
 
 ### max函数、min函数
 
-max 返回可迭代对象中的最大值，接受多个参数。函数参数为`max(arg1, arg2, *args, key=None)`
-
-min 返回可迭代对象中的最小值，接受多个参数。函数参数为`min(arg1, arg2, *args, key=None)`
-
 二者语法一致、参数一致，只是行为相反。
+
+max函数签名：`max(arg1, arg2, *args, key=None)`
+min函数签名：`min(arg1, arg2, *args, key=None)`
+
+参数说明：
+- `arg1, arg2, *args`：要比较的参数，可以是多个
+- `key`：一个函数，用于指定比较的规则，默认为None，即直接比较
+
+返回值：
+- max返回可迭代对象中的最大值，min返回可迭代对象中的最小值
 
 ```python showLineNumbers
 print(max(1, 2, 3)) # 3
@@ -480,15 +530,32 @@ print(max(lists,key=_sort)) # -2
 
 ### sum函数
 
-返回可迭代对象中所有元素的和。函数参数为`sum(iterable, /, start=0)`
+返回可迭代对象中所有元素的和。
+
+函数签名：`sum(iterable, /, start=0)`
+
+参数说明：
+- `iterable`：要计算和的可迭代对象
+- `start`：要添加到和的初始值，默认为0
 
 ```python showLineNumbers
 print(sum((1, 2, 3))) # 6
+
+print(sum([1,2,3],10)) # 16
 ```
 
 ### round函数
 
-四舍五入函数，如果与两个倍数同样接近，则选用偶数。因此，`round(0.5)` 和 `round(-0.5)` 均得出 `0` 而 `round(1.5)` 则为 `2`
+四舍五入函数，如果与两个倍数同样接近，则选用偶数。
+
+函数签名：`round(number, ndigits=None)`
+
+参数说明：
+- `number`：要四舍五入的数字
+- `ndigits`：要保留的小数位数，默认为None，即四舍五入到整数
+
+返回值：
+- 返回一个四舍五入后的数字，`round(0.5)` 和 `round(-0.5)` 均得出 `0` 而 `round(1.5)` 则为 `2`
 
 ```python showLineNumbers
 # 四舍五入转化
@@ -511,6 +578,15 @@ print(round(123.555,2)) # 123.56
 
 若操作数为混合类型，则适用二进制算术运算符的规则。
 
+函数签名：`divmod(a, b) -> tuple`
+
+参数说明：
+- `a`：被除数
+- `b`：除数
+
+返回值：
+- 返回一个包含商和余数的元组
+
 ```python showLineNumbers
 print(divmod(7, 3)) # (2, 1)
 
@@ -525,9 +601,17 @@ print(divmod(6.5, 3)) # (2.0, 0.5)
 
 ### pow函数
 
-函数参数为`pow(base, exp, mod=None)`
+函数签名：`pow(base, exp, mod=None)`
 
-计算`base`的`exp`次幂。如果`mod`存在，则再对结果进行取模，其结果等效于`pow(base, exp) % mod`。
+参数说明：
+- `base`：底数
+- `exp`：指数
+- `mod`：模数，默认为None，即不进行取模
+
+返回值：
+- 返回`base`的`exp`次幂。如果`mod`存在，则再对结果进行取模，其结果等效于`pow(base, exp) % mod`。
+
+等价于`base ** exp`，如果`mod`存在，则再对结果进行取模，其结果等效于`(base ** exp) % mod`。
 
 ```python showLineNumbers
 print(pow(2, 3)) # 8
