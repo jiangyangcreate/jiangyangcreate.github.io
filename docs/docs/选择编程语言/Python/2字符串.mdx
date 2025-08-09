@@ -359,7 +359,7 @@ print(unicodedata.name('世'),unicodedata.name('界'))
 print('\N{CJK UNIFIED IDEOGRAPH-4E16}\N{CJK UNIFIED IDEOGRAPH-754C}')
 # 输出：世界
 
-# 不支持拼接显示，包含字面值合并、加法拼接等
+# 会报错：因为\N不支持拼接显示，包含字面值合并、加法拼接、变量传递等
 name = 'CJK UNIFIED IDEOGRAPH-4E16'
 print(f'\N{name}')
 ```
@@ -564,7 +564,7 @@ Python中字符串类型的附加方法相当多。你可以根据自己的节�
 
 ### 字符串编码与解码
 - encode: 将字符串编码为字节串
-- decode: 将字节串解码为字符串
+- decode: 此方法将字节串解码为字符串（严格来说，decode是字节串的方法）
 
 ### 其他
 - join: 将可迭代对象中的字符串拼接成一个字符串
@@ -711,16 +711,15 @@ print(repr(1),repr("1"))# 1 '1'
 
 ### format函数
 
-format() 函数用于格式化字符串。它早于f-string、更早于%格式化字符串出现。
+format() 函数用于格式化字符串。它早于f-string出现，是传统的字符串格式化方法。
 
-支持的格式化方式与f-string相同，但不支持使用函数。
+支持的格式化方式与f-string类似，但语法稍有不同，且不支持f-string的调试表达式（如f`{var=}`）、表达式内的函数、方法调用（如f`{len(var)}`）。
 
 ```python showLineNumbers
 print("Hello, {}!".format("world")) # Hello, world!
 print("Hello, {name}!".format(name="world")) # Hello, world!
 print("Hello, {0}! {1}!".format("world", "python")) # Hello, world! python!
 ```
-
 
 ## 相关库推荐
 

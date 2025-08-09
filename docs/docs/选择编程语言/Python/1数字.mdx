@@ -64,7 +64,9 @@ x 不总是等于 +x
 
 特殊情况1：自定义类
 
-如果类重载了 `__pos__` 方法，`+x` 的行为可以自定义，这时 `x` 可能不等于 `+x`。例如Python的`collections.Counter`类重载了 `__pos__` 方法，所以`+Counter()` 的行为可以自定义。
+如果类重载了 `__pos__` 方法，`+x` 的行为可以自定义，这时 `x` 可能不等于 `+x`。
+
+例如Python的`collections.Counter`类重载了 `__pos__` 方法，所以`+Counter()` 的行为可以自定义。
 
 特殊情况2：decimal
 Decimal 类型的“设计是基于考虑人类习惯的浮点数模型，并且因此具有以下最高指导原则 —— 计算机必须提供与人们在学校所学习的算术相一致的算术。” —— 摘自 decimal 算术规范描述。
@@ -118,7 +120,9 @@ print(1E-2)  # 0.01
 
 ```python showLineNumbers
 # 使用float可以将其他数据类型转化为浮点数
-float(1)
+print(float(1))  # 1.0
+print(float('3.14'))  # 3.14
+print(float('inf'))  # inf
 ```
 
 :::tip
@@ -363,18 +367,24 @@ print(f"共轭: {z.conjugate()}")  # (3-4j)
 
 如果没有实现`__bool__`方法，则调用`__len__`方法，如果`__len__`方法返回0，则`bool(x)`返回False，否则返回True。
 
-所以常见的布尔值为False的有：
+常见的布尔值为False的情况：
 ```python showLineNumbers
 # 是数字类型且为0的值
-0
-0.0
-0j
+print(bool(0))        # False
+print(bool(0.0))      # False
+print(bool(0j))       # False
+
 # 是布尔类型且为False的值
-False
+print(bool(False))    # False
+
 # 实现了__bool__方法且返回False的值
-None
-# 没有实现__bool__方法且__len__方法返回0的值
-空字符串、空列表等空序列。
+print(bool(None))     # False
+
+# 没有实现__bool__方法且__len__方法返回0的值，例如：
+print(bool(""))       # False - 空字符串
+print(bool([]))       # False - 空列表
+print(bool({}))       # False - 空字典
+print(bool(set()))    # False - 空集合
 ```
 其他的数值布尔值为True。
 
@@ -438,9 +448,9 @@ print(f"True的个数: {true_count}, False的个数: {false_count}")
 如果参数是一个复数，则返回它的模。
 
 ```python showLineNumbers
-print(abs(-10)) # 10
-print(abs(10.5)) # 10.5
-print(abs(10j)) # 10.0
+print(abs(-10))     # 10
+print(abs(10.5))    # 10.5
+print(abs(3+4j))    # 5.0 - 复数的模长，即sqrt(3²+4²)
 ```
 
 ### max函数、min函数
@@ -532,10 +542,11 @@ print((2**3) % 5) # 3
 
 ## 相关库推荐
 
-- numbers: 数值抽象基类
-- <Highlight color="green">math: 数学函数</Highlight>
-- cmath: 复数数学函数
-- <Highlight color="green">decimal: 十进制定点和浮点算术</Highlight>
-- fractions: 有理数
 - <Highlight color="green">random: 生成伪随机数</Highlight>
+- <Highlight color="green">math: 数学函数</Highlight>
+- <Highlight color="green">decimal: 十进制定点和浮点算术</Highlight>
+- numbers: 数值抽象基类
+- cmath: 复数数学函数
+- fractions: 有理数
+
 - statistics: 数学统计函数
