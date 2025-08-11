@@ -2,9 +2,12 @@
 sidebar_position: 3
 title: opencv
 ---
-## opencv
 
-### 安装
+## 安装
+
+opencv 中的open指的是opensource，即开源的意思。cv指computer vision，即计算机视觉。
+
+opencv 是一个开源的计算机视觉库，包含大量的图像处理函数。
 
 [opencv-python](https://github.com/opencv/opencv-python)需要根据环境选择正确的包
 
@@ -23,22 +26,98 @@ title: opencv
 - 选项 4 - 无窗口完整包（包含主模块和 contrib/extra 模块）：``pip install opencv-contrib-python-headless``（请参考 [OpenCV 文档](https://docs.opencv.org/master/) 中的 contrib/extra 模块列表）
 
 
-### 教程指引
-
 OpenCv作为开源软件，自然有大量的教程，我读过一些纸质书籍，也看过一些开源教程，总体来说，对于入门与进阶来说，需要的是细致的基础讲解、完整的处理流程，非常推荐官方的[OpenCV-Python教程](https://opencv-python-tutorials.readthedocs.io/)。
 
 
-### 图像读取与显示
+## 图像读取与显示
+
+### cv2.imread
+
+函数签名：`cv2.imread(filename, flags=cv2.IMREAD_COLOR) -> image`
+
+参数说明：
+
+- `filename`：要读取的文件名
+- `flags`：读取标志，默认值为cv2.IMREAD_COLOR，表示读取为BGR格式。可选参数：
+    - cv2.IMREAD_COLOR：读取为BGR格式
+    - cv2.IMREAD_GRAYSCALE：读取为灰度图
+    - cv2.IMREAD_UNCHANGED：读取为原图，包含alpha通道
+
+返回值：
+
+- 返回读取的图像对象, 如果读取失败, 则返回None
+
+图像对象的常用属性：
+- `shape`：图像的形状，(height, width, channels) 其中channels为3、4，表示通道数为RGB、RGBA（A是透明度），如果是灰度、二值图，通道数为1的情况会报错。
+- `size`：图像的像素数，height * width * channels
+- `dtype`：图像的数据类型
+- `ndim`：图像的维度
+- `itemsize`：图像的元素大小
+- `nbytes`：图像的内存大小
 
 ```python showLineNumbers
-# 导入库
 import cv2
-# 读取图片, 读取的图片为BGR格式, 如果需要读取为RGB格式, 则需要使用cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-# 如果读取失败, 则返回None
-img = cv2.imread('imgs/img/10.jpg')
+path= "10.jpg"
+img = cv2.imread(path)
 print(img.shape) 
-# 打印图像的形状，(height, width, channels) 其中channels为3、4，表示通道数为RGB、RGBA（A是透明度），如果是灰度、二值图，通道数为1的情况会报错。
+```
 
+### cv2.imwrite
+
+函数签名：`cv2.imwrite(filename, img, [params])`
+
+参数说明：
+
+- `filename`：要保存的文件名
+- `img`：要保存的图像对象
+- `params`：可选参数，用于指定保存的格式和质量, 可选参数：
+    - cv2.IMWRITE_JPEG_QUALITY：JPEG图像质量，范围为0-100，默认值为95
+    - cv2.IMWRITE_PNG_COMPRESSION：PNG图像压缩级别，范围为0-9，默认值为3
+    - cv2.IMWRITE_PXM_BINARY：PPM/PGM/PBM图像格式，默认值为False
+
+```python showLineNumbers
+import cv2
+path= "10.jpg"
+img = cv2.imread(path)
+cv2.imwrite('new_img.jpg',img, [cv2.IMWRITE_JPEG_QUALITY, 100])
+```
+
+### cv2.imshow、cv2.waitKey、cv2.destroyWindow、cv2.destroyAllWindows
+
+cv2.imshow函数签名：`cv2.imshow(winname, img)`
+
+参数说明：
+
+- `winname`：窗口名称
+- `img`：要显示的图像对象
+
+
+cv2.waitKey函数签名：`cv2.waitKey([delay]) -> retval`
+
+参数说明：
+
+- `delay`：等待时间，单位为毫秒，默认值为0，表示无限等待
+
+返回值：
+
+- 返回按键的ASCII码，如果设置了中文输入法，键盘的捕获会被输入法占用，导致无法正常等待按键按下。
+
+
+上面两个函数是成对出现的，cv2.imshow用于显示图像，cv2.waitKey用于等待按键按下或者到时间自动关闭窗口。
+
+
+下面两个函数都表示关闭窗口，区别在于destroyWindow是关闭指定窗口，而destroyAllWindows是关闭所有窗口。
+
+destroyWindow函数签名：`cv2.destroyWindow(winname)`
+参数说明：
+- `winname`：要关闭的窗口名称
+
+destroyAllWindows函数签名：`cv2.destroyAllWindows()`
+
+```python showLineNumbers
+import cv2
+path= "10.jpg"
+img = cv2.imread(path)
 # 显示图片, 参数：img: 图像对象, 'Image': 窗口名称
 # 如果窗口名称重复，则不会创建新的窗口，而是将图像显示在已有的窗口中
 cv2.imshow('Image', img)
@@ -53,13 +132,58 @@ if key == ord('q'):
 cv2.destroyAllWindows()
 ```
 
-### 图像绘制
+## 图像绘制
+
+### cv2.line、cv2.rectangle、cv2.circle、cv2.polylines、cv2.ellipse
+
+line函数签名：`cv2.line(img, pt1, pt2, color, thickness, lineType, shift)`
+rectangle函数签名：`cv2.rectangle(img, pt1, pt2, color, thickness, lineType, shift)`
+
+参数说明：
+
+- `img`：图像对象
+- `pt1`：起点坐标
+- `pt2`：终点坐标
+- `color`：颜色
+- `thickness`：线宽
+- `lineType`：线型
+- `shift`：位移，默认为0，表示坐标是整数，如果大于1，则表示坐标是浮点数，例如shift=2，则表示坐标是浮点数。可用于实现亚像素精度绘图。
+
+circle函数签名：`cv2.circle(img, center, radius, color, thickness, lineType, shift)`
+ellipse函数签名：`cv2.ellipse(img, center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift)`
+
+参数说明：
+
+- `img`：图像对象
+- `center`：圆心坐标
+- `radius`：半径
+- `axes`：椭圆长轴和短轴长度
+- `angle`：椭圆旋转角度
+- `startAngle`：椭圆起始角度
+- `endAngle`：椭圆结束角度
+- `color`：颜色
+- `thickness`：线宽
+- `lineType`：线型
+- `shift`：位移，默认为0，表示坐标是整数，如果大于1，则表示坐标是浮点数，例如shift=2，则表示坐标是浮点数。可用于实现亚像素精度绘图。
+
+
+polylines函数签名：`cv2.polylines(img, pts, isClosed, color, thickness, lineType, shift)`
+
+参数说明：
+
+- `img`：图像对象
+- `pts`：顶点列表
+- `isClosed`：是否闭合
+- `color`：颜色
+- `thickness`：线宽
+- `lineType`：线型
+- `shift`：位移，默认为0，表示坐标是整数，如果大于1，则表示坐标是浮点数，例如shift=2，则表示坐标是浮点数。可用于实现亚像素精度绘图。
 
 ```python showLineNumbers
 # 导入库
 import cv2
 # 读取图片
-img = cv2.imread('imgs/img/10.jpg')
+img = cv2.imread('10.jpg')
 # 绘制直线
 # 参数：img: 图像对象, (100, 100): 起点坐标, (200, 200): 终点坐标, (0, 0, 255): 颜色, 2: 线宽
 cv2.line(img, (100, 100), (200, 200), (0, 0, 255), 2)
@@ -84,7 +208,41 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
 
-#### 绘制中文
+
+### cv2.putText
+
+函数签名：`cv2.putText(img, text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)`
+
+参数说明：
+
+- `img`：图像对象
+- `text`：要绘制的文字
+- `org`：文字的左下角坐标
+- `fontFace`：字体类型
+- `fontScale`：字体缩放比例
+- `color`：文字颜色
+- `thickness`：文字粗细
+- `lineType`：线型
+- `bottomLeftOrigin`：是否从左下角开始绘制
+
+函数直接作用于图像对象，不需要返回值。
+
+```python showLineNumbers
+import cv2
+
+# 读取图片
+img = cv2.imread('10.jpg')
+# 绘制文字：Hello, World! 位置为(100, 100)，字体为cv2.FONT_HERSHEY_SIMPLEX，字体缩放比例为1，颜色为红色，粗细为2
+cv2.putText(img, 'Hello, World!', (100, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+# 显示图片
+cv2.imshow('Image', img)
+# 展示1秒
+cv2.waitKey(1000)
+# 关闭所有窗口
+cv2.destroyAllWindows()
+```
+
+### PIL库绘制中文
 
 cv2的在图片上的绘制语法主要缺陷为无法绘制中文，需要使用PIL库来绘制中文。
 
@@ -115,7 +273,37 @@ img.show()
 # img.save('output.jpg')
 ```
 
-### 案例-人脸识别：录入并识别不同人脸
+## 基础图像操作
+
+### 获取图像的像素值cv2.item
+### 修改像素值cv2.itemset
+### 拆分与合并通道cv2.split、cv2.merge
+### 图像扩边cv2.copyMakeBorder
+### 图像加法cv2.add
+### 图像加权cv2.addWeighted
+### 图像逻辑运算cv2.bitwise_and、cv2.bitwise_or、cv2.bitwise_xor、cv2.bitwise_not
+
+## 动态图像
+
+### 视频读取与显示cv2.VideoCapture
+### 视频保存cv2.VideoWriter
+### 物体追踪cv2.Tracker
+
+## 图像变换
+
+### 图像缩放cv2.resize
+### 图像平移cv2.warpAffine
+### 图像旋转cv2.getRotationMatrix2D
+### 图像仿射变换cv2.getAffineTransform
+### 图像透视变换cv2.getPerspectiveTransform
+
+## 图像噪点
+
+## 图像边缘
+
+## 图像轮廓
+
+## 案例-人脸识别：录入并识别不同人脸
 
 - 这段程序首先会读取摄像头，并自动截取一定数量的人脸用作训练。
 - 然后将截取的人脸进行训练，生成一个训练模型。
