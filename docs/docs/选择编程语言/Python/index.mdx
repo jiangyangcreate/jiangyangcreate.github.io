@@ -108,7 +108,17 @@ docker是很典型的用空间换时间，它让开发者在任何地方都可�
 
 你可以选择任意一个工具箱或者都不选择，如果要选的话，我个人比较推荐`uv`，它吸取了各家之长，<HoverText text="目前看来是最好用的工具箱。" explanation="uv 基于 Rust 开发，速度很快，它的定位是一个工具替代多个工具，同时每个功能执行起来都非常快，比其他工具快 10 ~ 100 倍，一个命令等价于以前的多个命令！"/>
 
-因为对于专业的开发者来说，绝大部分时间我们都是在创建项目、发布项目、查看别人的项目并在本地复现，这些操作比较频繁。每周 `uv` 能为你节省 1 ~ 5 个小时，要知道我每周才工作 35 ~ 40 个小时！
+:::info
+`uv` 的核心哲学是每个项目都应该有自己独立的、隔离的环境。
+
+有的开发者习惯有一个全局的常用环境，安装像 `PyTorch` 这样的大型库，选择主环境后，大包处处可用，项目冲突时才创建一个新的虚拟环境。
+
+在 `uv` 的设计理念中，并没有一个真正的“全局环境”来安装这些大型库，以便所有项目共享。虽然这看起来可能意味着你需要为每个项目都安装一次大包，但 `uv` 实际上已经通过其智能缓存机制解决了这个问题。
+
+当 `uv` 第一次下载并安装 `PyTorch` 或 `OpenCV` 时，它会把这些包的二进制文件和依赖项缓存在你的本地文件系统中。当你在另一个项目中需要安装同样的包时，`uv` 不会重新从网络下载，而是直接从本地缓存中拷贝过来，几乎是瞬间完成。
+
+对于专业的开发者来说，绝大部分时间我们都是在创建项目、发布项目、查看别人的项目并在本地复现，这些操作比较频繁。每周 `uv` 能为你节省 1 ~ 5 个小时，要知道我每周才工作 35 ~ 40 个小时！
+:::
 
 下面是uv的常用命令示例，按项目构建顺序整理，可以参考。
 
@@ -131,7 +141,7 @@ cd example
 # 查看当前项目使用的Python版本
 uv python find
 
-# 添加包时会自动创建venv环境，同时更新项目依赖文件pyproject.toml，无需python -m venv，无需反复pip freeze
+# 添加包，添加时会自动创建venv环境，同时更新项目依赖文件pyproject.toml，无需python -m venv，无需反复pip freeze
 uv add ruff
 
 # 自动检查代码格式
@@ -156,7 +166,6 @@ uv init --app
 # 快速启动项目
 uv run fastapi dev
 ```
-
 
 #### UV 命令完整参考表
 
@@ -256,7 +265,7 @@ uv run fastapi dev
 | Python              | 提供Python语言基础支持，包括语法高亮、代码补全和格式化             |
 | Pylance             | 高性能Python语言服务器，提供类型检查和智能提示                     |
 | Python Debugger     | 支持Python代码的断点调试、变量监控和单步执行                       |
-| Black Formatter     | 自动格式化Python代码，保持一致的代码风格                           |
+| Ruff Formatter      | 自动格式化Python代码，保持一致的代码风格                           |
 | Jupyter             | 提供Jupyter Notebook支持，支持在VSCode中编辑和运行Jupyter Notebook |
 | Error Lens          | 直接在代码行内展示错误和警告信息，无需悬停鼠标                     |
 | Office Viewer       | 在VSCode中直接预览Word、Excel等Office文档并附赠IDE主题                          |
@@ -275,7 +284,7 @@ uv run fastapi dev
 - 推荐颜色主题：Dark Modern
 - 推荐图标主题：office material
 - 推荐字体：Fira Code（可选连字符显示）
-- Cursor推荐更改拓展栏位置：`View` -> `Appearance` -> `Panel Position` -> `Bottom`
+- Cursor侧边栏方向修改：`workbench.activityBar.orientation`，改为`vertical`
 
 ### 工作区的概念
 
