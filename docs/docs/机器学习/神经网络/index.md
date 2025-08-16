@@ -140,6 +140,19 @@ PyTorch 可以利用计算加速设备（例如GPU、NPU），为了达成这一
 **NVCC**：NVIDIA CUDA 编译器，是 CUDA Toolkit 的核心组件，负责将 CUDA 代码编译为可在 NVIDIA GPU 上执行的二进制代码。
 :::
 
+不过同样的测试代码，在[WSL2中安装的cuda对显卡性能](https://developer.nvidia.com/cuda-downloads?target_os=Linux&target_arch=x86_64&Distribution=WSL-Ubuntu&target_version=2.0&target_type=deb_local)会存在一定的影响。
+
+```bash showLineNumbers
+# windows原生环境
+name: NVIDIA GeForce RTX 3090 Ti
+write speed: 5063.91 MB/s
+read speed: 5565.53 MB/s
+
+# windows下的WSL2 Ubuntu-24.04 环境
+name: NVIDIA GeForce RTX 3090 Ti
+write speed: 2632.96 MB/s
+read speed: 4429.29 MB/s
+```
 
 
 ### PyTorch 数据集
