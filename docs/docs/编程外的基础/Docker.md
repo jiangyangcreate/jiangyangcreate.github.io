@@ -3,13 +3,13 @@ sidebar_position: 6
 title: Docker
 ---
 
-目前大部分的软件开发者已经意识到，不懂环境配置与希望开箱即用的人占大多数，因此开源社区提供容器分发已经成为主流。
+软件开发者已经意识到，希望开箱即用，不配置环境的人占大多数，因此提供容器分发已经成为主流。
 
-容器可以理解为轻量的虚拟机，是为组织设置软件基础架构的最流行的方法。Docker是最易于使用的工具之一。通常默认提到容器即特指Docker。
+容器可以理解为轻量的虚拟机，是为组织设置软件基础架构的最流行的方法。Docker是最易于使用的工具之一，是容器技术的代名词。<Highlight>默认容器与Docker等同。</Highlight>
 
 ## 安装
 
-在[个人电脑上安装](https://www.docker.com/get-started/)`Docker Desktop`可以以图形化的方式操作容器，方便你管理容器、镜像、卷和网络。这比单纯使用命令行更直观。
+在[个人电脑上安装](https://www.docker.com/get-started/)`Docker Desktop`可以用图形化的方式操作容器，方便管理容器、镜像、卷和网络。这比单纯使用命令行更直观。
 
 :::info
 如果你的电脑没有显示器或者是云服务器，那么还是[安装](https://docs.docker.com/engine/install/)`Docker`引擎吧。
@@ -17,30 +17,43 @@ title: Docker
 
 不论你通过哪种方式安装，都可以通过在终端输入：`docker`来检查是否安装成功。
 
-确认安装好后，可以通过云端和本地文件2种方式获取镜像并运行，下面云端镜像以`jiangmiemie/llmchat:0.0.2`为例，本地镜像以`nginx_latest`为例。
+## 快速上手
+
+确认安装好后，可以通过云端和本地文件2种方式获取镜像。
 
 ```bash showLineNumbers
-# 从云端拉取镜像
+# 从云端（Docker Hub）拉取名为 jiangmiemie/llmchat:0.0.2 的镜像
 docker pull jiangmiemie/llmchat:0.0.2
 
-# 有时直接从 Docker Hub 使用 `docker pull` 拉取镜像存在网络限制，可以从本地文件加载镜像
-docker load < nginx_latest.tar.gz
-# 也可以写为：docker load -i nginx_latest.tar.gz
+# 从本地文件加载名为 llmchat 的镜像
+docker load < llmchat.tar.gz
+# 也可以写为：
+# docker load -i llmchat.tar.gz
+```
 
-# 启动
-docker run -d -p 8501:8501 jiangmiemie/llmchat:0.0.2
+获取镜像后常用操作：
+```bash showLineNumbers
+# 启动容器，参考开发者提供的命令
+# 表示把容器内的8501端口映射到宿主机的80端口，-d表示后台运行，-p表示端口映射
+docker run -d -p 80:8501 jiangmiemie/llmchat:0.0.2
 
-# 查看
+# 查看所有容器
 docker ps -a
 
-# 停止
+# 停止容器
 docker stop {container_id}
 
-# 删除
+# 删除容器
 docker rm {container_id}
 ```
 
+:::tip
+如果你仅仅是想使用，那么可以跳过以下关于如何构建镜像的内容或未来你需要亲手维护服务的时候再回来学习。
+:::
+
 ## 基本命令
+
+[Docker 命令参考](https://docs.docker.com/reference/)
 
 ```bash showLineNumbers
 # 构建镜像
@@ -63,9 +76,11 @@ docker save nginx:latest > nginx_latest.tar
 docker save nginx:latest | gzip > nginx_latest.tar.gz
 ```
 
-### build
+### Dockerfile
 
-build 一个镜像的时候，例如`docker build -t llmchat:0.0.2 .`，其中末尾的`.`表示当前文件夹，他会在当前文件夹寻找`Dockerfile`文件。
+容器的开始始于 `Dockerfile`，build 一个镜像的时候，例如`docker build -t llmchat:0.0.2 .`，其中末尾的`.`表示当前文件夹，他会在当前文件夹寻找`Dockerfile`文件。
+
+[Dockerfile 参考](https://docs.docker.com/reference/dockerfile/)
 
 该文件如下关键字必不可少：
 
@@ -79,8 +94,11 @@ WORKDIR /app
 # 复制项目文件
 COPY . .
 
-# 安装依赖(可以在任意位置执行多个RUN命令)
+# 安装依赖(可以在任意位置执行多个RUN命令)shell 写法
 RUN pip install -r requirements.txt
+
+# 或者使用exec 形式，此种写法不支持管道、通配符或变量等 shell 特性，可以避免注入风险：
+RUN ["pip", "install", "-r", "requirements.txt"]
 
 # 启动服务
 CMD ["python", "chat_routers.py"]
@@ -101,20 +119,6 @@ FROM scratch
 
 不以任何系统为基础，直接将可执行文件复制进镜像的做法并不罕见，比如 swarm、coreos/etcd。对于 Linux 下静态编译的程序来说，并不需要有操作系统提供运行时支持，所需的一切库都已经在可执行文件里了，因此直接 FROM scratch 会让镜像体积更加小巧。使用 Go 语言 开发的应用很多会使用这种方式来制作镜像，这也是为什么有人认为 Go 是特别适合容器微服务架构的语言的原因之一。
 
-#### ADD & COPY
-
-ADD 指令和 COPY 的格式和性质基本一致。但是在 COPY 基础上增加了一些功能。
-
-比如 **源路径** 可以是一个 URL，这种情况下，Docker 引擎会试图去下载这个链接的文件放到 **目标路径** 去。下载后的文件权限自动设置为 600，如果这并不是想要的权限，那么还需要增加额外的一层 RUN 进行权限调整，另外，如果下载的是个压缩包，需要解压缩，也一样还需要额外的一层 RUN 指令进行解压缩。所以不如直接使用 RUN 指令，然后使用 wget 或者 curl 工具下载，处理权限、解压缩、然后清理无用文件更合理。因此，这个功能其实并不实用，而且不推荐使用。
-
-如果 **源路径** 为一个 tar 压缩文件的话，压缩格式为 gzip, bzip2 以及 xz 的情况下，ADD 指令将会自动解压缩这个压缩文件到 **目标路径** 去。
-
-#### ENTRYPOINT & RUN
-
-ENTRYPOINT 的格式和 RUN 指令格式一样，分为 exec 格式和 shell 格式。
-
-ENTRYPOINT 的目的和 CMD 一样，都是在指定容器启动程序及参数。ENTRYPOINT 在运行时也可以替代，不过比 CMD 要略显繁琐，需要通过 docker run 的参数 --entrypoint 来指定。
-
 #### WORKDIR
 
 切换到镜像中的指定路径，设置工作目录
@@ -123,9 +127,40 @@ ENTRYPOINT 的目的和 CMD 一样，都是在指定容器启动程序及参数�
 WORKDIR 指令为 Dockerfile 中跟随它的任何 RUN、CMD、ENTRYPOINT、COPY、ADD 指令设置工作目录
 如果 WORKDIR 不存在，即使它没有在任何后续 Dockerfile 指令中使用，它也会被创建
 
+#### ADD & COPY
+
+**ADD 指令**：用于将本地文件系统或远程 URL 资源添加到容器镜像中(下载后的文件权限自动设置为 600)，如果 **源路径** 为一个 tar 压缩文件的话，压缩格式为 gzip, bzip2 以及 xz 的情况下，ADD 指令将会自动解压缩这个压缩文件到 **目标路径** 去。
+
+**COPY 指令**：专门用于从构建上下文（build context）中复制文件或目录到容器镜像的指定路径。
+
+#### ENTRYPOINT & RUN & CMD
+
+**RUN 指令**：在镜像构建阶段执行命令，用于安装软件包、创建目录、设置环境等构建时操作。每个 RUN 指令会创建新的镜像层。
+
+**CMD 指令**：定义容器启动时的默认执行命令和参数。可以被 `docker run` 命令行参数完全覆盖。
+
+**ENTRYPOINT 指令**：定义容器启动时的固定入口点。与 CMD 的主要区别在于：
+
+1. **执行优先级**：ENTRYPOINT 具有更高的执行优先级，不会被 `docker run` 的命令行参数覆盖
+2. **参数传递**：`docker run` 的参数会作为 ENTRYPOINT 的参数传入
+3. **覆盖方式**：需要使用 `--entrypoint` 参数才能在运行时替换
+
+:::tip
+**ENTRYPOINT + CMD 组合模式**：
+- ENTRYPOINT 定义固定的执行程序
+- CMD 提供默认参数
+- 运行时参数会替换 CMD 的默认值
+
+```dockerfile
+ENTRYPOINT ["python", "app.py"]
+CMD ["--port", "8080"]
+```
+:::
+
+
 ### run
 
-`docker run`有超过100个参数，但你只需要记住常见的几个即可：
+`docker run`有超过100个参数，<Highlight>可以覆盖`Dockerfile`中的`CMD`指令</Highlight>，你需要记住常见的几个：
 
 #### **`-d`** (或 `--detach`)：**后台运行**
 
@@ -141,7 +176,7 @@ docker run -d nginx
 
 将宿主机的端口映射到容器内部的端口，以便从外部访问容器内的服务。
 
-<Highlight>命令也可以组合使用</Highlight>，例如：
+<Highlight>命令也可以组合使用</Highlight>
 
 ```bash
 # docker run -p [宿主机端口]:[容器内部端口] {镜像名}
@@ -224,8 +259,6 @@ Docker commit(固定语法) -m（主分支） 'fun'（注释） 'name'(image的�
 Docker rmi {id}
 Docker rmi（删除）
 ```
-
-如果是在自己的电脑上操作，可以在 vscode 内下载 docker 插件，即可查看对应容器状态。选中容器可以右键进行：删除、启动、停止等操作。也可以在 Docker 可视化界面进行操作。
 
 可以通过如下命令进入到容器内部的命令窗口：
 
@@ -403,126 +436,12 @@ docker-compose pull
 docker-compose up -d
 ```
 
-### 补充说明
-
-1. 如果使用私有仓库,需要先登录:
-
-```bash
-docker login your-registry
-```
-
-2. 可以使用环境变量控制版本:
-
-```yaml:docker-compose.yml
-services:
-  frontend:
-    image: your-registry/frontend:${TAG:-latest}
-```
-
-3. 可以只操作特定服务:
-
-```bash
-# 只推送前端
-docker-compose push frontend
-
-# 只拉取后端
-docker-compose pull backend
-```
-
-## 实战案例：群晖服务器搭建
-
-首先确保自己对每个环节的设备都拥有绝对控制权，在常见的家庭网络环节下，
-
-网络从运营商总部接入小区/园区的控制中心，由控制中心完成基本过滤
-用户通过光猫完成光电转换，完成与互联网的信息交换
-用户通过路由器链接光猫，完成内网与外网的信息交换
-用户通过交换机链接路由器，完成内网设备间的信息交换（中型公司会有）
-用户将购买的服务器连接到交换机/路由器，最后一步信息交换
-
-你可能会遇到如下问题：
-
-1.你所居住的小区/园区存在网络控制中心，限制家庭宽带的使用，例如我园区的网络控制中心：限制端口，限制设备数量，限制设备类。可以通过打电话沟通与钞能力解决。
-
-2.运营商提供的设备，例如：光猫，路由器，存在限制，例如我司的光猫仅开启上网功能，不允许端口对外开放，不允许端口映射。可以通过打电话沟通与钞能力解决。
-
-3.路由器、服务器不提供端口映射、仅暴露指定端口。我用的是华为+群晖，总价 4K。
-
-那么如果你的服务比较复杂，譬如我司曾经采购一个很古老的系统，我不负责迭代它，但需要维护他，那么打包成一个容器很显然是个不错的主意。
-
-由于群晖有很多版本，路由器也有很多版本，我这里只是提供一个思路，不保证一定能成功。
-
-### 群晖
-
-在群晖套件中心找到 Container Manager
-
-下载宝塔镜像 btpanel-baota
-
-映射端口前请确认端口没有在使用，可以通过群晖官网查询
-
-推荐端口号在 4000-5000 之间，因为这个端的端口未被使用。
-
-映射需要用到的端口与需要挂载的文件夹
-
-关于映射：如果你把宝塔的登录端口 8888 映射为群晖服务器的 4444，那么此时你就可以通过群晖的 4444 端口访问宝塔了。
-
-### 路由器
-
-开启设备映射，将群晖设为固定的 IP 地址，将群晖的端口映射到路由器的端口。
-
-如果你把群晖的 4444 端口映射为 80，并且把域名绑定到公网 IP 上时
-
-那么当你访问这个域名会跳转到路由器 80 端口，再跳到群晖的 4444 端口，再跳到群晖宝塔容器的 8888 端口。
-
-
-
-## 简易排错
-
-这个容器好像卡死了，查一下。
-
-### 观察并记录
-
-接手后通过以下命令先观察下
-
-```bash
-# 查看资源占用
-top
-
-# 静态查看容器资源占用
-docker stats --no-stream
-# 动态查看容器资源占用
-docker stats
-```
-
-CPU 资源占用升到了 280%，持续了 30 分钟，比较离谱。
-内存占了 8 个 G，这个程序需要模拟诸多浏览器且要保持缓存以便通信，所以 8 个 G 也不算离谱。
-
-> docker 显示的 cpu 占用是可以超 100%的，表示使用了多个核，200%表示用了 2 个核。合理的飙升：大数运算环节。异常的飙升：死循环、报错后日志不停歇的高速打印。
-
-### 分析并思考
-
-2 个可能： 1.因为 CPU 异常，所以可能是阻塞导致的，要查下阻塞的原因，因为代码里写了很多线程。 2.但是我等了 30 分钟，也可能是阻塞导致死锁了，这个可能性我觉得更大，内存一直被占着可以解释为死锁后资源无法释放，也合理。
-
-> （1）阻塞是由于资源不足引起的排队等待现象。
-> （2）死锁是由于两个对象在拥有一份资源的情况下申请另一份资源，而另一份资源恰好又是这两对象正持有的，导致两对象无法完成操作，且所持资源无法释放。
-
-### 缩小范围
-
-```bash
-# 进入容器
-docker exec -iter 【你的容器id】 /bin/bash
-# 示例
-docker exec -iter 6d711f6ee058 /bin/bash
-# 检查日志文件
-cd var/log
-ls
-
-# 退出容器
-exit
-
-# 复制日志
-docker cp 容器id:文件路径 本机路径
-```
 
 ## k8s
 
-[Kubernetes](https://kubernetes.io/) 是一个开源的容器编排引擎，用来对容器化应用进行自动化部署、 扩缩和管理。对容器化感兴趣的可以前往官网深入学习。
+[Kubernetes](https://kubernetes.io/) 是一个开源的容器编排引擎，用来对容器化应用进行自动化部署、 扩缩和管理。在容器编排市场中占据了主导地位。
+
+Docker 负责制造一辆辆轻便的汽车，而 Kubernetes 则是一个复杂的交通管理系统，确保这些汽车能高效、有序地运行在道路上。
+
+对容器编排感兴趣的可以前往官网深入学习。
+

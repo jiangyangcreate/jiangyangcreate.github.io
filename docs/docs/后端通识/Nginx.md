@@ -1,6 +1,6 @@
 ---
-sidebar_position: 4
-title: Web 服务
+sidebar_position: 6
+title: Nginx
 ---
 
 Nginx 是异步框架的网页服务器，也可以用作反向代理、负载平衡器和HTTP缓存。

@@ -1,7 +1,9 @@
 ---
-sidebar_position: 3
+sidebar_position: 8
 title: 不同的数据库
 ---
+
+你不需要精通所有这些数据库，但最好能根据项目需求选择并掌握其中几款
 
 # 不同的数据库
 
