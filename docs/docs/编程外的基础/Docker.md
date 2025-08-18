@@ -1,58 +1,31 @@
 ---
-sidebar_position: 5
-title: 容器化
+sidebar_position: 6
+title: Docker
 ---
 
-容器是为组织设置软件基础架构的最流行的方法。
+目前大部分的软件开发者已经意识到，不懂环境配置与希望开箱即用的人占大多数，因此开源社区提供容器分发已经成为主流。
 
-## Docker
+容器可以理解为轻量的虚拟机，是为组织设置软件基础架构的最流行的方法。Docker是最易于使用的工具之一。通常默认提到容器即特指Docker。
 
-[官方文档](https://yeasy.gitbook.io/docker_practice/)
-[民间文档](http://shouce.jb51.net/docker_practice/)
+## 安装
 
-### 安装
+在[个人电脑上安装](https://www.docker.com/get-started/)`Docker Desktop`可以以图形化的方式操作容器，方便你管理容器、镜像、卷和网络。这比单纯使用命令行更直观。
 
-#### win 和 mac 安装
+:::info
+如果你的电脑没有显示器或者是云服务器，那么还是[安装](https://docs.docker.com/engine/install/)`Docker`引擎吧。
+:::
 
-[https://www.docker.com/get-started](https://www.docker.com/get-started)
+不论你通过哪种方式安装，都可以通过在终端输入：`docker`来检查是否安装成功。
 
-#### Linux-Ubuntu 安装
-
-```language
-curl -sSL https://get.daocloud.io/docker | sh
-```
-
-#### 检查安装版本确认是否安装成功
-
-win 检查是否安装成功的命令：
-
-```language
-docker version
-```
-
-Linux 检查是否安装成功的命令：
-
-```language
-docker -v
-```
-
-### 基本命令
+确认安装好后，可以通过云端和本地文件2种方式获取镜像并运行，下面云端镜像以`jiangmiemie/llmchat:0.0.2`为例，本地镜像以`nginx_latest`为例。
 
 ```bash showLineNumbers
-# 构建镜像
-docker build -t llmchat:0.0.2 .
-
-# 打标签
-docker tag llmchat:0.0.2 jiangmiemie/llmchat:0.0.2
-
-# 登录
-docker login
-
-# 推送
-docker push jiangmiemie/llmchat:0.0.2
-
-# 拉取
+# 从云端拉取镜像
 docker pull jiangmiemie/llmchat:0.0.2
+
+# 有时直接从 Docker Hub 使用 `docker pull` 拉取镜像存在网络限制，可以从本地文件加载镜像
+docker load < nginx_latest.tar.gz
+# 也可以写为：docker load -i nginx_latest.tar.gz
 
 # 启动
 docker run -d -p 8501:8501 jiangmiemie/llmchat:0.0.2
@@ -67,11 +40,36 @@ docker stop {container_id}
 docker rm {container_id}
 ```
 
-#### build
+## 基本命令
 
-build 一个镜像的时候，如下关键字必不可少：
+```bash showLineNumbers
+# 构建镜像
+docker build -t llmchat:0.0.2 .
 
-```yaml showLineNumbers
+# 打标签
+docker tag llmchat:0.0.2 jiangmiemie/llmchat:0.0.2
+
+# 登录
+docker login
+
+# 推送镜像到云端
+docker push jiangmiemie/llmchat:0.0.2
+
+# 导出镜像为文件
+docker save nginx:latest > nginx_latest.tar
+# 也可以写为：docker save nginx:latest -o nginx_latest.tar
+
+# 如果文件较大，可压缩导出
+docker save nginx:latest | gzip > nginx_latest.tar.gz
+```
+
+### build
+
+build 一个镜像的时候，例如`docker build -t llmchat:0.0.2 .`，其中末尾的`.`表示当前文件夹，他会在当前文件夹寻找`Dockerfile`文件。
+
+该文件如下关键字必不可少：
+
+```yaml showLineNumbers title="Dockerfile"
 # 设置基础镜像
 FROM python:3.12.8
 
@@ -125,19 +123,86 @@ ENTRYPOINT 的目的和 CMD 一样，都是在指定容器启动程序及参数�
 WORKDIR 指令为 Dockerfile 中跟随它的任何 RUN、CMD、ENTRYPOINT、COPY、ADD 指令设置工作目录
 如果 WORKDIR 不存在，即使它没有在任何后续 Dockerfile 指令中使用，它也会被创建
 
-#### 运行时
+### run
 
-开启指定服务
+`docker run`有超过100个参数，但你只需要记住常见的几个即可：
 
-```language
-Docker run -p 8080:80 -d {name}
+#### **`-d`** (或 `--detach`)：**后台运行**
 
-Docker run -p 8080:80 -d nginx
+让容器在后台运行，并打印出容器ID。这对于需要持续运行的服务（如Web服务器、数据库）非常有用。
+
+```bash
+# docker run -d {镜像名}
+docker run -d nginx
 ```
+
+
+#### **`-p`** (或 `--publish`)：**端口映射**
+
+将宿主机的端口映射到容器内部的端口，以便从外部访问容器内的服务。
+
+<Highlight>命令也可以组合使用</Highlight>，例如：
+
+```bash
+# docker run -p [宿主机端口]:[容器内部端口] {镜像名}
+# 将宿主机的 8080 端口映射到容器内的 80 端口
+docker run -d -p 8080:80 nginx
+```
+
+
+#### **`-it`**：**交互式终端**
+
+这是两个参数的组合，通常一起使用。`-i` 保持标准输入开放，`-t` 分配一个伪终端。这让你能够进入容器内部进行交互式操作，例如执行 Shell 命令。
+
+```bash
+# docker run -it {镜像名} {命令}
+# 运行一个 Ubuntu 容器并进入其 bash 终端
+docker run -it ubuntu bash
+```
+
+#### **`--name`**：**指定容器名称**
+
+给容器一个易于记忆的名称，而不是一个随机生成的ID。这在后续操作（如 `docker stop`, `docker start`）时非常方便。
+
+```bash
+# docker run --name {容器名} {镜像名}
+docker run -d --name my-nginx-server nginx
+```
+
+
+#### **`-v`** (或 `--volume`)：**挂载卷**
+
+将宿主机的目录或文件挂载到容器内部，实现数据持久化或共享。
+
+```bash
+# docker run -v [宿主机路径]:[容器内部路径] {镜像名}
+# 将宿主机的 /app/data 目录挂载到容器内的 /data 目录
+docker run -d -v /app/data:/data postgres
+```
+
+
+#### **`--rm`**：**退出时自动删除容器**
+
+当容器停止时，自动删除它。这对于一次性任务、测试或临时运行的容器非常有用，可以保持你的系统整洁。
+
+```bash
+# docker run --rm {镜像名} {命令}
+# 运行一个临时容器，执行命令后自动删除
+docker run --rm busybox echo "Hello, Docker!"
+```
+
+#### **`-e`** (或 `--env`)：**设置环境变量**在容器内部设置环境变量，这对于配置应用程序非常重要。
+
+```bash
+# docker run -e [环境变量键]=[值] {镜像名}
+docker run -d -e POSTGRES_PASSWORD=mysecretpassword postgres
+```
+
+### 其他命令
 
 拷贝文件至 image(类似 git 里的 add 暂存)
 
-```language
+```bash
 docker cp {path} {id}{id_path}
 
 示例：
@@ -146,7 +211,7 @@ docker cp C:/Users/SY/Desktop/docktest/index.html {id}://usr/share/nginx/html
 
 保存(类似 git 里的 commit)
 
-```language
+```bash
 Docker commit -m 'fun' {id} 'name'
 
 示例：
@@ -155,7 +220,7 @@ Docker commit(固定语法) -m（主分支） 'fun'（注释） 'name'(image的�
 
 删除多余的 image
 
-```language
+```bash
 Docker rmi {id}
 Docker rmi（删除）
 ```
@@ -164,7 +229,7 @@ Docker rmi（删除）
 
 可以通过如下命令进入到容器内部的命令窗口：
 
-```language
+```bash
 docker ps -a
 # 查看所有容器id
 
@@ -179,87 +244,7 @@ python -m unittest test.test_spider.MyTestCase.test_spider
 更多命令可以查看以下链接:
 [https://www.runoob.com/docker/docker-tutorial.html](https://www.runoob.com/docker/docker-tutorial.html)
 
-### 离线镜像
 
-有时直接从 Docker Hub 拉取镜像存在网络限制，采用离线方式获取所需镜像显得尤为重要。以下方法适用于在网络畅通的环境与目标服务器之间传输镜像。
-
-```bash showLineNumbers
-# 在能访问 Docker Hub 的服务器（如海外服务器）上执行：
-docker pull nginx:latest
-
-# 导出镜像为文件
-## 普通导出
-docker save nginx:latest > nginx_latest.tar
-## Windows 平台（需指定输出文件）
-docker save nginx:latest -o nginx_latest.tar
-## 压缩导出
-docker save nginx:latest | gzip > nginx_latest.tar.gz
-
-# 将镜像文件传输到目标服务器后，执行以下命令进行加载：
-## 普通加载
-docker load < nginx_latest.tar.gz
-## 使用指定文件参数
-docker load -i nginx_latest.tar.gz
-
-# 导入过程中镜像标签可能丢失，因此建议使用以下命令为镜像重新打上标签
-# 其中，`<IMAGE ID>` 可通过导入命令的输出信息或使用 `docker image ls` 命令查看获得。
-docker tag <IMAGE ID> nginx:latest
-```
-
-附加建议：
-
-- **自动化**：可编写脚本实现不同服务器间的镜像传输自动化。
-- **定期同步**：对于更新频繁的镜像，建议设置定期检测和同步机制，以保障生产环境使用最新且安全的版本。
-- **私有 Registry**：构建私有 Docker Registry 可以简化镜像分发流程，并便于团队协作和多环境部署。
-
-
-### 简易排错
-
-这个容器好像卡死了，查一下。
-
-#### 观察并记录
-
-接手后通过以下命令先观察下
-
-```language
-# 查看资源占用
-top
-
-# 静态查看容器资源占用
-docker stats --no-stream
-# 动态查看容器资源占用
-docker stats
-```
-
-CPU 资源占用升到了 280%，持续了 30 分钟，比较离谱。
-内存占了 8 个 G，这个程序需要模拟诸多浏览器且要保持缓存以便通信，所以 8 个 G 也不算离谱。
-
-> docker 显示的 cpu 占用是可以超 100%的，表示使用了多个核，200%表示用了 2 个核。合理的飙升：大数运算环节。异常的飙升：死循环、报错后日志不停歇的高速打印。
-
-#### 分析并思考
-
-2 个可能： 1.因为 CPU 异常，所以可能是阻塞导致的，要查下阻塞的原因，因为代码里写了很多线程。 2.但是我等了 30 分钟，也可能是阻塞导致死锁了，这个可能性我觉得更大，内存一直被占着可以解释为死锁后资源无法释放，也合理。
-
-> （1）阻塞是由于资源不足引起的排队等待现象。
-> （2）死锁是由于两个对象在拥有一份资源的情况下申请另一份资源，而另一份资源恰好又是这两对象正持有的，导致两对象无法完成操作，且所持资源无法释放。
-
-#### 缩小范围
-
-```language
-# 进入容器
-docker exec -iter 【你的容器id】 /bin/bash
-# 示例
-docker exec -iter 6d711f6ee058 /bin/bash
-# 检查日志文件
-cd var/log
-ls
-
-# 退出容器
-exit
-
-# 复制日志
-docker cp 容器id:文件路径 本机路径
-```
 ## docker-compose
 
 docker-compose 是一个用于定义和运行多容器 Docker 应用程序的工具。它通过一个 YAML 文件来配置应用程序的服务、网络和卷，并使用一个命令来启动、停止和重新启动这些服务。当你需要启动多个容器时，docker-compose 可以简化这个过程。
@@ -332,7 +317,7 @@ docker-compose up
 
 3. 其他常用命令：
 
-````bash
+```bash
 # 停止所有服务
 docker-compose down
 
@@ -345,16 +330,14 @@ docker-compose ps
 # 查看特定服务的日志
 docker-compose logs -f python-app-frontend
 docker-compose logs -f python-app-backend
-
+```
 
 如果遇到问题：
 
 1. 确保 Docker 和 Docker Compose 已经正确安装
 2. 检查端口是否被占用
-3. 查看容器日志排查问题：
-```bash
-docker-compose logs -f
-````
+3. 查看容器日志排查问题：`docker-compose logs -f`
+
 
 4. 如果需要重置环境：
 
@@ -490,6 +473,55 @@ docker-compose pull backend
 
 那么当你访问这个域名会跳转到路由器 80 端口，再跳到群晖的 4444 端口，再跳到群晖宝塔容器的 8888 端口。
 
+
+
+## 简易排错
+
+这个容器好像卡死了，查一下。
+
+### 观察并记录
+
+接手后通过以下命令先观察下
+
+```bash
+# 查看资源占用
+top
+
+# 静态查看容器资源占用
+docker stats --no-stream
+# 动态查看容器资源占用
+docker stats
+```
+
+CPU 资源占用升到了 280%，持续了 30 分钟，比较离谱。
+内存占了 8 个 G，这个程序需要模拟诸多浏览器且要保持缓存以便通信，所以 8 个 G 也不算离谱。
+
+> docker 显示的 cpu 占用是可以超 100%的，表示使用了多个核，200%表示用了 2 个核。合理的飙升：大数运算环节。异常的飙升：死循环、报错后日志不停歇的高速打印。
+
+### 分析并思考
+
+2 个可能： 1.因为 CPU 异常，所以可能是阻塞导致的，要查下阻塞的原因，因为代码里写了很多线程。 2.但是我等了 30 分钟，也可能是阻塞导致死锁了，这个可能性我觉得更大，内存一直被占着可以解释为死锁后资源无法释放，也合理。
+
+> （1）阻塞是由于资源不足引起的排队等待现象。
+> （2）死锁是由于两个对象在拥有一份资源的情况下申请另一份资源，而另一份资源恰好又是这两对象正持有的，导致两对象无法完成操作，且所持资源无法释放。
+
+### 缩小范围
+
+```bash
+# 进入容器
+docker exec -iter 【你的容器id】 /bin/bash
+# 示例
+docker exec -iter 6d711f6ee058 /bin/bash
+# 检查日志文件
+cd var/log
+ls
+
+# 退出容器
+exit
+
+# 复制日志
+docker cp 容器id:文件路径 本机路径
+```
 
 ## k8s
 

@@ -12,7 +12,7 @@ Nginx 是异步框架的网页服务器，也可以用作反向代理、负载�
 在 nginx.conf 的注释符号为： #
 默认的 nginx 配置文件 nginx.conf 内容如下：
 
-```language
+```bash
 #user  nobody;
 worker_processes  1;
 
