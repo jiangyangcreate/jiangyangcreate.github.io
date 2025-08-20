@@ -212,7 +212,6 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
 
-
 ### cv2.putText
 
 函数签名：`cv2.putText(img, text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)`
@@ -250,6 +249,8 @@ cv2.destroyAllWindows()
 
 cv2的在图片上的绘制语法主要缺陷为无法绘制中文，需要使用PIL库来绘制中文。
 
+字体文件：一种可以把码点转换为像素显示的超大型字典。
+
 ```python showLineNumbers
 import cv2
 import numpy as np
@@ -277,35 +278,445 @@ img.show()
 # img.save('output.jpg')
 ```
 
+## 图像运算
+
+加减法的前提是两张图片的尺寸相同。
+
+### 图像加法cv2.add、图像减法cv2.subtract
+
+```python showLineNumbers
+import cv2
+import numpy as np
+path = "xxx.png"
+def draw_add(path):
+    img = cv2.imread(path)
+    if img is None:
+        return 
+    img_width, img_height = img.shape[:2]
+    mask_img = np.zeros((img_width, img_height, 3), dtype=np.uint8) + 255
+    cv2.putText(mask_img, "Showcase", (img_width//4, img_height//2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 5)
+    img3 = cv2.add(img, mask_img)
+    cv2.imwrite("img3.png", img3)
+
+def draw_subtract(path):
+    img = cv2.imread(path)
+    if img is None:
+        return 
+    h, w = img.shape[:2]
+    mask_img = np.zeros((h, w, 3), dtype=np.uint8) + 255
+    cv2.circle(mask_img, (w//2, h//2), int(min(w, h)*0.45), (0, 0, 0), -1)
+    img3 = cv2.subtract(img, mask_img)
+    cv2.imwrite("img3.png", img3)
+```
+
+### 图像加权cv2.addWeighted
+
+函数签名：`cv2.addWeighted(src1, alpha, src2, beta, gamma) -> dst`
+
+参数说明：
+
+- `src1`：图像1
+- `alpha`：图像1的强度，范围为0-1
+- `src2`：图像2
+- `beta`：图像2的强度，范围为0-1
+- `gamma`：偏移量（即图像在加权后，整体增加的值，一般为0）
+
+图像1和图像2的强度不需要合起来等于1，可以大于1，也可以小于1。
+
+```python showLineNumbers
+import cv2
+import numpy as np
+
+img1 = cv2.imread("green.png")
+img2 = cv2.imread("red.png")
+
+img3 = cv2.addWeighted(img1, 1, img2, 1,0)
+
+cv2.imshow("img4", img3)
+cv2.waitKey(0)
+```
+
 ## 基础图像操作
 
+### 图像缩放cv2.resize
+
+函数签名：`cv2.resize(src, dsize, fx, fy, interpolation) -> dst`
+
+参数说明：
+
+- `src`：源图像
+- `dsize`：目标图像大小，如果为None，则根据fx和fy计算，传入的是(width, height)
+- `fx`：水平缩放比例
+- `fy`：垂直缩放比例
+- `interpolation`：插值方式，默认值为cv2.INTER_LINEAR
+
+```python showLineNumbers
+import cv2
+import numpy as np
+
+img1 = cv2.imread("xxx.png")
+# 固定值缩放
+img2 = cv2.resize(img1, (100, 100))
+# 按比例缩放
+img2 = cv2.resize(img1, dsize = None, fx = 0.5, fy = 0.5)
+```
+
+### 图像翻转cv2.flip
+### 图像仿射变换cv2.getAffineTransform
+### 图像平移cv2.warpAffine
+### 图像旋转cv2.getRotationMatrix2D
+### 图像透视变换cv2.getPerspectiveTransform
+### 图像扩边cv2.copyMakeBorder
+### 图像裁剪cv2.crop
+### 拆分与合并通道cv2.split、cv2.merge
 ### 获取图像的像素值cv2.item
 ### 修改像素值cv2.itemset
-### 拆分与合并通道cv2.split、cv2.merge
-### 图像扩边cv2.copyMakeBorder
-### 图像加法cv2.add
-### 图像加权cv2.addWeighted
-### 图像逻辑运算cv2.bitwise_and、cv2.bitwise_or、cv2.bitwise_xor、cv2.bitwise_not
+
+## 色彩处理
+
+:::info
+科普：什么是HSV？
+
+HSV：相比RGB相比，HSV能更好的表示同个颜色的不同值（饱和度和明度）
+- H: 色调，取值范围是0-180，表示颜色
+- S: 饱和度，取值范围是0-255，表示颜色的纯度
+- V: 明度，取值范围是0-255，表示颜色的亮度
+:::
+
+
+:::info
+什么是24位真彩屏？
+
+每个像素点的取值返回是0~255，即在二进制中需要8位来表示（2的8次方）
+
+那么 R G B 三个通道就需要 8 + 8 + 8 = 24 位来表示
+
+难道还有假彩屏？
+
+是的，因为人眼并不能分辨出 255 * 255 * 255 种颜色，所以可以适当的减少一些颜色，也不影响人眼感知
+
+所以就有了<HoverText text="16bit屏幕（单片机常用）" explanation="蓝色：5位 + 绿色：6位 + 红色：5位"/>
+
+:::
+
+### 灰度图
+
+灰度图
+适用于图像处理，如边缘检测及其应用：图像分割、轮廓检测
+只有1个通道，取值范围是0-255，表示颜色的亮度
+
+```python showLineNumbers
+import numpy as np
+import cv2
+
+# 方式1 （支持自定义权重）
+img = cv2.imread("xxx.png")
+B,G,R = cv2.split(img)
+gray = R*0.299 + G*0.587 + B*0.114
+gray = gray.astype(np.uint8)
+
+# 方式2 (最简单，最常用)
+gray = cv2.imread("xxx.png",0)
+
+# 方式3 （可以转化为各种色彩空间）
+img = cv2.imread("xxx.png")
+gray = cv2.cvtColor(img,cv2.COLOR_BGR2GRAY)
+
+
+cv2.imshow("gray",gray)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+### 二值化图
+
+二值化图
+适用于图像压缩
+只有1个通道，取值范围是0或1
+
+#### 人为设置阈值法（固定阈值法）
+
+在这种方法中，我们人为设定一个阈值，比如 取 255 的中间值 127。 大于这个值则取1,小于等于这个值则取0
+
+在 Python 中，这种除法运算后向下取整的操作可以表示为 255 // 2，也等价于 int(255/2)。
+
+存在的问题：
+
+这种方法的主要问题在于，它并不能适应所有类型的图像。
+
+例如，对于一张整体偏暗的照片，大部分像素值可能都会低于 127，因此二值化后的图像几乎全黑。
+
+同样，对于一张整体偏亮的照片，大部分像素值可能都会高于 127，因此二值化后的图像几乎全白。
+
+#### 全局平均值法
+
+为了解决上述问题，我们可以使用一种被称为"平均值法"的优化方法。在这种方法中，我们不再使用固定的阈值，而是计算图像本身的平均像素值，并用这个值作为阈值。
+
+优点：
+
+这种方法可以更好地适应不同亮度的图像，因为它根据图像的实际像素值分布来确定阈值，而不是简单地使用固定的阈值。
+
+对于那些整体偏暗或偏亮的图像，使用平均值法可以得到更好的二值化效果。
+
+注意：
+
+尽管平均值法在许多情况下都能得到不错的结果，但它仍然不能解决所有问题。例如，对于那些既有很亮的区域又有很暗的区域的图像，平均值法可能无法得到理想的二值化效果。在这种情况下，可能需要使用更复杂的方法，如自适应阈值法或 Otsu's 方法等。
+
+#### 自适应阈值法
+
+自适应阈值法是一种更为复杂的二值化方法，它不是使用一个全局阈值，而是为图像中的每一个小区域计算一个阈值。这意味着在图像的不同部分可能会使用不同的阈值，使得二值化的效果更好。
+
+自适应阈值法的基本步骤如下：
+
+将图像分割为许多小区域。 对于每一个小区域，计算其像素值的平均值或中值，并将这个值作为该区域的阈值。 对每一个小区域进行二值化。 这种方法对于那些局部亮度变化大的图像特别有效，但是计算量比较大。。
+
+该方法常常用于自动驾驶，可以根据不同的光照条件，自动调整阈值。
+
+#### Otsu's 方法
+
+Otsu's 方法是一种自动确定阈值的方法，它通过使得二值化后的图像的类间方差最大化来确定最佳阈值。这种方法的基本步骤如下：
+
+1. 对图像的灰度直方图进行归一化，使其成为一个概率分布。
+2. 对于每一个可能的阈值，计算类间方差。
+3. 选择使得类间方差最大的阈值作为最佳阈值。
+
+Otsu's 方法对于那些有明显的双峰灰度直方图的图像特别有效，但是对于灰度分布比较均匀的图像可能效果不佳。
+
+:::info
+什么是直方图
+
+横坐标：表示的是像素的数值，最左边是0，最右边是255
+
+纵坐标：表示的是像素的个数
+
+常用于观察图片的像素分布
+:::
+
+:::info
+归一化（Normalization）是一种常见的数据预处理技术
+
+用于改变数据的范围以使其落在一个特定的区间,通常是[0,1]或者[-1,1]。
+
+归一化的目的是消除数据量纲和尺度的影响，使得不同尺度或单位的数据可以在同一水平上进行比较或处理。
+:::
+
+Otsu's 方法的目标就是找到一个阈值，使得类间方差最大。这个阈值就是最佳的二值化阈值。这种方法假设图像包含两类像素（即前景和背景），且这两类像素的灰度值分布是双峰的。在这种情况下，类间方差最大的阈值可以很好地分割这两类像素。 (t)最大。这个阈值就是最佳的二值化阈值。这种方法假设图像包含两类像素（即前景和背景），且这两类像素的灰度值分布是双峰的。在这种情况下，类间方差最大的阈值可以很好地分割这两类像素。
+
+缺点：计算量都比较大，特别是对于大图像或高分辨率的图像。因此，在实际使用时需要考虑到计算效率和内存使用的问题。
+
+
+```python showLineNumbers
+# 用于数据计算
+import numpy as np
+# 用于图像读取与处理
+import cv2
+# 用于图像显示
+import matplotlib.pyplot as plt
+
+class ImageThresholding:
+    def __init__(self, image_path):
+        # 直接读取为灰度图
+        self.image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+
+    def threshold_fixed(self, threshold=127):
+        """使用OpenCV的固定阈值二值化"""
+        _, binary_image = cv2.threshold(self.image, threshold, 255, cv2.THRESH_BINARY)
+        return (binary_image / 255).astype(int)  # 转换为0和1的值
+
+    def threshold_mean(self):
+        """使用OpenCV的自适应均值阈值二值化"""
+        binary_image = cv2.adaptiveThreshold(self.image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
+                                           cv2.THRESH_BINARY, 11, 2)
+        return (binary_image / 255).astype(int)  # 转换为0和1的值
+
+    def threshold_adaptive(self, window_size=11):
+        """使用OpenCV的自适应高斯阈值二值化"""
+        # 确保window_size是奇数
+        if window_size % 2 == 0:
+            window_size += 1
+        binary_image = cv2.adaptiveThreshold(self.image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                           cv2.THRESH_BINARY, window_size, 2)
+        return (binary_image / 255).astype(int)  # 转换为0和1的值
+
+    def threshold_otsu(self):
+        """使用OpenCV的Otsu自动阈值二值化"""
+        _, binary_image = cv2.threshold(self.image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        return (binary_image / 255).astype(int)  # 转换为0和1的值
+
+    def show_image(self, image, title):
+        
+        plt.imshow(image, cmap='gray')# 显示灰度图
+        plt.title(title)# 设置标题
+        plt.axis('off')# 不要显示坐标轴
+        plt.show()
+
+if __name__ == "__main__":
+    thresholding = ImageThresholding('xxx.bmp')
+    thresholding.show_image(thresholding.threshold_fixed(), 'Fixed Thresholding')
+    thresholding.show_image(thresholding.threshold_mean(), 'Mean Thresholding')
+    thresholding.show_image(thresholding.threshold_adaptive(), 'Adaptive Thresholding')
+    thresholding.show_image(thresholding.threshold_otsu(), 'Otsu Thresholding')
+```
+
+除了上述的方法之外，还有许多其他的二值化方法，每种方法都有其适用的场景和优缺点。
+
+以下是一些常见的二值化方法：
+
+双峰法（Bimodal method）：这种方法假设图像的直方图是双峰的，即有两个主要的亮度级别（通常对应于对象和背景）。阈值被设置为这两个峰值之间的最低点。
+
+最小误差法（Minimum error method）：这种方法假设像素的灰度值来自两个具有相同方差的高斯分布。阈值被设置为最小化两个分布之间的误差的值。
+
+最大熵法（Maximum entropy method）：这种方法选择使得二值化后的两个类（即，阈值以上和以下的像素）的熵之和最大的阈值。
+
+Kittler-Illingworth 最小误差法：这种方法是最小误差法的一个改进版本，它可以处理来自不同高斯分布（即，具有不同方差）的像素。
+
+ISODATA 算法：这是一种迭代的方法，它开始于图像的平均灰度值，然后迭代地计算两个类的平均值，直到阈值稳定。
+
+Niblack 方法：这是一种局部阈值选择方法，它根据每个像素周围的像素的平均值和标准差来计算阈值。
+
+Sauvola 方法：这是 Niblack 方法的一个改进版本，它引入了一个新的参数来处理不同对比度的图像。
+
+多阈值方法：这些方法不是选择一个阈值，而是选择多个阈值，将像素分割成多个类。这对于一些应用可能会很有用，例如在处理具有多个亮度级别的对象的图像时。
+
+
+## 形态学处理
+
+### 膨胀cv2.dilate
+### 腐蚀cv2.erode
+
+- 开运算: 先腐蚀后膨胀
+- 闭运算: 先膨胀后腐蚀
+- 形态学梯度: 膨胀 - 腐蚀
+- 顶帽: 原图 - 开运算
+- 黑帽: 闭运算 - 原图
+
+## 图像预处理
+
+模糊的原理：让像素点的混在一起：即每个像素点不再是自己，而是自己与周围像素点的混合值。
+
+### 高斯模糊cv2.GaussianBlur
+
+
+### 中值滤波cv2.medianBlur
+### 双边滤波cv2.bilateralFilter
+### 矩阵卷积cv2.filter2D
+```
+import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib.font_manager import FontProperties
+import cv2
+
+# 设置中文字体
+# 替换为你系统中支持中文的字体路径(windows)
+font_path = r'C:\Windows\Fonts\simhei.ttf'  
+# mac（如果有的话）
+# font_path = '/System/Library/Fonts/STHeiti Light.ttc' 
+font_prop = FontProperties(fname=font_path)
+
+# 读取灰度图像
+image = np.array(cv2.imread('xxx.bmp',cv2.IMREAD_GRAYSCALE))
+
+# 定义卷积核
+kernels = {
+    '水平边缘': np.array([[-1, -1, -1], [0, 0, 0], [1, 1, 1]]),
+    '垂直边缘': np.array([[-1, 0, 1], [-1, 0, 1], [-1, 0, 1]]),
+    'Sobel水平': np.array([[-1, 0, 1], [-2, 0, 2], [-1, 0, 1]]),
+    'Sobel垂直': np.array([[1, 2, 1], [0, 0, 0], [-1, -2, -1]]),
+    '拉普拉斯': np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]]),
+    '锐化': np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]),
+    '高斯模糊3x3': np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) / 16,
+    '高斯模糊5x5': np.array([[1, 4, 6, 4, 1], [4, 16, 24, 16, 4], [6, 24, 36, 24, 6], [4, 16, 24, 16, 4], [1, 4, 6, 4, 1]]) / 256,
+    '边缘增强': np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]]),
+    '均值滤波': np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]) / 9
+}
+
+# 使用NumPy实现卷积操作
+def convolve2d(image, kernel):
+    # 获取图像和卷积核的尺寸
+    i_height, i_width = image.shape
+    k_height, k_width = kernel.shape
+    
+    # 计算输出图像的尺寸
+    o_height = i_height - k_height + 1
+    o_width = i_width - k_width + 1
+    
+    # 创建输出图像
+    output = np.zeros((o_height, o_width))
+    
+    # 执行卷积操作
+    for y in range(o_height):
+        for x in range(o_width):
+            # 提取图像区域
+            region = image[y:y+k_height, x:x+k_width]
+            # 计算卷积值
+            output[y, x] = np.sum(region * kernel)
+    
+    return output
+
+# 应用卷积核
+results = {}
+for name, kernel in kernels.items():
+    # 为了处理边界，先对图像进行填充
+    if kernel.shape[0] == 5:  # 对于5x5卷积核
+        pad_width = 2
+    else:  # 对于3x3卷积核
+        pad_width = 1
+    
+    padded_image = np.pad(image, pad_width, mode='constant')
+    filtered_image = convolve2d(padded_image, kernel)
+    
+    # 归一化处理，确保像素值在有效范围内
+    filtered_image = np.clip(filtered_image, 0, 255).astype(np.uint8)
+    results[name] = filtered_image
+
+# 显示结果
+plt.figure(figsize=(15, 8))
+for i, (name, result) in enumerate(results.items()):
+    plt.subplot(3, 4, i + 1)
+    plt.imshow(result, cmap='gray')
+    plt.title(name, fontproperties=font_prop)
+    plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+```
+## 边缘与轮廓
+
+### 边缘检测cv2.Canny
+### 获取轮廓cv2.findContours
+### 轮廓属性cv2.contourArea、cv2.arcLength
+
+```
+import cv2
+img = cv2.imread("xxx.png")
+# 边缘检测
+canny = cv2.Canny(img,threshold1=100,threshold2=200)
+
+# 轮廓检测
+contours,hierarchy = cv2.findContours(canny,cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+
+# 轮廓的面积
+area = cv2.contourArea(contours[0])
+# 轮廓的周长
+perimeter = cv2.arcLength(contours[0],True)
+
+max_area = max([cv2.contourArea(contour) for contour in contours])
+for contour in contours:
+    if cv2.contourArea(contour) >= max_area:
+        # 绘制轮廓
+        cv2.drawContours(img,contour,-1,(0,0,255),1)
+
+cv2.imshow("img",img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
 
 ## 动态图像
 
 ### 视频读取与显示cv2.VideoCapture
 ### 视频保存cv2.VideoWriter
-### 物体追踪cv2.Tracker
 
-## 图像变换
-
-### 图像缩放cv2.resize
-### 图像平移cv2.warpAffine
-### 图像旋转cv2.getRotationMatrix2D
-### 图像仿射变换cv2.getAffineTransform
-### 图像透视变换cv2.getPerspectiveTransform
-
-## 图像噪点
-
-## 图像边缘
-
-## 图像轮廓
 
 ## 案例-人脸识别：录入并识别不同人脸
 
