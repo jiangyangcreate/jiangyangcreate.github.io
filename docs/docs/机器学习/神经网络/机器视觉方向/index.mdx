@@ -9,13 +9,13 @@ title: 机器视觉方向
 
 ## 安装
 
-opencv 中的open指的是opensource，即开源的意思。cv指computer vision，即计算机视觉。
-
-opencv 是一个开源的计算机视觉库，包含大量的图像处理函数。
+opencv（opensource computer vision）开源计算机视觉库，包含大量的图像处理函数。
 
 [opencv-python](https://github.com/opencv/opencv-python)需要根据环境选择正确的包
 
-有4个不同的包（参见下面的选项 1、2、3 和 4），你**只能选择其中的一个**。不要在同一环境中安装多个不同的包。没有插件架构：所有包都使用相同的名称空间（`cv2`）。如果你在同一环境中安装了多个不同的包，请使用 ``pip uninstall`` 卸载所有包，然后只重新安装一个包。
+有4个不同的包，你<Highlight>只能选择其中的一个。不要在同一环境中安装多个不同的包。</Highlight>
+
+所有包都使用相同的名称空间（`cv2`）。如果你在同一环境中安装了多个不同的包，请使用 ``pip uninstall`` 卸载所有包，然后只重新安装一个包。
 
 **a.** 针对标准桌面环境的包（适用于 Windows、macOS、几乎所有 GNU/Linux 发行版）
 
@@ -35,7 +35,7 @@ OpenCv作为开源软件，自然有大量的教程，我读过一些纸质书�
 
 ## 图像读取与显示
 
-### cv2.imread
+### 图像读取
 
 函数签名：`cv2.imread(filename, flags=cv2.IMREAD_COLOR) -> image`
 
@@ -43,16 +43,17 @@ OpenCv作为开源软件，自然有大量的教程，我读过一些纸质书�
 
 - `filename`：要读取的文件名
 - `flags`：读取标志，默认值为cv2.IMREAD_COLOR，表示读取为BGR格式。可选参数：
-    - cv2.IMREAD_COLOR：读取为BGR格式
-    - cv2.IMREAD_GRAYSCALE：读取为灰度图
-    - cv2.IMREAD_UNCHANGED：读取为原图，包含alpha通道
+    - cv2.IMREAD_COLOR：读取为BGR格式，默认值。对应数值为1。
+    - cv2.IMREAD_GRAYSCALE：读取为灰度图，对应数值为0。
+    - cv2.IMREAD_UNCHANGED：读取为原图，包含alpha通道，对应数值为-1。
 
 返回值：
 
-- 返回读取的图像对象, 如果读取失败, 则返回None
+- 返回读取的图像对象, <Highlight>如果读取失败, 不报错，返回None</Highlight>
+- <Highlight>CV2默认使用系统编码，如果文件路径含中文无法正常读取，需要把系统编码改为`utf-8`。</Highlight>
 
 图像对象的常用属性：
-- `shape`：图像的形状，(height, width, channels) 其中channels为3、4，表示通道数为RGB、RGBA（A是透明度），如果是灰度、二值图，通道数为1的情况会报错。
+- `shape`：图像的形状，(height, width, channels) 其中channels为3、4，表示通道数为RGB、RGBA（A是透明度），如果是灰度、二值图，通道数为1的情况会只返回(height, width)。
 - `size`：图像的像素数，height * width * channels
 - `dtype`：图像的数据类型
 - `ndim`：图像的维度
@@ -66,15 +67,15 @@ img = cv2.imread(path)
 print(img.shape) 
 ```
 
-### cv2.imwrite
+### 图像保存
 
 函数签名：`cv2.imwrite(filename, img, [params])`
 
 参数说明：
 
 - `filename`：要保存的文件名
-- `img`：要保存的图像对象
-- `params`：可选参数，用于指定保存的格式和质量, 可选参数：
+- `img`：要保存的图像对象(数据)
+- `params`：可选参数，<Highlight>用于指定保存的格式和质量</Highlight>，可选参数：
     - cv2.IMWRITE_JPEG_QUALITY：JPEG图像质量，范围为0-100，默认值为95
     - cv2.IMWRITE_PNG_COMPRESSION：PNG图像压缩级别，范围为0-9，默认值为3
     - cv2.IMWRITE_PXM_BINARY：PPM/PGM/PBM图像格式，默认值为False
@@ -86,7 +87,7 @@ img = cv2.imread(path)
 cv2.imwrite('new_img.jpg',img, [cv2.IMWRITE_JPEG_QUALITY, 100])
 ```
 
-### cv2.imshow、cv2.waitKey、cv2.destroyWindow、cv2.destroyAllWindows
+### 图像显示、等待按键、关闭窗口
 
 cv2.imshow函数签名：`cv2.imshow(winname, img)`
 
@@ -95,22 +96,23 @@ cv2.imshow函数签名：`cv2.imshow(winname, img)`
 - `winname`：窗口名称
 - `img`：要显示的图像对象
 
-
 cv2.waitKey函数签名：`cv2.waitKey([delay]) -> retval`
 
 参数说明：
 
-- `delay`：等待时间，单位为毫秒，默认值为0，表示无限等待
+- `delay`：等待时间，单位为毫秒。当值为0时，表示无限等待。
 
 返回值：
 
-- 返回按键的ASCII码，如果设置了中文输入法，键盘的捕获会被输入法占用，导致无法正常等待按键按下。
+- 返回按键的ASCII码<Highlight>（大小写敏感）</Highlight>，如果到时间没有按键按下，则返回-1。
 
+注意：
+- <Highlight>如果设置了中文输入法，键盘的捕获会被输入法占用，导致无法正常等待按键按下。</Highlight>
+- <Highlight>如果弹出多个相同名称的窗口，只会显示一个窗口，窗口内的图像内容会被覆盖。</Highlight>
 
-上面两个函数是成对出现的，cv2.imshow用于显示图像，cv2.waitKey用于等待按键按下或者到时间自动关闭窗口。
+上面两个函数是成对出现的，`cv2.imshow`用于显示图像，`cv2.waitKey`用于等待按键按下或者到时间自动关闭窗口。
 
-
-下面两个函数都表示关闭窗口，区别在于destroyWindow是关闭指定窗口，而destroyAllWindows是关闭所有窗口。
+下面两个函数都表示关闭窗口，区别在于`destroyWindow`是关闭指定窗口，而`destroyAllWindows`是关闭所有窗口。
 
 destroyWindow函数签名：`cv2.destroyWindow(winname)`
 参数说明：
@@ -138,10 +140,10 @@ cv2.destroyAllWindows()
 
 ## 图像绘制
 
-### cv2.line、cv2.rectangle、cv2.circle、cv2.polylines、cv2.ellipse
+### 绘制直线、矩形
 
-line函数签名：`cv2.line(img, pt1, pt2, color, thickness, lineType, shift)`
-rectangle函数签名：`cv2.rectangle(img, pt1, pt2, color, thickness, lineType, shift)`
+- `line`函数签名：`cv2.line(img, pt1, pt2, color, thickness, lineType, shift)`
+- `rectangle`函数签名：`cv2.rectangle(img, pt1, pt2, color, thickness, lineType, shift)`
 
 参数说明：
 
@@ -152,9 +154,12 @@ rectangle函数签名：`cv2.rectangle(img, pt1, pt2, color, thickness, lineType
 - `thickness`：线宽
 - `lineType`：线型
 - `shift`：位移，默认为0，表示坐标是整数，如果大于1，则表示坐标是浮点数，例如shift=2，则表示坐标是浮点数。可用于实现亚像素精度绘图。
+- <Highlight>对于矩形来说，`pt1`是左上角，`pt2`是右下角。</Highlight>
 
-circle函数签名：`cv2.circle(img, center, radius, color, thickness, lineType, shift)`
-ellipse函数签名：`cv2.ellipse(img, center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift)`
+### 圆形、椭圆
+
+- `circle`函数签名：`cv2.circle(img, center, radius, color, thickness, lineType, shift)`
+- `ellipse`函数签名：`cv2.ellipse(img, center, axes, angle, startAngle, endAngle, color, thickness, lineType, shift)`
 
 参数说明：
 
@@ -170,6 +175,7 @@ ellipse函数签名：`cv2.ellipse(img, center, axes, angle, startAngle, endAngl
 - `lineType`：线型
 - `shift`：位移，默认为0，表示坐标是整数，如果大于1，则表示坐标是浮点数，例如shift=2，则表示坐标是浮点数。可用于实现亚像素精度绘图。
 
+### 多边形
 
 polylines函数签名：`cv2.polylines(img, pts, isClosed, color, thickness, lineType, shift)`
 
@@ -212,7 +218,7 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
 
-### cv2.putText
+### 绘制文字
 
 函数签名：`cv2.putText(img, text, org, fontFace, fontScale, color, thickness, lineType, bottomLeftOrigin)`
 
@@ -222,7 +228,7 @@ cv2.destroyAllWindows()
 - `text`：要绘制的文字
 - `org`：文字的左下角坐标
 - `fontFace`：字体类型
-- `fontScale`：字体缩放比例
+- `fontScale`：字体缩放比例（大于1时，文字会变大、0~1时，文字会变小，小于0时，文本将倒置）
 - `color`：文字颜色
 - `thickness`：文字粗细
 - `lineType`：线型
@@ -282,34 +288,41 @@ img.show()
 
 加减法的前提是两张图片的尺寸相同。
 
-### 图像加法cv2.add、图像减法cv2.subtract
+### 图像加法、图像减法
 
-```python showLineNumbers
+```python showLineNumbers {12,23}
 import cv2
 import numpy as np
-path = "xxx.png"
+path = "xxx.bmp"
 def draw_add(path):
     img = cv2.imread(path)
-    if img is None:
-        return 
-    img_width, img_height = img.shape[:2]
-    mask_img = np.zeros((img_width, img_height, 3), dtype=np.uint8) + 255
+    img_height, img_width = img.shape[:2]
+    # 创建一个全白的mask_img
+    mask_img = np.zeros((img_height, img_width, 3), dtype=np.uint8) + 255
+    # 在mask_img上写上Showcase
     cv2.putText(mask_img, "Showcase", (img_width//4, img_height//2), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 0), 5)
+    # 将mask_img和img相加
     img3 = cv2.add(img, mask_img)
-    cv2.imwrite("img3.png", img3)
+    cv2.imwrite(f"add_{path}", img3)
 
 def draw_subtract(path):
     img = cv2.imread(path)
-    if img is None:
-        return 
-    h, w = img.shape[:2]
-    mask_img = np.zeros((h, w, 3), dtype=np.uint8) + 255
-    cv2.circle(mask_img, (w//2, h//2), int(min(w, h)*0.45), (0, 0, 0), -1)
+    img_height, img_width = img.shape[:2]
+    # 创建一个全白的mask_img
+    mask_img = np.zeros((img_height, img_width, 3), dtype=np.uint8) + 255
+    # 在mask_img上画一个圆
+    cv2.circle(mask_img, (img_width//2, img_height//2), int(min(img_width, img_height)*0.45), (0, 0, 0), -1)
+    # 将mask_img和img相减
     img3 = cv2.subtract(img, mask_img)
-    cv2.imwrite("img3.png", img3)
+    cv2.imwrite(f"subtract_{path}", img3)
+
+draw_add(path)
+draw_subtract(path)
 ```
 
-### 图像加权cv2.addWeighted
+:::info
+
+图像加权cv2.addWeighted
 
 函数签名：`cv2.addWeighted(src1, alpha, src2, beta, gamma) -> dst`
 
@@ -335,10 +348,11 @@ img3 = cv2.addWeighted(img1, 1, img2, 1,0)
 cv2.imshow("img4", img3)
 cv2.waitKey(0)
 ```
+:::
 
 ## 基础图像操作
 
-### 图像缩放cv2.resize
+### 图像缩放
 
 函数签名：`cv2.resize(src, dsize, fx, fy, interpolation) -> dst`
 
@@ -348,7 +362,10 @@ cv2.waitKey(0)
 - `dsize`：目标图像大小，如果为None，则根据fx和fy计算，传入的是(width, height)
 - `fx`：水平缩放比例
 - `fy`：垂直缩放比例
-- `interpolation`：插值方式，默认值为cv2.INTER_LINEAR
+- `interpolation`：插值方式，默认值为cv2.INTER_LINEAR:双线性插值
+
+
+当resize指定的新尺寸大于原尺寸时，会使用插值方式来填充新产生的像素。
 
 ```python showLineNumbers
 import cv2
@@ -361,16 +378,91 @@ img2 = cv2.resize(img1, (100, 100))
 img2 = cv2.resize(img1, dsize = None, fx = 0.5, fy = 0.5)
 ```
 
-### 图像翻转cv2.flip
-### 图像仿射变换cv2.getAffineTransform
-### 图像平移cv2.warpAffine
-### 图像旋转cv2.getRotationMatrix2D
-### 图像透视变换cv2.getPerspectiveTransform
-### 图像扩边cv2.copyMakeBorder
-### 图像裁剪cv2.crop
-### 拆分与合并通道cv2.split、cv2.merge
-### 获取图像的像素值cv2.item
-### 修改像素值cv2.itemset
+### 拆分与合并通道
+
+拆分通道函数签名：`cv2.split(img) -> list`
+
+合并通道函数签名：`cv2.merge(list) -> img`
+
+参数说明：
+
+- `img`：图像对象
+
+返回值：
+
+- `list`：不同通道的图像对象
+
+```python showLineNumbers
+import cv2
+import numpy as np
+
+img = cv2.imread("xxx.png")
+b, g, r = cv2.split(img)
+
+img2 = cv2.merge([b, g, r])
+
+cv2.imshow("img", img)
+cv2.imshow("img2", img2)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+### 其他操作
+
+```python showLineNumbers
+import cv2
+import numpy as np
+
+img = cv2.imread("xxx.png")
+
+# 图像翻转
+# 0: 上下翻转（垂直翻转）
+# 1: 左右翻转（水平翻转）
+# -1: 上下左右翻转（垂直水平翻转）
+img1 = cv2.flip(img, 0)
+
+# 图像裁剪
+roi = (100, 100, 200, 200)
+img2 = img[100:300, 100:300]
+
+
+# 图像平移
+# 参数1：原图像
+# 参数2：仿射变换矩阵
+# 参数3：目标图像大小
+width, height = img.shape[:2]
+M = np.float32([[1, 0, 100], [0, 1, 100]])
+img2 = cv2.warpAffine(img, M, (width, height))
+
+# 图像旋转
+# 参数1：中心点
+# 参数2：旋转角度
+# 参数3：缩放比例
+M = cv2.getRotationMatrix2D(center, angle, scale)
+
+# 图像仿射变换
+# 参数1：原图像的三个点
+# 参数2：目标图像的三个点
+# 返回值：仿射变换矩阵
+M = cv2.getAffineTransform(pts1, pts2)
+
+# 图像透视变换
+# 参数1：原图像的四个点
+# 参数2：目标图像的四个点
+# 返回值：透视变换矩阵
+M = cv2.getPerspectiveTransform(pts1, pts2)
+
+# 图像扩边
+# 参数1：原图像
+# 参数2：上边框宽度
+# 参数3：下边框宽度
+# 参数4：左边框宽度
+# 参数5：右边框宽度
+# 参数6：边框类型
+# 参数7：边框颜色
+img2 = cv2.copyMakeBorder(img, top, bottom, left, right, borderType, value)
+
+```
 
 ## 色彩处理
 
@@ -581,26 +673,62 @@ Sauvola 方法：这是 Niblack 方法的一个改进版本，它引入了一个
 
 ## 形态学处理
 
-### 膨胀cv2.dilate
-### 腐蚀cv2.erode
+### 膨胀和腐蚀
 
-- 开运算: 先腐蚀后膨胀
-- 闭运算: 先膨胀后腐蚀
-- 形态学梯度: 膨胀 - 腐蚀
-- 顶帽: 原图 - 开运算
-- 黑帽: 闭运算 - 原图
+膨胀函数签名：`cv2.dilate(img,kernel,iterations=5)`
 
-## 图像预处理
+腐蚀函数签名：`cv2.erode(img,kernel,iterations=5)`
+
+参数：
+
+- img：输入图像
+- kernel：膨胀和腐蚀的核
+- iterations：膨胀和腐蚀的迭代次数
+
+膨胀工作原理：类似卷积操作，将核覆盖在图像上，如果核的中心点在图像的范围内，则将核的中心点替换为核的最大值。
+
+腐蚀工作原理与膨胀相反，将核覆盖在图像上，如果核的中心点在图像的范围内，则将核的中心点替换为核的最小值。
+
+
+```python showLineNumbers
+import cv2
+import numpy as np
+img = cv2.imread("dt2.png")
+# 膨胀和腐蚀的操作
+kernel = np.ones((3,3),np.uint8)
+# 腐蚀
+erode = cv2.erode(img,kernel,iterations=5)
+# 膨胀
+dilate = cv2.dilate(img,kernel,iterations=5)
+cv2.imshow("img",img)
+cv2.imshow("dilate",dilate)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+:::info
+- 开运算: 先腐蚀后膨胀，用于去除图像中的小噪声
+- 闭运算: 先膨胀后腐蚀，用于填充图像中的小孔洞
+- 形态学梯度: 膨胀 - 腐蚀，用于提取图像中的边缘
+- 顶帽: 原图 - 开运算，用于提取图像中的小噪声
+- 黑帽: 闭运算 - 原图，用于填充图像中的小孔洞
+:::
+
+
+### 模糊
 
 模糊的原理：让像素点的混在一起：即每个像素点不再是自己，而是自己与周围像素点的混合值。
 
-### 高斯模糊cv2.GaussianBlur
+常见的有：
 
+- 高斯模糊：`cv2.GaussianBlur`
+- 中值滤波：`cv2.medianBlur`
+- Box滤波：`cv2.boxFilter`
+- 均值滤波：`cv2.blur`（Box滤波的归一化版本）
+- 双边滤波：`cv2.bilateralFilter`
+- 矩阵卷积（自定义卷积核）：`cv2.filter2D`
 
-### 中值滤波cv2.medianBlur
-### 双边滤波cv2.bilateralFilter
-### 矩阵卷积cv2.filter2D
-```
+```python showLineNumbers
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.font_manager import FontProperties
@@ -625,9 +753,9 @@ kernels = {
     '拉普拉斯': np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]]),
     '锐化': np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]]),
     '高斯模糊3x3': np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) / 16,
-    '高斯模糊5x5': np.array([[1, 4, 6, 4, 1], [4, 16, 24, 16, 4], [6, 24, 36, 24, 6], [4, 16, 24, 16, 4], [1, 4, 6, 4, 1]]) / 256,
     '边缘增强': np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]]),
-    '均值滤波': np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]) / 9
+    'Box滤波': np.array([[2, 2, 2], [2, 2, 2], [2, 2, 2]]) / 9
+    '均值滤波': np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]) / 9,
 }
 
 # 使用NumPy实现卷积操作
@@ -686,10 +814,14 @@ plt.show()
 ### 获取轮廓cv2.findContours
 ### 轮廓属性cv2.contourArea、cv2.arcLength
 
-```
+```python showLineNumbers
 import cv2
 img = cv2.imread("xxx.png")
 # 边缘检测
+# 低阈值、高阈值：
+# 强边缘：梯度值 > 高阈值 → 确定保留
+# 弱边缘：低阈值 < 梯度值 < 高阈值 → 条件保留
+# 噪声：梯度值 < 低阈值 → 丢弃（不保留）
 canny = cv2.Canny(img,threshold1=100,threshold2=200)
 
 # 轮廓检测
@@ -711,11 +843,89 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
 
-
 ## 动态图像
 
-### 视频读取与显示cv2.VideoCapture
-### 视频保存cv2.VideoWriter
+### 视频读取与显示
+
+```python showLineNumbers
+# cv2.VideoCapture(参数)：参数可以是整数、字符串、流媒体
+
+# 整数:表示摄像头的编号
+# 0:表示默认摄像头
+# 1:表示第二个摄像头
+
+# 字符串:表示视频文件的路径（绝对相对都可以）：1.mp4
+
+# 流媒体:表示视频流： http://192.168.1.100:8080
+
+cap = cv2.VideoCapture(0) # 摄像头的语柄
+if not cap.isOpened():
+    print("Error: Could not open video.")
+    cap.release() # 释放摄像头
+while True:
+    ret,frame = cap.read() # 读取视频帧
+    # ret:表示是否读取成功（True/False）
+    # frame:表示读取到的视频帧数据（numpy数组）
+    if not ret:
+        print("Error: Could not read frame.")
+        break
+    cv2.imshow("frame",frame) # 显示视频帧。同个窗口名称，会覆盖窗口内容，而不是新开窗口。
+    if cv2.waitKey(1) == ord('q'): # 按q键退出循环
+        break
+cap.release() # 释放摄像头
+cv2.destroyAllWindows() # 关闭所有窗口
+```
+
+### 视频保存
+
+函数签名：`cv2.VideoWriter(filename, fourcc, fps, frameSize)`
+
+参数说明：
+
+- filename：视频文件名
+- fourcc：视频编码格式
+- fps：帧率
+- frameSize：帧大小
+
+```python showLineNumbers {16,18,31,35}
+import cv2
+import numpy as np
+# cv2.VideoCapture(参数)：参数可以是整数、字符串、流媒体
+
+# 整数:表示摄像头的编号
+# 0:表示默认摄像头
+# 1:表示第二个摄像头
+
+# 字符串:表示视频文件的路径（绝对相对都可以）：1.mp4
+
+# 流媒体:表示视频流：rtsp://192.168.1.100:8554/test 或者 http://192.168.1.100:8080
+
+cap = cv2.VideoCapture(0) # 摄像头的语柄
+
+# 视频的编码格式
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+# 视频的输出路径
+out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (640,480))
+
+
+if not cap.isOpened():
+    print("Error: Could not open video.")
+    cap.release() # 释放摄像头
+while True:
+    ret,frame = cap.read() # 读取视频帧
+    # ret:表示是否读取成功（True/False）
+    # frame:表示读取到的视频帧数据（numpy数组）
+    if not ret:
+        print("Error: Could not read frame.")
+        break
+    out.write(frame) # 写入视频帧
+    cv2.imshow("frame",frame) # 显示视频帧。同个窗口名称，会覆盖窗口内容，而不是新开窗口。
+    if cv2.waitKey(1) == ord('q'): # 按q键退出循环
+        break
+out.release() # 释放视频
+cap.release() # 释放摄像头
+cv2.destroyAllWindows() # 关闭所有窗口
+```
 
 
 ## 案例-人脸识别：录入并识别不同人脸
