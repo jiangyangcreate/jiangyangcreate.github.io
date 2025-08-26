@@ -53,8 +53,6 @@ docker rm {container_id}
 
 ## 基本命令
 
-[Docker 命令参考](https://docs.docker.com/reference/)
-
 ```bash showLineNumbers
 # 构建镜像
 docker build -t llmchat:0.0.2 .
@@ -135,11 +133,11 @@ WORKDIR 指令为 Dockerfile 中跟随它的任何 RUN、CMD、ENTRYPOINT、COPY
 
 #### ENTRYPOINT & RUN & CMD
 
-**RUN 指令**：在镜像构建阶段执行命令，用于安装软件包、创建目录、设置环境等构建时操作。每个 RUN 指令会创建新的镜像层。
+- **RUN 指令**：在镜像构建阶段执行命令，用于安装软件包、创建目录、设置环境等构建时操作。每个 RUN 指令会创建新的镜像层。
 
-**CMD 指令**：定义容器启动时的默认执行命令和参数。可以被 `docker run` 命令行参数完全覆盖。
+- **CMD 指令**：定义容器启动时的默认执行命令和参数。可以被 `docker run` 命令行参数完全覆盖。
 
-**ENTRYPOINT 指令**：定义容器启动时的固定入口点。与 CMD 的主要区别在于：
+- **ENTRYPOINT 指令**：定义容器启动时的固定入口点。与 CMD 的主要区别在于：
 
 1. **执行优先级**：ENTRYPOINT 具有更高的执行优先级，不会被 `docker run` 的命令行参数覆盖
 2. **参数传递**：`docker run` 的参数会作为 ENTRYPOINT 的参数传入
@@ -215,17 +213,6 @@ docker run -d --name my-nginx-server nginx
 docker run -d -v /app/data:/data postgres
 ```
 
-
-#### **`--rm`**：**退出时自动删除容器**
-
-当容器停止时，自动删除它。这对于一次性任务、测试或临时运行的容器非常有用，可以保持你的系统整洁。
-
-```bash
-# docker run --rm {镜像名} {命令}
-# 运行一个临时容器，执行命令后自动删除
-docker run --rm busybox echo "Hello, Docker!"
-```
-
 #### **`-e`** (或 `--env`)：**设置环境变量**在容器内部设置环境变量，这对于配置应用程序非常重要。
 
 ```bash
@@ -234,6 +221,9 @@ docker run -d -e POSTGRES_PASSWORD=mysecretpassword postgres
 ```
 
 ### 其他命令
+
+[Docker 命令参考](https://docs.docker.com/reference/)
+
 
 拷贝文件至 image(类似 git 里的 add 暂存)
 
