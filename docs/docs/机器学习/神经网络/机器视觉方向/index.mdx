@@ -15,19 +15,19 @@ opencv（opensource computer vision）开源计算机视觉库，包含大量的
 
 有4个不同的包，你<Highlight>只能选择其中的一个。不要在同一环境中安装多个不同的包。</Highlight>
 
-所有包都使用相同的名称空间（`cv2`）。如果你在同一环境中安装了多个不同的包，请使用 ``pip uninstall`` 卸载所有包，然后只重新安装一个包。
+所有包都使用相同的名称空间（`cv2`）。如果你在同一环境中安装了多个不同的包，请使用 `pip uninstall` 卸载所有包，然后只重新安装一个包。
 
 **a.** 针对标准桌面环境的包（适用于 Windows、macOS、几乎所有 GNU/Linux 发行版）
 
-- 选项 1 - 主模块包：``pip install opencv-python``
-- 选项 2 - 完整包（包含主模块和 contrib/extra 模块）：``pip install opencv-contrib-python``（请参考 [OpenCV 文档](https://docs.opencv.org/master/) 中的 contrib/extra 模块列表）
+- 选项 1 - 主模块包：`pip install opencv-python`
+- 选项 2 - 完整包（包含主模块和 contrib/extra 模块）：`pip install opencv-contrib-python`（请参考 [OpenCV 文档](https://docs.opencv.org/master/) 中的 contrib/extra 模块列表）
 
 **b.** 针对服务器（无窗口）环境的包（例如 Docker、云环境等），无 GUI 库依赖
 
 这些包比前面两种包更小，因为它们不包含任何图形用户界面功能（未编译 Qt 或其他 GUI 组件）。这意味着这些包避免了对 X11 库的庞大依赖，从而例如可以生成更小的 Docker 镜像。如果你不使用 `cv2.imshow` 等函数，或者你使用其他包（例如 PyQt）来构建界面而非 OpenCV，则应始终使用这些包。
 
-- 选项 3 - 无窗口主模块包：``pip install opencv-python-headless``
-- 选项 4 - 无窗口完整包（包含主模块和 contrib/extra 模块）：``pip install opencv-contrib-python-headless``（请参考 [OpenCV 文档](https://docs.opencv.org/master/) 中的 contrib/extra 模块列表）
+- 选项 3 - 无窗口主模块包：`pip install opencv-python-headless`
+- 选项 4 - 无窗口完整包（包含主模块和 contrib/extra 模块）：`pip install opencv-contrib-python-headless`（请参考 [OpenCV 文档](https://docs.opencv.org/master/) 中的 contrib/extra 模块列表）
 
 
 OpenCv作为开源软件，自然有大量的教程，我读过一些纸质书籍，也看过一些开源教程，总体来说，对于入门与进阶来说，需要的是细致的基础讲解、完整的处理流程，非常推荐官方的[OpenCV-Python教程](https://opencv-python-tutorials.readthedocs.io/)。
@@ -136,6 +136,91 @@ if key == ord('q'):
     cv2.destroyWindow('Image') 
 # 关闭所有窗口
 cv2.destroyAllWindows()
+```
+
+
+## 动态图像
+
+### 视频读取与显示
+
+```python showLineNumbers
+# cv2.VideoCapture(参数)：参数可以是整数、字符串、流媒体
+
+# 整数:表示摄像头的编号
+# 0:表示默认摄像头
+# 1:表示第二个摄像头
+
+# 字符串:表示视频文件的路径（绝对相对都可以）：1.mp4
+
+# 流媒体:表示视频流： http://192.168.1.100:8080
+
+cap = cv2.VideoCapture(0) # 摄像头的语柄
+if not cap.isOpened():
+    print("Error: Could not open video.")
+    cap.release() # 释放摄像头
+while True:
+    ret,frame = cap.read() # 读取视频帧
+    # ret:表示是否读取成功（True/False）
+    # frame:表示读取到的视频帧数据（numpy数组）
+    if not ret:
+        print("Error: Could not read frame.")
+        break
+    cv2.imshow("frame",frame) # 显示视频帧。同个窗口名称，会覆盖窗口内容，而不是新开窗口。
+    if cv2.waitKey(1) == ord('q'): # 按q键退出循环
+        break
+cap.release() # 释放摄像头
+cv2.destroyAllWindows() # 关闭所有窗口
+```
+
+### 视频保存
+
+函数签名：`cv2.VideoWriter(filename, fourcc, fps, frameSize)`
+
+参数说明：
+
+- filename：视频文件名
+- fourcc：视频编码格式
+- fps：帧率
+- frameSize：帧大小
+
+```python showLineNumbers {16,18,31,35}
+import cv2
+import numpy as np
+# cv2.VideoCapture(参数)：参数可以是整数、字符串、流媒体
+
+# 整数:表示摄像头的编号
+# 0:表示默认摄像头
+# 1:表示第二个摄像头
+
+# 字符串:表示视频文件的路径（绝对相对都可以）：1.mp4
+
+# 流媒体:表示视频流：rtsp://192.168.1.100:8554/test 或者 http://192.168.1.100:8080
+
+cap = cv2.VideoCapture(0) # 摄像头的语柄
+
+# 视频的编码格式
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+# 视频的输出路径
+out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (640,480))
+
+
+if not cap.isOpened():
+    print("Error: Could not open video.")
+    cap.release() # 释放摄像头
+while True:
+    ret,frame = cap.read() # 读取视频帧
+    # ret:表示是否读取成功（True/False）
+    # frame:表示读取到的视频帧数据（numpy数组）
+    if not ret:
+        print("Error: Could not read frame.")
+        break
+    out.write(frame) # 写入视频帧
+    cv2.imshow("frame",frame) # 显示视频帧。同个窗口名称，会覆盖窗口内容，而不是新开窗口。
+    if cv2.waitKey(1) == ord('q'): # 按q键退出循环
+        break
+out.release() # 释放视频
+cap.release() # 释放摄像头
+cv2.destroyAllWindows() # 关闭所有窗口
 ```
 
 ## 图像绘制
@@ -407,61 +492,287 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
 
-### 其他操作
+### 图像翻转
+
+函数签名：`cv2.flip(src, flipCode) -> dst`
+
+参数说明：
+
+- `src`：源图像
+- `flipCode`：翻转方式，可选参数：
+  - 0：上下翻转（垂直翻转）
+  - 1：左右翻转（水平翻转）
+  - -1：上下左右翻转（垂直水平翻转）
+
+返回值：
+
+- 翻转后的图像对象
+
+```python showLineNumbers
+import cv2
+
+img = cv2.imread("xxx.png")
+
+# 上下翻转（垂直翻转）
+img_vertical = cv2.flip(img, 0)
+
+# 左右翻转（水平翻转）
+img_horizontal = cv2.flip(img, 1)
+
+# 上下左右翻转（垂直水平翻转）
+img_both = cv2.flip(img, -1)
+
+cv2.imshow("Original", img)
+cv2.imshow("Vertical Flip", img_vertical)
+cv2.imshow("Horizontal Flip", img_horizontal)
+cv2.imshow("Both Flip", img_both)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+### 图像裁剪
+
+图像裁剪使用NumPy数组切片操作，不需要专门的OpenCV函数。
+
+操作语法：`img[start_y:end_y, start_x:end_x]`
+
+参数说明：
+
+- `start_y`：裁剪区域的起始行（y坐标）
+- `end_y`：裁剪区域的结束行（y坐标）
+- `start_x`：裁剪区域的起始列（x坐标）
+- `end_x`：裁剪区域的结束列（x坐标）
+
+注意：<Highlight>坐标系以图像左上角为原点，y轴向下，x轴向右</Highlight>
+
+```python showLineNumbers
+import cv2
+
+img = cv2.imread("xxx.png")
+
+# 获取图像尺寸
+height, width = img.shape[:2]
+
+# 裁剪中心区域（从坐标(100,100)到(300,300)）
+cropped_img = img[100:300, 100:300]
+
+# 裁剪图像上半部分
+top_half = img[0:height//2, 0:width]
+
+# 裁剪图像右下角四分之一
+bottom_right = img[height//2:height, width//2:width]
+
+cv2.imshow("Original", img)
+cv2.imshow("Cropped", cropped_img)
+cv2.imshow("Top Half", top_half)
+cv2.imshow("Bottom Right", bottom_right)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+### 图像平移
+
+函数签名：`cv2.warpAffine(src, M, dsize, flags, borderMode, borderValue) -> dst`
+
+参数说明：
+
+- `src`：源图像
+- `M`：2×3的仿射变换矩阵
+- `dsize`：输出图像的大小，格式为(width, height)
+- `flags`：插值方法，默认为cv2.INTER_LINEAR
+- `borderMode`：边界处理方式，默认为cv2.BORDER_CONSTANT
+- `borderValue`：边界填充值，默认为0
+
+变换矩阵格式：`[[1, 0, dx], [0, 1, dy]]`，其中dx为x方向位移，dy为y方向位移
 
 ```python showLineNumbers
 import cv2
 import numpy as np
 
 img = cv2.imread("xxx.png")
+height, width = img.shape[:2]
 
-# 图像翻转
-# 0: 上下翻转（垂直翻转）
-# 1: 左右翻转（水平翻转）
-# -1: 上下左右翻转（垂直水平翻转）
-img1 = cv2.flip(img, 0)
+# 向右平移100像素，向下平移50像素
+M = np.float32([[1, 0, 100], [0, 1, 50]])
+translated_img = cv2.warpAffine(img, M, (width, height))
 
-# 图像裁剪
-roi = (100, 100, 200, 200)
-img2 = img[100:300, 100:300]
+# 向左平移50像素，向上平移30像素
+M2 = np.float32([[1, 0, -50], [0, 1, -30]])
+translated_img2 = cv2.warpAffine(img, M2, (width, height))
 
+cv2.imshow("Original", img)
+cv2.imshow("Translated Right-Down", translated_img)
+cv2.imshow("Translated Left-Up", translated_img2)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
 
-# 图像平移
-# 参数1：原图像
-# 参数2：仿射变换矩阵
-# 参数3：目标图像大小
-width, height = img.shape[:2]
-M = np.float32([[1, 0, 100], [0, 1, 100]])
-img2 = cv2.warpAffine(img, M, (width, height))
+### 图像旋转
 
-# 图像旋转
-# 参数1：中心点
-# 参数2：旋转角度
-# 参数3：缩放比例
-M = cv2.getRotationMatrix2D(center, angle, scale)
+旋转矩阵函数签名：`cv2.getRotationMatrix2D(center, angle, scale) -> M`
 
-# 图像仿射变换
-# 参数1：原图像的三个点
-# 参数2：目标图像的三个点
-# 返回值：仿射变换矩阵
+参数说明：
+
+- `center`：旋转中心点坐标，格式为(x, y)
+- `angle`：旋转角度（度数），正值表示逆时针旋转
+- `scale`：缩放比例，1.0表示不缩放
+
+应用旋转需要配合`cv2.warpAffine`函数使用。
+
+```python showLineNumbers
+import cv2
+import numpy as np
+
+img = cv2.imread("xxx.png")
+height, width = img.shape[:2]
+
+# 以图像中心为旋转点，逆时针旋转45度，不缩放
+center = (width // 2, height // 2)
+M = cv2.getRotationMatrix2D(center, 45, 1.0)
+rotated_img = cv2.warpAffine(img, M, (width, height))
+
+# 以图像中心为旋转点，顺时针旋转30度，放大1.5倍
+M2 = cv2.getRotationMatrix2D(center, -30, 1.5)
+rotated_scaled_img = cv2.warpAffine(img, M2, (width, height))
+
+cv2.imshow("Original", img)
+cv2.imshow("Rotated 45°", rotated_img)
+cv2.imshow("Rotated -30° Scaled 1.5x", rotated_scaled_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+### 仿射变换
+
+仿射变换矩阵函数签名：`cv2.getAffineTransform(src, dst) -> M`
+
+参数说明：
+
+- `src`：源图像中的三个点坐标，numpy数组格式
+- `dst`：目标图像中对应的三个点坐标，numpy数组格式
+
+返回值：
+
+- 2×3的仿射变换矩阵
+
+仿射变换能够实现旋转、平移、缩放和错切等变换的组合。
+
+```python showLineNumbers
+import cv2
+import numpy as np
+
+img = cv2.imread("xxx.png")
+height, width = img.shape[:2]
+
+# 定义源图像中的三个点（左上角、右上角、左下角）
+pts1 = np.float32([[0, 0], [width-1, 0], [0, height-1]])
+
+# 定义目标图像中对应的三个点（实现错切变换）
+pts2 = np.float32([[0, height*0.33], [width*0.85, height*0.25], [width*0.15, height*0.7]])
+
+# 计算仿射变换矩阵
 M = cv2.getAffineTransform(pts1, pts2)
 
-# 图像透视变换
-# 参数1：原图像的四个点
-# 参数2：目标图像的四个点
-# 返回值：透视变换矩阵
+# 应用仿射变换
+affine_img = cv2.warpAffine(img, M, (width, height))
+
+# 在原图上标记三个关键点
+cv2.circle(img, (0, 0), 5, (255, 0, 0), -1)
+cv2.circle(img, (width-1, 0), 5, (255, 0, 0), -1)
+cv2.circle(img, (0, height-1), 5, (255, 0, 0), -1)
+
+cv2.imshow("Original", img)
+cv2.imshow("Affine Transform", affine_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+### 透视变换
+
+透视变换矩阵函数签名：`cv2.getPerspectiveTransform(src, dst) -> M`
+
+透视变换函数签名：`cv2.warpPerspective(src, M, dsize, flags, borderMode, borderValue) -> dst`
+
+参数说明：
+
+- `src`：源图像中的四个点坐标，numpy数组格式
+- `dst`：目标图像中对应的四个点坐标，numpy数组格式
+- `M`：3×3的透视变换矩阵
+- `dsize`：输出图像的大小，格式为(width, height)
+
+透视变换能够模拟三维空间中的投影效果，常用于文档矫正、鸟瞰图变换等。
+
+```python showLineNumbers
+import cv2
+import numpy as np
+
+img = cv2.imread("xxx.png")
+height, width = img.shape[:2]
+
+# 定义源图像中的四个点（矩形的四个角）
+pts1 = np.float32([[0, 0], [width, 0], [0, height], [width, height]])
+
+# 定义目标图像中对应的四个点（梯形效果）
+pts2 = np.float32([[0, 0], [width, 0], [width*0.3, height], [width*0.7, height]])
+
+# 计算透视变换矩阵
 M = cv2.getPerspectiveTransform(pts1, pts2)
 
-# 图像扩边
-# 参数1：原图像
-# 参数2：上边框宽度
-# 参数3：下边框宽度
-# 参数4：左边框宽度
-# 参数5：右边框宽度
-# 参数6：边框类型
-# 参数7：边框颜色
-img2 = cv2.copyMakeBorder(img, top, bottom, left, right, borderType, value)
+# 应用透视变换
+perspective_img = cv2.warpPerspective(img, M, (width, height))
 
+cv2.imshow("Original", img)
+cv2.imshow("Perspective Transform", perspective_img)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
+
+### 图像扩边
+
+函数签名：`cv2.copyMakeBorder(src, top, bottom, left, right, borderType, value) -> dst`
+
+参数说明：
+
+- `src`：源图像
+- `top`：上边框宽度（像素）
+- `bottom`：下边框宽度（像素）
+- `left`：左边框宽度（像素）
+- `right`：右边框宽度（像素）
+- `borderType`：边框类型，常用类型：
+  - cv2.BORDER_CONSTANT：常数边框，需要指定value参数
+  - cv2.BORDER_REFLECT：反射边框
+  - cv2.BORDER_REPLICATE：复制边框
+  - cv2.BORDER_WRAP：包装边框
+- `value`：边框颜色值（当borderType为BORDER_CONSTANT时使用）
+
+```python showLineNumbers
+import cv2
+
+img = cv2.imread("xxx.png")
+
+# 添加常数边框（黑色）
+border_constant = cv2.copyMakeBorder(img, 50, 50, 50, 50, cv2.BORDER_CONSTANT, value=(0, 0, 0))
+
+# 添加常数边框（红色）
+border_red = cv2.copyMakeBorder(img, 30, 30, 30, 30, cv2.BORDER_CONSTANT, value=(0, 0, 255))
+
+# 添加反射边框
+border_reflect = cv2.copyMakeBorder(img, 50, 50, 50, 50, cv2.BORDER_REFLECT)
+
+# 添加复制边框
+border_replicate = cv2.copyMakeBorder(img, 50, 50, 50, 50, cv2.BORDER_REPLICATE)
+
+# 添加包装边框
+border_wrap = cv2.copyMakeBorder(img, 50, 50, 50, 50, cv2.BORDER_WRAP)
+
+cv2.imshow("Original", img)
+cv2.imshow("Constant Border (Black)", border_constant)
+cv2.imshow("Constant Border (Red)", border_red)
+cv2.imshow("Reflect Border", border_reflect)
+cv2.imshow("Replicate Border", border_replicate)
+cv2.imshow("Wrap Border", border_wrap)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
 ```
 
 ## 色彩处理
@@ -526,56 +837,17 @@ cv2.destroyAllWindows()
 适用于图像压缩
 只有1个通道，取值范围是0或1
 
-#### 人为设置阈值法（固定阈值法）
 
-在这种方法中，我们人为设定一个阈值，比如 取 255 的中间值 127。 大于这个值则取1,小于等于这个值则取0
-
-在 Python 中，这种除法运算后向下取整的操作可以表示为 255 // 2，也等价于 int(255/2)。
-
-存在的问题：
-
-这种方法的主要问题在于，它并不能适应所有类型的图像。
-
-例如，对于一张整体偏暗的照片，大部分像素值可能都会低于 127，因此二值化后的图像几乎全黑。
-
-同样，对于一张整体偏亮的照片，大部分像素值可能都会高于 127，因此二值化后的图像几乎全白。
-
-#### 全局平均值法
-
-为了解决上述问题，我们可以使用一种被称为"平均值法"的优化方法。在这种方法中，我们不再使用固定的阈值，而是计算图像本身的平均像素值，并用这个值作为阈值。
-
-优点：
-
-这种方法可以更好地适应不同亮度的图像，因为它根据图像的实际像素值分布来确定阈值，而不是简单地使用固定的阈值。
-
-对于那些整体偏暗或偏亮的图像，使用平均值法可以得到更好的二值化效果。
-
-注意：
-
-尽管平均值法在许多情况下都能得到不错的结果，但它仍然不能解决所有问题。例如，对于那些既有很亮的区域又有很暗的区域的图像，平均值法可能无法得到理想的二值化效果。在这种情况下，可能需要使用更复杂的方法，如自适应阈值法或 Otsu's 方法等。
-
-#### 自适应阈值法
-
-自适应阈值法是一种更为复杂的二值化方法，它不是使用一个全局阈值，而是为图像中的每一个小区域计算一个阈值。这意味着在图像的不同部分可能会使用不同的阈值，使得二值化的效果更好。
-
-自适应阈值法的基本步骤如下：
-
-将图像分割为许多小区域。 对于每一个小区域，计算其像素值的平均值或中值，并将这个值作为该区域的阈值。 对每一个小区域进行二值化。 这种方法对于那些局部亮度变化大的图像特别有效，但是计算量比较大。。
-
-该方法常常用于自动驾驶，可以根据不同的光照条件，自动调整阈值。
-
-#### Otsu's 方法
-
-Otsu's 方法是一种自动确定阈值的方法，它通过使得二值化后的图像的类间方差最大化来确定最佳阈值。这种方法的基本步骤如下：
-
-1. 对图像的灰度直方图进行归一化，使其成为一个概率分布。
-2. 对于每一个可能的阈值，计算类间方差。
-3. 选择使得类间方差最大的阈值作为最佳阈值。
-
-Otsu's 方法对于那些有明显的双峰灰度直方图的图像特别有效，但是对于灰度分布比较均匀的图像可能效果不佳。
+| 方法 | 核心思想 | 如何工作？ | 优点 | 缺点 | 适用场景 |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **固定阈值法** | 设置一个固定的“分界线”来区分黑白。 | 你先设定一个固定的数值，比如 127。然后程序会遍历图像中的每一个像素点：如果像素值大于 127，就把它变成纯白色（255）。如果像素值小于或等于 127，就变成纯黑色（0）。最后，再把白色变为 1，黑色变为 0。 | **简单粗暴，速度快。** 就像给所有学生设一条及格线，谁分数高谁就及格。 | **太死板，不灵活。** 面对一张整体很暗的照片，大部分像素可能都低于 127，结果整个图都变成黑的了。对光线不均匀的图片完全无效。 | 适合处理**光线均匀、对比度高**的简单图像，比如扫描的黑白文档。 |
+| **全局平均值法** | 自动计算图像的“平均分数”作为分界线。 | 程序会先计算整张图片的所有像素值的平均值，并把这个平均值作为动态的阈值。然后按照固定阈值法的方式进行二值化。 | **更智能。** 它会根据图片本身的亮度来决定阈值，所以对整体偏亮或偏暗的图片效果更好。 | **忽略局部差异。** 如果一张图片既有明亮的区域（比如太阳光），又有很暗的区域（比如阴影），这个方法就不太行了，因为它只用一个平均值来判断所有地方。 | 适合处理**整体亮度统一**，但**亮度值不确定**的图片。 |
+| **自适应均值法** | “因地制宜”，为每个小区域设置不同的分界线。 | 程序会把图片分成很多个小格子。然后，它会只看每个格子里的像素，计算这个小区域的平均值，并把这个值作为这个小格子的阈值。 | **最灵活，效果好。** 完美解决了局部光线不均的问题，比如在有阴影的纸张上，文字依然能被清晰地二值化。 | **计算量大。** 因为要处理很多个小区域，所以比前两种方法慢一些。同时，你需要设置小格子的大小，这个参数的选择会影响最终效果。 | 广泛应用于**文档识别**、**车牌识别**、**自动驾驶**等对局部细节要求高的场景。 |
+| **自适应高斯法** | “加权平均”，为每个小区域设置更智能的分界线。 | 类似于自适应均值法，也是将图像分成小格子。但不同的是，它会给离中心点更近的像素更高的权重，来计算区域的加权平均值，作为阈值。这样中心像素的影响更大。 | 相比自适应均值法，它对噪声的敏感度更低，能得到更平滑的二值化结果。 | 计算量比自适应均值法更大，因为要进行加权计算。 | 图像中有较多噪声或细节，需要更平滑二值化效果的场景。 |
+| **Otsu's 方法** | 寻找一个最佳阈值，让图像的“黑白对比度”最大。 | 它会通过分析图像的灰度直方图（用来展示像素分布的图）来寻找最佳阈值。这个方法假设图像只有两类像素（前景和背景），然后找到一个阈值，让这两类像素之间的差异最大。 | **全自动，效果好。** 无需手动设置任何参数，就能找到一个最优的阈值，特别适合那些背景和前景对比度很明显的图片。 | **有前提限制。** 如果图片的前景和背景混合得很复杂，或者灰度直方图不是明显的双峰形状，这个方法的表现就会变差。 | 适合处理**对比度高**的图片，特别是那些有**清晰前景和背景**的图片。 |
 
 :::info
-什么是直方图
+什么是直方图？
 
 横坐标：表示的是像素的数值，最左边是0，最右边是255
 
@@ -592,83 +864,116 @@ Otsu's 方法对于那些有明显的双峰灰度直方图的图像特别有效�
 归一化的目的是消除数据量纲和尺度的影响，使得不同尺度或单位的数据可以在同一水平上进行比较或处理。
 :::
 
-Otsu's 方法的目标就是找到一个阈值，使得类间方差最大。这个阈值就是最佳的二值化阈值。这种方法假设图像包含两类像素（即前景和背景），且这两类像素的灰度值分布是双峰的。在这种情况下，类间方差最大的阈值可以很好地分割这两类像素。 (t)最大。这个阈值就是最佳的二值化阈值。这种方法假设图像包含两类像素（即前景和背景），且这两类像素的灰度值分布是双峰的。在这种情况下，类间方差最大的阈值可以很好地分割这两类像素。
-
-缺点：计算量都比较大，特别是对于大图像或高分辨率的图像。因此，在实际使用时需要考虑到计算效率和内存使用的问题。
-
 
 ```python showLineNumbers
-# 用于数据计算
-import numpy as np
-# 用于图像读取与处理
 import cv2
-# 用于图像显示
+import numpy as np
 import matplotlib.pyplot as plt
 
-class ImageThresholding:
-    def __init__(self, image_path):
-        # 直接读取为灰度图
-        self.image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
+# 确保能找到图片，请将 'xxx.bmp' 替换为你自己的图片路径
+IMAGE_PATH = 'xxx.bmp'
 
-    def threshold_fixed(self, threshold=127):
-        """使用OpenCV的固定阈值二值化"""
-        _, binary_image = cv2.threshold(self.image, threshold, 255, cv2.THRESH_BINARY)
-        return (binary_image / 255).astype(int)  # 转换为0和1的值
+def show_all_images(original_img, binary_images, titles):
+    """
+    使用 matplotlib 同时显示原始图像和所有二值化图像。
+    :param original_img: 原始灰度图像
+    :param binary_images: 二值化图像列表
+    :param titles: 图像标题列表
+    """
+    num_images = len(binary_images) + 1  # +1 for original image
+    
+    # 计算子图的行数和列数 (尽量接近正方形布局)
+    cols = int(np.ceil(np.sqrt(num_images)))
+    rows = int(np.ceil(num_images / cols))
+    
+    fig, axes = plt.subplots(rows, cols, figsize=(15, 10))
+    fig.suptitle('Image Thresholding Comparison', fontsize=16)
+    
+    # 如果只有一个子图，将axes转换为列表
+    if num_images == 1:
+        axes = [axes]
+    else:
+        axes = axes.flatten()
+    
+    # 显示原始图像
+    axes[0].imshow(original_img, cmap='gray')
+    axes[0].set_title('Original Grayscale Image')
+    axes[0].axis('off')
+    
+    # 显示二值化图像
+    for i, (binary_img, title) in enumerate(zip(binary_images, titles)):
+        axes[i + 1].imshow(binary_img, cmap='gray')
+        axes[i + 1].set_title(title)
+        axes[i + 1].axis('off')
+    
+    # 隐藏多余的子图
+    for i in range(num_images, len(axes)):
+        axes[i].axis('off')
+    
+    plt.tight_layout()
+    plt.show()
 
-    def threshold_mean(self):
-        """使用OpenCV的自适应均值阈值二值化"""
-        binary_image = cv2.adaptiveThreshold(self.image, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
-                                           cv2.THRESH_BINARY, 11, 2)
-        return (binary_image / 255).astype(int)  # 转换为0和1的值
+def get_binary_image(img, method, *args, **kwargs):
+    """
+    根据不同方法获取二值化图像。
+    :param img: 原始灰度图像
+    :param method: 阈值处理方法，可选 'fixed', 'global_mean', 'adaptive_mean', 'adaptive_gaussian', 'otsu'
+    """
+    if method == 'fixed':
+        # 固定阈值法
+        _, binary = cv2.threshold(img, 127, 255, cv2.THRESH_BINARY)
+    elif method == 'global_mean':
+        # 全局平均值法
+        _, binary = cv2.threshold(img, img.mean(), 255, cv2.THRESH_BINARY)
+    elif method == 'adaptive_mean':
+        # 自适应均值阈值法
+        binary = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
+                                       cv2.THRESH_BINARY, 11, 2)
+    elif method == 'adaptive_gaussian':
+        # 自适应高斯阈值法
+        binary = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
+                                       cv2.THRESH_BINARY, 11, 2)
+    elif method == 'otsu':
+        # Otsu's 方法
+        _, binary = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    else:
+        raise ValueError("Invalid method. Choose from 'fixed', 'global_mean', 'adaptive_mean', 'adaptive_gaussian', 'otsu'")
 
-    def threshold_adaptive(self, window_size=11):
-        """使用OpenCV的自适应高斯阈值二值化"""
-        # 确保window_size是奇数
-        if window_size % 2 == 0:
-            window_size += 1
-        binary_image = cv2.adaptiveThreshold(self.image, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
-                                           cv2.THRESH_BINARY, window_size, 2)
-        return (binary_image / 255).astype(int)  # 转换为0和1的值
+    # 将二值图的像素值从 0/255 转换为 0/1，以便于分析和存储
+    return (binary / 255).astype(int)
 
-    def threshold_otsu(self):
-        """使用OpenCV的Otsu自动阈值二值化"""
-        _, binary_image = cv2.threshold(self.image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        return (binary_image / 255).astype(int)  # 转换为0和1的值
+def main():
+    """主函数，演示不同二值化方法。"""
+    
+    # 读取灰度图像
+    img = cv2.imread(IMAGE_PATH, cv2.IMREAD_GRAYSCALE)
+    if img is None:
+        print(f"Error: Could not read image at {IMAGE_PATH}")
+        return
 
-    def show_image(self, image, title):
-        
-        plt.imshow(image, cmap='gray')# 显示灰度图
-        plt.title(title)# 设置标题
-        plt.axis('off')# 不要显示坐标轴
-        plt.show()
+    # 准备各种二值化方法
+    methods = [
+        ('fixed', 'Fixed Thresholding (127)'),
+        ('global_mean', 'Global Mean Thresholding'),
+        ('adaptive_mean', 'Adaptive Mean Thresholding'),
+        ('adaptive_gaussian', 'Adaptive Gaussian Thresholding'),
+        ('otsu', "Otsu's Thresholding")
+    ]
+    
+    # 生成所有二值化图像
+    binary_images = []
+    titles = []
+    for method, title in methods:
+        binary_image = get_binary_image(img, method)
+        binary_images.append(binary_image)
+        titles.append(title)
+    
+    # 同时显示所有图像
+    show_all_images(img, binary_images, titles)
 
 if __name__ == "__main__":
-    thresholding = ImageThresholding('xxx.bmp')
-    thresholding.show_image(thresholding.threshold_fixed(), 'Fixed Thresholding')
-    thresholding.show_image(thresholding.threshold_mean(), 'Mean Thresholding')
-    thresholding.show_image(thresholding.threshold_adaptive(), 'Adaptive Thresholding')
-    thresholding.show_image(thresholding.threshold_otsu(), 'Otsu Thresholding')
+    main()
 ```
-
-除了上述的方法之外，还有许多其他的二值化方法，每种方法都有其适用的场景和优缺点。
-
-以下是一些常见的二值化方法：
-
-双峰法（Bimodal method）：这种方法假设图像的直方图是双峰的，即有两个主要的亮度级别（通常对应于对象和背景）。阈值被设置为这两个峰值之间的最低点。
-
-最小误差法（Minimum error method）：这种方法假设像素的灰度值来自两个具有相同方差的高斯分布。阈值被设置为最小化两个分布之间的误差的值。
-
-最大熵法（Maximum entropy method）：这种方法选择使得二值化后的两个类（即，阈值以上和以下的像素）的熵之和最大的阈值。
-
-Kittler-Illingworth 最小误差法：这种方法是最小误差法的一个改进版本，它可以处理来自不同高斯分布（即，具有不同方差）的像素。
-
-ISODATA 算法：这是一种迭代的方法，它开始于图像的平均灰度值，然后迭代地计算两个类的平均值，直到阈值稳定。
-
-Niblack 方法：这是一种局部阈值选择方法，它根据每个像素周围的像素的平均值和标准差来计算阈值。
-
-Sauvola 方法：这是 Niblack 方法的一个改进版本，它引入了一个新的参数来处理不同对比度的图像。
-
-多阈值方法：这些方法不是选择一个阈值，而是选择多个阈值，将像素分割成多个类。这对于一些应用可能会很有用，例如在处理具有多个亮度级别的对象的图像时。
 
 
 ## 形态学处理
@@ -843,92 +1148,26 @@ cv2.waitKey(0)
 cv2.destroyAllWindows()
 ```
 
-## 动态图像
+## 算法指路
 
-### 视频读取与显示
+### HDR
 
-```python showLineNumbers
-# cv2.VideoCapture(参数)：参数可以是整数、字符串、流媒体
+HDR 是一种图像处理技术，用于提高图像的动态范围，使得图像中的高光和阴影细节更加清晰。给定多张不同曝光的图像，通过算法将这些图像融合成一张高动态范围的图像。
 
-# 整数:表示摄像头的编号
-# 0:表示默认摄像头
-# 1:表示第二个摄像头
+### 全景拼接
 
-# 字符串:表示视频文件的路径（绝对相对都可以）：1.mp4
+可以实现多张图片的拼接，形成一张完整的全景图。支持拼接为环形
 
-# 流媒体:表示视频流： http://192.168.1.100:8080
+### 对象检测
 
-cap = cv2.VideoCapture(0) # 摄像头的语柄
-if not cap.isOpened():
-    print("Error: Could not open video.")
-    cap.release() # 释放摄像头
-while True:
-    ret,frame = cap.read() # 读取视频帧
-    # ret:表示是否读取成功（True/False）
-    # frame:表示读取到的视频帧数据（numpy数组）
-    if not ret:
-        print("Error: Could not read frame.")
-        break
-    cv2.imshow("frame",frame) # 显示视频帧。同个窗口名称，会覆盖窗口内容，而不是新开窗口。
-    if cv2.waitKey(1) == ord('q'): # 按q键退出循环
-        break
-cap.release() # 释放摄像头
-cv2.destroyAllWindows() # 关闭所有窗口
-```
+### 对象跟踪
 
-### 视频保存
+### 人体检测
 
-函数签名：`cv2.VideoWriter(filename, fourcc, fps, frameSize)`
+#### 人体姿态估计
 
-参数说明：
+#### 人脸检测
 
-- filename：视频文件名
-- fourcc：视频编码格式
-- fps：帧率
-- frameSize：帧大小
-
-```python showLineNumbers {16,18,31,35}
-import cv2
-import numpy as np
-# cv2.VideoCapture(参数)：参数可以是整数、字符串、流媒体
-
-# 整数:表示摄像头的编号
-# 0:表示默认摄像头
-# 1:表示第二个摄像头
-
-# 字符串:表示视频文件的路径（绝对相对都可以）：1.mp4
-
-# 流媒体:表示视频流：rtsp://192.168.1.100:8554/test 或者 http://192.168.1.100:8080
-
-cap = cv2.VideoCapture(0) # 摄像头的语柄
-
-# 视频的编码格式
-fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-# 视频的输出路径
-out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (640,480))
-
-
-if not cap.isOpened():
-    print("Error: Could not open video.")
-    cap.release() # 释放摄像头
-while True:
-    ret,frame = cap.read() # 读取视频帧
-    # ret:表示是否读取成功（True/False）
-    # frame:表示读取到的视频帧数据（numpy数组）
-    if not ret:
-        print("Error: Could not read frame.")
-        break
-    out.write(frame) # 写入视频帧
-    cv2.imshow("frame",frame) # 显示视频帧。同个窗口名称，会覆盖窗口内容，而不是新开窗口。
-    if cv2.waitKey(1) == ord('q'): # 按q键退出循环
-        break
-out.release() # 释放视频
-cap.release() # 释放摄像头
-cv2.destroyAllWindows() # 关闭所有窗口
-```
-
-
-## 案例-人脸识别：录入并识别不同人脸
 
 - 这段程序首先会读取摄像头，并自动截取一定数量的人脸用作训练。
 - 然后将截取的人脸进行训练，生成一个训练模型。
@@ -1057,3 +1296,9 @@ if __name__ == "__main__":
     trainer_face(path="dataSet")
     recognizer()
 ```
+
+#### 手势识别
+
+#### 动作识别
+
+#### 行为识别
