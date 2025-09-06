@@ -60,6 +60,148 @@ else:
 
 ### assert 语句
 
+### match, case 语句
+
+:::info
+
+即便你从未学习过match, case 语句，你也可以轻松的看懂match, case 语句的用法。它是最具有可读性的条件判断语句。
+
+[PEP 636 – 结构匹配：教程](https://peps.python.org/pep-0636/)
+[PEP 635 - 结构匹配：动机和基本原理](https://peps.python.org/pep-0635/)
+[PEP 634 – 结构匹配：规范](https://peps.python.org/pep-0634/)
+:::
+
+如果需要对一个表达式进行多个条件的判断，可以使用 match, case 语句。
+
+match case 匹配语法更简洁、匹配时自动绑定变量、支持模式组合、支持通配符。尤其对 JSON 数据结构解析非常友好。
+
+当其满足多个条件时，会从上到下依次判断，直到匹配到第一个条件为止。
+
+#### 文字模式与通配符模式
+
+这种写成 _（称为通配符）的特殊模式总是匹配，但它<Highlight>不绑定任何变量</Highlight>。
+
+总是能成功匹配的表达式，我们称其为<Highlight>无可辩驳的</Highlight>。
+
+因此，只有将<Highlight>无可辩驳的表达式单独作为最后一个模式才有意义（为了防止错误，Python 会阻止您之前使用它）。</Highlight>
+
+如果把它放在其他 case 之前，那么后面的 case 块就永远没有机会被执行到，这会使得代码逻辑变得无效或产生问题。
+
+```python showLineNumbers
+# 在这个例子中，`match` 语句将 `status` 与每个模式进行比较，直到找到一个匹配的模式。
+def http_error(status):
+    match status:
+        # 代码形式上从 `if status == 400:` 变成了 `case 400:` ，更加简洁。
+        case 400:
+            return "Bad request"
+        case 404:
+            return "Not found"
+        case _:
+            return "Something's wrong with the internet"
+for code in [400, 404, 300, 301, 302, 900]:
+    print(code, http_error(code))
+'''
+输出：
+400 Bad request
+404 Not found
+300 Redirection
+301 Redirection
+302 Redirection
+Something's wrong with the internet
+'''
+```
+
+:::info
+
+这种写成 _（称为通配符）的特殊模式总是匹配，但它<Highlight>不绑定任何变量</Highlight>。
+
+```python showLineNumbers
+match 900:
+    case _:
+        print("Something's wrong with the internet")
+# 这里会报错，因为 _ 不绑定任何变量
+print(_) # NameError: name '_' is not defined
+'''
+输出：
+Something's wrong with the internet
+NameError: name '_' is not defined
+'''
+```
+:::
+
+
+####  OR 模式 与 序列模式
+
+```python showLineNumbers
+def sort(seq):  # 定义排序函数，参数为要排序的序列
+    match seq:      # 使用match语句对序列进行模式匹配
+        # 你可以使用 | （“ or ”）在一个模式中组合几个字面值或模式
+        # 匹配空列表或单元素列表的情况(注意：同个 | 语句中，绑定变量或不绑定变量要一致)
+        case [] | [_]:              
+        # 这里 _ 不绑定任何变量，因此可以匹配空列表或单元素列表
+        # 如果这里写成 [] | [x]，则会报错，因为 | 之前不绑定变量，所有后面的语句也不能绑定变量
+            return seq              # 空列表和单元素列表已经有序，直接返回
+        # 同样下面的2种写法也是不允许的，因为前者绑定了变量为x，后者不能绑定变量为非x（不论是否处于相同位置）
+        # case [0,x] | [0,y]: # 报错
+        # case [0,x] | [y,0]: # 报错
+        # 合法，因为前者后者都绑定同一个变量
+        # case [0,x] | [x,0]: 
+        #     pass
+        # 使用 if 表达式 结合 case ，匹配两个元素且已经升序排列的情况
+        case [x, y] if x <= y:      
+            return seq              # 已经有序，直接返回原序列
+        # 匹配两个元素但非升序的情况（因为前者已经匹配了升序的情况）
+        case [x, y]:                
+            return [y, x]           # 交换两个元素的位置并返回
+        # 使用 if 表达式 结合 case ，匹配三个元素且已经升序排列的情况
+        case [x, y, z] if x <= y <= z:  
+            return seq                  # 已经有序，直接返回原序列
+        # 使用 if 表达式 结合 case ，匹配三个元素且完全降序排列的情况
+        case [x, y, z] if x >= y >= z:  
+            return [z, y, x]            # 完全反转序列并返回
+        # 匹配包含多个元素的序列，p为第一个元素，rest为剩余元素
+        case [p, *rest]:                
+            a = sort([x for x in rest if x <= p])  # 递归排序小于等于pivot(p)的元素
+            b = sort([x for x in rest if p < x])   # 递归排序大于pivot(p)的元素
+            return a + [p] + b                     # 合并结果：小于等于p的元素 + p + 大于p的元素
+```
+
+#### 捕获模式
+
+获取匹配结果并绑定到变量即为捕获模式，通配符模式不将匹配结果绑定到变量。
+
+```python showLineNumbers
+responses = [
+    ["SUCCESS", 200, "OK"],
+    ["ERROR", 404, "Not Found"],
+    ["ERROR", 500, "Server Error"],
+    ["UNKNOWN", 999, "Weird response"]
+]
+for res in responses:
+    match res:
+        # 如果是 SUCCESS，我們捕獲 code 和 message 來顯示
+        case ["SUCCESS", code, message]:
+            print(f"✅ Success! Code: {code}, Message: {message}")
+            
+        # 如果是 ERROR，我們不在乎具體 code 和 message，只想標記為錯誤
+        case ["ERROR", _, _]:
+            print("❌ An error occurred.")
+            
+        # 捕獲所有其他情況
+        case other:
+            print(f"❓ Unhandled status: {other}")
+'''
+输出：
+✅ Success! Code: 200, Message: OK
+❌ An error occurred.
+❌ An error occurred.
+❓ Unhandled status: ['UNKNOWN', 999, 'Weird response']
+'''
+```
+
+
+### 守卫、无可辩驳
+
 ### 三元表达式（条件表达式）
 
 ```python
