@@ -120,9 +120,9 @@ print(Person.__init__.__doc__)
 
 Python易于学习的另外一个原因，就是丰富的内置内容。所有的内置对象在代码编辑器中都会有<HoverText text="Code Highlight" explanation="代码高亮,在Vscode中，关键字（保留字）是紫色，模块和类是绿色，函数是黄色，变量是蓝色,不同主体或IDE的代码高亮规则有所不同"/>。
 
-### 内置保留字
+### 关键字
 
-保留字即关键字，是Python语言中预先定义的标识符。
+关键字是Python语言中预先定义的标识符。
 
 我们把它们用作标识符名称会引发错误或导致其功能失效。
 
@@ -134,6 +134,14 @@ print(keyword.kwlist)
 
 # ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield']
 ```
+
+某些标识符仅在特定上下文中被保留。 它们被称为软关键字。
+
+- `match, case, _`中`case`和`_`只有在`match`语句下才有特殊功能。
+
+- `type`在语法这一部分中仅被解释为关键字。巧合的是：内置函数中也有名为`type()`的函数。
+
+软关键字虽然没有收录在`keyword.kwlist`中，但本文亦将其列出。
 
 <MarkmapHooks initialMarkdown={`
 
@@ -148,7 +156,7 @@ print(keyword.kwlist)
 
 ### 控制流
 - if, elif, else: 条件判断
-- match, case: 模式匹配
+- match, case, _: 模式匹配（软关键字）
 - for, while: 循环控制
 - break, continue: 循环控制
 - try, except, finally: 异常处理
@@ -166,6 +174,9 @@ print(keyword.kwlist)
 
 ### 类
 - class: 定义类
+
+### 泛型
+- type: 泛型声明
 
 ### 模块和导入
 - import, from: 模块导入
