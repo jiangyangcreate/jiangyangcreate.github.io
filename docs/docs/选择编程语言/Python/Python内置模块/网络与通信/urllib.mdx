@@ -1,14 +1,10 @@
-# 网络与通信
-
-### webbrowser 模块
-
-### urllib 模块
+## urllib 模块
 
 urllib 是一个收集了多个涉及 URL 的模块的自带包：可以打开和读取 URL、 抛出异常、解析 URL、解析 robots.txt 文件是最底层的模块。虽然仅支持 HTTP1.0 仅同步 ，但是解码和解析功能是真的很好用
 
 [urllib 模块代码文档](https://docs.python.org/zh-cn/3/library/urllib.html?highlight=urllib#module-urllib)
 
-#### urllib 发送请求
+### urllib 发送请求
 
 ```python showLineNumbers
 import urllib.request
@@ -27,7 +23,7 @@ print(response.getheaders())
 [('Connection', 'close'), ('Content-Length', '50064'), ('Server', 'nginx'), ('Content-Type', 'text/html; charset=utf-8'), ('X-Frame-Options', 'DENY'), ('Via', '1.1 vegur, 1.1 varnish, 1.1 varnish'), ('Accept-Ranges', 'bytes'), ('Date', 'Tue, 17 Jan 2023 14:37:33 GMT'), ('Age', '1938'), ('X-Served-By', 'cache-iad-kiad7000025-IAD, cache-nrt-rjtf7700057-NRT'), ('X-Cache', 'HIT, HIT'), ('X-Cache-Hits', '263, 1190'), ('X-Timer', 'S1673966254.566369,VS0,VE0'), ('Vary', 'Cookie'), ('Strict-Transport-Security', 'max-age=63072000; includeSubDomains')]
 ```
 
-#### urllib 异常处理
+### urllib 异常处理
 
 URLError 是 OSError 的一个子类，所有请求问题都会被捕获。
 
@@ -47,7 +43,7 @@ if __name__ == "__main__":
         print(e) # <urlopen error [Errno 11002] getaddrinfo failed>
 ```
 
-#### urllib 解析 URL
+### urllib 解析 URL
 
 你肯定经历过复制网址出现乱码，这是因为网址必须以通用码的形式传送，而且还要避免几个特殊字符，因此网址要经编码，汉字经过编码后自然就是不可辨认的乱码了。
 
@@ -68,7 +64,7 @@ print( 'https://www.baidu.com/s?ie=UTF-8&wd='+quote('科技&技术'))
 # 结果为'https://www.baidu.com/s?ie=UTF-8&wd=%E7%A7%91%E6%8A%80&%E6%8A%80%E6%9C%AF'
 ```
 
-#### urllib 解析 robots.txt 文件
+### urllib 解析 robots.txt 文件
 
 ```python showLineNumbers
 import urllib.robotparser
