@@ -1,0 +1,614 @@
+---
+sidebar_position: 39
+title: 模块
+---
+
+:::info
+绝对导入和相对导入为Python包的组织提供了清晰的规则。明确的导入方式让代码的依赖关系更加清晰，避免了命名冲突。
+
+```python
+# 绝对导入
+from mypackage.submodule import function
+
+# 相对导入
+from .submodule import function
+from ..parentmodule import other_function
+```
+
+[PEP 328 – 导入：多行和绝对/相对导入](https://peps.python.org/pep-0328/)
+:::
+
+## 模块
+
+模块表示一个或多个具有相关功能的Python代码的集合。
+
+最小的模块是单个Python可执行文件。最常见的是`.py`后缀结尾的文件。
+
+较大的模块往往是一个文件夹，内含多个Python可执行文件、文件夹与资源等等。
+
+:::info
+python的import不止能导入.py后缀结尾的文件
+
+pyc是由py文件经过编译后生成的二进制文件，py文件变成pyc文件后，加载的速度有所提高，并且可以实现源码隐藏。
+
+pyo是优化编译后的程序，也可以提高加载速度，针对嵌入式系统，把需要的模块编译成pyo文件可以减少容量。
+
+.so和.dll分别是Linux和window的动态库
+
+这些都可以被import导入，所以我们只需要编译C代码，然后import导入即可。
+:::
+
+
+### from,import,as
+
+在导入模块时，可以使用`from`、`import`、`as`关键字来导入模块中的指定内容。
+
+通过`import`关键字导入指定的模块。
+
+通过`from`关键字从模块中导入指定内容。
+
+通过`as`关键字给函数别名。
+
+```python title="module.py"
+def foo():
+    print('goodbye, world!')
+```
+
+```python title="test.py"
+import module # 导入整个模块文件
+module.foo()# 输出goodbye, world!
+
+
+from module import foo # 从模块中导入foo函数
+foo() # 输出goodbye, world!
+
+from module import foo as foo2 # 导入模块中的foo函数，并别名为foo2
+foo2() # 输出goodbye, world!
+```
+
+### `__name__`属性
+
+`__name__`属性是一个特殊的属性，用于获取模块的名称。
+
+```python showLineNumbers title="module.py"
+print(__name__)
+"""
+当模块被直接运行时，__name__的值为__main__
+当模块被导入时，__name__的值为模块的名称,即module
+
+如果你希望在模块被直接运行时执行一些代码，被导入时则不执行，可以这样写：
+"""
+if __name__ == "__main__":
+    print("This is the main module")
+```
+
+
+### 模块导入顺序
+
+通常情况下，当使用 import 语句导入模块后，Python 会按照以下顺序查找指定的模块文件：
+
+> 前目录，即当前执行的程序文件所在目录下查找；
+
+> 到 PYTHONPATH（环境变量）下的每个目录中查找；
+
+> 到 Python 默认的安装目录下查找。
+
+以上所有涉及到的目录，都保存在标准模块 sys 的 sys.path 变量中，通过此变量我们可以看到指定程序文件支持查找的所有目录。换句话说，如果要导入的模块没有存储在 sys.path 显示的目录中，那么导入该模块并运行程序时，Python 解释器就会抛出 ModuleNotFoundError（未找到模块）异常。
+
+解决“Python 找不到指定模块”的方法有 3 种，分别是：
+
+> 向 sys.path 中临时添加模块文件存储位置的完整路径；
+
+> 将模块放在 sys.path 变量中已包含的模块加载路径中；
+
+> 设置 path 系统环境变量。
+
+具体区别可以创建下面的文件解构来了解：
+
+```bash
+top/
+├── __init__.py
+├── second.py
+└── second_copy.py
+```
+
+```python title="second.py"
+import sys
+print(sys.argv)
+from .second_copy import *
+```
+
+```python title="second_copy.py"
+import sys
+print(sys.argv)
+```
+
+两种运行脚本的方式，以及对应的输出：
+
+1. **使用 `python -m top.second` 运行**：
+   ```
+   PS C:\Users\jiang\Desktop> python -m top.second
+   ['C:\\Users\\jiang\\Desktop\\top\\second.py']
+   ['C:\\Users\\jiang\\Desktop\\top\\second.py']
+   ```
+   - 输出两次相同的 `sys.argv`，显示脚本的完整路径。
+   - 没有错误，脚本正常运行。
+
+2. **直接运行 `python top\second.py`**：
+   ```
+   PS C:\Users\jiang\Desktop> python top\second.py
+   ['top\\second.py']
+   Traceback (most recent call last):
+     File "C:\Users\jiang\Desktop\top\second.py", line 3, in <module>
+       from .second_copy import *
+   ImportError: attempted relative import with no known parent package
+   ```
+   - 仅输出了 `sys.argv` 一次，显示的是相对路径 `top\second.py`。
+   - 然后抛出了 `ImportError`，提示“尝试进行相对导入，但没有已知的父包”。
+
+#### 为什么会有这样的差异？
+问题的核心在于 Python 如何处理这两种运行方式，以及它们对模块结构和相对导入的影响。
+
+##### 1. `python -m top.second` 的行为
+- **运行方式**：使用 `-m` 标志告诉 Python 将 `top.second` 作为一个模块运行。这里，`top` 被识别为一个包，`second` 是该包中的一个模块。
+- **包上下文**：Python 会正确设置包的层次结构。由于当前工作目录是 `C:\Users\jiang\Desktop`，Python 知道 `top` 是一个包，并且 `second.py` 是其中的模块。
+- **相对导入**：在 `second.py` 中，`from .second_copy import *` 是一个相对导入，`.` 表示当前包（即 `top`）。因为 Python 已经建立了包上下文，它能找到同一目录下的 `second_copy.py`，导入成功。
+- **`sys.argv` 的值**：在这种模式下，`sys.argv[0]` 被设置为脚本的完整路径，即 `C:\\Users\\jiang\\Desktop\\top\\second.py`。  
+  - 首先，`second.py` 打印这个值。
+  - 然后，导入 `second_copy.py` 时，`second_copy.py` 也打印 `sys.argv`，因为 `sys.argv` 是全局的，不会因模块不同而改变，所以输出两次相同的结果。
+
+##### 2. `python top\second.py` 的行为
+- **运行方式**：直接通过文件路径运行 `second.py`，即将其作为独立的脚本执行，而不是作为一个包中的模块。
+- **包上下文缺失**：在这种情况下，Python 不会将 `top` 视为一个包，而是直接运行 `second.py` 作为主模块（`__main__`）。因此，没有定义任何“父包”。
+- **相对导入失败**：`second.py` 中的 `from .second_copy import *` 依赖于包结构，但由于缺少包上下文，Python 不知道 `.` 代表什么，导致抛出 `ImportError: attempted relative import with no known parent package`。
+- **`sys.argv` 的值**：在这里，`sys.argv[0]` 是命令行中提供的路径，即 `top\second.py`（相对于当前工作目录 `C:\Users\jiang\Desktop`）。  
+  - `second.py` 打印这个值后，尝试执行相对导入时失败，因此程序终止，`second_copy.py` 的代码未被执行。
+
+### 垃圾回收机制
+
+如果持续不断加载数据，调用函数模块，计算机的内存会溢出，Python 的垃圾回收机制。是计数机制，当一个对象的引用数为 0 时，它就会被垃圾回收机制回收。
+
+```python
+import sys
+# 生以下四种情况的时候，该对象的引用计数器+1
+a= "hello" # 对象被创建  
+b=a   # 对象被引用 
+def func(a):
+    return
+func(a)   # 对象被作为参数,传到函数中
+List=[a,"a","b",2]   # 对象作为一个元素，存储在容器中  
+sys.getrefcount(a)
+# python系统内部很多地方都在使用一些常用的对象，这些对象在python解释器启动时就被创建出来。
+
+#发生以下四种情况时，该对象的引用计数器**-1**
+
+#该对象的别名被显式销毁时 
+del a
+#该对象的引别名被赋予新的对象，  
+a = "world"
+#个对象离开它的作用域，例如 func函数执行完毕时，函数里面的局部变量的引用计数器就会减一（但是全局变量不会）
+#该元素从容器中删除时，或者容器被销毁时。
+b = a  # 当前计数器为2
+del b # 删除变量b：b对应的对象的引用计数器-1   （此时计数器为1）
+del a # 删除变量a：a对应的对象的引用计数器-1    (此时引用计数器为0)
+
+# 当引用计数器为0 时，意味着没有人再使用这个对象，这个对象就变成垃圾，垃圾回收。
+# 回收：1.对象从refchain的链表移除。
+#.将对象进行销毁，内存归还给操作系统，可用内存就增加。
+sys.getrefcount(a)
+```
+
+## 内置函数
+
+### `__import__`函数
+
+函数签名：`__import__(name, globals=None, locals=None, fromlist=(), level=0) -> module`
+
+参数说明：
+- `name`：要导入的模块名
+- `globals`：全局命名空间
+- `locals`：局部命名空间
+- `fromlist`：要导入的属性列表
+- `level`：导入级别
+
+返回值：
+- 返回导入的模块
+
+```python showLineNumbers
+math = __import__('math')
+
+print(math.sqrt(16)) # 4.0
+```
+
+## 发布模块
+
+我们安装的模块来自于`pypi.org`，我们也可以分享我们的模块到`pypi.org`。
+
+截至2025年8月，UV 已经成为最现代化和高效的 Python 包管理工具，它集成了包管理、虚拟环境和打包发布功能，比传统的 pip + setuptools 方案更快更简单。
+
+
+
+### 安装 UV
+
+```bash
+# Windows (PowerShell)
+powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
+
+# macOS/Linux
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 或者通过 pip 安装
+pip install uv
+```
+
+### 目录结构
+
+```bash showLineNumbers
+your_project/
+├── .github/（可选）
+│  └── workflows/（可选）
+│      └── python-publish.yml（可选）
+│
+├── src/（推荐结构）
+│   └── your_package/（包名）
+│       ├── __init__.py
+│       └── module.py
+│
+├── tests/（可选）
+│   └── test_module.py
+│
+├── README.md（可选）
+├── LICENSE（可选）
+├── pyproject.toml
+└── uv.lock（UV 生成的锁文件）
+```
+
+### pyproject.toml 示例
+
+:::info
+pyproject.toml为Python项目提供了统一的配置文件格式，取代了传统的setup.py。它让项目配置更加清晰和标准化。
+
+```toml
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "my-package"
+version = "1.0.0"
+description = "A sample package"
+```
+
+[PEP 621 – 在pyproject.toml中存储项目元数据](https://peps.python.org/pep-0621/)
+:::
+
+```toml showLineNumbers title="pyproject.toml"
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "exboard"
+version = "1.0.12"
+authors = [
+  { name="Allen", email="jiangyangcreate@gmail.com" },
+]
+description = "A exboard package for AIBOX"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "schedule>=1.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/jiangyangcreate/exboard"
+Issues = "https://github.com/jiangyangcreate/exboard/issues"
+
+# UV 特定配置
+[tool.uv]
+dev-dependencies = [
+    "pytest>=7.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+]
+```
+
+### 使用 UV 进行项目管理
+
+#### 初始化项目
+```bash
+# 创建新项目
+uv init your_project
+cd your_project
+
+# 或在现有项目中初始化
+uv init
+```
+
+#### 添加依赖
+```bash
+# 添加运行时依赖
+uv add schedule
+
+# 添加开发依赖
+uv add --dev pytest black ruff
+
+# 从 requirements.txt 添加
+uv add -r requirements.txt
+```
+
+#### 管理虚拟环境
+```bash
+# UV 会自动创建和管理虚拟环境
+uv run python your_script.py
+
+# 激活虚拟环境
+uv shell
+
+# 安装项目（开发模式）
+uv pip install -e .
+```
+
+### 打包发布
+
+#### 本地打包
+```bash
+# 构建包（生成 wheel 和 sdist）
+uv build
+
+# 只构建 wheel
+uv build --wheel
+
+# 只构建源码分发
+uv build --sdist
+```
+
+该命令将在 `dist/` 目录下生成 `.tar.gz` 和 `.whl` 文件。
+
+#### 发布到 PyPI
+```bash
+# 安装 twine（如果需要）
+uv add --dev twine
+
+# 上传到 PyPI
+uv run twine upload dist/*
+
+# 上传到测试 PyPI
+uv run twine upload --repository testpypi dist/*
+```
+
+#### 配置 PyPI 凭据
+编辑用户目录下的 `.pypirc` 文件：
+
+```ini showLineNumbers title="~/.pypirc"
+[pypi]
+username = __token__
+password = your_api_token
+
+[testpypi]
+repository = https://test.pypi.org/legacy/
+username = __token__
+password = your_test_api_token
+```
+
+### 通过 GitHub Actions 自动发布
+
+```yaml showLineNumbers title=".github/workflows/python-publish.yml"
+name: Upload Python Package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install UV
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: Set up Python
+      run: uv python install 3.11
+    
+    - name: Install dependencies
+      run: |
+        uv sync --all-extras --dev
+    
+    - name: Run tests
+      run: |
+        uv run pytest
+    
+    - name: Build package
+      run: |
+        uv build
+    
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+```
+
+
+### 常用 UV 命令
+
+```bash
+# 项目管理
+uv init                    # 初始化项目
+uv add package            # 添加依赖
+uv remove package         # 移除依赖
+uv sync                   # 同步依赖
+
+# 运行和构建
+uv run script.py          # 运行脚本
+uv run pytest            # 运行测试
+uv build                  # 构建包
+
+# 环境管理
+uv venv                   # 创建虚拟环境
+uv shell                  # 激活环境
+uv python install 3.11   # 安装 Python 版本
+```
+
+### PyPI 密钥配置
+
+在 PyPI 中获取 API Token：
+
+1. 访问：https://pypi.org/manage/account/token/
+2. 选择 "Add API token"
+3. 设置名称和权限范围
+4. 复制生成的 token
+
+在 GitHub 项目中添加密钥：
+
+```bash
+Settings -> Secrets and variables -> Actions -> New repository secret
+
+Name: PYPI_API_TOKEN
+Value: 刚刚复制的 API token
+```
+
+这样当我们在 GitHub 上**创建 release** 时，会自动将包上传到 PyPI。注意不是 push 代码自动上传。
+
+### 迁移现有项目到 UV
+
+```bash
+# 从 requirements.txt 迁移
+uv add -r requirements.txt
+
+# 从 poetry 迁移
+uv add $(poetry show --only=main --quiet | cut -d' ' -f1)
+
+# 从 pipenv 迁移
+uv add $(pipenv requirements | grep -v '^-')
+```
+
+UV 提供了更现代化、更高效的 Python 包管理体验，强烈推荐在新项目中使用！
+
+
+## Python 导入 C 模块
+
+:::info
+Python社区的发展依赖于开放、透明的决策过程。每个PEP都经过充分讨论，这种民主化的开发方式保证了Python的长期健康发展。
+
+当你遇到"为什么Python要这样设计"的问题时，PEP往往能给你答案。
+
+[PEP 1 – PEP目的和指南](https://peps.python.org/pep-0001/)
+:::
+
+
+Python 的底层是 C 写的（实际上大部分高级编程语言都是 C 写的）因此Python可以调用以下C/C++文件类型：
+- C源代码文件（.c）
+- C++源代码文件（.cpp、.cxx、.cc）
+- 编译后的共享库（Linux/Unix的.so、Windows的.dll、macOS的.dylib）
+- 编译后的静态库（Linux/Unix的.a、Windows的.lib）
+
+因此互相调用的逻辑主要是：数据类型转换、编译库的链接、接收返回值。
+
+python+c/c++混合编程如：
+
+> 原生的 Python.h
+
+> cython
+
+> pybind11：pytorch 也采用该方法
+
+> ctypes、cffi、SWIG、Boost.Pytho 等
+
+但不论是哪个方法，大致的流程都是：转换数据类型->编译代码->生成编译后的文件（.pyd .pyc .pyo .so .dll 等）
+
+
+
+### 代码编写
+
+一个求某个数可以分解为多少个质数之和代码,其中最核心的代码是判断一个数是否为质数。我们使用C语言实现这个被频繁调用的功能。
+
+```c showLineNumbers title="prime.c"
+#include <math.h>
+
+int is_prime(int n) {
+    if (n < 2) return 0;
+    for (int i = 2; i <= (int)sqrt(n); i++) {
+        if (n % i == 0) return 0;
+    }
+    return 1;
+}
+```
+
+编译：`gcc -shared -o prime.so prime.c`
+
+```python showLineNumbers
+import ctypes
+import timeit
+
+# 加载C动态库
+prime_lib = ctypes.CDLL('./prime.so')
+is_prime = prime_lib.is_prime
+is_prime.argtypes = [ctypes.c_int]
+is_prime.restype = ctypes.c_int
+
+def count_prime_pairs(n):
+    count = 0
+    for i in range(2, n // 2 + 1):
+        if is_prime(i) and is_prime(n - i):
+            count += 1
+    return count
+
+def is_prime_py(n):
+    if n < 2:
+        return False
+    for i in range(2, int(n ** 0.5) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+def count_prime_pairs_py(n):
+    count = 0
+    for i in range(2, n // 2 + 1):
+        if is_prime_py(i) and is_prime_py(n - i):
+            count += 1
+    return count
+
+if __name__ == "__main__":
+    n = int(input("输入一个正整数: "))
+    print("C混合版结果:", count_prime_pairs(n))
+    print("纯Python结果:", count_prime_pairs_py(n))
+
+    # 性能对比
+    py_time = timeit.timeit(lambda: count_prime_pairs_py(n), number=100)
+    c_time = timeit.timeit(lambda: count_prime_pairs(n), number=100)
+    print(f"Pure Python: {py_time:.4f} seconds")
+    print(f"Python+C: {c_time:.4f} seconds")
+```
+
+:::tip
+想把Python代码封装为可执行文件，可以使用PyInstaller。
+
+官方文档：[https://www.pyinstaller.org/](https://www.pyinstaller.org/)
+
+命令行：
+
+```bash showLineNumbers
+# 直接封装
+pyinstaller -F app.py
+# 指定图标
+pyinstaller -F -i app.ico app.py
+# 指定图标 不展示终端框
+pyinstaller -F -i app.ico app.py --noconsole
+# 将数据文件添加到捆绑包中，中间使用分号分隔，前面是源目录地址，后面是目的目录地址
+pyinstaller -F -i app.ico app.py --add-data="C:\mediapipe\modules;mediapipe/modules" --noconsole
+```
+:::
