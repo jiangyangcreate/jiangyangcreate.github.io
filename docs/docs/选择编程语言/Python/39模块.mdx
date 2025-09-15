@@ -82,8 +82,8 @@ if __name__ == "__main__":
     print("This is the main module")
 ```
 
+### `__init__.py`与`-m`
 
-### 模块导入顺序
 
 通常情况下，当使用 import 语句导入模块后，Python 会按照以下顺序查找指定的模块文件：
 
@@ -103,6 +103,7 @@ if __name__ == "__main__":
 
 > 设置 path 系统环境变量。
 
+
 具体区别可以创建下面的文件解构来了解：
 
 ```bash
@@ -112,15 +113,21 @@ top/
 └── second_copy.py
 ```
 
-```python title="second.py"
-import sys
-print(sys.argv)
-from .second_copy import *
-```
+:::info
+在 Python 中，`__init__.py` 文件是一个特殊的文件，它标志着一个目录是一个 Python 包（package）。当 Python 解释器在导入一个模块时，如果发现一个目录里包含了 __init__.py 文件，它就会将这个目录当作一个包来处理。
+
+`__init__.py` 文件本身可以为空，但它也可以包含初始化包的代码。例如，你可以在里面定义变量、函数，或者导入子模块，以便在包被导入时自动执行这些代码。这使得你可以控制包的初始化行为，比如设置包级别的配置或简化子模块的导入路径。
+:::
 
 ```python title="second_copy.py"
 import sys
 print(sys.argv)
+```
+
+```python title="second.py"
+import sys
+print(sys.argv)
+from .second_copy import *
 ```
 
 两种运行脚本的方式，以及对应的输出：

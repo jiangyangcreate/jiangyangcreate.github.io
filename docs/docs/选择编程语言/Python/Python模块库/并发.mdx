@@ -156,19 +156,76 @@ def test_thread(para='hi', sleep=3):
 
 
 def main():
-    # create thread
+    # 创建线程
     thread_hi = threading.Thread(target=test_thread)
     thread_hello = threading.Thread(target=test_thread, args=('hello', 1))
-    # run thread
+    # 运行线程
     thread_hi.start()
     thread_hello.start()
+
+    # join表示阻塞，直到子线程结束，再向下执行。可以加也可以不加。
+    thread_hi.join()
+    thread_hello.join()
+
     print('Main thread has ended!')
 
 
 if __name__ == '__main__':
     main()
 
+"""
+添加join后，输出：
+hello
+hi
+Main thread has ended!
+
+不添加join后，输出：
+Main thread has ended!
+hello
+hi
+"""
+
 ```
+
+#### 守护线程
+
+设置守护线程的子线程会在主线程结束时自动结束。
+
+```python showLineNumbers
+import time
+import threading
+
+
+def test_thread(para='hi', sleep=3):
+    time.sleep(sleep)
+    print(para)
+
+
+
+# create thread
+thread_hi = threading.Thread(target=test_thread)
+thread_hello = threading.Thread(target=test_thread, args=('hello', 1))
+thread_hello.daemon = True
+thread_hi.daemon = True
+
+# run thread
+thread_hi.start()
+thread_hello.start()
+
+print('Main thread has ended!')
+
+
+"""
+添加守护线程后，输出：
+Main thread has ended!
+"""
+
+```
+
+这是因为主线程中没有阻塞等待子线程，执行到`print('Main thread has ended!')`时，主线程结束，此时子线程还在`time.sleep`，由于子线程是守护线程，所以会立即结束，还未执行的代码不会执行。
+
+#### 多线程实现下载任务
+
 
 如下所示的界面中，有“下载”和“关于”两个按钮，用休眠的方式模拟点击“下载”按钮会联网下载文件需要耗费 10 秒的时间，当点击“下载”按钮后，整个任务阻塞：
 
@@ -258,11 +315,11 @@ if __name__ == '__main__':
 
 会看到弹出的窗口是多模态的，点击下载按钮不影响其他按钮操作。
 
-**Python 的多线程并不能发挥 CPU 的多核特性**，这一点只要启动几个执行死循环的线程就可以得到证实了。之所以如此，是因为 Python 的解释器有一个“全局解释器锁”（GIL）的东西，任何线程执行前必须先获得 GIL 锁，然后每执行 100 条字节码，解释器就自动释放 GIL 锁，让别的线程有机会执行，这是一个历史遗留问题。
+**Python 的多线程并不能发挥 CPU 的多核特性**，这一点只要启动几个执行死循环的线程就可以得到证实了。
 
-Python 解释器由于设计时有 GIL 全局锁，导致了多线程无法利用多核。多线程的并发在 Python 中就是一个美丽的梦。
+之所以如此，是因为 Python 的解释器有一个“全局解释器锁”（GIL）的东西，任何线程执行前必须先获得 GIL 锁，然后每执行 100 条字节码，解释器就自动释放 GIL 锁，让别的线程有机会执行，新版Python已经移除了GIL。
 
-多进程是有效的。
+
 
 ### asyncio 模块
 
