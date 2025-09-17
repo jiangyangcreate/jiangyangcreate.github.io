@@ -1,0 +1,151 @@
+---
+sidebar_position: 10
+title: ROS2入门
+---
+
+本章节前置知识：`Python`、`Linux`
+
+入门体验：通过命令行`ros2 run learning_node node_helloworld`启动节点。
+
+如果你想依次输入命令，就能获得一个结果，没有任何自己的思考，那这篇文档可能不适合你。
+
+## ros2的安装
+
+安装过程中注意：ros2的版本往往与ubuntu的版本有关。
+
+```bash
+# 如果你是ubuntu 24.04，那么安装jazzy版本
+sudo apt install ros-jazzy-desktop
+
+# 如果你是ubuntu 22.04，那么安装humble版本
+sudo apt install ros-humble-desktop
+```
+## 下载依赖
+
+复杂的功能需要很多依赖，系统中默认的Python3出于安全考虑，可能不让你在全局环境中安装包。代码的提示给了很多选项，例如安装在虚拟环境中，删除安全文件。加上关键字，<Highlight>你应该学会通过翻译软件，翻译报错信息。它让你看某个文件，也请学会使用翻译软件，翻译文件内容。</Highlight>
+
+```bash
+error: externally-managed-environment
+
+× This environment is externally managed
+╰─> To install Python packages system-wide, try apt install
+    python3-xyz, where xyz is the package you are trying to
+    install.
+    
+    If you wish to install a non-Debian-packaged Python package,
+    create a virtual environment using python3 -m venv path/to/venv.
+    Then use path/to/venv/bin/python and path/to/venv/bin/pip. Make
+    sure you have python3-full installed.
+    
+    If you wish to install a non-Debian packaged Python application,
+    it may be easiest to use pipx install xyz, which will manage a
+    virtual environment for you. Make sure you have pipx installed.
+    
+    See /usr/share/doc/python3.12/README.venv for more information.
+
+note: If you believe this is a mistake, please contact your Python installation or OS distribution provider. You can override this, at the risk of breaking your Python installation or OS, by passing --break-system-packages.
+hint: See PEP 668 for the detailed specification.
+```
+
+根据提示，得到的解决方式之一：`pip3 install 你的包 --break-system-packages`
+
+或者可以把`externally managed`文件删除。
+
+```bash
+sudo apt install -y python3-pip
+
+sudo pip3 install rosdepc
+
+sudo rosdepc init
+
+rosdepc update
+```
+
+## 创建节点
+
+创建节点有两种方式：
+
+- 创建Python节点：`ros2 pkg create --build-type ament_python learning_node`
+
+- 创建C++节点：`ros2 pkg create --build-type ament_cmake learning_node`
+
+<Highlight>只需执行其中一个命令即可，如果你会Python，就执行创建Python节点的命令。</Highlight>命令创建一个名为`learning_node`文件夹。
+
+这里我推荐大家创建节点名的时候，使用有辨识性的名字，例如加上自己的学号：`ros2 pkg create --build-type ament_python learning_node20250101`。这样之后你用你同学的节点就不会报重名错误了。
+
+注意：对于节点同名，ros2在编译时的处理方式不是使用第一个节点或最后一个节点，而是会报错。
+
+## 编写代码
+
+接着在`learning_node`文件夹我们就可以准备编写代码了，此时你的路径应该是：
+
+```bash
+~/work_space
+    |_src
+        |_learning_node/
+            |_learning_node
+                |_ __init__.py
+            |_package.xml
+            |_setup.py
+            |_setup.cfg
+            |_test/
+            |_resource/
+```
+
+此时你就可以编写代码了,在`__init__.py`<Highlight>同级</Highlight>下创建一个`.py`文件，符合文件命名规则前提下，你想叫什么都可以，但是最好有一定的含义，如果你的功能是打印`Hello World`，那么你就可以叫`node_helloworld.py`。
+
+python的函数通常是需要调用的，例如`abc()`函数，你需要在代码中输入`abc()`，才会调用这个函数。和C++有且仅有一个`main`函数不同，那么如何确定哪个函数是入口？更进一步思考：不同的指令对应不同的函数。因此有了`setup.py`最下方的入口点定义。
+
+编写完成后记得修改`setup.py`最下方的入口点。
+
+详细内容参可以参考现成的仓库：
+
+:::info
+拉取git仓库，可免去自己从0开始手敲代码。如果你喜欢自己从0开始抄写代码，也可以跳过本部分。
+
+git安装：`sudo apt install git`
+
+拉取命令：`git clone https://gitee.com/guyuehome/ros2_21_tutorials.git`
+
+这个命令会把仓库克隆到本地。执行后，你应该能在<Highlight>当前文件夹下</Highlight>看到名为`ros2_21_tutorials`的文件夹，内含多个子文件夹。每个子文件夹对应一个功能包。因为ros2是<Highlight>模块化的</Highlight>，不同的功能被拆解为不同的功能包后期更好维护。
+:::
+
+注意：如果你之前在`src`里创建了一些Python节点，之后又把`ros2_21_tutorials`文件夹也放置在`src`里，那么你需要检查你的创建的节点名，是否与`ros2_21_tutorials`内已有节点重名。
+
+## 编译
+
+```bash
+# 安装colcon（此步全局仅在第一次执行时需要执行，如果失败会导致colcon build 命令不可用）
+sudo apt install python3-colcon-ros
+# 进入工作空间
+cd ~/work_space
+# 编译
+colcon build
+```
+
+`colcon build`命令会将所有功能包，编译成一个可执行文件。
+
+如果是Python这样无需编译的，会将代码直接拷贝到`install`文件夹下。
+
+编译过程可能出现的报错：
+
+- 节点重名：对与节点同名，ros的处理方式不是使用第一个节点或最后一个节点，而是会报错。应该删除多余节点。确保你`src`文件夹下，所有的`xml`文件中，节点的名称是唯一的。
+
+- 编译失败：如果代码语法错误，则会编译失败，需要手动解决。
+
+## 添加环境变量
+
+在不更换工作空间的情况下，以下命令仅在第一次执行时需要执行。
+
+如果你的工作空间路径不是`~/work_space`，请将`~/work_space`替换为你的工作空间路径。
+
+`source ~/work_space/install/setup.bash & echo ~/work_space/install/setup.bash >> ~/.bashrc`
+
+## 运行脚本
+
+`ros2 run learning_node node_helloworld`
+
+参考资料：
+
+- [古月ROS 21讲](https://book.guyuehome.com/)
+
