@@ -29,6 +29,20 @@ wsl -l -v
 
 # 设置默认发行版（配置后输入wsl命令即可进入）
 wsl --set-default <distro-name>
+
+# 导出
+wsl --export <你的Ubuntu发行版名称> <导出的文件路径>.tar
+# 示例：wsl --export Ubuntu-24.04 ubuntu-24.04-wsl-ros2.tar
+
+# 从文件导入
+wsl --import <新实例的名称> C:\<新实例的文件夹> <压缩包的完整路径>
+# 示例：wsl --import Ubuntu-ROS2 C:\WSL_ROS2 D:\windows_app\systools\ubuntu-24.04-wsl-ros2.tar
+
+
+# 启动指定wsl
+wsl -d <新实例的名称>
+# 示例：wsl -d Ubuntu-ROS2
+
 ```
 
 如果你不属于以上系统，推荐购买云服务器并选择Linux系统配置，然后使用SSH连接到服务器。
@@ -328,13 +342,19 @@ Linux 内核衍生版本众多，譬如 ubuntu、debian、centos、fedora、arch
 
 ### 重要概念说明
 
-| 概念 | 说明 | 示例 |
-|------|------|------|
-| sudo | 以超级用户（root）身份执行命令 | `sudo apt-get install` |
-| su | super user（超级用户） | sudo = su + do |
-| do | 执行 | sudo = su + do |
-| apt-get | 包管理器名称 | 用于下载和安装软件包 |
-| 管道符 \| | 将前一个命令的输出作为后一个命令的输入 | `command1 \| command2` |
+
+sudo ：以超级用户（root）身份执行命令 
+
+su 表示 super user（超级用户） do 表示 执行。
+
+apt-get 包管理器名称，用于下载和安装软件包
+
+示例：`sudo apt-get install <软件包>` 
+
+`su 用户名`表示切换到该用户，如果不填用户名则默认切换到`root`
+
+
+管道符 `\|`  将前一个命令的输出作为后一个命令的输入 ,示例 `command1 \| command2` |
 
 ## 系统管理实战案例
 
