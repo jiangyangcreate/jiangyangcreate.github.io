@@ -335,34 +335,6 @@ if __name__ == '__main__':
 可以看出，f 不是 Fun 类的一个实例，而是 Demo 类的一个实例，拥有 Demo 类的字段。因为 Fun 类的\_\_new\_\_方法创建的是一个 Demo 类实例，而非 Fun 类本身。因此 Fun.\_\_new\_\_方法在 return 后调用了 Demo.\_\_init\_\_方法，以完成该实例的初始化。
 
 
-### \_\_repr\_\_和\_\_str\_\_
-
-```python showLineNumbers
-class Clothes(object):
-    """
-    repr and str demo
-    """
-
-    def __init__(self, color="green"):
-        self.color = color
-
-    def __str__(self):
-        "This is a string to print."
-        return ("a {} clothes".format(self.color))
-
-    def __repr__(self):
-        "This string recreates the object."
-        return ("{}(color='{}')".format(self.__class__.__name__, self.color))
-```
-
-`__str__()` 是使用 print 函数显示的结果,即str()函数调用的结果。
-
-`__repr__()` 是使用 repr() 函数显示的结果，理想情况下，应该返回一个可以重新创建对象的表达式。
-
-```python showLineNumbers
-print(Clothes()) # a green clothes
-print(repr(Clothes())) # Clothes(color='green')
-```
 ### \_\_call\_\_
 
 `__call__()` 当实例名加上()时被调用,可以使对象可以像函数一样被调用。
@@ -382,78 +354,67 @@ print(my_clothes())  # Wearing blue clothes for the 1 time
 print(my_clothes())  # Wearing blue clothes for the 2 time
 ```
 
-### \_\_iter\_\_
+### \_\_iter\_\_和\_\_next\_\_
 
+:::info
+实现了 `__iter__()` 方法的对象是可迭代对象。
 
-`__iter__()` 使对象可以被迭代（用于 for 循环）。
+如果同时实现了 `__next__()` 方法，那它是可迭代对象的同时，也是迭代器。
+
+如果只实现了 `__next__()` 方法，那它可以像手动迭代器一样工作，但是，它不是一个有效的可迭代对象。
+
+```mermaid
+graph TD
+    subgraph 对象
+        subgraph 可迭代对象
+            迭代器
+        end
+    end
+```
+
+| 类型 | 是否实现`__iter__` | 是否实现`__next__` |
+| :--- | :---: | :---: |
+| **对象** | ✖️ | ✖️ |
+| **对象** | ✖️ | ✔️ |
+| **可迭代对象** | ✔️ | ✖️ |
+| 是**可迭代对象**也是**迭代器** | ✔️ | ✔️ |
+:::
 
 ```python showLineNumbers
-class ClothesCollection(object):
-    def __init__(self):
-        self.clothes = ["shirt", "pants", "jacket"]
-        
+class MyRange:
+    def __init__(self, start, end):
+        self.current = start
+        self.end = end
+    
     def __iter__(self):
-        return iter(self.clothes)
-
-collection = ClothesCollection()
-for item in collection:
-    print(item)  # 依次输出: shirt, pants, jacket
-```
-
-### \_\_add\_\_和\_\_sub\_\_
-
-这些方法定义对象的算术运算行为。
-
-```python showLineNumbers
-class Price(object):
-    def __init__(self, value):
-        self.value = value
+        print("__iter__")
+        return self
     
-    def __add__(self, other):
-        if isinstance(other, Price):
-            return Price(self.value + other.value)
-        return Price(self.value + other)
-    
-    def __sub__(self, other):
-        if isinstance(other, Price):
-            return Price(self.value - other.value)
-        return Price(self.value - other)
+    def __next__(self):
+        print("__next__")
+        if self.current < self.end:
+            result = self.current
+            self.current += 1
+            return result
+        else:
+            raise StopIteration
 
-    def __repr__(self):
-        return f"Price({self.value})"
+# 创建一个 MyRange 对象，这是一个“可迭代对象”
+my_range_object = MyRange(1, 4) # 调用__iter__
 
-price1 = Price(100)
-price2 = Price(50)
-print(price1 + price2)  # Price(150)
-print(price1 - 30)      # Price(70)
-```
-
-### \_\_rmul\_\_和\_\_mul\_\_
-
-`__mul__()` 和 `__rmul__()` 定义对象的乘法运算行为。
-
-`__mul__()` 定义对象的左乘法运算行为。
-
-`__rmul__()` 定义对象的右乘法运算行为。
-
-```python showLineNumbers
-class Price(object):
-    def __init__(self, value):
-        self.value = value
-    
-    def __mul__(self, other):
-        return Price(self.value * other)
-    
-    def __rmul__(self, other):
-        # 当 other * self 时调用
-        return Price(other * self.value)
-    
-    def __repr__(self):
-        return f"Price({self.value})"
-
-price = Price(10)
-print(price * 5)    # Price(50) - 调用 __mul__
-print(3 * price)    # Price(30) - 调用 __rmul__
+for i in my_range_object: # 每次迭代都在调用__next__
+    # 等价于 print(next(my_iterator))
+    print(i) 
+"""
+__iter__
+__next__
+1
+__next__
+2
+__next__
+3
+__next__
+"""
 ```
 
 ###  \_\_enter\_\_和\_\_exit\_\_ 与 with 语句
@@ -491,6 +452,53 @@ with open('my_file.txt', 'w') as fp:
 ```
 :::
 
+### \_\_len\_\_
+
+`__len__()` 返回对象的长度。
+
+```python showLineNumbers
+class Clothes(object):
+    def __init__(self, color="green"):
+        self.color = color
+
+    def __len__(self):
+        return len(self.color)
+    
+my_clothes = Clothes("blue")
+print(len(my_clothes)) # 调用__len__方法
+# 因为有4个字符，所以返回4
+```
+### \_\_getitem\_\_和\_\_setitem\_\_和\_\_delitem\_\_
+
+`__getitem__()` 返回对象的索引值。
+
+`__setitem__()` 设置对象的索引值。
+
+`__delitem__()` 删除对象的索引值。
+
+```python showLineNumbers
+class Clothes:
+    def __init__(self):
+        self.color = ["blue", "green", "red"]
+    
+    def __getitem__(self, index):
+        return self.color[index]
+    
+    def __setitem__(self, index, value):
+        self.color[index] = value
+    
+    def __delitem__(self, index):
+        del self.color[index]
+    
+my_clothes = Clothes()
+print(my_clothes[0]) # 调用__getitem__方法
+# blue
+my_clothes[0] = "red" # 调用__setitem__方法
+print(my_clothes.color) # ['red', 'green', 'red']
+
+del my_clothes[0] # 调用__delitem__方法
+print(my_clothes.color) # ['green', 'red']
+```
 
 ### \_\_class\_\_和\_\_name\_\_
 
@@ -539,8 +547,343 @@ print(nike_clothes.__class__)           # <class '__main__.NikeClothes'>
 print(nike_clothes.__class__.__bases__)  # (<class '__main__.Clothes'>,)
 ```
 
-## 内置函数
 
+## 重载类型转换
+
+### \_\_repr\_\_和\_\_str\_\_
+
+```python showLineNumbers
+class Clothes(object):
+    """
+    repr and str demo
+    """
+    def __init__(self, color="green"):
+        self.color = color
+
+    # __str__() 是使用 print 函数显示的结果,即str()函数调用的结果。
+    def __str__(self):
+        "This is a string to print."
+        return ("a {} clothes".format(self.color))
+
+    # __repr__() 是使用 repr() 函数显示的结果，理想情况下，应该返回一个可以重新创建对象的表达式。
+    def __repr__(self):
+        "This string recreates the object."
+        return ("{}(color='{}')".format(self.__class__.__name__, self.color))
+
+print(Clothes()) # a green clothes
+print(repr(Clothes())) # Clothes(color='green')
+```
+
+### \_\_int\_\_和\_\_float\_\_和\_\_complex\_\_
+
+```python showLineNumbers
+class Price(object):
+    def __init__(self, value):
+        self.value = value
+    
+    def __int__(self):
+        return int(self.value)
+    
+    def __float__(self):
+        return float(self.value)
+    
+    def __complex__(self):
+        return complex(self.value)
+
+price = Price(100)
+print(int(price)) # 100
+print(float(price)) # 100.0
+print(complex(price)) # (100+0j)
+```
+
+## 重载运算符
+
+:::warning
+运算符当中，除了`=` `is` `not` `and` `or` 不能被重载，其他运算符都可以被重载。
+:::
+
+### 重载算术运算符
+
+这些方法定义对象的算术运算行为。
+
+```python showLineNumbers
+class Price(object):
+    def __init__(self, value):
+        self.value = value
+    
+    def __add__(self, other):
+        # + (加法)
+        if isinstance(other, Price):
+            return Price(self.value + other.value)
+        return Price(self.value + other)
+    
+    def __sub__(self, other):
+        # - (减法)
+        if isinstance(other, Price):
+            return Price(self.value - other.value)
+        return Price(self.value - other)
+
+    def __mul__(self, other):
+        # * (左乘法)
+        return Price(self.value * other)
+    
+    def __rmul__(self, other):
+        # * (右乘法)
+        return Price(other * self.value)
+
+    def __truediv__(self, other):
+        # / (左除法)
+        return Price(self.value / other)
+    
+    def __rtruediv__(self, other):
+        # / (右除法)
+        return Price(other / self.value)
+
+    def __floordiv__(self, other):
+        # // (左整数除法)
+        return Price(self.value // other)
+    
+    def __rfloordiv__(self, other):
+        # // (右整数除法)
+        return Price(other // self.value)
+
+    def __mod__(self, other):
+        # % (左取模)
+        return Price(self.value % other)
+    
+    def __rmod__(self, other):
+        # % (右取模)
+        return Price(other % self.value)
+
+    def __pow__(self, other):
+        # ** (左幂运算)
+        return Price(self.value ** other)
+    
+    def __rpow__(self, other):
+        # ** (右幂运算)
+        return Price(other ** self.value)
+
+    def __repr__(self):
+        return f"Price({self.value})"
+
+price1 = Price(100)
+price2 = Price(50)
+print(price1 + price2)  # Price(150)
+print(price1 - 30)      # Price(70)
+
+price = Price(10)
+print(price * 5)    # Price(50) - 调用 __mul__
+print(3 * price)    # Price(30) - 调用 __rmul__
+
+price = Price(10)
+print(price / 2)    # Price(5.0) - 调用 __truediv__
+print(3 / price)    # Price(0.3) - 调用 __rtruediv__
+
+
+price = Price(10)
+print(price // 2)    # Price(5) - 调用 __floordiv__
+print(3 // price)    # Price(0) - 调用 __rfloordiv__
+
+price = Price(10)
+print(price % 3)    # Price(1) - 调用 __mod__
+print(3 % price)    # Price(3) - 调用 __rmod__
+
+price = Price(10)
+print(price ** 2)    # Price(100) - 调用 __pow__
+print(2 ** price)    # Price(1024) - 调用 __rpow__
+```
+
+### 重载比较（关系）运算符
+
+
+```python showLineNumbers
+class Price(object):
+    def __init__(self, value):
+        self.value = value
+    
+    def __eq__(self, other):
+        # == (等于)
+        return self.value == other.value
+    
+    def __ne__(self, other):
+        # != (不等于)
+        return self.value != other.value
+    
+    def __lt__(self, other):
+        # < (小于)
+        return self.value < other.value
+    
+    def __gt__(self, other):
+        # > (大于)
+        return self.value > other.value
+    
+    def __le__(self, other):
+        # <= (小于等于)
+        return self.value <= other.value
+    
+    def __ge__(self, other):
+        # >= (大于等于)
+        return self.value >= other.value
+    
+    def __repr__(self):
+        return f"Price({self.value})"
+
+price1 = Price(10)
+price2 = Price(20)
+print(price1 == price2)    # False
+print(price1 != price2)    # True
+print(price1 < price2)    # True
+print(price1 > price2)    # False
+print(price1 <= price2)    # True
+print(price1 >= price2)    # False
+```
+### 重载赋值运算符
+
+这些方法定义对象的赋值运算行为。
+
+
+```python showLineNumbers
+class Price(object):
+    def __init__(self, value):
+        self.value = value
+    
+    def __iadd__(self, other):
+        # += (加法赋值)
+        return Price(self.value + other)
+    
+    def __isub__(self, other):
+        # -= (减法赋值)
+        return Price(self.value - other)
+        
+    def __imul__(self, other):
+        # *= (乘法赋值)
+        return Price(self.value * other)
+    
+    def __itruediv__(self, other):
+        # /= (除法赋值)
+        return Price(self.value / other)
+    
+    def __imod__(self, other):
+        # %= (取模赋值)
+        return Price(self.value % other)
+    
+    def __ipow__(self, other):
+        # **= (幂赋值)
+        return Price(self.value ** other)
+    
+    def __ifloordiv__(self, other):
+        # //= (整数除法赋值)
+        return Price(self.value // other)
+    
+    def __repr__(self):
+        return f"Price({self.value})"
+
+for i in [ "+=","-=", "*=", "/=", "%=", "**=", "//="]:
+    price = Price(10)
+    if i == "+=":
+        price += 10
+    elif i == "-=":
+        price -= 10
+    elif i == "*=":
+        price *= 10
+    elif i == "/=":
+        price /= 10
+    elif i == "%=":
+        price %= 10
+    elif i == "**=":
+        price **= 10
+    elif i == "//=":
+        price //= 10
+    print(price)
+"""
+Price(20)
+Price(0)
+Price(100)
+Price(1.0)
+Price(0)
+Price(10000000000)
+Price(1)
+"""
+```
+
+### 重载位运算符
+
+这些方法定义对象的位运算行为。
+
+```python showLineNumbers
+class Permission(object):
+    def __init__(self, value):
+        self.value = value
+    
+    def __and__(self, other):
+        # & (按位与)
+        return Permission(self.value & other.value)
+    
+    def __or__(self, other):
+        # | (按位或)
+        return Permission(self.value | other.value)
+    
+    def __xor__(self, other):
+        # ^ (按位异或)
+        return Permission(self.value ^ other.value)
+    
+    def __invert__(self):
+        # ~ (按位取反)
+        return Permission(~self.value)
+    
+    def __lshift__(self, other):
+        # << (左移)
+        if isinstance(other, Permission):
+            return Permission(self.value << other.value)
+        return Permission(self.value << other)
+    
+    def __rshift__(self, other):
+        # >> (右移)
+        if isinstance(other, Permission):
+            return Permission(self.value >> other.value)
+        return Permission(self.value >> other)
+    
+    def __repr__(self):
+        return f"Permission({self.value})"
+
+# 权限示例
+read_perm = Permission(4)    # 100 (二进制)
+write_perm = Permission(2)   # 010 (二进制)
+exec_perm = Permission(1)    # 001 (二进制)
+
+# 位运算操作
+print(read_perm & write_perm)    # Permission(0) - 按位与
+print(read_perm | write_perm)    # Permission(6) - 按位或
+print(read_perm ^ write_perm)    # Permission(6) - 按位异或
+print(~read_perm)                # Permission(-5) - 按位取反
+print(read_perm << 1)            # Permission(8) - 左移
+print(read_perm >> 1)            # Permission(2) - 右移
+```
+
+### 重载成员运算符
+
+`__contains__()` 定义对象的成员运算 `in` 行为。
+
+```python showLineNumbers
+class ClothesWardrobe(object):
+    def __init__(self):
+        self.clothes = ["shirt", "pants", "jacket", "dress"]
+
+    def __contains__(self, item):
+        # in (成员运算)
+        return item.lower() in self.clothes
+
+# 创建衣柜对象
+wardrobe = ClothesWardrobe()
+
+# 使用 in 运算符检查
+print("shirt" in wardrobe)      # True
+print("SHIRT" in wardrobe)      # True # 不区分大小写
+print("hat" in wardrobe)        # False
+print("jacket" in wardrobe)     # True
+
+```
+## 内置函数
 
 
 ### type函数、isinstance函数、issubclass函数
