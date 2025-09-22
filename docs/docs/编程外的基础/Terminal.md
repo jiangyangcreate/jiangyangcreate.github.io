@@ -38,18 +38,45 @@ wsl --export <你的Ubuntu发行版名称> <导出的文件路径>.tar
 wsl --import <新实例的名称> C:\<新实例的文件夹> <压缩包的完整路径>
 # 示例：wsl --import Ubuntu-ROS2 C:\WSL_ROS2 D:\windows_app\systools\ubuntu-24.04-wsl-ros2.tar
 
-
 # 启动指定wsl
 wsl -d <新实例的名称>
 # 示例：wsl -d Ubuntu-ROS2
-
 ```
 
 如果你不属于以上系统，推荐购买云服务器并选择Linux系统配置，然后使用SSH连接到服务器。
 
+:::info
+Linux 内核衍生版本众多，譬如 ubuntu、debian、centos、fedora、archlinux 等。
+
+不同版本之间存在差异，譬如 ubuntu 大版本号之外，小版本号也很重要，此外有时候版本号和代号会混用
+:::
+
+
 [网道 bash 教程](https://wangdoc.com/bash/intro)是开源的 bash 文档，教科书式的篇章划分能帮助学习者系统的了解终端命令。
 
 [tldr](https://tldr.inbrowser.app/)是社区维护的命令行工具帮助页面合集，支持在线查询终端命令，有不同平台选择，支持不同语言显示
+
+## 有趣的命令行体验
+
+### 终端娱乐命令
+
+| 命令名称 | 安装命令 | 使用方法 | 功能说明 |
+|----------|----------|----------|----------|
+| hollywood | `sudo apt-get install hollywood` | `hollywood` | 让终端像好莱坞大片一样显示各种电脑参数 |
+| cowsay | `sudo apt-get install cowsay` | `cowsay "消息内容"` | 让一头牛说话，显示指定消息 |
+| fortune | `sudo apt-get install fortunes` | `fortune` | 显示随机名言、谚语或幽默语句，注意命令内加`s` |
+| lolcat | `sudo apt-get install lolcat` | `命令 \| lolcat` | 将文本输出为彩虹颜色 |
+
+命令组合示例：`fortune | cowsay | lolcat`
+
+- `sudo`：以超级用户身份执行命令（ su 表示 super user（超级用户） do 表示 执行）
+
+如果不希望每次都输入`sudo`，可以切换到有权限的用户。
+
+- `su 用户名`表示切换到该用户，如果不填用户名`sudo su` 则默认切换到`root`
+
+- 管道符 `|`  将前一个命令的输出作为后一个命令的输入 ,示例 `command1 | command2` |
+
 
 ## 基本语法
 
@@ -309,197 +336,13 @@ start  C:\"Program Files (x86)"\Tencent\WeChat\WeChat.exe
 | `~` | 用户主目录 | `~/Downloads` 表示用户主目录下的Downloads文件夹 |
 | `-r` | 递归选项 | 用于复制目录及其内容 |
 
-## Linux版本信息
+### 变量设置
 
-:::info
-Linux 内核衍生版本众多，譬如 ubuntu、debian、centos、fedora、archlinux 等。
-
-不同版本之间存在差异，譬如 ubuntu 大版本号之外，小版本号也很重要，此外有时候版本号和代号会混用，譬如 ros 2（一种机器人操作系统）只能使用 Ubuntu 的 noble 即 Ubuntu 24.04。
-:::
-
-| Ubuntu版本 | 代号 | 特殊说明 |
-|------------|------|----------|
-| 24.10 | oracular | 最新版本 |
-| 24.04 | noble | ROS 2 支持版本 |
-
-## 有趣的命令行体验
-
-### 终端娱乐命令
-
-| 命令名称 | 安装命令 | 使用方法 | 功能说明 |
-|----------|----------|----------|----------|
-| hollywood | `sudo apt-get install hollywood` | `hollywood` | 让终端像好莱坞大片一样显示各种电脑参数 |
-| cowsay | `sudo apt-get install cowsay` | `cowsay "消息内容"` | 让一头牛说话，显示指定消息 |
-| fortune | `sudo apt-get install fortune` | `fortune` | 显示随机名言、谚语或幽默语句 |
-| lolcat | `sudo apt-get install lolcat` | `命令 \| lolcat` | 将文本输出为彩虹颜色 |
-
-### 命令组合示例
-
-| 组合效果 | 命令 | 说明 |
-|----------|------|------|
-| 彩色牛说谚语 | `fortune \| cowsay \| lolcat` | 结合三个命令：随机谚语 + 牛说话 + 彩色输出 |
-| 退出娱乐模式 | `Ctrl + C` | C表示Cancel（取消），退出当前运行的程序 |
-
-### 重要概念说明
-
-
-sudo ：以超级用户（root）身份执行命令 
-
-su 表示 super user（超级用户） do 表示 执行。
-
-apt-get 包管理器名称，用于下载和安装软件包
-
-示例：`sudo apt-get install <软件包>` 
-
-`su 用户名`表示切换到该用户，如果不填用户名则默认切换到`root`
-
-
-管道符 `\|`  将前一个命令的输出作为后一个命令的输入 ,示例 `command1 \| command2` |
-
-## 系统管理实战案例
-
-### 案例1：系统状态报告和管理脚本
-
-#### 工作环境设置
-
-| 操作类型 | 命令 | 说明 |
-|----------|------|------|
-| 创建工作目录 | `mkdir -p /tmp/system_report` | 创建目录（包括父目录） |
-| 进入目录 | `cd /tmp/system_report` | 切换到工作目录 |
-| 记录当前路径 | `pwd > current_directory.txt` | 将当前路径保存到文件 |
-| 列出目录内容 | `ls -l > directory_listing.txt` | 详细列出文件和文件夹信息 |
-
-#### 系统和用户信息收集
-
-| 信息类型 | 命令 | 说明 |
-|----------|------|------|
-| 当前时间 | `date > system_datetime.txt` | 获取系统日期和时间 |
-| 当前用户 | `whoami > current_user.txt` | 显示当前登录用户 |
-| 内核版本 | `uname -r > kernel_version.txt` | 显示系统内核版本信息 |
-| root用户ID | `echo "Root user ID: $(id -u root)" > root_user_id.txt` | 获取root用户的ID |
-
-#### 文件和目录信息
-
-| 操作 | 命令 | 说明 |
-|------|------|------|
-| 查看配置目录 | `ls -l /etc > etc_directory_listing.txt` | 列出/etc目录内容 |
-| 查看文件权限 | `ls -l /etc/passwd > file_permissions.txt` | 检查passwd文件权限 |
-| 修改文件权限 | `chmod 644 /tmp/system_report/* > chmod_output.txt 2>&1` | 设置文件权限为644（所有者读写，组用户和其他用户只读） |
-
-#### 系统日志和资源信息
-
-| 信息类型 | 命令 | 说明 |
-|----------|------|------|
-| 内核消息 | `dmesg > dmesg.log` | 收集内核环形缓冲区消息 |
-| 系统日志 | `journalctl -xe > system_journal.log` | 获取系统详细日志 |
-| 运行时间 | `uptime > uptime_info.txt` | 系统运行时间和负载信息 |
-| 文件类型 | `file /etc/passwd > file_type.txt` | 检查文件类型信息 |
-
-#### 磁盘和进程信息
-
-| 信息类型 | 命令 | 说明 |
-|----------|------|------|
-| 磁盘使用 | `df -h > disk_usage.txt` | 磁盘空间使用情况（人类可读格式） |
-| 进程列表 | `ps -aux > process_list.txt` | 显示所有进程信息 |
-| 实时进程（批处理） | `top -b -n 1 > top_output.txt` | 一次性获取top信息 |
-| htop信息 | `htop -C -b -n 1 > htop_output.txt` | 一次性获取htop信息 |
-
-#### 网络信息收集
-
-| 信息类型 | 命令 | 说明 |
-|----------|------|------|
-| 网络连接 | `sudo netstat -tulnp > network_connections.txt` | 显示当前网络连接状态 |
-
-#### 文件压缩和传输
-
-| 操作 | 命令 | 说明 |
-|------|------|------|
-| 创建压缩包 | `tar -czvf system_report.tar.gz *.txt *.log` | 压缩所有文本和日志文件 |
-| 发送给管理员 | `scp system_report.tar.gz admin@example.com:/reports/` | 通过scp传输报告文件 |
-
-### 案例2：系统安全监控
-
-#### 安全监控命令
-
-| 监控类型 | 命令 | 说明 |
-|----------|------|------|
-| 失败登录记录 | `grep "Failed password" /var/log/auth.log` | 查找登录失败记录 |
-| 活动用户 | `w` | 显示当前登录的用户 |
-| 最后登录信息 | `last` | 显示用户登录历史 |
-| 开放端口 | `ss -tuln` | 显示监听的端口 |
-| 文件完整性 | `find /etc -type f -exec md5sum {} \;` | 检查配置文件完整性 |
-
-## Linux系统测试题库
-
-### 单选题
-
-| 题目 | 选项 | 正确答案 |
-|------|------|----------|
-| 在Linux中，以下哪个命令用于查看当前目录的内容？ | A. cd B. ls C. pwd D. mkdir | B |
-| 哪个命令用于在Linux中创建一个新目录？ | A. mkdir B. rmdir C. touch D. rm | A |
-| 在Linux中，以下哪个命令用于删除文件？ | A. delete B. remove C. rm D. del | C |
-| 哪个命令用于在Linux中查看文件内容？ | A. view B. cat C. see D. read | B |
-| 在Linux中，以下哪个命令用于复制文件？ | A. copy B. cp C. duplicate D. clone | B |
-| 哪个命令用于在Linux中移动或重命名文件？ | A. move B. rename C. mv D. shift | C |
-| 在Linux中，以下哪个命令用于查看磁盘使用情况？ | A. disk B. df C. space D. usage | B |
-| 哪个命令用于在Linux中查看当前运行的进程？ | A. processes B. ps C. running D. tasks | B |
-| 在Linux中，以下哪个命令用于终止进程？ | A. stop B. end C. kill D. terminate | C |
-| 哪个命令用于在Linux中压缩文件？ | A. compress B. zip C. tar D. pack | C |
-
-### 判断题
-
-| 题目 | 正确答案 |
-|------|----------|
-| 在Linux中，`pwd`命令用于显示当前工作目录的路径。 | 对 |
-| `chmod`命令用于更改文件的权限。 | 对 |
-| `exit`命令用于退出当前Shell会话。 | 对 |
-| `echo`命令用于输出文本到终端。 | 对 |
-| `tar`命令可以用于压缩和解压文件。 | 对 |
-| 在Linux中，`kill`命令只能终止当前用户的进程。 | 错 |
-| `find`命令只能搜索文件名，不能搜索目录。 | 错 |
-| `crontab`命令用于管理定时任务。 | 对 |
-| 在Linux中，`lsof`命令用于列出打开的文件。 | 对 |
-| `iptables`命令用于配置文件权限。 | 错 |
-| 在Linux中，`ls`命令用于列出目录中的文件。 | 对 |
-| Bash脚本中，注释行以`#`开头。 | 对 |
-| 在Linux中，`rm`命令用于移动文件。 | 错 |
-| `cd ..`命令用于切换到上一级目录。 | 对 |
-| Linux中，`/bin`目录通常包含二进制可执行文件。 | 对 |
-| `chmod`命令用于修改文件的所有者。 | 错 |
-| 在Linux中，`man`命令用于查看命令的手册页。 | 对 |
-| `df -h`命令用于查看磁盘空间使用情况。 | 对 |
-| `ps`命令用于显示当前系统的进程信息。 | 对 |
-| `mkdir`命令用于删除目录。 | 错 |
-
-### 多选题
-
-| 题目 | 选项 | 正确答案 |
-|------|------|----------|
-| 以下哪些命令可以用于在Bash中定义和调用函数？ | A. func B. function C. () D. def | B, C |
-| 在Bash中，以下哪些符号可以用于重定向标准输出？ | A. > B. >> C. < D. \| | A, B |
-| 以下哪些命令可以用于SSH登录到远程服务器？ | A. ssh B. scp C. sftp D. rsync | A, B, C |
-| Bash脚本中，以下哪些符号用于逻辑运算？ | A. && B. \|\| C. ! D. == | A, B, C |
-| 在SSH配置文件`~/.ssh/config`中，以下哪些选项可以用于配置主机？ | A. Host B. User C. Port D. Password | A, B, C |
-| Bash中，以下哪些命令可以用于文本处理？ | A. awk B. sed C. grep D. ls | A, B, C |
-| 以下哪些命令可以用于查看和管理SSH密钥？ | A. ssh-keygen B. ssh-add C. ssh-agent D. ssh-copy-id | A, B, C, D |
-| 在Bash中，以下哪些命令可以用于控制流操作？ | A. if B. for C. while D. switch | A, B, C |
-| 以下哪些命令可以用于查看Bash中的环境变量？ | A. printenv B. env C. set D. export | A, B, C |
-| 在Bash中，以下哪些命令可以用于信号处理？ | A. trap B. kill C. sigaction D. signal | A, B |
-| 在Linux中，以下哪些命令可以用于文件操作？ | A. cp B. mv C. rm D. all of the above | A, B, C |
-| 以下哪些命令可以显示文件内容？ | A. cat B. less C. more D. tail | A, B, C, D |
-| 以下哪些命令可以用于查看磁盘使用情况？ | A. df B. du C. ls D. top | A, B |
-| 以下哪些命令可以用于搜索文件中的文本内容？ | A. grep B. find C. locate D. awk | A, D |
-| 以下哪些命令可以用于网络管理？ | A. ifconfig B. ip C. ping D. netstat | A, B, C, D |
-| 在Linux中，以下哪些命令可以用于进程管理？ | A. ps B. top C. kill D. all of the above | A, B, C |
-| 以下哪些命令可以用于压缩和解压文件？ | A. tar B. gzip C. unzip D. zip | A, B, C, D |
-| 在Linux中，以下哪些目录通常包含配置文件？ | A. /etc B. /var C. /home D. /usr | A, D |
-| 以下哪些命令可以用于监控系统性能？ | A. top B. htop C. vmstat D. iostat | A, B, C, D |
-| 在Linux中，以下哪些命令可以用于管理服务？ | A. systemctl B. service C. init D. all of the above | A, B, C |
-
-### 重要提示
+`export A="1 2 3"`
 
 :::warning
 终端的命令通过空格和反斜杠来区分参数或者换行，示例中的引号并不是字符串的引号，而是为了避免空格和反斜杠引发歧义。<Highlight>环境变量本质都是字符串，建议新手始终使用引号包裹环境变量。</Highlight>
 :::
 
 不光是环境变量，其他命令的变量也遵循这个引号使用规则。正确理解和使用这些规则对于避免命令执行错误非常重要。
+

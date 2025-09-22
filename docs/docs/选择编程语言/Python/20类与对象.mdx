@@ -5,7 +5,7 @@ title: 类与对象
 :::info
 数据类自动生成常用的方法如`__init__`、`__repr__`等，减少样板代码，让开发者专注于业务逻辑。
 
-```python
+```python showLineNumbers
 from dataclasses import dataclass
 
 @dataclass
@@ -31,204 +31,50 @@ class Person:
 
 ### class
 
-python通过class关键字定义一个类，并创建一个实例。
+python通过class关键字定义一个类，类如果不继承其他类，则默认继承object类，此时可以省略括号与object。
 
 ```python showLineNumbers
-class ClassName:
+# class ClassName:
+class ClassName(object):
     """class docstring"""
     pass
 
 instance = ClassName()
 ```
 
-#### 类的特殊方法
+类里的函数称为方法，类里的变量称为属性。
 
-Python 使用 \_\_ 开头的名字来定义特殊的方法和属性，它们有：
+类方法包括以下几种：
 
-```
-__init__()
-__repr__()
-__str__()
-__call__()
-__iter__()
-__add__()
-__sub__()
-__mul__()
-__rmul__()
-__class__
-__name__
-```
+- 共有的方法和属性，即不以 \_\_ 开头和结尾的方法和属性
+- special 方法和属性，即以 \_\_ 开头和结尾的方法和属性(有特殊用途)
+- 私有方法和属性，以 \_ 开头，不过不是真正私有，而是可以调用的，但是不会被代码自动完成所记录（即 Tab 键之后不会显示）
+- 名称修饰方法，以 `__` 开头不以 `__` 结尾的属性是更加特殊的方法。
 
-构造方法 `__init__()`
+```python showLineNumbers
+class MyDemoClass(object):
+    def __init__(self):
+        print("special.")
 
-在产生对象之后，我们可以向对象中添加属性。
-事实上，还可以通过构造方法，在构造对象的时候直接添加属性：
+    def get_value(self):
+        print("get_value is public method.")
 
-```python
-class Clothes(object):
-    """
-    init_demo
-    """
+    def _get_name(self):
+        print("_get_name is private method.")
+    # 当你定义一个 __my_method() 方法时，Python 解释器会自动将其名称修改为 
+    # _ClassName__my_method() 的形式，以避免在子类中发生名称冲突
+    def __get_type(self):
+        print("__get_type is really special method.")
 
-    def __init__(self, color="green"):
-        self.color = color
-
-
-my_clothes = Clothes()
-my_clothes.color
+demo = MyDemoClass() # special.
+demo.get_value() # get_value is public method.
+demo._get_name() # _get_name is private method
+demo._MyDemoClass__get_type() # __get_type is really special method.
 ```
 
-传入有参数的值：
+类继承的基本形式：
 
-```python
-your_clothes = Clothes('orange')
-your_clothes.color
-```
-
-表示方法 `__repr__() 和 __str__()`:
-
-```python
-class Clothes(object):
-    """
-    repr and str demo
-    """
-
-    def __init__(self, color="green"):
-        self.color = color
-
-    def __str__(self):
-        "This is a string to print."
-        return ("a {} clothes".format(self.color))
-
-    def __repr__(self):
-        "This string recreates the object."
-        return ("{}(color='{}')".format(self.__class__.__name__, self.color))
-```
-
-`__str__()` 是使用 print 函数显示的结果,类似 java 中的 toString：
-
-```python
-my_clothes = Clothes()
-print(my_clothes)
-```
-
-`__repr__()` 返回的是不使用 print 方法的结果:
-
-```python
-my_clothes
-```
-
-```python
-print(my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color)
-```
-
-```python
-my_clothes.__class__, my_clothes.__class__.__name__, my_clothes.color
-```
-
-#### 类的属性
-
-只读属性：
-
-```python
-class Clothes(object):
-    def __init__(self, price):
-        self.price = price
-
-    # 这样 discount_price 就变成属性了
-    @property
-    def discount_price(self):
-        return self.price * 0.8
-```
-
-这里 discount_price 就是一个只读不写的属性了（注意是属性不是方法）,
-而 price 是可读写的属性：
-
-```python
-my_clothes = Clothes(100)
-print(my_clothes.discount_price)  # 80.0
-```
-
-可以修改 price 属性来改变 discount_price：
-
-```python
-my_clothes.price = 200
-print(my_clothes.discount_price)  # 160.0
-```
-
-my_clothes.discount_price()会报错，因为 my_clothes.discount_price 是属性，不是方法；
-
-my_clothes.discount_price=100 也会报错，因为只读。
-
-对于 @property 生成的只读属性，我们可以使用相应的 @attr.setter 修饰符来使得这个属性变成可写的：
-
-```python
-class Clothes(object):
-    def __init__(self, price):
-        self.price = price
-
-    # 这样就变成属性了
-    @property
-    def discount_price(self):
-        return self.price * 0.8
-
-    @discount_price.setter
-    def discount_price(self, new_price):
-        self.price = new_price * 1.25
-```
-
-测试一下：
-
-```python
-my_clothes = Clothes(100)
-print(my_clothes.discount_price)
-
-my_clothes.price = 200
-print(my_clothes.discount_price)
-```
-
-修改 discount_price 属性：
-
-```python
-my_clothes.discount_price = 180
-print(my_clothes.price)
-print(my_clothes.discount_price)
-```
-
-一个等价的替代如下，用方法：
-
-```python
-class Clothes(object):
-    def __init__(self, price):
-        self.price = price
-
-    def get_discount_price(self):
-        return self.price * 0.8
-
-    def set_discount_price(self, new_price):
-        self.price = new_price * 1.25
-
-    discount_price = property(get_discount_price, set_discount_price)
-
-```
-
-```python
-my_clothes = Clothes(100)
-print(my_clothes.discount_price)
-
-my_clothes.price = 200
-print(my_clothes.discount_price)
-
-my_clothes.discount_price = 180
-print(my_clothes.price)
-print(my_clothes.discount_price)
-```
-
-### 继承
-
-类定义的基本形式：
-
-```python
+```python showLineNumbers
 class ClassName(ParentClass):
     """class docstring"""
     def method(self):
@@ -237,54 +83,34 @@ class ClassName(ParentClass):
 
 里面的 ParentClass 就是用来继承的。
 
-```python
+```python showLineNumbers
 class Clothes(object):
     def __init__(self, color="green"):
         self.color = color
 
     def out_print(self):
         return self.__class__.__name__, self.color
-```
 
-```python
 my_clothes = Clothes()
 my_clothes.color
-```
-
-```python
 my_clothes.out_print()
-```
 
-定义一个子类，继承父类的所有方法:
-
-```python
+# 定义一个子类，继承父类的所有方法
 class NikeClothes(Clothes):
     def change_color(self):
         if self.color == "green":
             self.color = "red"
-```
 
-继承父类的所有方法：
-
-```python
+# 子类继承父类的所有方法
 your_clothes = NikeClothes()
 your_clothes.color
-```
-
-```python
 your_clothes.out_print()
-```
 
-但有自己的方法：
-
-```python
+# 同时子类也有自己的方法可用
 your_clothes.change_color()
 your_clothes.color
-```
 
-如果想对父类的方法进行修改，只需要在子类中重定义这个类即可：
-
-```python
+# 如果想对父类的方法进行修改，只需要在子类中重定义这个类方法即可
 class AdidasClothes(Clothes):
     def change_color(self):
         if self.color == "green":
@@ -303,15 +129,37 @@ print(him_clothes.color)
 print(him_clothes.out_print())
 ```
 
-### super函数
+:::info
+异常是标准库中的类，这意味着我们可以自定义异常类：
 
-super(CurrentClassName, instance)
+尝试在文本输入框输入：k，start，q
 
-返回该类实例对应的父类对象。
+```python showLineNumbers
+class CommandError(ValueError):
+    print("bad command operation. must input 'start', 'stop', 'pause'")
+
+valid_commands = {'start', 'stop', 'pause'}
+while True:
+    command = input('>')
+    if command == 'q':
+        break
+    try:
+        if command.lower() not in valid_commands:
+            raise CommandError('Invalid command: %s' % command)
+        print('input command:', command)
+    except CommandError:
+        print("bad command string: %s" % command)
+
+```
+:::
+
+### super
+
+`super(CurrentClassName, instance)`返回该类实例对应的父类对象。
 
 刚才 AdidasClothes 可以改写为：
 
-```python
+```python showLineNumbers
 class NewAdidasClothes(Clothes):
     def change_color(self):
         if self.color == "green":
@@ -327,23 +175,127 @@ print(her_clothes.color)
 her_clothes.out_print()
 ```
 
-### type函数
 
-```python
+### property
 
+`@property`装饰器可以使得一个属性变成通过方法访问的只读属性（注意是属性不是方法）。
+
+对于 `@property` 生成的只读属性，我们可以使用相应的 `@attr.setter` 修饰符来使得这个属性变成可写的：
+
+
+```python showLineNumbers
+class Clothes(object):
+    def __init__(self, price):
+        self.price = price
+
+    # 这样就变成属性了
+    @property
+    def discount_price(self):
+        print("discount_price 被读取")
+        if self.price <= 100:
+            self.new_price = 0
+        else:
+            self.new_price = 1
+        return self.new_price
+
+    @discount_price.setter
+    def discount_price(self, new_price):
+        print(f"discount_price 被设置{new_price}")
+        self.new_price = new_price
+
+
+my_clothes = Clothes(100)
+print(my_clothes.discount_price)
+my_clothes.price = 200 
+my_clothes.discount_price = 180 
+print(my_clothes.discount_price) 
+"""
+discount_price 被读取
+0
+discount_price 被设置180
+discount_price 被读取
+1
+"""
 ```
 
-### object
+:::info
 
-```python
+property 函数也可以直接使用，等价于上面的写法。
 
+```python showLineNumbers {8,18,21}
+class Clothes(object):
+    def __init__(self, price):
+        self.price = price
+
+    # # 这样就变成属性了
+    # @property
+    # def discount_price(self):
+    def get_discount_price(self):
+        print("discount_price 被读取")
+        if self.price <= 100:
+            self.new_price = 0
+        else:
+            self.new_price = 1
+        return self.new_price
+
+    # @discount_price.setter
+    # def discount_price(self, new_price):
+    def set_discount_price(self, new_price):
+        print(f"discount_price 被设置{new_price}")
+        self.new_price = new_price
+    discount_price = property(get_discount_price, set_discount_price)
+
+
+my_clothes = Clothes(100)
+print(my_clothes.discount_price)
+my_clothes.price = 200 
+my_clothes.discount_price = 180 
+print(my_clothes.discount_price) 
+"""
+discount_price 被读取
+0
+discount_price 被设置180
+discount_price 被读取
+1
+"""
+```
+:::
+
+
+## 特殊方法与属性
+
+Python 使用 \_\_ 开头的名字来定义特殊方法与特殊属性
+
+### \_\_init\_\_
+
+`__init__()` 在每次创建实例时被调用，用于初始化实例。
+
+```python showLineNumbers
+class Clothes(object):
+    """
+    init_demo
+    """
+    def __init__(self, color="green"):
+        self.color = color
+
+
+my_clothes = Clothes()
+my_clothes.color
 ```
 
-### **new**() 方法
+传入有参数的值：
 
-**new**()用来创建一个实例，它至少有一个参数 cls，代表当前类。默认情况下**new**()会创建当前类的实例，该方法也可以被重载，重载后也可以创建其他类的实例。
+```python showLineNumbers
+your_clothes = Clothes('orange')
+your_clothes.color
+```
 
-```python
+
+### \_\_new\_\_
+
+\_\_new\_\_()用来创建一个实例，它至少有一个参数 cls，代表当前类。默认情况下\_\_new\_\_()会创建当前类的实例，该方法也可以被重载，重载后也可以创建其他类的实例。
+
+```python showLineNumbers
 class Fun(object):
     def __init__(self, fun):
         self.fun = fun
@@ -356,11 +308,11 @@ if __name__ == '__main__':
     print(type(f))
 ```
 
-**new**()方法只是创建实例，此时拿到的实例并不能正常使用。一个实例需要被**init**()方法初始化后才可以被正常使用。也就是说，正常场景下，我们生成一个类的实例，Python 先调用该类的**new()\*\*方法创建一个实例，然后再调用**init\*\*()方法初始化该实例。**new()**方法存在于 object 方法中，通常情况下不需要被重载。
+\_\_new\_\_()方法只是创建实例，此时拿到的实例并不能正常使用。一个实例需要被\_\_init\_\_()方法初始化后才可以被正常使用。也就是说，正常场景下，我们生成一个类的实例，Python 先调用该类的\_\_new\_\_方法创建一个实例，然后再调用\_\_init\_\_()方法初始化该实例。\_\_new\_\_方法存在于 object 方法中，通常情况下不需要被重载。
 
-可以使用**new**方法创建出其它类的实例。在这种场景下，**new**方法创建后会调用对应类的**init**方法完成初始化：
+可以使用\_\_new\_\_()方法创建出其它类的实例。在这种场景下，\_\_new\_\_()方法创建后会调用对应类的\_\_init\_\_方法完成初始化：
 
-```python
+```python showLineNumbers
 class Fun(object):
     def __init__(self, fun):
         self.fun = fun
@@ -380,107 +332,216 @@ if __name__ == '__main__':
     print("f.demo:", f.demo)
 ```
 
-可以看出，f 不是 Fun 类的一个实例，而是 Demo 类的一个实例，拥有 Demo 类的字段。因为 Fun 类的**new**方法创建的是一个 Demo 类实例，而非 Fun 类本身。因此 Fun.**new**方法在 return 后调用了 Demo.**init**方法，以完成该实例的初始化。
+可以看出，f 不是 Fun 类的一个实例，而是 Demo 类的一个实例，拥有 Demo 类的字段。因为 Fun 类的\_\_new\_\_方法创建的是一个 Demo 类实例，而非 Fun 类本身。因此 Fun.\_\_new\_\_方法在 return 后调用了 Demo.\_\_init\_\_方法，以完成该实例的初始化。
 
-### 接口
 
-接口的调用：
+### \_\_repr\_\_和\_\_str\_\_
 
-```python
+```python showLineNumbers
+class Clothes(object):
+    """
+    repr and str demo
+    """
+
+    def __init__(self, color="green"):
+        self.color = color
+
+    def __str__(self):
+        "This is a string to print."
+        return ("a {} clothes".format(self.color))
+
+    def __repr__(self):
+        "This string recreates the object."
+        return ("{}(color='{}')".format(self.__class__.__name__, self.color))
+```
+
+`__str__()` 是使用 print 函数显示的结果,即str()函数调用的结果。
+
+`__repr__()` 是使用 repr() 函数显示的结果，理想情况下，应该返回一个可以重新创建对象的表达式。
+
+```python showLineNumbers
+print(Clothes()) # a green clothes
+print(repr(Clothes())) # Clothes(color='green')
+```
+### \_\_call\_\_
+
+`__call__()` 当实例名加上()时被调用,可以使对象可以像函数一样被调用。
+
+```python showLineNumbers
+class Clothes(object):
+    def __init__(self, color="green"):
+        self.color = color
+        self.wear_count = 0
+
+    def __call__(self):
+        self.wear_count += 1
+        return f"Wearing {self.color} clothes for the {self.wear_count} time"
+
+my_clothes = Clothes("blue")
+print(my_clothes())  # Wearing blue clothes for the 1 time
+print(my_clothes())  # Wearing blue clothes for the 2 time
+```
+
+### \_\_iter\_\_
+
+
+`__iter__()` 使对象可以被迭代（用于 for 循环）。
+
+```python showLineNumbers
+class ClothesCollection(object):
+    def __init__(self):
+        self.clothes = ["shirt", "pants", "jacket"]
+        
+    def __iter__(self):
+        return iter(self.clothes)
+
+collection = ClothesCollection()
+for item in collection:
+    print(item)  # 依次输出: shirt, pants, jacket
+```
+
+### \_\_add\_\_和\_\_sub\_\_
+
+这些方法定义对象的算术运算行为。
+
+```python showLineNumbers
+class Price(object):
+    def __init__(self, value):
+        self.value = value
+    
+    def __add__(self, other):
+        if isinstance(other, Price):
+            return Price(self.value + other.value)
+        return Price(self.value + other)
+    
+    def __sub__(self, other):
+        if isinstance(other, Price):
+            return Price(self.value - other.value)
+        return Price(self.value - other)
+
+    def __repr__(self):
+        return f"Price({self.value})"
+
+price1 = Price(100)
+price2 = Price(50)
+print(price1 + price2)  # Price(150)
+print(price1 - 30)      # Price(70)
+```
+
+### \_\_rmul\_\_和\_\_mul\_\_
+
+`__mul__()` 和 `__rmul__()` 定义对象的乘法运算行为。
+
+`__mul__()` 定义对象的左乘法运算行为。
+
+`__rmul__()` 定义对象的右乘法运算行为。
+
+```python showLineNumbers
+class Price(object):
+    def __init__(self, value):
+        self.value = value
+    
+    def __mul__(self, other):
+        return Price(self.value * other)
+    
+    def __rmul__(self, other):
+        # 当 other * self 时调用
+        return Price(other * self.value)
+    
+    def __repr__(self):
+        return f"Price({self.value})"
+
+price = Price(10)
+print(price * 5)    # Price(50) - 调用 __mul__
+print(3 * price)    # Price(30) - 调用 __rmul__
+```
+
+###  \_\_enter\_\_和\_\_exit\_\_ 与 with 语句
+
+`__enter__()` 和 `__exit__()` 定义对象的上下文管理行为。
+
+当一个对象被用于 with 语句时，会自动调用 `__enter__()` ,当 with 语句块结束时，会自动调用 `__exit__()` 方法。
+
+```python showLineNumbers
+class ContextManager(object):
+    def __enter__(self):
+        print("Entering")
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print("Exiting")
+
+with ContextManager():
+    print("inside operate")
+"""
+Entering
+inside operate
+Exiting
+"""
+```
+
+:::info
+with 语句常常与 as 关键字一起使用，`as 变量名`。`__enter__()` 方法返回的值被赋值给 as 关键字后面的变量。
+
+下面的代码展示了打开文件，将文件语柄赋值给 fp 变量，然后通过 fp 变量调用 write 方法写入文件。
+
+```python showLineNumbers
+with open('my_file.txt', 'w') as fp:
+    fp.write("Hello world")
+```
+:::
+
+
+### \_\_class\_\_和\_\_name\_\_
+
+`__class__` 返回对象所属的类，`__name__` 返回类的名称。
+
+```python showLineNumbers
 class Clothes(object):
     def __init__(self, color="green"):
         self.color = color
 
-    def out(self):
-        print("father.")
+    def get_class_info(self):
+        # __class__ 返回对象的类
+        return self.__class__
+    
+    def get_class_name(self):
+        # __class__.__name__ 返回类的名称
+        return self.__class__.__name__
 
+# 创建实例
+my_clothes = Clothes("blue")
+print(Clothes)                        # <class '__main__.Clothes'>
+# 使用 __class__ 属性
+print(my_clothes.__class__)           # <class '__main__.Clothes'>
+print(my_clothes.get_class_info())    # <class '__main__.Clothes'>
+
+# 使用 __name__ 属性
+print(Clothes.__name__)               # Clothes
+print(my_clothes.__class__.__name__)  # Clothes
+print(my_clothes.get_class_name())    # Clothes
+
+# 检查对象类型
+print(type(my_clothes))               # <class '__main__.Clothes'>
+print(my_clothes.__class__ == Clothes)  # True
+
+# 在继承中的应用：
 
 class NikeClothes(Clothes):
-    def out(self):
-        self.color = "brown"
-        super(NikeClothes, self).out()
+    def __init__(self, color="red"):
+        super().__init__(color)
 
+nike_clothes = NikeClothes()
+print(nike_clothes.__class__.__name__)  # NikeClothes
+print(nike_clothes.__class__)           # <class '__main__.NikeClothes'>
 
-class AdidasClothes(object):
-    def out(self):
-        print("adidas.")
-
+# 获取父类
+print(nike_clothes.__class__.__bases__)  # (<class '__main__.Clothes'>,)
 ```
-
-因为三个类都实现了 out() 方法，因此可以这样使用：
-
-```python
-objects = [Clothes(), NikeClothes(), AdidasClothes()]
-for obj in objects:
-    obj.out()
-```
-
-### 类方法
-
-类方法包括以下几种：
-
-1. special 方法和属性，即以 \_\_ 开头和结尾的方法和属性
-2. 私有方法和属性，以 \_ 开头，不过不是真正私有，而是可以调用的，
-   但是不会被代码自动完成所记录（即 Tab 键之后不会显示）
-3. 共有的方法和属性
-
-以 `__` 开头不以 `__` 结尾的属性是更加特殊的方法，调用方式也不同：
-
-```python
-class MyDemoClass(object):
-    def __init__(self):
-        print("special.")
-
-    def _get_name(self):
-        print("_get_name is private method.")
-
-    def get_value(self):
-        print("get_value is public method.")
-
-    def __get_type(self):
-        print("__get_type is really special method.")
-```
-
-```python
-demo = MyDemoClass()
-
-```
-
-```python
-demo.get_value()
-demo._get_name()
-demo._MyDemoClass__get_type()
-```
-
-
-### 自定义异常类
-
-异常是标准库中的类，这意味着我们可以自定义异常类：
-
-尝试在文本输入框输入：k，start，q
-
-```python
-class CommandError(ValueError):
-    print("bad command operation. must input 'start', 'stop', 'pause'")
-
-valid_commands = {'start', 'stop', 'pause'}
-while True:
-    command = input('>')
-    if command == 'q':
-        break
-    try:
-        if command.lower() not in valid_commands:
-            raise CommandError('Invalid command: %s' % command)
-        print('input command:', command)
-    except CommandError:
-        print("bad command string: %s" % command)
-
-```
-
-
-### with
 
 ## 内置函数
+
+
 
 ### type函数、isinstance函数、issubclass函数
 
@@ -500,3 +561,10 @@ while True:
 
 
 ## 元类编程
+
+
+### object
+
+```python showLineNumbers
+
+```
