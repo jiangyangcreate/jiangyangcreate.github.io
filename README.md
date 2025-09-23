@@ -2,7 +2,7 @@
 
 欢迎来到这个基于[Docusaurus 3](https://docusaurus.io/)最新版本构建的定制站点。
 
-我从[Docusaurus Site Showcase](https://docusaurus.io/showcase)中汲取了许多灵感，但我更倾向于简洁且精美的设计，以确保代码能够便于维护,同时使用markmap与mermaid制图，使得文本均可被选中，易于被网页翻译。。
+我从[Docusaurus Site Showcase](https://docusaurus.io/showcase)中汲取了许多灵感，但我更倾向于简洁且精美的设计，以确保代码能够便于维护,同时使用markmap与mermaid制图，使得文本均可被选中，易于被网页翻译。
 
 **设计理念：美丽优于丑陋，清晰优于模糊。简洁优于复杂，复杂优于繁琐。**
 

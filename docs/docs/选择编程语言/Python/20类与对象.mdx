@@ -44,12 +44,17 @@ instance = ClassName()
 
 类里的函数称为方法，类里的变量称为属性。
 
-类方法包括以下几种：
+实例方法按照是否可访问实例和类的属性分为：
+- 实例方法：第一个参数传入实例（约定为self），可以访问实例的属性和方法
+- 类方法：第一个参数传入类（约定为cls）+ @classmethod 装饰器，可以访问类的属性和方法
+- 静态方法：@staticmethod 装饰器，不能访问实例和类的属性和方法
+
+类方法按照是否以`__`开头和结尾，可以分为以下几种：
 
 - 共有的方法和属性，即不以 \_\_ 开头和结尾的方法和属性
 - special 方法和属性，即以 \_\_ 开头和结尾的方法和属性(有特殊用途)
 - 私有方法和属性，以 \_ 开头，不过不是真正私有，而是可以调用的，但是不会被代码自动完成所记录（即 Tab 键之后不会显示）
-- 名称修饰方法，以 `__` 开头不以 `__` 结尾的属性是更加特殊的方法。
+- 名称修饰方法，即以 `__` 开头不以 `__` 结尾的属性是更加特殊的方法。
 
 ```python showLineNumbers
 class MyDemoClass(object):
@@ -71,6 +76,9 @@ demo.get_value() # get_value is public method.
 demo._get_name() # _get_name is private method
 demo._MyDemoClass__get_type() # __get_type is really special method.
 ```
+
+### 继承
+
 
 类继承的基本形式：
 
@@ -155,26 +163,148 @@ while True:
 
 ### super
 
-`super(CurrentClassName, instance)`返回该类实例对应的父类对象。
+`super()` 函数用于在子类中调用父类（或超类）的方法，特别是支持多继承的场景下，它会根据方法的解析顺序[Method Resolution Order, MRO](#__mro__与mro)来决定调用哪个类的方法。
 
-刚才 AdidasClothes 可以改写为：
+:::info
+这种将上下文打包传递给下一个可调用对象的重定向思想，在Python中非常常见，比如各类装饰器、回调函数等。
+:::
+
+#### 无参数形式
+
+当在类的方法内部使用 `super()` 时（通常是实例方法，如 `__init__`），它会自动推断当前类和当前实例（即 `self`）。这相当于 `super(CurrentClass, self)`，其中 `CurrentClass` 是当前方法的所在类。
+
+必须在方法内部使用（有 `self` 或 `cls` 上下文），否则会报错。无参数形式依赖于 Python 的 `__class__` 魔法变量。它会返回一个代理对象，用于调用当前类在 MRO 中的下一个类的方法（通常是直接父类，但多继承时可能不同）。
+
+将当前的上下文(`self` 或 `cls`)作为参数，传递给"MRO的下一个类 的 指定方法",然后调用。
 
 ```python showLineNumbers
-class NewAdidasClothes(Clothes):
-    def change_color(self):
-        if self.color == "green":
-            self.color = "black"
+class Parent:
+    def __init__(self, name):
+        self.name = name
+        print(f"Parent init: {name}")
+    
+    def greet(self):
+        print(f"Hello, I'm {self.name}")
+    
+    @classmethod
+    def class_method(cls):
+        # cls参数永远指向调用该方法的类
+        # 不论提供的是类还是实例，最终都会调用类的方法。
+        print("Parent class method",cls)
 
-    def out_print(self):
-        self.change_color()
-        print(super(NewAdidasClothes, self).out_print())
 
-her_clothes = NewAdidasClothes()
-print(her_clothes.color)
+class Child(Parent):
+    def __init__(self, name, age):
+        super().__init__(name)  # 等价于 super(Child, self).__init__(name)
+        self.age = age
+        print(f"Child init: {name}, {age}")
+    
+    def greet(self):
+        super().greet()  # 调用父类的 greet 方法
+        print(f"I'm {self.age} years old")
 
-her_clothes.out_print()
+    @classmethod
+    def class_method(cls):
+        # 将当前的上下文cls作为参数，传递给"MRO的下一个类（Parent）的class_method方法",然后调用
+        super().class_method()
+
+child = Child("Alice", 10)
+child.greet()
+child.class_method()
+"""
+Parent init: Alice
+Child init: Alice, 10
+Hello, I'm Alice
+I'm 10 years old
+Parent class method <class '__main__.Child'>
+"""
 ```
 
+#### 双参数形式
+
+`super(class, instance)` 明确指定要查找的类和绑定的类或实例，提供最大的控制灵活性，一般是与实例方法和类方法配合使用。
+
+```python showLineNumbers
+class A:
+    name = 'A'
+    @classmethod
+    def class_method(cls):
+        # cls参数永远指向调用该方法的类
+        # 不论提供的是类还是实例，最终都会调用类的方法。
+        print(cls,cls.name)
+
+
+    def method(self):
+        print("A.method")
+
+class B(A):
+    def method(self):
+        print("B.method")
+
+class C(A):
+    def method(self):
+        print("C.method")
+
+class D(B, C):
+    name = 'D'
+    def method(self):
+        print("D.method")
+        # 使用双参数形式精确控制调用
+        super(D, self).method()  # 将当前的self作为参数，传递给"MRO的D的下一个类的method方法",然后调用
+        super(B, self).method()  # 将当前的self作为参数，传递给"MRO的B的下一个类的method方法",然后调用
+        super(C, self).method()  # 将当前的self作为参数，传递给"MRO的C的下一个类的method方法",然后调用 
+    
+    @classmethod
+    def class_method(cls):
+        print(cls,cls.name)
+        super(D, cls).class_method() # 将当前的cls作为参数，传递给"MRO的下一个类的class_method方法",然后调用
+        super(B, cls).class_method() # 将当前的cls作为参数，传递给"MRO的B的下一个类的class_method方法",然后调用
+        super(C, cls).class_method() # 将当前的cls作为参数，传递给"MRO的C的下一个类的class_method方法",然后调用
+
+print("MRO:", D.__mro__)
+d = D()
+d.method()
+"""
+MRO: (<class '__main__.D'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.A'>, <class 'object'>)
+D.method
+B.method
+C.method
+A.method
+"""
+D.class_method()
+"""
+<class '__main__.D'> D
+<class '__main__.D'> D
+<class '__main__.D'> D
+<class '__main__.D'> D
+<class '__main__.D'> D
+"""
+```
+
+### classmethod 和 staticmethod
+
+- `classmethod`：第一个参数传入类（约定为cls）+ @classmethod 装饰器，<Highlight>可以访问类变量</Highlight>，并可以用于创建类的不同实例。
+- `staticmethod`：@staticmethod 装饰器，本质上就是一个普通的函数，只是被放在类的命名空间下。它<Highlight>不能访问类或实例的任何属性</Highlight>，通常用于与类逻辑相关但不需要访问其状态的工具函数。
+
+```python showLineNumbers
+class A:
+    name = 'A'
+    @classmethod
+    def class_method(cls):
+        print(cls,cls.name)
+
+    @staticmethod
+    def static_method():
+        print("static_method")
+
+a = A()
+a.class_method()
+a.static_method()
+"""
+<class '__main__.A'> A
+static_method
+"""
+```
 
 ### property
 
@@ -266,78 +396,96 @@ discount_price 被读取
 
 Python 使用 \_\_ 开头的名字来定义特殊方法与特殊属性
 
-### \_\_init\_\_
+### \_\_mro\_\_与mro()
 
-`__init__()` 在每次创建实例时被调用，用于初始化实例。
+`__mro__`与`mro()`用于获取类的继承关系。
+
+`__mro__`是method resolution order的缩写，表示方法解析顺序。返回的是tuple。
+
+mro()是method resolution order的缩写，表示方法解析顺序。返回的是list。
+
 
 ```python showLineNumbers
-class Clothes(object):
-    """
-    init_demo
-    """
-    def __init__(self, color="green"):
-        self.color = color
+class Parent(object):
+    pass
 
+class Child(Parent):
+    pass
 
-my_clothes = Clothes()
-my_clothes.color
+print(Child.mro()) # [<class '__main__.Child'>, <class '__main__.Parent'>, <class 'object'>]
+print(Child.__mro__) # (<class '__main__.Child'>, <class '__main__.Parent'>, <class 'object'>)
 ```
 
-传入有参数的值：
+### `__init__` 与 `__new__` 方法详解
+
+- `__new__()` 在每次<Highlight>创建实例时</Highlight>时被调用，用于创建实例。它至少有一个参数，约定俗成为`cls`，代表当前类。必须返回一个实例。
+
+- `__init__()` 在每次<Highlight>实例创建后</Highlight>后被调用，用于初始化实例。它至少有一个参数，约定俗成为`self`，代表当前实例。返回值必须为 `None` 。
+
+
+执行流程：
+
+- 调用\_\_new\_\_()方法创建实例。\_\_new\_\_必须返回一个实例。
+
+此时拿到的实例并不能正常使用。一个实例需要被\_\_init\_\_()方法初始化后才可以被正常使用。
+
+- 调用\_\_init\_\_()方法初始化该实例。\_\_init\_\_什么都不返回
 
 ```python showLineNumbers
-your_clothes = Clothes('orange')
-your_clothes.color
+class Person:
+    def __new__(cls, name, age):
+        print(f"__new__ called: 创建 {name} 的实例")
+        # 调用父类的 __new__ 方法创建实例
+        # 因为__new__必须返回一个实例，当前的__new__又被重写了，如果调用自己会循环引用，所以调用父类的__new__
+        instance = super().__new__(cls)
+        return instance
+    
+    def __init__(self, name, age):
+        print(f"__init__ called: 初始化 {name} 的实例")
+        self.name = name
+        self.age = age
+    
+    def __str__(self):
+        return f"Person(name={self.name}, age={self.age})"
+
+# 创建实例
+person = Person("Alice", 25)
+print(person)
+"""
+__new__ called: 创建 Alice 的实例
+__init__ called: 初始化 Alice 的实例
+Person(name=Alice, age=25)
+"""
 ```
 
 
-### \_\_new\_\_
+:::info
+单例模式实现
 
-\_\_new\_\_()用来创建一个实例，它至少有一个参数 cls，代表当前类。默认情况下\_\_new\_\_()会创建当前类的实例，该方法也可以被重载，重载后也可以创建其他类的实例。
+`__new__` 方法最常见的用途是实现单例模式：
 
 ```python showLineNumbers
-class Fun(object):
-    def __init__(self, fun):
-        self.fun = fun
-
+class Singleton:
+    _instance = None
+    
     def __new__(cls, *args, **kwargs):
-        return object.__new__(Fun)
+        if cls._instance is None:
+            print("创建新的单例实例")
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def __init__(self, *args, **kwargs):
+        print(id(self))
 
-if __name__ == '__main__':
-    f = Fun.__new__(Fun)
-    print(type(f))
+a = Singleton() # 2747644276960
+b = Singleton() # 2747644276960
+# id 相同，说明是同一个实例
 ```
-
-\_\_new\_\_()方法只是创建实例，此时拿到的实例并不能正常使用。一个实例需要被\_\_init\_\_()方法初始化后才可以被正常使用。也就是说，正常场景下，我们生成一个类的实例，Python 先调用该类的\_\_new\_\_方法创建一个实例，然后再调用\_\_init\_\_()方法初始化该实例。\_\_new\_\_方法存在于 object 方法中，通常情况下不需要被重载。
-
-可以使用\_\_new\_\_()方法创建出其它类的实例。在这种场景下，\_\_new\_\_()方法创建后会调用对应类的\_\_init\_\_方法完成初始化：
-
-```python showLineNumbers
-class Fun(object):
-    def __init__(self, fun):
-        self.fun = fun
-
-    def __new__(cls, *args, **kwargs):
-        return Demo(*args, **kwargs)
-
-
-class Demo(object):
-    def __init__(self, d):
-        self.demo = d
-
-
-if __name__ == '__main__':
-    f = Fun(1)
-    print("type f:", type(f))
-    print("f.demo:", f.demo)
-```
-
-可以看出，f 不是 Fun 类的一个实例，而是 Demo 类的一个实例，拥有 Demo 类的字段。因为 Fun 类的\_\_new\_\_方法创建的是一个 Demo 类实例，而非 Fun 类本身。因此 Fun.\_\_new\_\_方法在 return 后调用了 Demo.\_\_init\_\_方法，以完成该实例的初始化。
-
+:::
 
 ### \_\_call\_\_
 
-`__call__()` 当实例名加上()时被调用,可以使对象可以像函数一样被调用。
+- `__call__()` 当实例名加上()时被调用,可以使对象可以像函数一样被调用。
 
 ```python showLineNumbers
 class Clothes(object):
@@ -421,7 +569,9 @@ __next__
 
 `__enter__()` 和 `__exit__()` 定义对象的上下文管理行为。
 
-当一个对象被用于 with 语句时，会自动调用 `__enter__()` ,当 with 语句块结束时，会自动调用 `__exit__()` 方法。
+- 当一个对象被用于 with 语句时，会自动调用 `__enter__()` 方法。
+
+- 当 with 语句块结束时，会自动调用 `__exit__()` 方法。
 
 ```python showLineNumbers
 class ContextManager(object):
@@ -454,7 +604,7 @@ with open('my_file.txt', 'w') as fp:
 
 ### \_\_len\_\_
 
-`__len__()` 返回对象的长度。
+- `__len__()` 返回对象的长度。
 
 ```python showLineNumbers
 class Clothes(object):
@@ -470,11 +620,11 @@ print(len(my_clothes)) # 调用__len__方法
 ```
 ### \_\_getitem\_\_和\_\_setitem\_\_和\_\_delitem\_\_
 
-`__getitem__()` 返回对象的索引值。
+- `__getitem__()` 返回对象的索引值。
 
-`__setitem__()` 设置对象的索引值。
+- `__setitem__()` 设置对象的索引值。
 
-`__delitem__()` 删除对象的索引值。
+- `__delitem__()` 删除对象的索引值。
 
 ```python showLineNumbers
 class Clothes:
@@ -502,7 +652,8 @@ print(my_clothes.color) # ['green', 'red']
 
 ### \_\_class\_\_和\_\_name\_\_
 
-`__class__` 返回对象所属的类，`__name__` 返回类的名称。
+- `__class__` 返回<Highlight>对象</Highlight>所属的<Highlight>类</Highlight>
+- `__name__` 返回<Highlight>类</Highlight>的名称。
 
 ```python showLineNumbers
 class Clothes(object):

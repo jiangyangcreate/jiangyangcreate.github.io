@@ -96,7 +96,7 @@ Executor 负责调度和执行节点中的回调函数。一个 ROS 2 节点可�
 
 `rclpy.try_shutdown(*, context: Context | None = None, uninstall_handlers: bool | None = None)→ None`
 
-关闭以前初始化的上下文（如果尚未关闭）。这也将关闭全局执行器，如果已关闭不会报错。。
+关闭以前初始化的上下文（如果尚未关闭）。这也将关闭全局执行器，如果已关闭不会报错。
 
 - context – 要失效的上下文。如果为 None，则使用默认上下文
 - uninstall_handlers – 如果为 None，则在关闭默认上下文时将卸载信号处理程序。如果为 True，则将卸载信号处理程序。如果为 False，则不会卸载信号处理程序。和前面signal_handler_options对应上。
