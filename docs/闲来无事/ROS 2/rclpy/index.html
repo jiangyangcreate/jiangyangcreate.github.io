@@ -15,7 +15,7 @@
 
 
 <link rel="stylesheet" href="/katex/katex.min.css"><link rel="stylesheet" href="/assets/css/styles.11098515.css">
-<script src="/assets/js/runtime~main.a6d89383.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.2aa1cfce.js" defer="defer"></script>
 <script src="/assets/js/main.ba9defeb.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -88,10 +88,10 @@
 <li>uninstall_handlers – 如果为 None，则在关闭默认上下文时将卸载信号处理程序。如果为 True，则将卸载信号处理程序。如果为 False，则不会卸载信号处理程序。和前面signal_handler_options对应上。</li>
 </ul>
 <p><code>rclpy.try_shutdown(*, context: Context | None = None, uninstall_handlers: bool | None = None)→ None</code></p>
-<p>关闭以前初始化的上下文（如果尚未关闭）。这也将关闭全局执行器，如果已关闭不会报错。。</p>
+<p>关闭以前初始化的上下文（如果尚未关闭）。这也将关闭全局执行器，如果已关闭不会报错。</p>
 <ul>
 <li>context – 要失效的上下文。如果为 None，则使用默认上下文</li>
-<li>uninstall_handlers – 如果为 None，则在关闭默认上下文时将卸载信 号处理程序。如果为 True，则将卸载信号处理程序。如果为 False，则不会卸载信号处理程序。和前面signal_handler_options对应上。</li>
+<li>uninstall_handlers – 如果为 None，则在关闭默认上下文时将卸载信号 处理程序。如果为 True，则将卸载信号处理程序。如果为 False，则不会卸载信号处理程序。和前面signal_handler_options对应上。</li>
 </ul>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="上下文">上下文<a href="#上下文" class="hash-link" aria-label="Direct link to 上下文" title="Direct link to 上下文">​</a></h2>
 <p>上下文管理器Context与直接使用rclpy基本一致，但背后其实是线程管理，每个独立的上下文管理器都是独立的线程。</p>
