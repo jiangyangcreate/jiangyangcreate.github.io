@@ -396,13 +396,15 @@ discount_price 被读取
 
 Python 使用 \_\_ 开头的名字来定义特殊方法与特殊属性
 
-### \_\_mro\_\_与mro()
+### `__mro__`与mro()与`__bases__`
 
 `__mro__`与`mro()`用于获取类的继承关系。
 
 `__mro__`是method resolution order的缩写，表示方法解析顺序。返回的是tuple。
 
 mro()是method resolution order的缩写，表示方法解析顺序。返回的是list。
+
+`__bases__`返回一个元组，包含直接继承的所有父类。它只反映了类的直接继承关系，不包括当前类及其祖父类或其他更远的祖先。
 
 
 ```python showLineNumbers
@@ -414,6 +416,7 @@ class Child(Parent):
 
 print(Child.mro()) # [<class '__main__.Child'>, <class '__main__.Parent'>, <class 'object'>]
 print(Child.__mro__) # (<class '__main__.Child'>, <class '__main__.Parent'>, <class 'object'>)
+print(Child.__bases__) # (<class '__main__.Parent'>,)
 ```
 
 ### `__init__` 与 `__new__` 方法详解
@@ -1039,26 +1042,227 @@ print("jacket" in wardrobe)     # True
 
 ### type函数、isinstance函数、issubclass函数
 
+`type(object)` / `type(name, bases, dict, **kwds)`: 获取对象的类型，或动态创建类。返回对象的类型或新创建的类
+- `object`: 要获取类型的对象
+- `name`: 新类的名称（动态创建时）
+- `bases`: 父类元组（动态创建时）
+- `dict`: 类属性字典（动态创建时）
+
+
+`isinstance(object, classinfo)->bool`: 检查对象是否是指定类型的实例（支持继承关系） 如果对象是指定类型的实例为`True`，否则 `False`
+- `object`: 要检查的对象
+- `classinfo`: 类<Highlight>或类型元组</Highlight>
+
+
+`issubclass(class, classinfo)->bool`: 检查一个类是否是另一个类的子类。如果是子类为`True`，否则 `False`
+- `class`: 要检查的类
+- `classinfo`: 父类<Highlight>或父类元组</Highlight>
+
+```python showLineNumbers
+class Animal:
+    def __init__(self, name):
+        self.name = name
+
+class Dog(Animal):
+    def __init__(self, name, breed):
+        super().__init__(name)
+        self.breed = breed
+
+class Cat(Animal):
+    def __init__(self, name, color):
+        super().__init__(name)
+        self.color = color
+
+# 创建实例
+dog = Dog("旺财", "金毛")
+cat = Cat("小白", "白色")
+
+# type() - 获取对象的确切类型
+print(type(dog))        # <class '__main__.Dog'>
+print(type(cat))        # <class '__main__.Cat'>
+print(type(Dog))        # <class 'type'>
+
+# type() - 比较类型
+print(type(dog) == Dog)     # True
+print(type(dog) == Animal)  # False (不考虑继承关系)
+
+# isinstance() - 检查实例类型（考虑继承关系）
+print(isinstance(dog, Dog))     # True
+print(isinstance(dog, Animal))  # True (Dog继承自Animal)
+print(isinstance(dog, Cat))     # False
+
+# isinstance() - 检查多个类型
+print(isinstance(dog, (Dog, Cat)))  # True (是Dog或Cat中的一种)
+print(isinstance(42, (int, str)))   # True (42是int类型)
+
+# issubclass() - 检查类的继承关系
+print(issubclass(Dog, Animal))      # True (Dog是Animal的子类)
+print(issubclass(Cat, Animal))      # True (Cat是Animal的子类)
+print(issubclass(Dog, Cat))         # False (Dog不是Cat的子类)
+print(issubclass(Animal, object))   # True (所有类都继承自object)
+
+# issubclass() - 检查多个父类
+print(issubclass(Dog, (Animal, object)))  # True
+```
+:::info
+type 函数获取对象的类型。同时也可以动态创建类。
+
+```python showLineNumbers
+# 定义一个方法
+def init_method(self, x):
+    self.x = x
+
+# 定义一个方法
+def say_hello(self):
+    return f"Hello, x = {self.x}"
+
+# 动态创建类：type(类名, 父类元组, 属性字典)
+DynamicClass = type('DynamicClass', (object,), {
+    '__init__': init_method,
+    'say_hello': say_hello,
+    'class_var': 'I am a class variable'
+})
+
+# 使用动态创建的类
+obj = DynamicClass(10)
+print(obj.say_hello())        # Hello, x = 10
+print(obj.class_var)          # I am a class variable
+print(type(obj))              # <class '__main__.DynamicClass'>
+```
+:::
+
 
 ### dir函数、hasattr函数、delattr函数、setattr函数、getattr函数、vars函数
 
-表格说明：
-| 函数 | 说明 |
-| --- | --- |
-| dir | 获取对象的所有属性和方法 |
-| hasattr | 检查对象是否具有某个属性 |
-| delattr | 删除对象的属性 |
-| setattr | 设置对象的属性 |
-| getattr | 获取对象的属性 |
-| vars | 获取对象的属性字典 |
+`dir(object=None)->list`: 获取对象的所有属性和方法名列表
+- `object`: 要获取属性的对象，默认为当前作用域
 
+`hasattr(object, name)->bool`: 检查对象是否具有指定名称的属性。如果对象有该属性为`True`，否则 `False`
+- `object`: 要检查的对象
+- `name`: 属性名称（字符串）
+
+`delattr(object, name)->None`: 删除对象的指定属性。等价于 `del object.name`
+- `object`: 目标对象
+- `name`: 要删除的属性名称（字符串）
+
+`setattr(object, name, value)->None`: 设置对象的属性值。等价于 `object.name = value`
+- `object`: 目标对象
+- `name`: 属性名称（字符串）
+- `value`: 要设置的属性值
+
+`getattr(object, name, default=None)`: 获取对象的属性值。等价于 `object.name`，但可以提供默认值
+- `object`: 目标对象
+- `name`: 属性名称（字符串）
+- `default`: 属性不存在时的默认值
+
+`vars(object=None)->dict`: 获取对象的属性字典。返回对象的 `__dict__` 属性或当前作用域的局部变量字典
+- `object`: 目标对象，默认为当前作用域
+
+```python showLineNumbers
+class Person:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    
+    def greet(self):
+        return f"Hello, I'm {self.name}"
+
+person = Person("Alice", 25)
+
+# dir() - 获取所有属性和方法名
+print("dir(person):", dir(person))
+# ['__class__', '__delattr__', '__dict__', ... 'age', 'greet', 'name']
+
+# hasattr() - 检查属性是否存在
+print("hasattr(person, 'name'):", hasattr(person, 'name'))        # True
+print("hasattr(person, 'height'):", hasattr(person, 'height'))    # False
+print("hasattr(person, 'greet'):", hasattr(person, 'greet'))      # True
+
+# getattr() - 获取属性值
+print("getattr(person, 'name'):", getattr(person, 'name'))                    # Alice
+print("getattr(person, 'height', 'Unknown'):", getattr(person, 'height', 'Unknown'))  # Unknown
+
+# setattr() - 设置属性值
+setattr(person, 'height', 170)
+setattr(person, 'country', 'China')
+print("After setattr:", person.name, person.age, person.height, person.country)
+# After setattr: Alice 25 170 China
+
+# vars() - 获取属性字典
+print("vars(person):", vars(person))
+# {'name': 'Alice', 'age': 25, 'height': 170, 'country': 'China'}
+
+# delattr() - 删除属性
+delattr(person, 'country')
+print("After delattr:", vars(person))
+# {'name': 'Alice', 'age': 25, 'height': 170}
+
+# 等价操作演示
+person.city = "Beijing"              # 等价于 setattr(person, 'city', 'Beijing')
+print(person.city)                   # 等价于 getattr(person, 'city')
+del person.city                      # 等价于 delattr(person, 'city')
+
+# vars() 在不同上下文的使用
+def test_vars():
+    local_var = "test"
+    another_var = 42
+    print("Local vars:", vars())  # 显示局部变量
+    # {'local_var': 'test', 'another_var': 42}
+
+test_vars()
+print("Global vars keys:", list(vars().keys()))  # 显示全局变量的键
+```
 
 
 ## 元类编程
 
-
 ### object
 
-```python showLineNumbers
+`object` 是 Python 中所有类的最终基类。在 Python 3 中，即使没有显式继承，所有类都会自动继承自 `object`。<Highlight>object 自己没有基类，它是根基类。</Highlight>
 
+Python 使用 `type` 这个内置类作为所有新类默认的元类。<Highlight>type 是所有类的元类，包括 object 和 type自己</Highlight>
+
+元类编程就是通过继承 type 或自定义元类，来控制类的创建过程，例如在一个类被定义时，动态地修改它的属性、方法，或者对其进行验证。
+
+这使得我们可以在不修改类定义本身的情况下，对多个类应用相同的行为或规则，从而实现更强大的代码生成和设计模式。
+
+```python showLineNumbers
+# 以下两种写法是等价的
+class MyClass:
+    pass
+
+# 类的元类
+print("\n元类关系:")
+print(type(MyClass))            # <class 'type'>
+print(MyClass.__class__)        # <class 'type'>
+
+# object 本身的类型
+print(type(object))             # <class 'type'>
+print(object.__class__)         # <class 'type'>
+
+# object 提供的所有方法和属性
+print("\nobject 的所有属性和方法:")
+object_methods = dir(object)
+for attr in object_methods:
+    print(f"  {attr}")
+"""
+  __class__      __delattr__    __dir__        __doc__
+  __eq__         __format__     __ge__         __getattribute__
+  __getstate__   __gt__         __hash__       __init__
+  __init_subclass__  __le__     __lt__         __ne__
+  __new__        __reduce__     __reduce_ex__  __repr__
+  __setattr__    __sizeof__     __str__        __subclasshook__
+"""
+
+# 元类的概念示例
+class Meta(type):
+    def __new__(cls, name, bases, attrs):
+        attrs['class_id'] = f"{name}_ID"
+        return super().__new__(cls, name, bases, attrs)
+
+class MyMetaClass(metaclass=Meta):
+    pass
+
+print(type(MyMetaClass))     # <class '__main__.Meta'>
+print(MyMetaClass.class_id)  # MyMetaClass_ID
 ```
