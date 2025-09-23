@@ -23,7 +23,7 @@ class Person:
 
 在 Python 中，所有数据类型都可以视为对象，当然也可以自定义对象。自定义的对象数据类型就是面向对象中的类（Class）的概念。
 
-面向对象的设计思想是从自然界中来的，因为在自然界中，类（Class）和实例（Instance）的概念是很自然的。Class 是一种抽象概念，比如我们定义的 Class——Student，是指学生这个概念，而实例（Instance）则是一个个具体的 Student，比如，张三和李四是两个具体的 Student。
+面向对象的设计思想是从自然界中来的，因为在自然界中，类（Class）和实例（Instance）的概念是很自然的。Class 是一种抽象概念，比如我们定义的 Class——印花T恤，是指印花T恤这个概念，而实例（Instance）则是一个个具体的印花T恤，比如，我手上的向日葵印花T恤和玫瑰印花T恤是两个具体的印花T恤。
 
 所以，面向对象的设计思想是抽象出 Class，根据 Class 创建 Instance。
 
@@ -49,23 +49,29 @@ instance = ClassName()
 - 类方法：第一个参数传入类（约定为cls）+ @classmethod 装饰器，可以访问类的属性和方法
 - 静态方法：@staticmethod 装饰器，不能访问实例和类的属性和方法
 
+不遵守约定不会让你代码报错，但是遵守约定可以让你的代码可读性更高。
+
 类方法按照是否以`__`开头和结尾，可以分为以下几种：
 
 - 共有的方法和属性，即不以 \_\_ 开头和结尾的方法和属性
 - special 方法和属性，即以 \_\_ 开头和结尾的方法和属性(有特殊用途)
 - 私有方法和属性，以 \_ 开头，不过不是真正私有，而是可以调用的，但是不会被代码自动完成所记录（即 Tab 键之后不会显示）
-- 名称修饰方法，即以 `__` 开头不以 `__` 结尾的属性是更加特殊的方法。
+- 名称修饰方法，即以 `__` 开头不以 `__` 结尾的是更加特殊的名称修饰方法。
 
 ```python showLineNumbers
 class MyDemoClass(object):
+    # special 方法(有特殊用途)
     def __init__(self):
         print("special.")
-
+    # 共有方法
     def get_value(self):
         print("get_value is public method.")
 
+    # 私有方法：会被代码自动完成所记录
     def _get_name(self):
         print("_get_name is private method.")
+
+    # 名称修饰方法
     # 当你定义一个 __my_method() 方法时，Python 解释器会自动将其名称修改为 
     # _ClassName__my_method() 的形式，以避免在子类中发生名称冲突
     def __get_type(self):
@@ -163,121 +169,139 @@ while True:
 
 ### super
 
-`super()` 函数用于在子类中调用父类（或超类）的方法，特别是支持多继承的场景下，它会根据方法的解析顺序[Method Resolution Order, MRO](#__mro__与mro)来决定调用哪个类的方法。
+`super(class, instance)` 函数用于在子类中调用父类（或超类）的方法，特别是支持多继承的场景下，它会根据方法的解析顺序[Method Resolution Order, MRO](#__mro__与mro)来决定调用查找类的下一个类的方法。
 
-:::info
-这种将上下文打包传递给下一个可调用对象的重定向思想，在Python中非常常见，比如各类装饰器、回调函数等。
-:::
+<Highlight>参数`class`决定从MRO的哪个类之后开始查找（即从该类的下一个类开始找），参数`instance`决定使用谁的MRO。`instance`可以是实例对象或类对象。</Highlight>
 
 #### 无参数形式
 
-当在类的方法内部使用 `super()` 时（通常是实例方法，如 `__init__`），它会自动推断当前类和当前实例（即 `self`）。这相当于 `super(CurrentClass, self)`，其中 `CurrentClass` 是当前方法的所在类。
+无参数写法必须在类方法或实例方法内部使用，即有`self`或`cls`上下文。当在类的方法内部使用 `super()` 时，它会自动推断当前类和当前上下文。
 
-必须在方法内部使用（有 `self` 或 `cls` 上下文），否则会报错。无参数形式依赖于 Python 的 `__class__` 魔法变量。它会返回一个代理对象，用于调用当前类在 MRO 中的下一个类的方法（通常是直接父类，但多继承时可能不同）。
+将当前类传入第一个参数，将当前方法的第一个实例或类（即`self`或`cls`）传入第二个参数。
 
-将当前的上下文(`self` 或 `cls`)作为参数，传递给"MRO的下一个类 的 指定方法",然后调用。
+```python showLineNumbers
+class Child:
+    def self_method(self):
+        # 自动推断当前类和当前上下文，将当前类传入第一个参数，将当前上下文传入第二个参数。
+        print(id(super())==id(super(Child, self))) # True
+
+    @classmethod
+    def class_method(cls):
+        # 自动推断当前类和当前上下文，将当前类传入第一个参数，将当前上下文传入第二个参数。
+        print(id(super())==id(super(Child, cls))) # True
+    
+    @staticmethod
+    def static_method():
+        # 静态方法没有上下文，不传入第一个参数，不传入第二个参数。
+        print(id(super())) 
+child = Child()
+child.self_method() # True
+child.class_method() # True
+child.static_method() # super(): no arguments
+```
+
+使用`super().指定方法()`时，会将当前的上下文(`self` 或 `cls`)作为打包为super对象，传递给"<Highlight>当前的上下文(`self` 或 `cls`)对应MRO的下一个类</Highlight>的指定方法",然后调用。
+
+- 如果指定方法是静态方法，则上下文不作为参数，因为静态方法本身就不依赖于实例或类来执行。
+- 如果指定方法是类方法，则不论上下文是实例对象还是类对象。类方法都能解析为类对象正常执行。
+- 如果指定方法是实例方法，则传递当前的上下文如果是不是实例对象，而是其他（如类对象）会报错。
 
 ```python showLineNumbers
 class Parent:
-    def __init__(self, name):
-        self.name = name
-        print(f"Parent init: {name}")
-    
-    def greet(self):
-        print(f"Hello, I'm {self.name}")
+    def self_method(self):
+        print("Parent self_method: ",self)
     
     @classmethod
     def class_method(cls):
         # cls参数永远指向调用该方法的类
         # 不论提供的是类还是实例，最终都会调用类的方法。
-        print("Parent class method",cls)
+        print("Parent class method:",cls)
+
+    @staticmethod
+    def static_method():
+        print("Parent static method")
 
 
 class Child(Parent):
-    def __init__(self, name, age):
-        super().__init__(name)  # 等价于 super(Child, self).__init__(name)
-        self.age = age
-        print(f"Child init: {name}, {age}")
     
-    def greet(self):
-        super().greet()  # 调用父类的 greet 方法
-        print(f"I'm {self.age} years old")
+    def self_method(self):
+        # 将当前的self作为参数，传递给"self即Child,对应的MRO的Child的下一个类的方法",然后调用
+        super().self_method()  # 调用父类的 self_method 方法
+        super().class_method()  # 调用父类的 class_method 方法
+        super().static_method()  # 调用父类的 static_method 方法
 
     @classmethod
     def class_method(cls):
-        # 将当前的上下文cls作为参数，传递给"MRO的下一个类（Parent）的class_method方法",然后调用
-        super().class_method()
+        # 将当前的cls作为参数，传递给"cls即Child,对应的MRO的Child的下一个类的方法",然后调用
+        # super().self_method()  # 调用父类的 self_method 方法
+        super().class_method()  # 调用父类的 class_method 方法
+        super().static_method()  # 调用父类的 static_method 方法
 
-child = Child("Alice", 10)
-child.greet()
+child = Child()
+child.self_method()
+"""
+Parent self_method:  <__main__.Child object at 0x000001CAE6FBC1D0>
+Parent class method: <class '__main__.Child'>
+Parent static method
+"""
 child.class_method()
 """
-Parent init: Alice
-Child init: Alice, 10
-Hello, I'm Alice
-I'm 10 years old
-Parent class method <class '__main__.Child'>
+TypeError: Parent.self_method() missing 1 required positional argument: 'self'
+Parent class method: <class '__main__.Child'>
+Parent static method
 """
 ```
 
-#### 双参数形式
+#### 双参数写法
 
-`super(class, instance)` 明确指定要查找的类和绑定的类或实例，提供最大的控制灵活性，一般是与实例方法和类方法配合使用。
+明确指定要查找的类和绑定的类或实例，使`super()`可以在类外使用，提供最大的控制灵活性，一般是与实例方法和类方法配合使用。
+
+<Highlight>参数`class`决定从MRO的哪个类之后开始查找（即从该类的下一个类开始找），参数`instance`决定使用谁的MRO。`instance`可以是实例对象或类对象。</Highlight>
+
+下面例子中第二个参数始终不变，但是第一个参数一直在变。下面代码中`d.method()`运行流程：
+
+- 首先会调用`D`的`method`方法，`super()`中自动补全`D`和`D`的实例`d`（即`self`）。
+- 然后`super().method()`会依据`D`的MRO找`method`方法找`D`的下一个类`B`,看有没有`method`方法,没找到则继续找下一个类，找到则调用。
+- 然后调用`B`的`method`方法,将`D`的<Highlight>实例`d`（即`self`）作为参数传递给`B`的`method`方法。</Highlight>
+- 此时`B`的`method`方法中的`super()`中自动补全`B`和实例`self`，<Highlight>这时的`self`是刚刚传入`d`的实例</Highlight>。
+- 然后`super().method()`会依据`d`的MRO找`B`的下一个类`C`,看有没有`method`方法,找到`C`。
+- 然后调用`C`的`method`方法,打印"C.method"
+
 
 ```python showLineNumbers
 class A:
-    name = 'A'
-    @classmethod
-    def class_method(cls):
-        # cls参数永远指向调用该方法的类
-        # 不论提供的是类还是实例，最终都会调用类的方法。
-        print(cls,cls.name)
-
-
     def method(self):
         print("A.method")
 
 class B(A):
     def method(self):
-        print("B.method")
+        print(f"super将从{self}的{self.__class__.__mro__}中，找到B的下一个类")
+        super().method()
 
 class C(A):
     def method(self):
+        print(f"C: {self}{self.__class__.__mro__}")
         print("C.method")
 
 class D(B, C):
-    name = 'D'
     def method(self):
-        print("D.method")
-        # 使用双参数形式精确控制调用
-        super(D, self).method()  # 将当前的self作为参数，传递给"MRO的D的下一个类的method方法",然后调用
-        super(B, self).method()  # 将当前的self作为参数，传递给"MRO的B的下一个类的method方法",然后调用
-        super(C, self).method()  # 将当前的self作为参数，传递给"MRO的C的下一个类的method方法",然后调用 
-    
-    @classmethod
-    def class_method(cls):
-        print(cls,cls.name)
-        super(D, cls).class_method() # 将当前的cls作为参数，传递给"MRO的下一个类的class_method方法",然后调用
-        super(B, cls).class_method() # 将当前的cls作为参数，传递给"MRO的B的下一个类的class_method方法",然后调用
-        super(C, cls).class_method() # 将当前的cls作为参数，传递给"MRO的C的下一个类的class_method方法",然后调用
+        super().method()
+
 
 print("MRO:", D.__mro__)
 d = D()
 d.method()
 """
 MRO: (<class '__main__.D'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.A'>, <class 'object'>)
-D.method
-B.method
+super将从<__main__.D object at 0x0000024AF4D00500>的(<class '__main__.D'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.A'>, <class 'object'>)中，找到B的下一个类
+C: <__main__.D object at 0x000001A7BA8F04D0>(<class '__main__.D'>, <class '__main__.B'>, <class '__main__.C'>, <class '__main__.A'>, <class 'object'>)
 C.method
+"""
+# 在类外使用super()，不可缺省，要明确指定要查找的类和绑定的类或实例即可。
+# 找到C的MRO，从该MRO的C之后的类开始找，找到A有method方法，然后调用A的method方法。
+super(C, C()).method()
+"""
 A.method
-"""
-D.class_method()
-"""
-<class '__main__.D'> D
-<class '__main__.D'> D
-<class '__main__.D'> D
-<class '__main__.D'> D
-<class '__main__.D'> D
 """
 ```
 
