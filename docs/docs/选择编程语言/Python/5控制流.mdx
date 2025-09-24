@@ -127,6 +127,295 @@ match case 匹配语法更简洁、匹配时自动绑定变量、支持模式组
 
 当其满足多个条件时，会从上到下依次判断，直到匹配到第一个条件为止。
 
+#### 字面量、值、通配符模式
+
+最基本的模式匹配，直接匹配具体的值。
+
+```python showLineNumbers
+# 定义一个类，用于匹配具体的值
+# 任何带点的名称（即属性访问）应被解释为值模式
+class HTTPError:
+    # 值相等即可，所以300和300.0是可以匹配成功的。
+    E300 = 300.0
+
+# 在这个例子中，`match` 语句将 `status` 与每个模式进行比较，直到找到一个匹配的模式。
+def http_error(status):
+    match status:
+        # 代码形式上从 `if status == 400:` 变成了 `case 400:` ，更加简洁。
+        case 400:
+            return "Bad request"
+        case 404:
+            return "Not found"
+        # 任何带点的名称（即属性访问）应被解释为值模式（
+        # 如果我写case a:，那么a会被解释为捕获模式，而不是值模式
+        # 同时传入的是一个变量status，总是能与a匹配，那么这又是一个无法辩驳的表达式
+        case HTTPError.E300:
+            return "Redirection"
+        case _:
+            return "Something's wrong with the internet"
+
+
+for code in [400, 404, 300,  900]:
+    print(code, http_error(code))
+'''
+输出：
+400 Bad request
+404 Not found
+300 Redirection
+Something's wrong with the internet
+'''
+# 这里会报错，因为 _ 不绑定任何变量
+print(_) # NameError: name '_' is not defined
+```
+
+这种写成 _（称为通配符）的特殊模式总是匹配，但它<Highlight>不绑定任何变量</Highlight>。
+
+总是能成功匹配的表达式，我们称其为<Highlight>无可辩驳的</Highlight>。
+
+因此，只有将<Highlight>无可辩驳的表达式单独作为最后一个模式才有意义（为了防止错误，Python 会阻止您之前使用它）。</Highlight>
+
+如果把它放在其他 case 之前，那么后面的 case 块就永远没有机会被执行到，这会使得代码逻辑变得无效或产生问题。
+
+:::tip
+
+捕获多个元素可以使用`*变量名`，`*变量名`属于常见的捕获不定长的数据的写法。
+
+`*_` 在这里表示匹配多个任意元素并不绑定任何变量，所以这里改为`*anything`也是可以的。
+
+```python showLineNumbers
+def is_closed(sequence):
+    match sequence:
+        case [_]:               # any sequence with a single element
+            return True
+        # *_ 表示匹配多个元素，但不绑定任何变量
+        case [start, *_, end]:  # a sequence with at least two elements
+            return start == end
+        case _:                 # anything
+            return False
+
+print(is_closed([9]))      # True
+print(is_closed([9,10,9])) #True
+print(is_closed([9,10,10,9])) #True
+print(is_closed([9,10]))   # False
+```
+:::
+
+
+#### 类模式
+
+类模式检查给定的主题是否确实是一个特定类、或类的实例。
+
+- 它首先检查被匹配的对象是否是类 C 的实例（或者是其子类的实例）。
+
+- 如果匹配，它会进一步检查该实例是否拥有名称为 attr1、attr2 等的属性。
+
+- 最后，它会检查这些属性的值是否与模式中的 value1、value2 等字面量或模式匹配。
+
+```python showLineNumbers
+class Custom:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+
+def simplify(expr):
+    match expr:
+        case int():
+            return "int"
+        case str("1"):
+            return "str1"
+        case str():
+            return "str"
+        case Custom(x=0,y=0):
+            return "Custom"
+        # 一个浮点数经过float转换后等于自身
+        case float(expr):
+            return "float"
+
+print(simplify(1)) # int
+print(simplify("1")) # str_str_1
+print(simplify("2")) # str
+print(simplify(Custom(0,0))) # Custom
+print(simplify(10.1)) # float
+```
+
+#### OR 模式 与 组模式
+
+使用 `|` 符号可以匹配多个模式中的任意一个：
+
+```python showLineNumbers
+def simplify(expr):
+    match expr:
+        case 400|404|500:
+            return '网络错误'
+        case ('*'|'/', 0, _):
+            return 0
+        # 组模式允许用户显式指定分组，一个括号就代表一个组，组内元素可以使用 OR 模式
+        case ('+'|'-', x, 0) | ('+', 0, x):
+            return x
+    return expr
+
+print(simplify(400))  # 网络错误
+print(simplify(("*",0,9)))    # 0
+print(simplify(("+",0,9)))    # 9
+```
+
+#### 捕获模式
+
+捕获模式的形式为一个名称，它接受任何值并将其绑定到一个变量。
+
+```python showLineNumbers
+# 传入的是不定长参数元组
+def average(*args):
+    match args:
+        # 这里的 x,y 变量类似于函数的形参
+        case [x, y]:           # captures the two elements of a sequence
+            return (x + y) / 2
+        case [x]:              # captures the only element of a sequence
+            return x
+        case []:
+            return 0
+        case a:                # captures the entire sequence
+            print(a) 
+            return sum(a) / len(a)
+print(average())            # 0
+print(average(1, 2, 3, 4))  # 2.5
+```
+
+#### AS 模式
+
+AS 模式它们允许用户指定一个通用模式，同时将主题捕获到一个变量中。
+
+```python showLineNumbers
+# 为 AS 模式示例定义必要的类
+class UnaryOp:
+    def __init__(self, op, operand):
+        self.op = op
+        self.operand = operand
+    
+    def __repr__(self):
+        return f"UnaryOp({self.op}, {self.operand})"
+
+class Num:
+    def __init__(self, value):
+        self.value = value
+    
+    def __repr__(self):
+        return f"Num({self.value})"
+
+def simplify_expr(tokens):
+    match tokens:
+        case [('('|'[') as l, *expr, (')'|']') as r] if (l+r) in ('()', '[]'):
+            return simplify_expr(expr)
+        case [0, ('+'|'-') as op, right]:
+            return UnaryOp(op, right)
+        case [
+            (int() | float() as left) | Num(left), 
+            '+',
+            (int() | float() as right) |Num(right)
+            ]:
+            return Num(left + right)
+        case [(int() | float()) as value]:
+            return Num(value)
+
+print(simplify_expr(['(', 5, ')']))           # Num(5)
+print(simplify_expr([0, '+', 10]))            # UnaryOp(+, 10)
+print(simplify_expr([3, '+', 7]))             # Num(10)
+print(simplify_expr([5]))                     # Num(5)
+```
+
+#### 序列模式
+
+匹配列表、元组等序列类型，并可以解构赋值：
+
+```python showLineNumbers
+def sort(seq):  # 定义排序函数，参数为要排序的序列
+    match seq:      # 使用match语句对序列进行模式匹配
+        # 你可以使用 | （“ or ”）在一个模式中组合几个字面值或模式
+        # 匹配空列表或单元素列表的情况(注意：同个 | 语句中，绑定变量或不绑定变量要一致)
+        case [] | [_]:              
+        # 这里 _ 不绑定任何变量，因此可以匹配空列表或单元素列表
+        # 如果这里写成 [] | [x]，则会报错，因为 | 之前不绑定变量，所有后面的语句也不能绑定变量
+            return seq              # 空列表和单元素列表已经有序，直接返回
+        # 同样下面的2种写法也是不允许的，因为前者绑定了变量为x，后者不能绑定变量为非x（不论是否处于相同位置）
+        # case [0,x] | [0,y]: # 报错
+        # case [0,x] | [y,0]: # 报错
+        # 合法，因为前者后者都绑定同一个变量
+        # case [0,x] | [x,0]: 
+        #     pass
+        # 使用 if 表达式 结合 case ，匹配两个元素且已经升序排列的情况
+        case [x, y] if x <= y:      
+            return seq              # 已经有序，直接返回原序列
+        # 匹配两个元素但非升序的情况（因为前者已经匹配了升序的情况）
+        case [x, y]:                
+            return [y, x]           # 交换两个元素的位置并返回
+        # 使用 if 表达式 结合 case ，匹配三个元素且已经升序排列的情况
+        case [x, y, z] if x <= y <= z:  
+            return seq                  # 已经有序，直接返回原序列
+        # 使用 if 表达式 结合 case ，匹配三个元素且完全降序排列的情况
+        case [x, y, z] if x >= y >= z:  
+            return [z, y, x]            # 完全反转序列并返回
+        # 匹配包含多个元素的序列，p为第一个元素，rest为剩余元素
+        case [p, *rest]:                
+            a = sort([x for x in rest if x <= p])  # 递归排序小于等于pivot(p)的元素
+            b = sort([x for x in rest if p < x])   # 递归排序大于pivot(p)的元素
+            return a + [p] + b                     # 合并结果：小于等于p的元素 + p + 大于p的元素
+
+
+print(sort([])) 
+print(sort([3, 2]))      
+print(sort([10, 2, 3])) 
+
+"""
+[]
+[2, 3]
+[2, 3, 10]
+"""
+```
+
+#### 映射模式
+
+匹配字典类型，非常适合处理 JSON 数据：
+
+```python showLineNumbers
+def change_red_to_blue(json_obj):
+    match json_obj:
+        case { 'color': ('red' | '#FF0000') }:
+            json_obj['color'] = 'blue'
+        case { 'children': children }:
+            for child in children:
+                change_red_to_blue(child)
+    return json_obj
+ 
+print(change_red_to_blue({'color': 'red'})) # {'color': 'blue'}
+print(change_red_to_blue({'color': '#FF0000'})) # {'color': 'blue'}
+print(change_red_to_blue({'children': [{'color': 'red'}, {'color': '#FF0000'}]})) # {'children': [{'color': 'blue'}, {'color': 'blue'}]}
+```
+
+#### 守卫条件 (Guard)
+
+守卫通过任意表达式（这些表达式可能有副作用）以高度可控的方式增强 case 块。将整体功能分为静态结构和动态评估部分不仅有助于提高可读性，还可以为编译器优化引入巨大的潜力。
+
+为了保持这种清晰的分离，守卫仅在 case 子句级别得到支持，而不是针对单个模式。
+
+```python showLineNumbers
+def sort(seq):
+    match seq:
+        case [] | [_]:
+            return seq
+        case [x, y] if x <= y:
+            return seq
+        case [x, y]:
+            return [y, x]
+        case [x, y, z] if x <= y <= z:
+            return seq
+        case [x, y, z] if x >= y >= z:
+            return [z, y, x]
+        case [p, *rest]:
+            a = sort([x for x in rest if x <= p])
+            b = sort([x for x in rest if p < x])
+            return a + [p] + b
+```
+
 
 
 ## 循环
@@ -149,7 +438,6 @@ print(total)  # 4999950000
 ```python showLineNumbers
 while <condition>:
      <statesments>
-
 ```
 
 Python 会循环执行**statesments**，直到**condition**不满足为止。
@@ -226,29 +514,30 @@ while command_list:
 - `try`  + 大于等于1个`except` 
 - `try`  + 大于等于1个`except`  + `finally` 
 - `try`  + `finally` 
+:::tip
+在 标准 的 `try...except` 结构中，通常只会触发一个 `except` 块。
 
-<Highlight>在 标准 的 `try...except` 结构中，通常只会触发一个 `except` 块。</Highlight>
+一个`except`可以捕捉多个异常类型(写为元组格式，Python3.14版本之前需使用括号)。
+
+捕获到的异常可以被`as`别名捕获，便于使用（例如记录到日志等）。
+:::
 
 ```python showLineNumbers
-# 捕捉不同的错误类型，尝试在下面输入框输入：-1，1，2，q
-import math
-
-while True:
+for input_str in ['文字','0','1']:
     try:
-        # 尝试执行代码块，如果发生异常，则跳转到对应的except块
-        text = input('>')
-        if text[0] == 'q':
-            break
-        x = float(text)
-        y = 1 / math.log10(x)
-        print("1/log10({0}) = {1}".format(x, y))
-    # 如果发生ValueError异常，则跳转到对应的except块内
-    except ValueError:
-        print("value must bigger than 0")
-    # 如果发生ZeroDivisionError异常，则跳转到对应的except块内，异常可以被捕获为别名，便于使用（例如记录到日志等）
-    except ZeroDivisionError as e:
-        print("the value must not be 1", e)
+        # 转换为数字并进行除法运算
+        num1 = num2 = float(input_str)
+        print(f"{num1} ÷ {num2} = {num1 / num2}")
+    except (ValueError,KeyboardInterrupt) as e:
+        print("没有输入有效的数字或程序被中断！",e)
+    except ZeroDivisionError:
+        print("除数不能为0！")
 
+"""
+没有输入有效的数字或程序被中断！ could not convert string to float: '文字'
+除数不能为0！
+1.0 ÷ 1.0 = 1.0
+"""
 ```
 
 不管 `try` 块有没有异常， `finally` 块的内容总是会被执行，而且会在抛出异常前执行，因此可以用来作为安全保证，比如文件操作时，常在 `finally` 关闭文件。
@@ -268,6 +557,43 @@ def process_file(filename):
         print("文件已关闭")
     # 如果出现异常，会在finally执行后继续向上抛出
 ```
+
+:::warning
+
+frame对except的影响
+
+以下代码在 Python3.14.0rc0 中依然存在。
+
+```python showLineNumbers
+e = 1
+try:
+    0/0 # 此处会抛出错误，因为0不能被0除
+except Exception as e:
+    # 此处会对覆盖e，并删除e
+    print(f'error info :{e}！')
+print(e)
+'''
+输出：
+error info :division by zero！
+Traceback (most recent call last):
+  File "c:\Users\jiang\Desktop\todo\1.py", line 7, in <module>
+    print(e)
+          ^
+NameError: name 'e' is not defined
+'''
+```
+
+下面的代码更有可能在生产环境中出现，原理相同，报错信息同样为：`NameError: name 'e' is not defined`
+
+```python showLineNumbers
+try:
+    e = eval(input("please input 0/0:"))
+except Exception as e:
+    pass
+finally:
+    print(e)
+```
+:::
 
 :::info
 由于 `finally` 的特性，目前3.14版本中`finally`块中`return`、`break`、`continue`语句都算语法错误。
@@ -303,9 +629,11 @@ def dangerous_file_operation():
 dangerous_file_operation()
 ```
 :::
+
+
 ### except* 与 ExceptionGroup
 
-当需要引发多个不相关的异常时，<Highlight>`ExceptionGroup`</Highlight>被使用。
+当需要引发多个不相关的异常时，<Highlight>`ExceptionGroup`</Highlight>被使用。（后续表述中**异常组**与`ExceptionGroup`等价）
 
 `ExceptionGroup`是异常层次结构的一部分，是`Exception`异常的子类，因此可以像所有其他异常一样使用 `except` 进行处理。
 
@@ -322,13 +650,11 @@ ExceptionGroup
 此外，它们被 `except*` 识别，该识别器根据所包含异常的类型匹配它们的子组。
 
 :::tip
-注意：
-
 `except*` 和 `except` 不能同时使用。
 
-与<Highlight>在 标准 的 `try...except` 结构中，通常只会触发一个 `except` 块。</Highlight>不同，使用`except*`时，每个被`except*`捕获的1个或多个异常都会被抛出为一个新的异常组(包含被捕获的一个或多个异常)。直到所有异常都被抛出。
+使用`except*`时，每个被`except*`捕获的1个或多个异常都会被抛出为一个新的异常组(包含被捕获的一个或多个异常)。剩下的异常作为一个异常组继续与`except*`匹配。
 
-如果except* 结束还有异常，则这些剩下异常会继续被抛出为一个异常组。
+直到匹配结束如果还有异常，则这些剩下异常会继续被抛出为一个`ExceptionGroup`。
 :::
 
 ```python showLineNumbers
@@ -349,7 +675,7 @@ Exception: test (2 sub-exceptions)
 """
 ```
 
-捕获到异常组之后，可以对异常组做进一步拆分处理。
+捕获到异常组之后，可以对异常组做进一步拆分处理。以是所有`ExceptionGroup`的属性和方法。
 
 ```python showLineNumbers
 try:
@@ -389,46 +715,76 @@ test (1 sub-exception)
 
 ### raise 语句
 
-:::info 
+`raise` 语句用于主动抛出异常。它可以抛出内置异常或自定义异常，让程序的错误处理更加精确和可控。
 
-frame对except的影响
-
-以下代码在 Python3.14.0rc0 中依然存在。
+:::tip
+raise 语句的三种基本用法：
+1. `raise` - 重新抛出当前异常
+2. `raise Exception` - 抛出指定类型的异常
+3. `raise Exception("message")` - 抛出带有错误信息的异常
+:::
 
 ```python showLineNumbers
-e = 1
+class CustomError(Exception):
+    """自定义异常类"""
+    pass
+
+def login(username, password):
+    if not username:
+        # 使用raise抛出内置异常
+        raise ValueError("用户名不能为空",1001)
+    if not password:
+        # 使用raise抛出自定义异常
+        raise CustomError("密码不能为空", 1002)
+    # 模拟登录逻辑
+    if username != "admin" or password != "123456":
+        raise CustomError("用户名或密码错误", 1003)
+    return "登录成功"
+
+# 使用示例
 try:
-    0/0 # 此处会抛出错误，因为0不能被0除
+    result = login("admin", "")
+except CustomError as e:
+    # args是异常的参数元组，是用户传入的参数
+    print(f"登录失败: {e.args[0]}, 错误代码: {e.args[1]}")
 except Exception as e:
-    # 此处会对覆盖e，并删除e
-    print(f'error info :{e}！')
-print(e)
-'''
-输出：
-error info :division by zero！
-Traceback (most recent call last):
-  File "c:\Users\jiang\Desktop\todo\1.py", line 7, in <module>
-    print(e)
-          ^
-NameError: name 'e' is not defined
-'''
+    print(f"登录失败: {e.args[0]}, 错误代码: {e.args[1]}")
+    # 登录失败: 用户名不能为空, 错误代码: 1001
 ```
 
-下面的代码更有可能在生产环境中出现，原理相同，报错信息同样为：`NameError: name 'e' is not defined`
+
+:::tip
+
+异常链：`from`关键字的独特用法。
 
 ```python showLineNumbers
+def parse_config(config_str):
+    try:
+        import json
+        config = json.loads(config_str)
+        return config
+    except json.JSONDecodeError as e:
+        # 可以只写raise，重新抛出当前异常，保持原始的错误信息和堆栈跟踪
+        # raise
+        # 更推荐使用 `from` 关键字：将底层异常包装为更高级的异常链
+        raise ValueError("0011配置文件格式错误") from e
+
 try:
-    e = eval(input("please input 0/0:"))
-except Exception as e:
-    pass
-finally:
-    print(e)
+    parse_config("{invalid json}")
+except ValueError as e:
+    print(f"错误代码: {e}")
+    # 显示原始异常，__cause__专门用于存储异常链中的原始异常
+    print(f"原始报错: {e.__cause__}") 
+"""
+错误代码: 0011配置文件格式错误
+原始报错: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
+"""
 ```
 :::
 
 ## 内置函数
 
-以下函数大多为操作序列与控制流一起使用。
+以下内置函数大多为操作序列与控制流一起使用。
 
 ### any函数、all函数
 
