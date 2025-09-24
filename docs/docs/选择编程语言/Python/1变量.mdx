@@ -68,7 +68,7 @@ print(a == g) # True
 print(a is g) # False
 
 # 比较特别是None,None是Python中表示空值。且为单例常量，即整个程序中只有一个 None 对象。
-# Python3.12中5个单例常量：Ellipsis, False, None, NotImplemented, True
+# Python3.14中单例常量：True,False,None,__debug__,Ellipsis,NotImplemented
 a = None
 b = None
 print(a is b)  # True - 它们指向同一个对象
@@ -247,7 +247,7 @@ def add_str_or_int(a: int | str, b: int | str) -> int | str:
     return a + b
 
 
-# 泛型可以很好的表达这个需求（3.12 的语法）
+# 泛型可以很好的表达这个需求
 def add_str_or_int[T:(int , str)](a: T, b: T) -> T:
     return a + b
 ```

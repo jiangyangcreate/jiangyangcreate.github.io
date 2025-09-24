@@ -3,7 +3,7 @@ sidebar_position: 0
 title: 👍Python
 ---
 :::info
-Python 版本：3.12
+Python 版本：3.14
 
 系统：Windows11 + WSL2（Ubuntu24.04）
 
@@ -46,11 +46,11 @@ Path 环境变量是个特殊的值，它确定 `Windows PowerShell` 查找应�
 
 `where` 命令可以查找可执行文件的路径。
 
-如果你下载的是python3.12，不同途径下载的解释器对应的名称不同，可能为：python.exe、python3.exe、python3.12.exe。
+如果你下载的是python3.14，不同途径下载的解释器对应的名称不同，可能为：python.exe、python3.exe、python3.14.exe。
 
-可通过 `where python`、`where python3`、`where python3.12`查找可执行文件的路径。
+可通过 `where python`、`where python3`、`where python3.14`查找可执行文件的路径。
 
-添加成功后根据解释器的名称，你可以在终端中使用 `python` 或 `python3` 或 `python3.12` 命令来使用解释器。
+添加成功后根据解释器的名称，你可以在终端中使用 `python` 或 `python3` 或 `python3.14` 命令来使用解释器。
 
 pip 是python的包管理器（自身也是包），常与解释器一起被安装，名称可能为： pip.exe 或 pip3.exe。也可以添加到环境变量中，添加后可以直接使用`pip`或`pip3`命令，以`pip`为例：`pip install requests`。（安装名为`requests`的包）
 
@@ -104,7 +104,7 @@ Python环境主要由2部分组成：解释器和<HoverText text="模块库" exp
 - `Miniconda` =  `conda` + `Python` 
 - `Anaconda` = `Miniconda` + 1500+预装包 + GUI界面 + 账户登录配置云同步 
 
-我用的是完整版的`Anaconda`，它既预装了大量机器学习包免去重复安装，也可以创建<HoverText text="不同版本的 Python 解释器环境" explanation="老项目是3.7~3.10，新项目生产环境一般是3.12，个人体验nogil的3.14。"/>，还可以管理 CUDA 这样的外部包。而且在Linux环境下安装和管理多个原生Python不算方便，有了`conda`之后就方便很多了。
+我用的是完整版的`Anaconda`，它既预装了大量机器学习包免去重复安装，也可以创建<HoverText text="不同版本的 Python 解释器环境" explanation="老项目是3.10之前，新项目是3.10之后，个人体验nogil的3.14。"/>，还可以管理 CUDA 这样的外部包。而且在Linux环境下安装和管理多个原生Python不算方便，有了`conda`之后就方便很多了。
 
 可以说`Anaconda`推动了机器学习的发展，机器学习也让`Anaconda`广为人知。
 
@@ -148,13 +148,13 @@ docker是很典型的用空间换时间，它让开发者在任何地方都可�
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 一键安装多个python版本，支持多个来源
-uv python install 3.10 3.11 3.12
+uv python install 3.13 3.14
 
 # 锁定Python版本（设置默认的Python版本）
-uv python pin 3.12
+uv python pin 3.14
 
 # 初始化项目时可以指定 Python 版本，自动添加README.md、.git与.gitignore文件
-uv init example --python 3.12
+uv init example --python 3.14
 
 # 进入项目
 cd example
@@ -695,6 +695,6 @@ def analyze_performance(metrics):
 
 
 ## 推荐阅读
-- [Python 3.12 官方文档](https://docs.python.org/3.12/)
+- [Python 3.14 官方文档](https://docs.python.org/3.14/)
 - [流畅的Python](https://weread.qq.com/web/reader/b64322b0813ab8ee3g018675/)
 - [码农高天 不基础的python基础](https://space.bilibili.com/245645656/lists/346060?type=season)

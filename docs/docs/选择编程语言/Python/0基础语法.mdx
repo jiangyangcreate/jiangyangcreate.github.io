@@ -197,14 +197,14 @@ print(keyword.kwlist)
 有部分教材会归纳为六类基础数据类型：数字、字符串、列表、元组、字典、集合。
 > 如果只追求学习Python基础语法，确实可以只学习这六类基础数据类型。
 
-事实上，Python3.12内置有数据类型非常多。
+事实上，Python3.14内置有数据类型非常多。
 > 注意：Python中，`bool` 是 `int` 的子类。
 
 而且Python中你自己创建一个新类，设置一下实例，就是一种新的数据类型。
 
 <MarkmapHooks initialMarkdown={`
 
-# Python3.12 内置数据类型
+# Python3.14 内置数据类型
 
 ## 基础数据类型
 ### 数值类型
@@ -408,7 +408,6 @@ print(keyword.kwlist)
 ### 基本操作
 - input(): 用户输入
 - print(): 输出
-- help(): 帮助文档
 - hash(): 哈希值
 - id(): 对象标识
 
@@ -499,22 +498,27 @@ print(keyword.kwlist)
 - compile(): 编译代码
 - eval(): 执行表达式
 - exec(): 执行代码
+- help(): 显示帮助信息
 
 `} />
 
 
 ### 内置常量
 
-Python3.12中，内置常量有：
+Python3.14中，内置常量有：
 
-- `Ellipsis`: 用于切片操作，等价于`...`。
+- `True`: 布尔值True。
 - `False`: 布尔值False。
 - `None`: 空值。
-- `NotImplemented`: 用于在类中重载运算符，表示该运算符未实现。
-- `True`: 布尔值True。
 - `__debug__`: 用于判断是否为开发模式(注意与调试模式区分)。
+- `Ellipsis`: 用于切片操作，等价于`...`。
+- `NotImplemented`: 用于在类中重载运算符，表示该运算符未实现。
 
-对于常量我们倾向用`is`判断是否相等，而不是`==`。
+:::note
+注意 None 、 False 、 True 和 \_\_debug\_\_ 这些名称不能重新赋值（将它们作为属性名赋值也会引发 SyntaxError ），因此它们可以被认为是“真正的”常量。
+:::
+
+对于这些常量，我们倾向用`is`判断是否相等，而不是`==`。例如`变量 is None`。
 
 对于`Ellipsis`，我们实际使用中，一般使用`...`来代替。
 
@@ -530,12 +534,23 @@ print(a[...])
 print(... is Ellipsis) # 输出True
 ```
 
+:::info
+`site`模块（在启动时自动导入，除非提供了 -S 命令行选项）会添加几个常量。它们对交互式解释器很有用，但不应在程序中使用。
+
+- `quit(code=None)`与`exit(code=None)`：名称不同而已，都是退出解释器。较为常用。
+- `help`：显示帮助信息。输入 `help(object)` 获取关于 `object` 的帮助。
+- `copyright`：显示Python的版权信息。
+- `credits`：显示Python的贡献者信息。
+- `license`：显示Python的许可证信息。
+:::
+
+
 ### 标准库
 
 标准库就是内置的模块库，不需要安装，直接导入就可以使用。
 
 <MarkmapHooks initialMarkdown={`
-## Python 3.12 标准库
+## Python 3.14 标准库
 
 ### 文本处理服务
 - string: 常用字符串操作
