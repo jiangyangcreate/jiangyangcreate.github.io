@@ -29,13 +29,17 @@ from ..parentmodule import other_function
 :::info
 python的`import`不止能导入`.py`后缀结尾的文件
 
-`.pyx`是Cython的源代码文件，Cython是Python的扩展，可以插入C代码。
+`.pyd`是 Windows 特有的文件格式。它的作用和 `.dll`相似，可直接导入而不需要 `ctypes` 模块。
 
 `.pyc`是由py文件经过编译后生成的二进制文件，py文件变成`.pyc`文件后，加载的速度有所提高，并且可以实现源码隐藏。
 
-`.so`和`.dll`分别是Linux和window的动态库
+Python的`import`通过`importlib`模块自动处理这些不同格式的文件。
 
-Python的`import`通过`importlib`模块自动处理这些不同格式的文件
+`.so`和`.dll`分别是Linux和window的动态链接库，可使用 `ctypes` 模块导入。
+
+`.pyx`是Cython的源代码文件，支持Python与C代码混合编程。可以将 `.pyx` 文件编译为纯 C 文件，但需要注意的是，这个 C 文件通常是用来创建一个 Python 扩展模块 的，它不能独立运行。需要进一步编译为 `.so` 或 `.dll` 或 `.pyd` 文件。
+
+`.pyi`文件是 Python 接口文件 (Python Interface file)，也称为存根文件（stub file）。它包含模块的类型提示，但不包含实际的实现代码。当一个模块是用 C 或 Cython 编写的（例如，编译成 `.pyd` 或 `.so` 文件），它的源代码不是 Python 格式，因此无法直接被 MyPy、Pyright 等类型检查器或 IDE 识别。这时，开发者会创建一个对应的 `.pyi` 文件来提供类型信息。
 :::
 
 
