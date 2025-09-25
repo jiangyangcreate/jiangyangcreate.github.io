@@ -22,5 +22,9 @@ jobs:
         uses: webfactory/ssh-agent@v0.8.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Add SSH host key
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.IP }} >> ~/.ssh/known_hosts
       - name: Rsync files to server
         run: rsync -avz --delete ./build/ ${{ secrets.IP }}
