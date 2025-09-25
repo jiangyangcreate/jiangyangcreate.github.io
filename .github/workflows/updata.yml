@@ -25,6 +25,6 @@ jobs:
       - name: Add SSH host key
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.IP }} >> ~/.ssh/known_hosts
+          ssh-keyscan -H ${{ secrets.IPv4 }} >> ~/.ssh/known_hosts
       - name: Rsync files to server
         run: rsync -avz --delete ./build/ ${{ secrets.IP }}
