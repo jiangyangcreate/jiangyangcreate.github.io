@@ -169,15 +169,19 @@ info = f"{name}'s name first letter is {name[0].upper()} , the name length is {l
 print(info)  # 输出: jack's name first letter is J , the name length is 4
 ```
 
-:::info
+:::tip
+Python 3.14 支持模板字符串。
+
 模板字符串为开发者提供了在字符串组合前访问字符串及其插值值的能力。这为 Python 语言带来了原生的灵活字符串处理功能，并支持安全检查、Web 模板、特定领域语言等。
 
-预计Python 3.14 支持模板字符串。
+使用起来和f-string类似，但是支持`strings` 和 `interpolations` 属性提供对字符串部分和文字中任何插值的访问。
 
 ```python showLineNumbers
 name = "World"
-template = t"Hello {name}"
-assert template.interpolations[0].value == "World"
+template = t"Hello {name} !"
+print(template.interpolations[0].value) # World
+print(template.strings[0]) # Hello 
+print(template.strings[1]) # !
 ```
 
 [PEP 750 – Template Strings](https://peps.python.org/pep-0750/)

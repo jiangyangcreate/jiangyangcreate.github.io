@@ -27,15 +27,15 @@ from ..parentmodule import other_function
 较大的模块往往是一个文件夹，内含多个Python可执行文件、文件夹与资源等等。
 
 :::info
-python的import不止能导入.py后缀结尾的文件
+python的`import`不止能导入`.py`后缀结尾的文件
 
-pyc是由py文件经过编译后生成的二进制文件，py文件变成pyc文件后，加载的速度有所提高，并且可以实现源码隐藏。
+`.pyx`是Cython的源代码文件，Cython是Python的扩展，可以插入C代码。
 
-pyo是优化编译后的程序，也可以提高加载速度，针对嵌入式系统，把需要的模块编译成pyo文件可以减少容量。
+`.pyc`是由py文件经过编译后生成的二进制文件，py文件变成`.pyc`文件后，加载的速度有所提高，并且可以实现源码隐藏。
 
-.so和.dll分别是Linux和window的动态库
+`.so`和`.dll`分别是Linux和window的动态库
 
-这些都可以被import导入，所以我们只需要编译C代码，然后import导入即可。
+Python的`import`通过`importlib`模块自动处理这些不同格式的文件
 :::
 
 

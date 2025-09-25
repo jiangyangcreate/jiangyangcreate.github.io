@@ -23,7 +23,9 @@ class Person:
 
 在 Python 中，所有数据类型都可以视为对象，当然也可以自定义对象。自定义的对象数据类型就是面向对象中的类（Class）的概念。
 
-面向对象的设计思想是从自然界中来的，因为在自然界中，类（Class）和实例（Instance）的概念是很自然的。Class 是一种抽象概念，比如我们定义的 Class——印花T恤，是指印花T恤这个概念，而实例（Instance）则是一个个具体的印花T恤，比如，我手上的向日葵印花T恤和玫瑰印花T恤是两个具体的印花T恤。
+面向对象的设计思想是从自然界中来的，因为在自然界中，类（Class）和实例（Instance）的概念是很自然的。
+
+Class 是一种抽象概念，比如我们定义的 Class——印花T恤，是指印花T恤这个概念，而实例（Instance）则是一个个具体的印花T恤，比如，我手上的向日葵印花T恤和玫瑰印花T恤是两个具体的印花T恤。
 
 所以，面向对象的设计思想是抽象出 Class，根据 Class 创建 Instance。
 
@@ -34,29 +36,72 @@ class Person:
 python通过class关键字定义一个类，类如果不继承其他类，则默认继承object类，此时可以省略括号与object。
 
 ```python showLineNumbers
-# class ClassName:
-class ClassName(object):
+# class ClassName(object):
+class ClassName:
     """class docstring"""
     pass
 
 instance = ClassName()
 ```
 
-类里的函数称为方法，类里的变量称为属性。
+如果在定义时，括号内含有一个或多个其他类，那么这个类就<HoverText text="继承了这些类" explanation="继承可以让子类拥有父类的所有方法和属性，子类可以增加新方法或者重写父类的方法。"/>。
 
-实例方法按照是否可访问实例和类的属性分为：
-- 实例方法：第一个参数传入实例（约定为self），可以访问实例的属性和方法
-- 类方法：第一个参数传入类（约定为cls）+ @classmethod 装饰器，可以访问类的属性和方法
-- 静态方法：@staticmethod 装饰器，不能访问实例和类的属性和方法
+类继承的基本形式：
 
-不遵守约定不会让你代码报错，但是遵守约定可以让你的代码可读性更高。
+```python showLineNumbers
+# class ClassName(ParentClass1, ParentClass2, ...):
+class ClassName(ParentClass): # ParentClass 就是用来继承的父类
+    """class docstring"""
+    # 类里的变量称为属性。
+    name = "ClassName"
 
-类方法按照是否以`__`开头和结尾，可以分为以下几种：
+    # 类里的函数称为方法。
+    def method(self):
+        return
 
-- 共有的方法和属性，即不以 \_\_ 开头和结尾的方法和属性
-- special 方法和属性，即以 \_\_ 开头和结尾的方法和属性(有特殊用途)
-- 私有方法和属性，以 \_ 开头，不过不是真正私有，而是可以调用的，但是不会被代码自动完成所记录（即 Tab 键之后不会显示）
-- 名称修饰方法，即以 `__` 开头不以 `__` 结尾的是更加特殊的名称修饰方法。
+# 类被调用称为创建实例或实例化
+# instance称之为ClassName类的实例。
+instance = ClassName()
+```
+
+#### 方法和属性
+
+方法按照是否可访问实例和类的属性分为：
+
+- [类方法](#classmethod-和-staticmethod)：`@classmethod` 装饰器+第一个参数传入类（约定为cls） ，类或实例可以调用，能访问类的属性和方法。
+- [静态方法](#classmethod-和-staticmethod)：`@staticmethod` 装饰器，类或实例可以调用，不能访问实例和类和实例的属性和方法。
+- 实例方法：约定第一个参数传入实例（约定为self），约定实例化后调用，可以访问实例的属性和方法。
+
+:::tip
+不遵守`self`和`cls`命名约定不会让你代码报错，但是遵守约定可以让你的代码可读性更高。
+
+```python showLineNumbers
+class ClassName:
+    def instance_method(is_not_self):
+        print("instance_method", is_not_self)
+
+    # 不遵守第一个参数传入实例的约定，可通过类调用。但是不能实例化后调用。
+    # 这种方法如果加上@staticmethod装饰器，既可以类调用，也可以实例化后调用。
+    def instance_method_no_self():
+        print("instance_method_no_self")
+
+# 如果你通过类调用方法，那么它就是普通函数。如果有参数需要手动传入参数。
+ClassName.instance_method_no_self()   # instance_method_no_self
+ClassName.instance_method(1)          # instance_method 1
+ClassName.instance_method(ClassName())# instance_method <__main__.ClassName object at 0x0000021973262280>
+
+# 如果实例化后调用，那么它会自动将实例作为第一个参数传入。如果方法没有参数则会报错。
+ClassName().instance_method()         # instance_method <__main__.ClassName object at 0x0000021973262280>
+ClassName().instance_method_no_self() # TypeError: ClassName.instance_method_no_self() takes 0 positional arguments but 1 was given
+```
+:::
+
+方法和属性按照是否以下划线`_`开头和结尾，可以分为以下几种：
+
+- 以 \_\_ 开头和结尾的方法和属性，大多有特殊用途。称呼多样，称为 “special/双下划线/魔法” 方法和属性。
+- 不以 \_\_ 开头和结尾的方法和属性，即共有的方法和属性。
+- 以 \_\_ 开头不以 \_\_ 结尾的方法，名称修饰方法，解释器会自动将其名称修改。
+- 以 \_ 开头，私有方法，不过不是真正私有，而是可以调用的，但是不会被代码自动完成所记录（即 Tab 键之后不会显示）
 
 ```python showLineNumbers
 class MyDemoClass(object):
@@ -83,19 +128,9 @@ demo._get_name() # _get_name is private method
 demo._MyDemoClass__get_type() # __get_type is really special method.
 ```
 
-### 继承
+#### 继承
 
-
-类继承的基本形式：
-
-```python showLineNumbers
-class ClassName(ParentClass):
-    """class docstring"""
-    def method(self):
-        return
-```
-
-里面的 ParentClass 就是用来继承的。
+继承可以让子类拥有父类的所有方法和属性，子类可以增加新方法或者重写父类的方法。
 
 ```python showLineNumbers
 class Clothes(object):
@@ -124,7 +159,7 @@ your_clothes.out_print()
 your_clothes.change_color()
 your_clothes.color
 
-# 如果想对父类的方法进行修改，只需要在子类中重定义这个类方法即可
+# 如果想对父类的方法进行修改，只需要在子类中重定义这个方法即可
 class AdidasClothes(Clothes):
     def change_color(self):
         if self.color == "green":
@@ -175,7 +210,7 @@ while True:
 
 #### 无参数形式
 
-无参数写法必须在类方法或实例方法内部使用，即有`self`或`cls`上下文。当在类的方法内部使用 `super()` 时，它会自动推断当前类和当前上下文。
+无参数写法必须在方法或实例方法内部使用，即有`self`或`cls`上下文。当在类的方法内部使用 `super()` 时，它会自动推断当前类和当前上下文。
 
 将当前类传入第一个参数，将当前方法的第一个实例或类（即`self`或`cls`）传入第二个参数。
 
