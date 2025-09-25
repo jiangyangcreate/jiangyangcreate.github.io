@@ -18,3 +18,9 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
+      - name: Deploy to mainland server
+        uses: webfactory/ssh-agent@v0.8.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Rsync files to server
+        run: rsync -avz --delete ./build/ ${{ secrets.IP }}
