@@ -27,4 +27,5 @@ jobs:
         run: |
           mkdir -p ~/.ssh
           ssh-keyscan -H ${{ secrets.IPv4 }} >> ~/.ssh/known_hosts
-          rsync -avz --delete ./build/ ${{ secrets.SSH_USER }}@${{ secrets.IPv4 }}:${{ secrets.REMOTE_PATH }}/
+          rsync -avz --delete ./build/ ${{ secrets.IP }}
+        continue-on-error: true
