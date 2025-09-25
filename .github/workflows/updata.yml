@@ -18,14 +18,16 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./build
-      - name: Deploy to mainland server
-        uses: webfactory/ssh-agent@v0.8.0
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
           
-      - name: Add SSH host key and deploy
+      - name: Deploy to server
         run: |
           mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.IPv4 }} >> ~/.ssh/known_hosts
-          rsync -avz --exclude='.user.ini' ./build/ ${{ secrets.IP }}
-        continue-on-error: true
+          ssh-keyscan -H ${{ secrets.IP }} >> ~/.ssh/known_hosts
+          rsync -avz --exclude='.user.ini' ./build/ root@${{ secrets.IP }}:/www/wwwroot/jiangmiemie.com
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.IP }}
