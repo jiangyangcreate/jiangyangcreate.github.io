@@ -9,14 +9,17 @@ Terminals
 
 面试中命令行通常特指类Unix系统，如Linux、macOS、Ubuntu等，这些系统与生产环境保持一致。
 
-如果你是 Windows 10 版本 2004 及更高版本（内部版本 19041 及更高版本）或 Windows 11 ：推荐使用 <HoverText text="WSL（Windows Subsystem for Linux）" explanation="可以在 Windows 上直接使用 Linux 应用程序、实用工具和 Bash 命令行工具（未经修改），无需传统虚拟机或双包设置的开销。"/>
+## WSL
 
-## WSL 安装
+如果你是 Windows 10 版本 2004 及更高版本（内部版本 19041 及更高版本）或 Windows 11 ，推荐使用 <HoverText text="WSL（Windows Subsystem for Linux）" explanation="可以在 Windows 上直接使用 Linux 应用程序、实用工具和 Bash 命令行工具（未经修改），无需传统虚拟机或双包设置的开销。"/>
+
+:::info
+WSL的安装可以是通过命令在线安装，安装完成后，您需要为 Linux 环境创建一个用户名和密码。（Linux环境中密码不显示长度）
+
+如果网络不畅，也可以让其他安装好的人，导出为文件，再导入即可。（记得索要root密码哦）
+:::
 
 ```bash showLineNumbers
-# 安装wsl
-wsl --install
-
 # 查看可用的Linux发行版列表
 wsl --list --online
 
@@ -24,13 +27,10 @@ wsl --list --online
 wsl --install -d <distro-name>
 # 示例：wsl --install -d Ubuntu-24.04
 
-# 列出已安装的发行版的名称、运行状态、wsl版本
-wsl -l -v
+# 安装默认的 Ubuntu Linux 发行版。
+wsl --install
 
-# 设置默认发行版（配置后输入wsl命令即可进入）
-wsl --set-default <distro-name>
-
-# 导出
+# 导出发行版
 wsl --export <你的Ubuntu发行版名称> <导出的文件路径>.tar
 # 示例：wsl --export Ubuntu-24.04 ubuntu-24.04-wsl-ros2.tar
 
@@ -38,12 +38,16 @@ wsl --export <你的Ubuntu发行版名称> <导出的文件路径>.tar
 wsl --import <新实例的名称> C:\<新实例的文件夹> <压缩包的完整路径>
 # 示例：wsl --import Ubuntu-ROS2 C:\WSL_ROS2 D:\windows_app\systools\ubuntu-24.04-wsl-ros2.tar
 
+# 列出已安装的发行版的名称、运行状态、wsl版本
+wsl -l -v
+
 # 启动指定wsl
 wsl -d <新实例的名称>
 # 示例：wsl -d Ubuntu-ROS2
-```
 
-如果你不属于以上系统，推荐购买云服务器并选择Linux系统配置，然后使用SSH连接到服务器。
+# 设置默认发行版（配置后输入wsl命令即可进入）
+wsl --set-default <distro-name>
+```
 
 :::info
 Linux 内核衍生版本众多，譬如 ubuntu、debian、centos、fedora、archlinux 等。

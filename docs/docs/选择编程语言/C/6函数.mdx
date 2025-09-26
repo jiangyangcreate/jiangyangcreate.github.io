@@ -1,0 +1,487 @@
+---
+sidebar_position: 6
+title: 函数
+---
+
+## 函数
+
+C 源程序是由函数组成的，C 语言不仅提供了极为丰富的库函数, 还允许用户建立自己定义的函数。用户可把自己的算法编写成一个个相对独立的函数，然后再需要的时候调用它。
+
+可以说 C 程序的全部工作都是由各式各样的函数完成的,所以也把 C 语言称为函数式语言。
+
+
+## 函数的分类
+
+- 在 C 语言中可从不同的角度对函数分类
+- 从函数定义的角度看,函数可分为库函数和用户定义函数两种
+
+* **_库函数:_** 由 C 语言系统提供,用户无须定义,也不必在程序中作类型说明,只需在程序前包含有该函数原型的头文件即可在程序中直接调用。在前面各章的例题中反复用到 printf、scanf、getchar、putchar 等函数均属此类
+* **_用户定义函数:_**由用户按需编写的函数。对于用户自定义函数,不仅要在程序中定义函数本身,而且在主调函数模块中还必须对该被调函数进行类型说明,然后才能使用
+
+- 从函数执行结果的角度来看, 函数可分为有返回值函数和无返回值函数两种
+
+* **_有返回值函数:_** 此类函数被调用执行完后将向调用者返回一个执行结果,称为函数返回值。(必须指定返回值类型和使用 return 关键字返回对应数据)
+* **_无返回值函数:_** 此类函数用于完成某项特定的处理任务,执行完成后不向调用者返回函数值。(返回值类型为 void, 不用使用 return 关键字返回对应数据)
+
+- 从主调函数和被调函数之间数据传送的角度看,又可分为无参函数和有参函数两种
+
+* **_无参函数:_** 在函数定义及函数说明及函数调用中均不带参数。主调函数和被调函数之间不进行参数传送。
+* **_有参函数:_** 在函数定义及函数说明时都有参数,称为形式参数(简称为形参)。在函数调用时也必须给出参数,称为实际参数(简称为实参)
+
+---
+
+## 函数的定义
+
+- 定义函数的目的
+
+* 将一个常用的功能封装起来，方便以后调用
+
+- 自定义函数的书写格式
+
+```c showLineNumbers
+返回值类型 函数名(参数类型 形式参数1，参数类型 形式参数2，…) {
+    函数体;
+    返回值;
+}
+```
+
+- 示例
+
+```c showLineNumbers
+int main(){
+    printf("hello world\n");
+    retrun 0;
+}
+```
+
+- 定义函数的步骤
+
+* 函数名：函数叫什么名字
+* 函数体：函数是干啥的，里面包含了什么代码
+* 返回值类型: 函数执行完毕返回什么和调用者
+
+---
+
+- 无参无返回值函数定义
+
+* 没有返回值时 return 可以省略
+
+* 格式:
+
+  ```c showLineNumbers
+  void 函数名() {
+      函数体;
+  }
+  ```
+
+* 示例:
+
+  ```c showLineNumbers
+  // 1.没有返回值/没有形参
+  // 如果一个函数不需要返回任何数据给调用者, 那么返回值类型就是void
+  void printRose() {
+      printf(" {@}\n");
+      printf("  |\n");
+      printf(" \\|/\n"); // 注意: \是一个特殊的符号(转意字符), 想输出\必须写两个斜线
+      printf("  |\n");
+    // 如果函数不需要返回数据给调用者, 那么函数中的return可以不写
+  }
+  ```
+
+---
+
+- 无参有返回值函数定义
+
+* 格式:
+
+  ```c showLineNumbers
+  返回值类型 函数名() {
+      函数体;
+      return 值;
+  }
+  ```
+
+* 示例:
+
+  ```c showLineNumbers
+  int getMax() {
+      printf("请输入两个整数, 以逗号隔开, 以回车结束\n");
+      int number1, number2;
+      scanf("%i,%i", &number1, &number2);
+      int max = number1 > number2 ? number1 : number2;
+      return max;
+  }
+  ```
+
+---
+
+- 有参无返回值函数定义
+
+* 形式参数表列表的格式: `类型 变量名,类型 变量2,......`
+
+* 格式:
+
+  ```c showLineNumbers
+  void 函数名(参数类型 形式参数1，参数类型 形式参数2，…) {
+      函数体;
+  }
+  ```
+
+* 示例:
+
+  ```c showLineNumbers
+  void printMax(int value1, int value2) {
+      int max = value1 > value2 ? value1 : value2;
+      printf("max = %i\n", max);
+  }
+  ```
+
+---
+
+- 有参有返回值函数定义
+
+* 格式:
+
+  ```c showLineNumbers
+  返回值类型 函数名(参数类型 形式参数1，参数类型 形式参数2，…) {
+      函数体;
+      return 0;
+  }
+  ```
+
+* 示例:
+
+  ```c showLineNumbers
+   int printMax(int value1, int value2) {
+      int max = value1 > value2 ? value1 : value2;
+      return max;
+  }
+  ```
+
+---
+
+- 函数定义注意
+
+- 函数名称不能相同
+
+  ```c showLineNumbers
+  void test() {
+  }
+  void test() { // 报错
+  }
+  ```
+
+---
+
+## 函数的参数和返回值
+
+- 形式参数
+  - 在**\*定义函数\***时，函数名后面小括号()中定义的变量称为形式参数，简称形参
+  - 形参变量只有在被调用时才分配内存单元,在调用结束时,即刻释放所分配的内存单元。
+  - 因此,形参只有在函数内部有效,函数调用结束返回主调函数后则不能再使用该形参变量
+
+```c showLineNumbers
+int max(int number1, int number2) //  形式参数
+{
+    return number1 > number2 ? number1 : number2;
+}
+```
+
+---
+
+- 实际参数
+  - 在**\*调用函数\***时, 传入的值称为实际参数，简称实参
+  - 实参可以是常量、变量、表达式、函数等,无论实参是何种类型的量,在进行函数调用时,它们都必须具有确定的值,以便把这些值传送给形参
+  - 因此应预先用赋值,输入等办法使实参获得确定值
+
+```c showLineNumbers
+int main() {
+    int num = 99;
+    // 88, num, 22+44均能得到一个确定的值, 所以都可以作为实参
+    max(88, num, 22+44); // 实际参数
+    return 0;
+}
+```
+
+---
+
+- 形参、实参注意点
+
+  - 调用函数时传递的实参个数必须和函数的形参个数必须保持一致
+
+  ```c showLineNumbers
+  int max(int number1, int number2) { //  形式参数
+      return number1 > number2 ? number1 : number2;
+  }
+  int main() {
+      // 函数需要2个形参, 但是我们只传递了一个实参, 所以报错
+      max(88); // 实际参数
+      return 0;
+  }
+  ```
+
+- - 形参实参类型不一致, 会自动转换为形参类型
+
+  ```c showLineNumbers
+  void change(double number1, double number2) {//  形式参数
+     // 输出结果: 10.000000, 20.000000
+     // 自动将实参转换为double类型后保存
+     printf("number1 = %f, number2 = %f", number1, number2);
+  }
+  int main() {
+      change(10, 20);
+      return 0;
+  }
+  ```
+
+- - 当使用基本数据类型（char、int、float 等）作为实参时，实参和形参之间只是值传递，修改形参的值并不影响到实参函数可以没有形参
+
+  ```c showLineNumbers
+  void change(int number1, int number2) { //  形式参数
+      number1 = 250; // 不会影响实参
+      number2 = 222;
+  }
+  int main() {
+      int a = 88;
+      int b = 99;
+      change(a, b);
+      printf("a  = %d, b = %d", a, b); // 输出结果: 88, 99
+      return 0;
+  }
+  ```
+
+---
+
+- 返回值类型注意点
+
+  - 如果没有写返回值类型，默认是 int
+
+  ```c showLineNumbers
+  max(int number1, int number2) {//  形式参数
+      return number1 > number2 ? number1 : number2;
+  }
+  ```
+
+- - 函数返回值的类型和 return 实际返回的值类型应保持一致。如果两者不一致,则以返回值类型为准,自动进行类型转换
+
+  ```c showLineNumbers
+  int height() {
+      return 3.14;
+  }
+  int main() {
+    double temp = height();
+    printf("%lf", temp);// 输出结果: 3.000000
+  }
+  ```
+
+- - 一个函数内部可以多次使用 return 语句，但是 return 语句后面的代码就不再被执行
+
+  ```c showLineNumbers
+  int max(int number1, int number2) {//  形式参数
+      return number1 > number2 ? number1 : number2;
+      printf("执行不到"); // 执行不到
+      return 250; // 执行不到
+  }
+  ```
+
+---
+
+## 函数的声明
+
+- 在 C 语言中，函数的定义顺序是有讲究的：
+
+* 默认情况下，只有后面定义的函数才可以调用前面定义过的函数
+
+- 如果想把函数的定义写在 main 函数后面，而且 main 函数能正常调用这些函数，那就必须在 main 函数的前面进行函数的声明, 否则
+
+* 系统搞不清楚有没有这个函数
+* 系统搞不清楚这个函数接收几个参数
+* 系统搞不清楚这个函数的返回值类型是什么
+
+- 所以函数声明,就是在函数调用之前告诉系统, 该函数叫什么名称, 该函数接收几个参数, 该函数的返回值类型是什么
+- 函数的声明格式：
+
+* 将自定义函数时{}之前的内容拷贝到调用之间即可
+* 例如: `int max( int a, int b );`
+* 或者: `int max( int, int );`
+
+```c showLineNumbers
+// 函数声明
+void getMax(int v1, int v2);
+int main(int argc, const char * argv[]) {
+    getMax(10, 20); // 调用函数
+    return 0;
+}
+// 函数实现
+void getMax(int v1, int v2) {
+    int max = v1 > v2 ? v1 : v2;
+    printf("max = %i\n", max);
+}
+```
+
+- 函数的声明与实现的关系
+
+* 声明仅仅代表着告诉系统一定有这个函数, 和这个函数的参数、返回值是什么
+* 实现代表着告诉系统, 这个函数具体的业务逻辑是怎么运作的
+
+- 函数声明注意点:
+
+* 函数的实现不能重复, 而函数的声明可以重复
+
+  ```c showLineNumbers
+  // 函数声明
+  void getMax(int v1, int v2);
+  void getMax(int v1, int v2);
+  void getMax(int v1, int v2); // 不会报错
+  int main(int argc, const char * argv[]) {
+      getMax(10, 20); // 调用函数
+      return 0;
+  }
+  // 函数实现
+  void getMax(int v1, int v2) {
+      int max = v1 > v2 ? v1 : v2;
+      printf("max = %i\n", max);
+  }
+  ```
+
+- 函数声明可以写在函数外面,也可以写在函数里面, 只要在调用之前被声明即可
+
+  ```c showLineNumbers
+  int main(int argc, const char * argv[]) {
+      void getMax(int v1, int v2); // 函数声明, 不会报错
+      getMax(10, 20); // 调用函数
+      return 0;
+  }
+  // 函数实现
+  void getMax(int v1, int v2) {
+      int max = v1 > v2 ? v1 : v2;
+      printf("max = %i\n", max);
+  }
+  ```
+
+- 当被调函数的函数定义出现在主调函数之前时,在主调函数中也可以不对被调函数再作声明
+
+  ```c showLineNumbers
+  // 函数实现
+  void getMax(int v1, int v2) {
+      int max = v1 > v2 ? v1 : v2;
+      printf("max = %i\n", max);
+  }
+  int main(int argc, const char * argv[]) {
+      getMax(10, 20); // 调用函数
+      return 0;
+  }
+  ```
+
+- 如果被调函数的返回值是整型时,可以不对被调函数作说明,而直接调用
+
+  ```c showLineNumbers
+  int main(int argc, const char * argv[]) {
+      int res = getMin(5, 3); // 不会报错
+      printf("result = %d\n", res );
+      return 0;
+  }
+  int getMin(int num1, int num2) {// 返回int, 不用声明
+      return num1 < num2 ? num1 : num2;
+  }
+  ```
+
+---
+
+## main 函数分析
+
+- main 的含义:
+
+* main 是函数的名称, 和我们自定义的函数名称一样, 也是一个标识符
+* 只不过 main 这个名称比较特殊, 程序已启动就会自动调用它
+
+- return 0;的含义:
+
+* 告诉系统 main 函数是否正确的被执行了
+* 如果 main 函数的执行正常, 那么就返回 0
+* 如果 main 函数执行不正常, 那么就返回一个非 0 的数
+
+- 返回值类型:
+
+* 一个函数 return 后面写的是什么类型, 函数的返回值类型就必须是什么类型, 所以写 int
+
+- 形参列表的含义
+
+* int argc :
+
+- 系统在启动程序时调用 main 函数时传递给 argv 的值的个数
+
+* const char \* argv[] :
+
+- 系统在启动程序时传入的的值, 默认情况下系统只会传入一个值, 这个值就是 main 函数执行文件的路径
+- 也可以通过命令行或项目设置传入其它参数
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/0ec7f77ac94198f539e8fa2dce87ab82.png)
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/5cdd2adc527c964fec76a5f55ed62d4d.png)
+
+---
+
+- 函数练习
+
+* 写一个函数从键盘输入三个整型数字,找出其最大值
+* 写一个函数求三个数的平均值
+
+## 递归函数
+
+- 什么是递归函数?
+
+* 一个函数在它的函数体内调用它自身称为递归调用
+
+  ```c showLineNumbers
+  void function(int x){
+      function(x);
+  }
+  ```
+
+- 递归函数构成条件
+
+* 自己搞自己
+* 存在一个条件能够让递归结束
+* 问题的规模能够缩小
+
+- 示例:
+
+* 获取用户输入的数字, 直到用户输入一个正数为止
+
+```c showLineNumbers
+void getNumber(){
+    int number = -1;
+    while (number < 0) {
+        printf("请输入一个正数\n");
+        scanf("%d", &number);
+    }
+
+    printf("number = %d\n", number);
+}
+```
+
+```c showLineNumbers
+void getNumber2(){
+    int number = -1;
+    printf("请输入一个正数abc\n");
+    scanf("%d", &number);
+    if (number < 0) {
+//        负数
+        getNumber2();
+    }else{
+//        正数
+       printf("number = %d\n", number);
+    }
+}
+```
+
+- 递归和循环区别
+
+* 能用循环实现的功能,用递归都可以实现
+* 递归常用于"回溯", "树的遍历","图的搜索"等问题
+* 但代码理解难度大，内存消耗大(易导致栈溢出), 所以考虑到代码理解难度和内存消耗问题, 在企业开发中一般能用循环都不会使用递归
+
+- 递归练习
+
+* 有 5 个人坐在一起,问第 5 个人多少岁?他说比第 4 个人大两岁。问 第 4 个人岁数,他说比第 3 个人大两岁。问第 3 个人,又说比第 2 个 人大两岁。问第 2 个人,说比第 1 个人大两岁。最后问第 1 个人, 他说是 10 岁。请问第 5 个人多大?
+* 用递归法求 N 的阶乘
+* 设计一个函数用来计算 B 的 n 次方

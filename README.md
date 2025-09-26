@@ -27,7 +27,7 @@
 
 - RSS 订阅，支持博客的 RSS 订阅。访问[访问 RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
 
-- 支持生成静态站点，托管至 GitHub Page。[查看 workflows](.github\workflows\updata.yml)
+- 支持生成静态站点，托管至 GitHub Page。[查看 workflows](.github\workflows\update.yml)
 
 - Algolia 全局搜索，支持站内搜索，帮助你快速找到所需内容，如需配置可在`docusaurus.config.js`中搜索`Algolia`。
 

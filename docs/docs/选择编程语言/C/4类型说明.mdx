@@ -1,0 +1,139 @@
+---
+sidebar_position: 4
+title: 类型说明
+---
+
+- 类型说明符基本概念
+
+* C 语言提供了**说明长度**和**说明符号位**的两种类型说明符, 这两种类型说明符一共有 4 个：
+* short 短整型 (说明长度)
+* long 长整型 (说明长度)
+* signed 有符号型 (说明符号位)
+* unsigned 无符号型 (说明符号位)
+
+- 这些说明符一般都是用来修饰 int 类型的，所以在使用时可以省略 int
+- 这些说明符都属于 C 语言关键字
+
+## short 和 long
+
+- short 和 long 可以提供不同长度的整型数，也就是可以改变整型数的取值范围。
+
+* 在 64bit 编译器环境下，int 占用 4 个字节（32bit），取值范围是-2^31 ~ 2^31-1；
+* short 占用 2 个字节（16bit），取值范围是-2^15 ~ 2^15-1；
+* long 占用 8 个字节（64bit），取值范围是-2^63 ~ 2^63-1
+
+- 总结一下：在 64 位编译器环境下:
+
+* short 占 2 个字节(16 位)
+* int 占 4 个字节(32 位)
+* long 占 8 个字节(64 位)。
+* 因此，如果使用的整数不是很大的话，可以使用 short 代替 int，这样的话，更节省内存开销。
+
+- 世界上的编译器林林总总，不同编译器环境下，int、short、long 的取值范围和占用的长度又是不一样的。比如在 16bit 编译器环境下，long 只占用 4 个字节。不过幸运的是，ANSI \ ISO 制定了以下规则：
+
+* short 跟 int 至少为 16 位(2 字节)
+* long 至少为 32 位(4 字节)
+* **short 的长度不能大于 int，int 的长度不能大于 long**
+* **char 一定为为 8 位(1 字节)，毕竟 char 是我们编程能用的最小数据类型**
+
+- 可以连续使用 2 个 long，也就是 long long。一般来说，long long 的范围是不小于 long 的，比如在 32bit 编译器环境下，long long 占用 8 个字节，long 占用 4 个字节。不过在 64bit 编译器环境下，long long 跟 long 是一样的，都占用 8 个字节。
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main()
+{
+    // char占1个字节, char的取值范围 -2^7~2^7
+    char num = 129;
+    printf("size = %i\n", sizeof(num)); // 1
+    printf("num = %i\n", num); // -127
+    // short int 占2个字节, short int的取值范围 -2^15~2^15-1
+    short int num1 = 32769;// -32767
+    printf("size = %i\n", sizeof(num1)); // 2
+    printf("num1 = %hi\n", num1);
+
+    // int占4个字节, int的取值范围 -2^31~2^31-1
+    int num2 = 12345678901;
+    printf("size = %i\n", sizeof(num2)); // 4
+    printf("num2 = %i\n", num2);
+
+    // long在32位占4个字节, 在64位占8个字节
+    long int num3 = 12345678901;
+    printf("size = %i\n", sizeof(num3)); // 4或8
+    printf("num3 = %ld\n", num3);
+
+    // long在32位占8个字节, 在64位占8个字节 -2^63~2^63-1
+    long long int num4 = 12345678901;
+    printf("size = %i\n", sizeof(num4)); // 8
+    printf("num4 = %lld\n", num4);
+
+    // 由于short/long/long long一般都是用于修饰int, 所以int可以省略
+    short num5 = 123;
+    printf("num5 = %lld\n", num5);
+    long num6 = 123;
+    printf("num6 = %lld\n", num6);
+    long long num7 = 123;
+    printf("num7 = %lld\n", num7);
+    return 0;
+}
+```
+
+## signed 和 unsigned
+
+- 首先要明确的：signed int 等价于 signed，unsigned int 等价于 unsigned
+- signed 和 unsigned 的区别就是它们的最高位是否要当做符号位，并不会像 short 和 long 那样改变数据的长度，即所占的字节数。
+
+* signed：表示有符号，也就是说最高位要当做符号位。但是 int 的最高位本来就是符号位，因此 signed 和 int 是一样的，signed 等价于 signed int，也等价于 int。signed 的取值范围是-2^31 ~ 2^31 - 1
+* unsigned：表示无符号，也就是说最高位并不当做符号位，所以不包括负数。
+* 因此 unsigned 的取值范围是：0000 0000 0000 0000 0000 0000 0000 0000 ~ 1111 1111 1111 1111 1111 1111 1111 1111，也就是 0 ~ 2^32 - 1
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main()
+{
+    // 1.默认情况下所有类型都是由符号的
+    int num1 = 9;
+    int num2 = -9;
+    int num3 = 0;
+    printf("num1 = %i\n", num1);
+    printf("num2 = %i\n", num2);
+    printf("num3 = %i\n", num3);
+
+    // 2.signed用于明确说明, 当前保存的数据可以是有符号的, 一般情况下很少使用
+    signed int num4 = 9;
+    signed int num5 = -9;
+    signed int num6 = 0;
+    printf("num4 = %i\n", num4);
+    printf("num5 = %i\n", num5);
+    printf("num6 = %i\n", num6);
+
+    // signed也可以省略数据类型, 但是不推荐这样编写
+    signed num7 = 9;
+    printf("num7 = %i\n", num7);
+
+
+    // 3.unsigned用于明确说明, 当前不能保存有符号的值, 只能保存0和正数
+    // 应用场景: 保存银行存款,学生分数等不能是负数的情况
+    unsigned int num8 = -9;
+    unsigned int num9 = 0;
+    unsigned int num10 = 9;
+    // 注意: 不看怎么存只看怎么取
+    printf("num8 = %u\n", num8);
+    printf("num9 = %u\n", num9);
+    printf("num10 = %u\n", num10);
+    return 0;
+}
+```
+
+- 注意点:
+
+* 修饰符号的说明符可以和修饰长度的说明符混合使用
+* 相同类型的说明符不能混合使用
+
+```c showLineNumbers
+  signed short int num1 = 666;
+  signed unsigned int num2 = 666; // 报错
+```
+
+开源不易，码字不易，如果觉得有价值，欢迎分享支持。

@@ -1,0 +1,183 @@
+---
+sidebar_position: 2
+title: 数值
+---
+
+## int型
+
+**整型常量**
+
+- 十进制整数：例如 `666`, `-120`, `0`
+- 八进制整数：以 `0` 开头，例如 `0123`（十进制的83）
+- 十六进制整数：以 `0x` 开头，例如 `0x123`（十进制的291）
+- 二进制整数：以 `0b` 开头，例如 `0b1010`（十进制的10）
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    printf("十进制: %d\n", 123);      // 123
+    printf("八进制: %d\n", 0123);     // 83
+    printf("十六进制: %d\n", 0x123);  // 291
+    printf("二进制: %d\n", 0b1010);   // 10
+    return 0;
+}
+```
+
+判断下列数字是否合理
+
+```c showLineNumbers
+10.98
+.089-10 // 浮点数，前面的0可以省略，所以.089等同于0.089，-10等同于做运算，所以.089-10为0.089-10=-9.911
+-.003
++178
+
+0b325 // 二进制只能是0-1
+0b0010
+
+0986 // 八进制只能是0-7
+00011
+
+0x001
+0x7h4 // 十六进制只能是0-9,a-f,A-F
+0xffdc
+
+96f // 缺少小数点
+96.0f
+96.oF //用了字母'o'而不是数字'0'，应该是96.0F
+```
+
+:::info
+- 进制转换(查表法)实现思路:
+
+* 将二进制、八进制、十进制、十六进制所有可能的字符都存入数组
+* 利用按位与运算符和右移依次取出当前进制对应位置的值
+* 利用取出的值到数组中查询当前位输出的结果
+* 将查询的结果存入一个新的数组, 当所有位都查询存储完毕, 新数组中的值就是对应进制的值
+
+- 代码实现
+
+```c showLineNumbers
+#include <stdio.h>
+void toBinary(int num)
+{
+    total(num, 1, 1);
+}
+void toOct(int num)
+{
+    total(num, 7, 3);
+}
+void toHex(int num)
+{
+    total(num, 15, 4);
+}
+
+void total(int num , int base, int offset)
+{
+    //    1.定义表用于查询结果
+    char cs[] = {
+        '0', '1', '2', '3', '4', '5',
+        '6', '7', '8', '9', 'a', 'b',
+        'c', 'd', 'e', 'f'
+    };
+    //    2.定义保存结果的数组
+    char rs[32];
+    //    计算最大的角标位置
+    int length = sizeof(rs)/sizeof(char);
+    int pos = length;//8
+
+    while (num != 0) {
+        int index = num & base;
+        rs[--pos] = cs[index];
+        num = num >> offset;
+    }
+
+    for (int i = pos; i < length; i++) {
+        printf("%c", rs[i]);
+    }
+    printf("\n");
+}
+int main()
+{
+    toBinary(9);
+    return 0;
+}
+```
+:::
+
+## float类型
+
+**实型常量**
+
+- <HoverText text="单精度小数" explanation="占用4个字节，精度约6-7位有效数字" />：以字母 `f` 或 `F` 结尾，例如 `3.14f`
+- <HoverText text="双精度小数" explanation="占用8个字节，精度约15-16位有效数字" />：默认的小数形式，例如 `3.14159`
+- 指数形式：使用 `e` 或 `E` 表示科学计数法，例如 `1.23e5`（表示123000）
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    const float pi_f = 3.14f;          // 单精度
+    const double pi_d = 3.14159;       // 双精度
+    const double big_num = 1.23e5;     // 科学计数法
+    const double small_num = 1.23e-3;  // 0.00123
+    
+    printf("单精度PI: %.7f\n", pi_f);
+    printf("双精度PI: %.15f\n", pi_d);
+    printf("大数: %.0f\n", big_num);
+    printf("小数: %.5f\n", small_num);
+    return 0;
+}
+```
+
+
+## 类型转换
+
+| 强制类型转换(显示转换)   | 自动类型转换(隐式转换) |
+| ------------------------ | ---------------------- |
+| (需要转换的类型)(表达式) | 1.算数转换 2.赋值转换  |
+
+- 强制类型转换(显示转换)
+
+```c showLineNumbers
+// 将double转换为int
+int a = (int)10.5;
+// C 取整时，总是向0取整。(计算余数和四舍五入时也总是向0取整)
+```
+
+- 算数转换
+  - 系统会自动对占用内存较少的类型做一个“自动类型提升”的操作, 先将其转换为当前算数表达式中占用内存高的类型, 然后再参与运算
+
+```c showLineNumbers
+// 当前表达式用1.0占用8个字节, 2占用4个字节
+// 所以会先将整数类型2转换为double类型之后再计算
+double b = 1.0 / 2;
+```
+
+- 赋值转换
+
+```c showLineNumbers
+// 赋值时左边是什么类型,就会自动将右边转换为什么类型再保存
+int a = 10.6;
+```
+
+- 注意点:
+
+* 参与计算的是什么类型, 结果就是什么类型
+
+```c showLineNumbers
+// 结果为0, 因为参与运算的都是整型
+double a = (double)(1 / 2);
+// 结果为0.5, 因为1被强制转换为了double类型, 2也会被自动提升为double类型
+double b = (double)1 / 2;
+```
+
+- 类型转换并不会影响到原有变量的值
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    double d = 3.14;
+    int num = (int)d;
+    printf("num = %i\n", num); // 3
+    printf("d = %lf\n", d); // 3.140000
+}
+```

@@ -5,6 +5,8 @@ title: 👍Python
 :::info
 Python 版本：3.14
 
+GCC 版本：13.3.0
+
 系统：Windows11 + WSL2（Ubuntu24.04）
 
 编辑器：VSCode/Cursor
@@ -31,7 +33,7 @@ Python环境管理工具经历了从简单到复杂，再到智能化的演进�
 
 对于Windows用户，我推荐在官网安装`python`来学习基础语法，使用 `pip` + `venv` 管理简单项目环境。
 
-开始接触生产开发后，在WSL2中通过`uv`管理Python环境，使用`uv`管理Python版本与项目依赖。项目调试完成后，使用`docker`打包便于生产部署。
+开始接触生产开发后，在WSL2中通过`uv`管理Python和C环境，使用`uv`管理Python版本与项目依赖。项目调试完成后，使用`docker`打包便于生产部署。
 
 记住，没有银弹，选择最适合你当前需求和技术栈的工具才是最好的选择。随着项目复杂度的增加，你可能需要组合使用多种工具来解决不同场景下的问题。
 
@@ -144,7 +146,7 @@ docker是很典型的用空间换时间，它让开发者在任何地方都可�
 下面是uv的常用命令示例，按项目构建顺序整理，可以参考。
 
 ```bash showLineNumbers
-# 安装uv
+# Linux/macOS安装uv
 curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # 一键安装多个python版本，支持多个来源
@@ -264,7 +266,36 @@ uv run fastapi dev
 | `uv python dir` | 显示uv已安装Python版本路径 |
 | `uv self update` | 将uv更新到最新版本 |
 
+### C++开发环境搭建
 
+有时我们需要进一提升算法性能，可以使用C++编写性能瓶颈的代码。
+
+:::info
+C 是一个面向过程的语言，是很多现代语言的基础。
+
+C++ 是在 C 的基础上发展起来的，引入了面向对象编程（OOP）的概念，可以看作是 C 的一个超集。
+:::
+
+```bash showLineNumbers
+# 首先更新包列表(需要网络畅通)
+sudo apt-get update
+
+# 安装编译和调试工具(需要网络畅通)
+sudo apt-get install build-essential gdb
+
+# 测试 GCC(如果安装成功，终端会显示 GCC 的版本信息)
+gcc --version
+
+# 测试 G++(如果安装成功，终端会显示 G++ 的版本信息)
+g++ --version
+
+# 测试 GDB(如果安装成功，会显示 GDB 的版本信息)
+gdb --version
+```
+
+- gcc/g++：编译器，它获取编写好的 C/C++ 代码（人类可读）并将其转换为计算机处理器可以理解和执行的语言。
+
+- gdb：调试器，它是一个工具，可逐步运行程序以查找和修复错误或“错误”。它对于查看程序运行时内部发生的情况非常有用。
 
 ## 编辑器
 
@@ -283,6 +314,7 @@ uv run fastapi dev
 | 扩展名称            | 功能描述                                                           |
 | ------------------- | ------------------------------------------------------------------ |
 | Remote - SSH        | 通过SSH连接远程服务器，在本地编辑远程文件                          |
+| C/C++               | 为 C/C++ 语言提供代码高亮、智能感知（自动补全）、代码格式化和调试等核心功能。|
 | Python              | 提供Python语言基础支持，包括语法高亮、代码补全和格式化             |
 | Pylance             | 高性能Python语言服务器，提供类型检查和智能提示                     |
 | Python Debugger     | 支持Python代码的断点调试、变量监控和单步执行                       |
