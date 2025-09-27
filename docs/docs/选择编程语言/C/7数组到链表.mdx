@@ -1,7 +1,53 @@
 ---
 sidebar_position: 7
-title: 数组
+title: （编写中）数组到链表
 ---
+
+## enum
+
+## typedef
+
+## static
+
+## extern
+
+
+## auto 和 register
+
+- auto 关键字(忘记)
+
+* 只能修饰局部变量, 局部变量如果没有其它修饰符, 默认就是 auto 的
+* 特点: 随用随开, 用完即销
+
+```c showLineNumbers
+auto int num; // 等价于 int num;
+```
+
+- register 关键字(忘记)
+
+* 只能修饰局部变量, 原则上将内存中变量提升到 CPU 寄存器中存储, 这样访问速度会更快
+* 但是由于 CPU 寄存器数量相当有限, 通常不同平台和编译器在优化阶段会自动转换为 auto
+
+```c showLineNumbers
+register int num;
+```
+
+
+## 数组
+
+### 二维数组
+
+
+
+## 指针
+
+## 结构体
+
+### 链表
+
+结构体是链表的基本组成单位，链表是由结构体连接而成的数据结构。
+
+
 
 ### 进制转换
 
@@ -3251,25 +3297,6 @@ enum Season {
 * 存储位置：静态存储区
 * 特点: 多个同名的全局变量指向同一块存储空间
 
-## auto 和 register 关键字
-
-- auto 关键字(忘记)
-
-* 只能修饰局部变量, 局部变量如果没有其它修饰符, 默认就是 auto 的
-* 特点: 随用随开, 用完即销
-
-```c showLineNumbers
-auto int num; // 等价于 int num;
-```
-
-- register 关键字(忘记)
-
-* 只能修饰局部变量, 原则上将内存中变量提升到 CPU 寄存器中存储, 这样访问速度会更快
-* 但是由于 CPU 寄存器数量相当有限, 通常不同平台和编译器在优化阶段会自动转换为 auto
-
-```c showLineNumbers
-register int num;
-```
 
 ## static 关键字
 
