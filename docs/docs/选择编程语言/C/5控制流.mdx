@@ -3,29 +3,12 @@ sidebar_position: 5
 title: 控制流
 ---
 
+为了方便我们控制程序的运行流程，C 语言提供 3 种流程控制结构，不同的流程控制结构可以实现不同的运行流程。
 
-## 流程控制基本概念
+- 顺序结构：按书写顺序从上至下依次执行
+- 选择结构：对给定的条件进行判断，再根据判断结果来决定执行代码
+- 循环结构：在给定条件成立的情况下，反复执行某一段代码
 
-- 默认情况下程序运行后，系统会按书写顺序从上至下依次执行程序中的每一行代码。但是这并不能满足我们所有的开发需求, 为了方便我们控制程序的运行流程，C 语言提供 3 种流程控制结构，不同的流程控制结构可以实现不同的运行流程。
-- 这 3 种流程结构分别是顺序结构、选择结构、循环结构
-- 顺序结构:
-
-* 按书写顺序从上至下依次执行
-  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/9071191723644a2b0364126c8a5bd65f.png)
-
-- 选择结构
-
-* 对给定的条件进行判断，再根据判断结果来决定执行代码
-  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/0e8b2f8b6230aedf754eab312605ce23.png)
-  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/e4452dcd9857466ecc0957fb4453b3a3.png)
-
-- 循环结构
-
-* 在给定条件成立的情况下，反复执行某一段代码
-  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/4899d440537583bc28f3bc17bd2b7ae1.png)
-  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/3f74e2788a1ccbaf1028b1360c514c70.png)
-
----
 
 ## 选择结构
 
@@ -46,9 +29,9 @@ if(表达式) {
 
 ```c showLineNumbers
 if(age >= 18) {
-  printf("开网卡\n");
+  printf("18岁会打印成年了！\n");
 }
-printf("买烟\n");
+printf("此时语句和if条件已经无关了\n");
 ```
 
 - if 第二种形式
@@ -65,12 +48,13 @@ if(表达式){
 ```
 
 ```c showLineNumbers
-if(age > 18){
-  printf("开网卡\n");
+// if else 结构中，一定会有一个语句块被执行
+if(age >= 18){
+  printf("可以上网了\n");
 }else{
-  printf("喊家长来开\n");
+  printf("未成年不准上网\n");
 }
-printf("买烟\n");
+printf("此时语句和if条件已经无关了\n");
 ```
 
 - if 第三种形式
@@ -93,15 +77,15 @@ if(表达式1) {
 
 ```c showLineNumbers
 if(age>40){
-  printf("给房卡");
+  printf("成熟的中年人");
 }else if(age>25){
-  printf("给名片");
+  printf("年轻的青年人");
 }else if(age>18){
-   printf("给网卡");
+  printf("小伙子");
 }else{
-  printf("给好人卡");
+  printf("未成年人");
 }
-printf("买烟\n");
+printf("此时语句和if条件已经无关了\n");
 ```
 
 - if 嵌套
@@ -122,8 +106,6 @@ if(表达式1){
 }
 ```
 
----
-
 - **_if 注意点_**
   - 任何数值都有真假性
 
@@ -138,15 +120,28 @@ int main(){
 }
 ```
 
-- 当 if else 后面只有一条语句时, if else 后面的大括号可以省略
+- 当 if else 后面只有一条语句时, if else 后面的大括号可以省略，极其不推荐写法，可读性差。
+
+<Highlight>C 语言中,仅分号`;`也是一条语句, 称之为空语句</Highlight>
 
 ```c showLineNumbers
-    // 极其不推荐写法
-    int age = 17;
-    if (age >= 18)
-        printf("开网卡\n");
-    else
-        printf("喊家长来开\n");
+if(10 > 2);
+{
+printf("10 > 2");
+// 输出结果: 10 > 2
+}
+
+/*
+因为if(10 > 2)后面有一个分号, 所以系统会认为if省略了大括号
+if省略大括号时只能管控紧随其后的那条语句, 所以只能管控一个空分号语句。
+
+等价于
+*/
+if(10 > 2){/*受if条件管控的空语句*/};
+{
+printf("此时和if条件已经无关了");
+// 输出结果: 此时和if条件已经无关了
+}
 ```
 
 - 当 if else 后面的大括号被省略时, else 会自动和距离最近的一个 if 匹配
@@ -189,17 +184,6 @@ int main(){
 }
 ```
 
-- C 语言中分号(;)也是一条语句, 称之为空语句
-
-```c showLineNumbers
-// 因为if(10 > 2)后面有一个分号, 所以系统会认为if省略了大括号
-// if省略大括号时只能管控紧随其后的那条语句, 所以只能管控分号
-if(10 > 2);
-{
-printf("10 > 2");
-}
-// 输出结果: 10 > 2
-```
 
 - 但凡遇到比较一个变量等于或者不等于某一个常量的时候，把常量写在前面
 
@@ -215,40 +199,6 @@ int main(){
     }
 }
 ```
-
----
-
-- if 练习
-
-  - 从键盘输入一个整数，判断其是否是偶数，如果是偶数就输出 YES，否则输出 NO；
-  - 接收用户输入的 1 ～ 7 的整数，根据用户输入的整数，输出对应的星期几
-  - 接收用户输入的一个整数 month 代表月份，根据月份输出对应的季节
-  - 接收用户输入的两个整数，判断大小后输出较大的那个数
-  - 接收用户输入的三个整数，判断大小后输出较大的那个数
-  - 接收用户输入的三个整数，排序后输出
-
-- 实现石头剪刀布
-
-```c showLineNumbers
-剪刀石头布游戏:
-1)定义游戏规则
-  剪刀 干掉 布
-  石头 干掉 剪刀
-  布 干掉石头
-2)显示玩家开始猜拳
-3)接收玩家输入的内容
-4)让电脑随机产生一种拳
-5)判断比较
-(1)玩家赢的情况(显示玩家赢了)
-(2)电脑赢的情况(显示电脑赢了)
-(3)平局(显示平局)
-```
-
-![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/672ff35609edd25e6aa45a8adf1a6225.png)
-![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/cb273336e304bc40948bfacebbdf01ed.png)
-![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/a44287edc332fab3fc13d7da196899a9.png)
-
----
 
 ### switch
 
@@ -311,8 +261,6 @@ int main() {
     }
 }
 ```
-
----
 
 - switch 注意点
 
@@ -468,8 +416,6 @@ int main() {
 }
 ```
 
----
-
 - **_if 和 Switch 转换_**
 - 看上去 if 和 switch 都可以实现同样的功能, 那么在企业开发中我们什么时候使用 if, 什么时候使用 switch 呢?
   - if else if 针对于范围的多路选择
@@ -512,20 +458,6 @@ int main() {
 }
 ```
 
----
-
-- 练习
-  - 实现分数等级判定
-
-```c showLineNumbers
-要求用户输入一个分数，根据输入的分数输出对应的等级
-A 90～100
-B 80～89
-C 70～79
-D 60～69
-E 0～59
-```
-
 - 实现+ - \* / 简单计算器
 
 ## 循环结构
@@ -534,7 +466,6 @@ E 0～59
 - 循环结构是程序中一种很重要的结构。
   - 其特点是,在给定条件成立时,反复执行某程序段, 直到条件不成立为止。
   - 给定的条件称为"循环条件",反复执行的程序段称为"循环体"
-    ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/d32037b3b82185eadb8c1f2ae4e2d160.png)
 
 ### while
 
@@ -609,8 +540,6 @@ int main(){
 }
 ```
 
----
-
 - **_while 循环注意点_**
   - 任何数值都有真假性
 
@@ -666,13 +595,6 @@ int main(){
 while (1);
 ```
 
----
-
-- while 练习
-  - 计算 1 + 2 + 3 + ...n 的和
-  - 获取 1 ～ 100 之间 7 的倍数的个数
-
----
 
 ### do while
 
@@ -714,7 +636,7 @@ int main()
         printf("请输入密码,验证您的身份\n");
         scanf("%d", &num);
     }while(123456 != num);
-    printf("主人,您终于回来了\n");
+    printf("您终于回来了\n");
 }
 ```
 
@@ -722,8 +644,6 @@ int main()
   - 绝大多数情况下 while 和 dowhile 可以互换, 所以能用 while 就用 while
   - 无论如何都需要先执行一次循环体的情况, 才使用 dowhile
   - do while 曾一度提议废除，但是他在输入性检查方面还是有点用的
-
----
 
 ### for
 
@@ -793,14 +713,22 @@ printf("count = %i\n", count);
 - C 语言中提供了四大跳转语句, 分别是 return、break、continue、goto
 ### break
 
-* 立即跳出 switch 语句或循环
+* 立即跳出 switch 语句 或 循环语句
 
-- 应用场景:
+```c showLineNumbers
+switch(表达式){
+    case 常量表达式1:
+        break;//跳出switch语句
+};//结束switch语句
 
-* switch
-* 循环结构
-  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/912852ed05d5b35f881533a2187ed9f6.png)
-  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/3d827d07e49b3a8714cb36dcb7d1ee68.png)
+while(表达式){
+    break;//跳出while语句
+};// 结束while语句
+for(表达式){
+    break;//跳出for语句
+};// 结束for语句
+```
+
 
 - break 注意点:
   - break 离开应用范围，存在是没有意义的
@@ -909,176 +837,3 @@ loop:if(num < 10){
 }
 ```
 
-
-## 控制流练习
-
-:::info
-- 循环结构的循环体中存在其他的循环结构，我们称之为循环嵌套
-  - 注意: 一般循环嵌套不超过三层
-  - 外循环执行的次数 \* 内循环执行的次数就是内循环总共执行的次数
-- 格式:
-
-```c showLineNumbers
-while(条件表达式) {
-    while循环结构 or dowhile循环结构 or for循环结构
-}
-for(初始化表达式；循环条件表达式；循环后的操作表达式) {
-    while循环结构 or dowhile循环结构 or for循环结构
-}
-do {
-     while循环结构 or dowhile循环结构 or for循环结构
-} while (循环控制条件 );
-```
-
-- 循环优化
-  - 在多重循环中，如果有可能，应当将最长的循环放在最内层，最短的循环放在最外层，以减少 CPU 跨切循环层的次数
-
-```c showLineNumbers
-for (row=0; row<100; row++) {
-  // 低效率：长循环在最外层
-  for ( col=0; col<5; col++ ) {
-    sum = sum + a[row][col];
-  }
-}
-for (col=0; col<5; col++ ) {
-  // 高效率：长循环在最内层
-  for (row=0; row<100; row++) {
-    sum = sum + a[row][col];
-  }
-}
-```
-:::
-
-- 练习
-  - 打印好友列表
-
-```c showLineNumbers
-好友列表1
-    好友1
-    好友2
-好友列表2
-    好友1
-    好友2
-好友列表3
-    好友1
-    好友2
-for (int i = 0; i < 4; i++) {
-    printf("好友列表%d\n", i+1);
-    for (int j = 0; j < 4; j++) {
-        printf("    角色%d\n", j);
-    }
-}
-```
-
-
-- 一重循环解决线性的问题，而二重循环和三重循环就可以解决平面和立体的问题了
-- 打印矩形
-
-```c showLineNumbers
-****
-****
-****
-// 3行4列
-//  外循环控制行数
-for (int i = 0; i < 3; i++) {
-//        内循环控制列数
-    for (int j = 0; j < 4; j++) {
-        printf("*");
-    }
-    printf("\n");
-}
-```
-
-- 打印三角形
-  - 尖尖朝上，改变内循环的条件表达式，让内循环的条件表达式随着外循环的 i 值变化
-  - 尖尖朝下，改变内循环的初始化表达式，让内循环的初始化表达式随着外循环的 i 值变化
-
-```c showLineNumbers
-*
-**
-***
-****
-*****
-/*
-最多打印5行
-最多打印5列
-每一行和每一列关系是什么? 列数<=行数
-*/
-for(int i = 0; i< 5; i++) {
-    for(int j = 0; j <= i; j++) {
-        printf("*");
-    }
-    printf("\n");
-}
-*****
-****
-***
-**
-*
-for(int i = 0; i< 5; i++) {
-    for(int j = i; j < 5; j++) {
-        printf("*");
-    }
-    printf("\n");
-}
-```
-
-- 练习
-  - 打印特殊三角形
-
-```c showLineNumbers
-1
-12
-123
-for (int i = 0; i < 3; i++) {
-    for (int j = 0; j <= i; j++) {
-        printf("%d", j+1);
-    }
-    printf("\n");
-}
-```
-
-- - 打印特殊三角形
-
-```c showLineNumbers
-1
-22
-333
-for (int i = 1; i <= 3; i++) {
-    for (int j = 1; j <= i; j++) {
-        printf("%d", i);
-    }
-    printf("\n");
-}
-```
-
-- - 打印特殊三角形
-
-```c showLineNumbers
---*
--***
-*****
-for (int i = 0; i <= 5; i++) {
-    for (int j = 0; j < 5 - i; j++) {
-        printf("-");
-    }
-    for (int m = 0; m < 2*i+1; m++) {
-        printf("*");
-    }
-    printf("\n");
-}
-```
-
-- - 打印 99 乘法表
-
-```c showLineNumbers
-1 * 1 = 1
-1 * 2 = 2     2 * 2 = 4
-1 * 3 = 3     2 * 3 = 6     3 * 3 = 9
-for (int i = 1; i <= 9; i++) {
-    for (int j = 1; j <= i; j++) {
-        printf("%d * %d = %d \t", j, i, (j * i));
-    }
-    printf("\n");
-}
-```

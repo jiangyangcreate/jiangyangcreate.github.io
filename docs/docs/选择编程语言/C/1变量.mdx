@@ -80,16 +80,29 @@ int b = a; // 相当于把a中存储的10拷贝了一份给b
 推荐使用 `const` 关键字。
 :::
 
+### const
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main(){
+    // 在程序中使用 const 关键字
+    const int MAX_SIZE = 100;
+    printf("MAX_SIZE = %d\n", MAX_SIZE);
+    return 0;
+}
+```
+
+
+### #define
+
 ```c showLineNumbers
 #include <stdio.h>
 // 在程序开头使用 #define 预处理器指令
 #define PI 3.14159
 
 int main(){
-    // 在程序中使用 const 关键字
-    const int MAX_SIZE = 100;
     printf("PI = %f\n", PI);
-    printf("MAX_SIZE = %d\n", MAX_SIZE);
     return 0;
 }
 ```
@@ -97,6 +110,9 @@ int main(){
 ## 作用域
 
 C 语言中所有变量都有自己的作用域，变量定义的位置不同,其作用域也不同
+
+- <Highlight>**代码块**：由一对花括号 `{}` 包围的代码区域，内部定义的变量只能在代码块内部使用。</Highlight>
+- `{}` 后面<Highlight>可加可不加</Highlight>分号，可不加是因为 `{}` 作为一个整体，已经明确的代表一个复合语句或代码块。加上可读性更强。
 
 ### 局部变量
 
@@ -152,41 +168,73 @@ int main(){
 }
 ```
 
-## 输入输出
 
-### printf 函数
 
-![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/1a1d70de9ee22c638b43de8009048570.png)
+## putchar 和 getchar
 
-- printf 函数称之为格式输出函数,方法名称的最后一个字母 f 表示 format。其功能是按照用户指定的格式,把指定的数据输出到屏幕上
-- printf 函数的调用格式为:
-  - `printf("格式控制字符串",输出项列表 );`
-  - 例如:`printf("a = %d, b = %d",a, b);`
-    ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/30dae0fb7fa2f93706031066d3cd99cf.png)
-  - 非格式字符串原样输出, 格式控制字符串会被输出项列表中的数据替换
-  - 注意: 格式控制字符串和输出项在数量和类型上**_必须一一对应_**
+向屏幕输出一个字符
 
-- 格式控制字符串
-  - 形式: `%[标志][输出宽度][.精度][长度]类型`
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    char ch = 'a';
+    putchar(ch); // 输出a
+}
+```
 
-- 类型
-  - 格式: `printf("a = %类型", a);`
-  - 类型字符串用以表示输出数据的类型, 其格式符和意义如下所示
+从键盘获得一个字符，
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    char ch;
+    ch = getchar();// 获取一个字符
+    printf("ch = %c\n", ch);
+}
+```
+
+## printf
+
+printf 函数称之为格式输出函数,方法名称的最后一个字母 f 表示 format。其功能是按照用户指定的格式,把指定的数据输出到屏幕上
+
+调用格式为:`printf("格式控制字符串",输出项列表 );`
+
+格式控制字符串形式: `%[标志][输出宽度][.精度][长度]类型`。类型是必选，其它是可选。
+
+例如:
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int a = 10;
+    int b = 20;
+    // 最简单的形式，只使用类型。输出: 10 20
+    printf("%d %d",a, b);
+
+    // 格式控制字符串和输出项在数量和类型上必须一一对应
+    printf("%d %d %d",a, b); // 危险！输出项不足会导致未定义行为
+    return 0;
+}
+```
+
+### 类型
+
+类型字符串用以表示输出数据的类型, 其格式符和意义如下所示
 
 | 类型  | 含义                                |
 | ----- | ----------------------------------- |
-| d     | 有符号 10 进制整型                  |
-| i     | 有符号 10 进制整型                  |
+| c     | 字符                                |
+| f     | 单、双精度浮点数(默认保留 6 位小数) |
+| d / i    | 有符号 10 进制整型                  |
 | u     | 无符号 10 进制整型                  |
 | o     | 无符号 8 进制整型                   |
-| x     | 无符号 16 进制整型                  |
-| X     | 无符号 16 进制整型                  |
-| f     | 单、双精度浮点数(默认保留 6 位小数) |
+| x / X    | 无符号 16 进制整型                  |
 | e / E | 以指数形式输出单、双精度浮点数      |
 | g / G | 以最短输出宽度,输出单、双精度浮点数 |
-| c     | 字符                                |
 | s     | 字符串                              |
 | p     | 地址                                |
+| n     | 不输出字符，将已输出字符数存储到指针指向的变量中 |
+| %     | 输出一个百分号字符 %                |
+
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -235,9 +283,11 @@ int main(){
 ```
 
 
-- 宽度
-  - 格式: `printf("a = %[宽度]类型", a);`
-  - 用十进制整数来指定输出的宽度, 如果实际位数多于指定宽度,则按照实际位数输出, 如果实际位数少于指定宽度则以空格补位
+### 宽度
+
+格式: `printf("a = %[宽度]类型", a);`
+
+用十进制整数来指定输出的宽度, 如果实际位数多于指定宽度,则按照实际位数输出, 如果实际位数少于指定宽度则以空格补位
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -254,8 +304,9 @@ int main(){
 ```
 
 
-- 标志
-  - 格式: `printf("a = %[标志][宽度]类型", a);`
+### 标志
+
+格式: `printf("a = %[标志][宽度]类型", a);`
 
 | 标志 | 含义                                                  |
 | ---- | ----------------------------------------------------- |
@@ -297,9 +348,10 @@ int main(){
 ```
 
 
-- 精度
-  - 格式: `printf("a = %[精度]类型", a); `
-  - 精度格式符以"."开头, 后面跟上十进制整数, 用于指定需要输出多少位小数, 如果输出位数大于指定的精度, 则删除超出的部分
+### 精度
+格式: `printf("a = %[精度]类型", a); `
+
+精度格式符以"."开头, 后面跟上十进制整数, 用于指定需要输出多少位小数, 如果输出位数大于指定的精度, 则删除超出的部分
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -339,8 +391,9 @@ int main(){
 ```
 
 
-- 长度
-  - 格式: `printf("a = %[长度]类型", a);`
+### 长度
+
+格式: `printf("a = %[长度]类型", a);`
 
 | 长度 | 修饰类型      | 含义               |
 | ---- | ------------- | ------------------ |
@@ -365,9 +418,11 @@ int main(){
 }
 ```
 
-- 转义字符
-  - 格式: `printf("%f%%", 3.1415);`
-  - %号在格式控制字符串中有特殊含义, 所以想输出%必须添加一个转移字符
+### 转义字符
+
+格式: `printf("%f%%", 3.1415);`
+
+%号在格式控制字符串中有特殊含义, 所以想输出%必须添加一个转义字符
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -377,20 +432,13 @@ int main(){
 ```
 
 
-### Scanf 函数
+## scanf
 
-- scanf 函数用于接收键盘输入的内容, 是一个阻塞式函数,程序会停在 scanf 函数出现的地方, 直到接收到数据才会执行后面的代码
-- printf 函数的调用格式为:
+scanf 函数用于接收键盘输入的内容, 是一个阻塞式函数,程序会停在 scanf 函数出现的地方。直到用户输入数据，按下回车键（输入`\n`）后，scanf接收到数据才会执行后面的代码。
 
-* `scanf("格式控制字符串", 地址列表);`
-* 例如: `scanf("%d", &num);`
-  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/6df3856aa41baa48cfc65ead2e0294de.png)
+调用格式为:`scanf("格式控制字符串", 地址列表);`
 
----
-
-- 基本用法
-
-* 地址列表项中只能传入变量地址, 变量地址可以通过&符号+变量名称的形式获取
+地址列表项中只能传入变量地址, 变量地址可以通过&符号+变量名称的形式获取
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -401,61 +449,24 @@ int main(){
 }
 ```
 
-- 接收非字符和字符串类型时, 空格、Tab 和回车会被忽略
+### 分隔符
 
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    float num;
-    // 例如:输入 Tab 空格 回车 回车 Tab 空格 3.14 , 得到的结果还是3.14
-    scanf("%f", &num);
-    printf("num = %f\n", num);
-}
-```
-
-- 非格式字符串原样输入, 格式控制字符串会赋值给地址项列表项中的变量
-
-* 不推荐这种写法
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    int number;
-    // 用户必须输入number = 数字  , 否则会得到一个意外的值
-    scanf("number = %d", &number);
-    printf("number = %d\n", number);
-}
-```
-
-- 接收多条数据
-
-* 格式控制字符串和地址列表项在数量和类型上必须一一对应
-* 非字符和字符串情况下如果没有指定多条数据的分隔符, 可以使用空格或者回车作为分隔符(不推荐这种写法)
-* 非字符和字符串情况下建议明确指定多条数据之间分隔符
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    int number;
-    scanf("%d", &number);
-    printf("number = %d\n", number);
-    int value;
-    scanf("%d", &value);
-    printf("value = %d\n", value);
-}
-```
+如果你要输入多个数据，怎么确定输入的哪个数据是给哪个变量赋值？这就是分隔符的作用。
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
     int number;
     int value;
-    // 可以输入 数字 空格 数字, 或者 数字 回车 数字
-    scanf("%d%d", &number, &value);
+    // 推荐使用空格
+    // 可以输入 数字 空格 数字
+    scanf("%d %d", &number, &value);
     printf("number = %d\n", number);
     printf("value = %d\n", value);
 }
 ```
+
+如果将分隔符指定为其他形式，例如逗号需要<Highlight>注意中英文之分</Highlight>，再次推荐使用空格。
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -469,19 +480,34 @@ int main(){
 }
 ```
 
-- \n 是 scanf 函数的结束符号, 所以格式化字符串中不能出现\n
+下面的写法相当于把分割符指定为`number = `
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
     int number;
-    // 输入完毕之后按下回车无法结束输入
-    scanf("%d\n", &number);
+    // 用户必须输入number = 数字  , 否则会得到一个意外的值
+    // 示例：如果你希望输入10，就必须输入number = 10【回车】
+    scanf("number = %d", &number);
     printf("number = %d\n", number);
 }
 ```
 
-#### scanf 运行原理
+### 忽略空白字符
+
+接收非字符和字符串类型时, 空格、Tab 和回车会被自动忽略
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    float num;
+    // 例如:输入 Tab 空格 回车 回车 Tab 空格 3.14 , 得到的结果还是3.14
+    scanf("%f", &num);
+    printf("num = %f\n", num);
+}
+```
+
+### 缓冲区
 
 - 系统会将用户输入的内容先放入输入缓冲区
 - scanf 方式会从输入缓冲区中逐个取出内容赋值给变量
@@ -493,23 +519,22 @@ int main(){
     int num1;
     int num2;
     char ch1;
+    // 如果在这里一次性输入：10a20b30
+    // 从缓冲区中提取整数、文本、整数
     scanf("%d%c%d", &num1, &ch1, &num2);
     printf("num1 = %d, ch1 = %c, num2 = %d\n", num1, ch1, num2);
     char ch2;
     int num3;
+    // 继续从缓冲区中提取文本、整数（无需输入）
     scanf("%c%d",&ch2, &num3);
     printf("ch2 = %c, num3 = %d\n", ch2, num3);
+    //
 }
 ```
 
-![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/29187affda3f7e082e9067fbfb927769.png)
+那我万一输入多了，影响后面的变量接收怎么办？
 
-- 利用 fflush 方法清空缓冲区(不是所有平台都能使用)
-  - 格式: `fflush(stdin);`
-  - C 和 C++的标准里从来没有定义过 fflush(stdin)
-  - MSDN 文档里清除的描述着"fflush on input stream is an extension to the C standard" （fflush 是在标准上扩充的函数, 不是标准函数, 所以不是所有平台都支持）
-- 利用 setbuf 方法清空缓冲区(所有平台有效)
-  - 格式: `setbuf(stdin, NULL);`
+可以利用以下方法清空输入缓冲区：
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -519,96 +544,17 @@ int main(){
     char ch1;
     scanf("%d%c%d", &num1, &ch1, &num2);
     printf("num1 = %d, ch1 = %c, num2 = %d\n", num1, ch1, num2);
-    //fflush(stdin); // 清空输入缓存区
-    setbuf(stdin, NULL); // 清空输入缓存区
+    
+    // 标准方法，通过getchar获取到回车符或EOF为止。
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    // 方法二
+    setbuf(stdin, NULL); 
+    
     char ch2;
     int num3;
     scanf("%c%d",&ch2, &num3);
     printf("ch2 = %c, num3 = %d\n", ch2, num3);
 }
 ```
-
-### putchar 和 getchar
-
-- putchar: 向屏幕输出一个字符
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    char ch = 'a';
-    putchar(ch); // 输出a
-}
-```
-
-- getchar: 从键盘获得一个字符
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    char ch;
-    ch = getchar();// 获取一个字符
-    printf("ch = %c\n", ch);
-}
-```
-
-
-
-## 变量内存分析
-
-- 内存模型
-
-* 内存模型是线性的(有序的)
-* 对于 32 机而言，最大的内存地址是 2^32 次方 bit(4294967296)(4GB)
-* 对于 64 机而言，最大的内存地址是 2^64 次方 bit(18446744073709552000)(171 亿 GB)
-
-![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/c15e330e2723191671e55b27cd9e4f1c.png)
-
-- CPU 读写内存
-
-  - CPU 在运作时要明确三件事
-
-  * 存储单元的地址（地址信息）
-  * 器件的选择，读 or 写 （控制信息）
-  * 读写的数据 （数据信息）
-
-- 如何明确这三件事情
-
-  - 通过地址总线找到存储单元的地址
-  - 通过控制总线发送内存读写指令
-  - 通过数据总线传输需要读写的数据
-
-> - 地址总线: 地址总线宽度决定了 CPU 可以访问的物理地址空间(寻址能力)
->   - 例如: 地址总线的宽度是 1 位, 那么表示可以访问 0 和 1 的内存
->   - 例如: 地址总线的位数是 2 位, 那么表示可以访问 00、01、10、11 的内存
-> - 数据总线: 数据总线的位数决定 CPU 单次通信能交换的信息数量
->   - 例如: 数据总线:的宽度是 1 位, 那么一次可以传输 1 位二进制数据
->   - 例如: 地址总线的位数是 2 位,那么一次可以传输 2 位二进制数据
-> - 控制总线: 用来传送各种控制信号
-
-- 写入流程
-
-  - CPU 通过地址线将找到地址为 FFFFFFFB 的内存
-  - CPU 通过控制线发出内存写入命令，选中存储器芯片，并通知它，要其写入数据。
-  - CPU 通过数据线将数据 8 送入内存 FFFFFFFB 单元中
-    ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/ed76e9a4a2ce06d0a3cd20192956f863.png)
-
-- 读取流程
-
-* CPU 通过地址线将找到地址为 FFFFFFFB 的内存
-* CPU 通过控制线发出内存读取命令，选中存储器芯片，并通知它，将要从中读取数据
-* 存储器将 FFFFFFFB 号单元中的数据 8 通过数据线送入 CPU 寄存器中
-  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/2fb17f543aa500524932669a322cd57a.png)
-
-- 变量的存储原则
-
-* 先分配字节地址大内存,然后分配字节地址小的内存(内存寻址是由大到小)
-
-* 变量的首地址,是变量所占存储空间字节地址(最小的那个地址 )
-
-* 低位保存在低地址字节上,高位保存在高地址字节上
-
-  ```c showLineNumbers
-  10的二进制: 0b00000000 00000000 00000000 00001010
-             高字节←                        →低字节
-  ```
-
