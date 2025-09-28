@@ -240,65 +240,91 @@ int main(){
 
 类型字符串用以表示输出数据的类型, 其格式符和意义如下所示
 
-| 类型  | 含义                                |
-| ----- | ----------------------------------- |
-| c     | 字符                                |
-| f     | 单、双精度浮点数(默认保留 6 位小数) |
-| d / i    | 有符号 10 进制整型                  |
-| u     | 无符号 10 进制整型                  |
-| o     | 无符号 8 进制整型                   |
-| x / X    | 无符号 16 进制整型                  |
-| e / E | 以指数形式输出单、双精度浮点数      |
-| g / G | 以最短输出宽度,输出单、双精度浮点数 |
-| s     | 字符串                              |
-| p     | 地址                                |
-| n     | 不输出字符，将已输出字符数存储到指针指向的变量中 |
-| %     | 输出一个百分号字符 %                |
+| 类型  | 含义                                | 示例 |
+| ----- | ----------------------------------- | ---- |
+| **字符类型** |
+| c     | 单个字符                            | `%c` |
+| s     | 字符串（char 数组）                 | `%s` |
+| **整数类型** |
+| d / i | 有符号 10 进制整数                  | `%d`, `%i` |
+| hd / hi | short int（短整型）               | `%hd`, `%hi` |
+| ld / li | long int（长整型）                | `%ld`, `%li` |
+| lld / lli | **long long int（长长整型）**   | `%lld`, `%lli` |
+| u     | 无符号 10 进制整数                  | `%u` |
+| hu    | unsigned short int                 | `%hu` |
+| lu    | unsigned long int                  | `%lu` |
+| llu   | **unsigned long long int**         | `%llu` |
+| **其他进制整数** |
+| o     | 无符号 8 进制整数                   | `%o` |
+| lo    | unsigned long int（8进制）         | `%lo` |
+| llo   | **unsigned long long int（8进制）** | `%llo` |
+| x / X | 无符号 16 进制整数                  | `%x`, `%X` |
+| lx / lX | unsigned long int（16进制）       | `%lx`, `%lX` |
+| llx / llX | **unsigned long long int（16进制）** | `%llx`, `%llX` |
+| **浮点数类型** |
+| f     | float/double（默认保留 6 位小数）   | `%f` |
+| lf    | double（推荐用法）                  | `%lf` |
+| e / E | 科学计数法输出浮点数                | `%e`, `%E` |
+| g / G | 自动选择最短格式输出浮点数          | `%g`, `%G` |
+| **特殊类型** |
+| p     | 指针地址                            | `%p` |
+| n     | 不输出字符，存储已输出字符数        | `%n` |
+| %     | 输出百分号字符 %                    | `%%` |
 
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
-    int a = 10;
-    int b = -10;
-    float c = 6.6f;
-    double d = 3.1415926;
-    double e = 10.10;
-    char f = 'a';
-    // 有符号整数(可以输出负数)
-    printf("a = %d\n", a); // 10
-    printf("a = %i\n", a); // 10
-
-    // 无符号整数(不可以输出负数)
-    printf("a = %u\n", a); // 10
-    printf("b = %u\n", b); // 429496786
-
-    // 无符号八进制整数(不可以输出负数)
-    printf("a = %o\n", a); // 12
-    printf("b = %o\n", b); // 37777777766
-
-    // 无符号十六进制整数(不可以输出负数)
-    printf("a = %x\n", a); // a
-    printf("b = %x\n", b); // fffffff6
-
-    // 无符号十六进制整数(不可以输出负数)
-    printf("a = %X\n", a); // A
-    printf("b = %X\n", b); // FFFFFFF6
-
-    // 单、双精度浮点数(默认保留6位小数)
-    printf("c = %f\n", c); // 6.600000
-    printf("d = %lf\n", d); // 3.141593
-
-    // 以指数形式输出单、双精度浮点数
-    printf("e = %e\n", e); // 1.010000e+001
-    printf("e = %E\n", e); // 1.010000E+001
-
-    // 以最短输出宽度,输出单、双精度浮点数
-    printf("e = %g\n", e); // 10.1
-    printf("e = %G\n", e); // 10.1
-
-    // 输出字符
-    printf("f = %c\n", f); // a
+    // 字符和字符串
+    char ch = 'A';
+    char str[] = "Hello";
+    printf("字符: %c\n", ch);           // A
+    printf("字符串: %s\n", str);        // Hello
+    
+    // 各种整数类型
+    short short_num = 12345;
+    int int_num = 123456;
+    long long_num = 1234567890L;
+    long long longlong_num = 1234567890123456789LL;
+    
+    printf("short: %hd\n", short_num);           // 12345
+    printf("int: %d\n", int_num);               // 123456
+    printf("long: %ld\n", long_num);            // 1234567890
+    printf("long long: %lld\n", longlong_num);  // 1234567890123456789
+    
+    // 无符号整数
+    unsigned int uint_num = 4294967295U;
+    unsigned long long ulonglong_num = 18446744073709551615ULL;
+    
+    printf("unsigned int: %u\n", uint_num);           // 4294967295
+    printf("unsigned long long: %llu\n", ulonglong_num); // 18446744073709551615
+    
+    // 不同进制输出
+    int num = 255;
+    printf("十进制: %d\n", num);        // 255
+    printf("八进制: %o\n", num);        // 377
+    printf("十六进制: %x\n", num);      // ff
+    printf("十六进制(大写): %X\n", num); // FF
+    
+    // long long 的不同进制
+    long long big_num = 255LL;
+    printf("long long 八进制: %llo\n", big_num);    // 377
+    printf("long long 十六进制: %llx\n", big_num);   // ff
+    
+    // 浮点数
+    float f_num = 3.14159f;
+    double d_num = 3.141592653589793;
+    
+    printf("float: %f\n", f_num);       // 3.141590
+    printf("double: %lf\n", d_num);     // 3.141593
+    printf("科学计数法: %e\n", d_num);   // 3.141593e+00
+    printf("自动格式: %g\n", d_num);     // 3.14159
+    
+    // 指针地址
+    int *ptr = &int_num;
+    printf("指针地址: %p\n", ptr);       // 类似 0x7fff5fbff6ac
+    
+    return 0;
 }
 ```
 

@@ -390,3 +390,177 @@ int main(){
     printf("d = %lf\n", d); // 3.140000
 }
 ```
+
+## 数组
+
+在 C 语言中,数组属于**构造数据类型**，是一组`相同类型`数据的`连续内存`集合。
+
+数组的特点包括：
+
+- 固定大小（编译时确定）
+- 元素类型相同
+- 内存连续分配
+- 通过下标访问（从0开始）
+
+
+定义数组:`数据类型 数组名[数组长度];`
+
+```c showLineNumbers
+// int 元素类型
+// ages 数组名称
+// [10] 数组长度 即 元素个数
+int ages[10];
+// 数组名为ages, 数组类型为int [10]
+
+int scores[5];     // 5个整数的数组
+double temps[30];    // 30个双精度浮点数
+char name[20];     // 20个字符的字符数组，也叫字符串
+```
+
+
+### 初始化数组
+
+```c showLineNumbers
+// 完全初始化, 其中在{ }中的各数据值即为各元素的初值,各值之间用逗号间隔
+// 定义的同时可以初始化多个值
+int ages[3] = {4, 6, 9};
+
+// 完全初始化,不指定元素个数,自动计算长度
+int days[] = {31,28,31,30,31};  // 自动确定为5个元素
+
+// 部分初始化（剩余自动补0）
+int arr[5] = {1, 2};     // [1, 2, 0, 0, 0]
+
+// 部分初始化,指定位置的元素初始化
+int nums[5] = {[0] = 1,[1] = 2}; // [1, 2, 0, 0, 0]
+
+
+// 先定义后初始化
+int nums[3];
+
+nums[0] = 1;
+nums[1] = 2;
+nums[2] = 3;
+
+int ages[3]; // 定义后只能逐个初始化值
+ages = {4, 6, 9}; // 报错
+```
+
+如果定义数组后,<Highlight>没有初始化,数组中是随机的垃圾数</Highlight>,所以如果想要正确使用数组应该要进行初始化。
+
+
+:::info
+
+在定义数组的时候[]里面能写整型常量或者是返回整型常量的表达式
+
+不能写变量。
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main() {
+    int ages1['A'] = {19, 22, 33};// 'A' 会被转换为 65
+    printf("ages1[0] = %d\n", ages1[0]);
+
+    int ages2[5 + 5] = {19, 22, 33};
+    printf("ages2[0] = %d\n", ages2[0]);
+
+    int ages3['A' + 5] = {19, 22, 33};// 'A' + 5会被转换为 70
+    printf("ages3[0] = %d\n", ages3[0]);
+
+    printf("sizeof(ages3) = %lu\n", sizeof(ages3));// 大小为 70 * 4 = 280
+}
+
+```
+:::
+
+### 数组元素的访问
+
+使用数组时不能超出数组的索引范围使用, 索引从 0 开始, 到元素个数-1 结束
+
+通过下标（索引）访问：
+
+```c showLineNumbers
+int nums[3] = {10, 20, 30};
+nums[0] = 15;       // 修改第一个元素
+int x = nums[2];     // 读取第三个元素
+
+// 越界访问
+int arr[3];
+arr[5] = 10;  // 未定义行为！可能破坏其他内存，导致程序崩溃
+```
+
+### 数组的遍历
+
+遍历的意思就是有序地查看数组的每一个元素
+
+```c showLineNumbers
+#include <stdio.h>
+int main() {
+    
+    int ages[4] = {11, 22, 33, 44};
+
+    // 正序输出(遍历)数组
+    for (int i = 0; i < 4; i++) {
+        printf("ages[%d] = %d\n", i, ages[i]);
+    }
+
+    // 逆序输出(遍历)数组
+    for (int i = 3; i >=0; i--) {
+        printf("ages[%d] = %d\n", i, ages[i]);
+    }
+
+    return 0;
+    }
+```
+
+
+### 数组的内存
+
+因为数组在内存中占用的字节数取决于其存储的数据类型和数据的个数
+
+数组所占用存储空间 = 一个元素所占用存储空间 x 元素个数(数组长度)
+
+可以使用`sizeof`函数来计算数组所占用的存储总空间和元素所占用的空间，进一步可以计算出数组的长度
+
+```c showLineNumbers
+#include <stdio.h>
+int main() {
+    int ages[4] = {19, 22, 33};
+    int length = sizeof(ages) / sizeof(ages[0]);
+    printf("length = %d\n", length); 
+    return 0;
+}
+
+```
+
+- 内存寻址从大到小, 从高地址开辟一块连续没有被使用的内存给数组
+- 从分配的连续存储空间中, 地址小的位置开始给每个元素分配空间
+- 从每个元素分配的存储空间中, 地址最大的位置开始存储数据
+- 用数组名指向整个存储空间最小的地址
+
+
+```c showLineNumbers
+#include <stdio.h>
+int main()
+{
+    int num = 9;
+    char cs[] = {'l','n','j'};
+    printf("cs = %p\n", &cs);       // cs = 0060FEA9
+    printf("cs[0] = %p\n", &cs[0]); // cs[0] = 0060FEA9
+    printf("cs[1] = %p\n", &cs[1]); // cs[1] = 0060FEAA
+    printf("cs[2] = %p\n", &cs[2]); // cs[2] = 0060FEAB
+
+    int nums[] = {2, 6};
+    printf("nums = %p\n", &nums);      // nums = 0060FEA0
+    printf("nums[0] = %p\n", &nums[0]);// nums[0] = 0060FEA0
+    printf("nums[1] = %p\n", &nums[1]);// nums[1] = 0060FEA4
+
+    return 0;
+}
+```
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/e0aa63f597f92632c90cd1c5f6adc292.png)
+
+> - 注意:字符在内存中是以对应 ASCII 码值的二进制形式存储的,而非上述的形式。
+
