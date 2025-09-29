@@ -1,0 +1,753 @@
+---
+sidebar_position: 7
+title: （编写中）构造数据
+---
+
+构造数据是指由用户可以定义的、非内置的数据类型。主要有数组、结构体、联合体。
+
+
+## 数组
+
+数组属于**构造数据类型**，是一组`相同类型`数据的`连续内存`集合。
+
+数组的特点包括：
+
+- 固定大小（编译时确定）
+- 元素类型相同
+- 内存连续分配
+- 通过下标访问（从0开始）
+
+前面提到的基本的数据类型又可以和数组结合，形成新的构造数据类型。这里不再逐一列举。
+
+定义数组:`数据类型 数组名[数组长度];`
+
+```c showLineNumbers
+// int 元素类型
+// ages 数组名称
+// [10] 数组长度 即 元素个数
+int ages[10];
+// 数组名为ages, 数组类型为int [10]
+
+int scores[5];     // 5个整数的数组
+double temps[30];    // 30个双精度浮点数
+char name[20];     // 20个字符的字符数组，也叫字符串
+```
+
+
+### 初始化数组
+
+```c showLineNumbers
+// 完全初始化, 其中在{ }中的各数据值即为各元素的初值,各值之间用逗号间隔
+// 定义的同时可以初始化多个值
+int ages[3] = {4, 6, 9};
+
+// 完全初始化,不指定元素个数,自动计算长度
+int days[] = {31,28,31,30,31};  // 自动确定为5个元素
+
+// 部分初始化（剩余自动补0）
+int arr[5] = {1, 2};     // [1, 2, 0, 0, 0]
+
+// 部分初始化,指定位置的元素初始化
+int nums[5] = {[0] = 1,[1] = 2}; // [1, 2, 0, 0, 0]
+
+
+// 先定义后初始化
+int nums[3];
+
+nums[0] = 1;
+nums[1] = 2;
+nums[2] = 3;
+
+int ages[3]; // 定义后只能逐个初始化值
+ages = {4, 6, 9}; // 报错
+```
+
+如果定义数组后,<Highlight>没有初始化,数组中是随机的垃圾数</Highlight>,所以如果想要正确使用数组应该要进行初始化。
+
+
+:::info
+
+在定义数组的时候[]里面能写整型常量或者是返回整型常量的表达式
+
+不能写变量。
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main() {
+    int ages1['A'] = {19, 22, 33};// 'A' 会被转换为 65
+    printf("ages1[0] = %d\n", ages1[0]);
+
+    int ages2[5 + 5] = {19, 22, 33};
+    printf("ages2[0] = %d\n", ages2[0]);
+
+    int ages3['A' + 5] = {19, 22, 33};// 'A' + 5会被转换为 70
+    printf("ages3[0] = %d\n", ages3[0]);
+
+    printf("sizeof(ages3) = %lu\n", sizeof(ages3));// 大小为 70 * 4 = 280
+}
+
+```
+:::
+
+### 数组元素的访问
+
+使用数组时不能超出数组的索引范围使用, 索引从 0 开始, 到元素个数-1 结束
+
+通过下标（索引）访问：
+
+```c showLineNumbers
+int nums[3] = {10, 20, 30};
+nums[0] = 15;       // 修改第一个元素
+int x = nums[2];     // 读取第三个元素
+
+// 越界访问
+int arr[3];
+arr[5] = 10;  // 未定义行为！可能破坏其他内存，导致程序崩溃
+```
+
+### 数组的遍历
+
+遍历的意思就是有序地查看数组的每一个元素
+
+```c showLineNumbers
+#include <stdio.h>
+int main() {
+    
+    int ages[4] = {11, 22, 33, 44};
+
+    // 正序输出(遍历)数组
+    for (int i = 0; i < 4; i++) {
+        printf("ages[%d] = %d\n", i, ages[i]);
+    }
+
+    // 逆序输出(遍历)数组
+    for (int i = 3; i >=0; i--) {
+        printf("ages[%d] = %d\n", i, ages[i]);
+    }
+
+    return 0;
+    }
+```
+
+
+### 数组的内存
+
+因为数组在内存中占用的字节数取决于其存储的数据类型和数据的个数
+
+数组所占用存储空间 = 一个元素所占用存储空间 x 元素个数(数组长度)
+
+可以使用`sizeof`函数来计算数组所占用的存储总空间和元素所占用的空间，进一步可以计算出数组的长度
+
+```c showLineNumbers
+#include <stdio.h>
+int main() {
+    int ages[4] = {19, 22, 33};
+    int length = sizeof(ages) / sizeof(ages[0]);
+    printf("length = %d\n", length); 
+    return 0;
+}
+
+```
+
+- 内存寻址从大到小, 从高地址开辟一块连续没有被使用的内存给数组
+- 从分配的连续存储空间中, 地址小的位置开始给每个元素分配空间
+- 从每个元素分配的存储空间中, 地址最大的位置开始存储数据
+- 用数组名指向整个存储空间最小的地址
+
+
+```c showLineNumbers
+#include <stdio.h>
+int main()
+{
+    int num = 9;
+    char cs[] = {'l','n','j'};
+    printf("cs = %p\n", &cs);       // cs = 0060FEA9
+    printf("cs[0] = %p\n", &cs[0]); // cs[0] = 0060FEA9
+    printf("cs[1] = %p\n", &cs[1]); // cs[1] = 0060FEAA
+    printf("cs[2] = %p\n", &cs[2]); // cs[2] = 0060FEAB
+
+    int nums[] = {2, 6};
+    printf("nums = %p\n", &nums);      // nums = 0060FEA0
+    printf("nums[0] = %p\n", &nums[0]);// nums[0] = 0060FEA0
+    printf("nums[1] = %p\n", &nums[1]);// nums[1] = 0060FEA4
+
+    return 0;
+}
+```
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/e0aa63f597f92632c90cd1c5f6adc292.png)
+
+> - 注意:字符在内存中是以对应 ASCII 码值的二进制形式存储的,而非上述的形式。
+
+
+
+### 数组和函数
+
+- 数组可以作为函数的参数使用,数组用作函数参数有两种形式:
+  - ￼ 一种是把数组元素作为实参使用
+  - ￼ 一种是把数组名作为函数的形参和实参使用
+
+
+- 数组的元素作为函数实参，与同类型的简单变量作为实参一样，如果是基本数据类型, 那么形参的改变不影响实参
+
+```c showLineNumbers
+void change(int val)// int val = number
+{
+    val = 55;
+}
+int main(int argc, const char * argv[])
+{
+    int ages[3] = {1, 5, 8};
+    printf("ages[0] = %d", ages[0]);// 1
+    change(ages[0]);
+    printf("ages[0] = %d", ages[0]);// 1
+}
+```
+
+> - 用数组元素作函数参数不要求形参也必须是数组元素
+
+
+
+### 数组名作为函数参数
+
+- 在 C 语言中,数组名除作为变量的标识符之外,数组名还代表了该数组在内存中的起始地址,因此,当数组名作函数参数时,实参与形参之间不是"值传递",而是"地址传递"
+- 实参数组名将该数组的起始地址传递给形参数组,两个数组共享一段内存单元, 系统不再为形参数组分配存储单元
+- 既然两个数组共享一段内存单元, 所以形参数组修改时，实参数组也同时被修改了
+
+```c showLineNumbers
+void change2(int array[3])// int array = 0ffd1
+{
+    array[0] = 88;
+}
+int main(int argc, const char * argv[])
+{
+    int ages[3] = {1, 5, 8};
+    printf("ages[0] = %d", ages[0]);// 1
+    change(ages);
+    printf("ages[0] = %d", ages[0]);// 88
+}
+```
+
+---
+
+### 数组名作函数参数的注意点
+
+- 在函数形参表中,允许不给出形参数组的长度
+
+```c showLineNumbers
+void change(int array[])
+{
+    array[0] = 88;
+}
+```
+
+- 形参数组和实参数组的类型必须一致,否则将引起错误。
+
+```c showLineNumbers
+void prtArray(double array[3]) // 错误写法
+{
+    for (int i = 0; i < 3; i++) {
+        printf("array[%d], %f", i, array[i]);
+    }
+}
+int main(int argc, const char * argv[])
+{
+    int ages[3] = {1, 5, 8};
+    prtArray(ages[0]);
+}
+```
+
+- 当数组名作为函数参数时, 因为自动转换为了指针类型，所以在函数中无法动态计算除数组的元素个数
+
+```c showLineNumbers
+void printArray(int array[])
+{
+    printf("printArray size = %lu\n", sizeof(array)); // 8
+    int length = sizeof(array)/ sizeof(int); // 2
+    printf("length = %d", length);
+}
+```
+
+
+### 二维数组
+
+- 所谓二维数组就是一个一维数组的每个元素又被声明为一 维数组,从而构成二维数组. 可以说二维数组是特殊的一维数组。
+- 示例:
+
+```c showLineNumbers
+int a[2][3] = { {80,75,92}, {61,65,71}};
+```
+
+- 可以看作由一维数组 a[0]和一维数组 a[1]组成，这两个一维数组都包含了 3 个 int 类型的元素
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/c716d53c6b228ea211a524645a5d13a5.png)
+
+
+- 格式:
+
+* 数据类型 数组名[一维数组的个数][一维数组的元素个数]
+* 其中"一维数组的个数"表示当前二维数组中包含多少个一维数组
+* 其中"一维数组的元素个数"表示当前前二维数组中每个一维数组元素的个数
+
+
+### 二维数组的初始化
+
+- 二维数的初始化可分为两种:
+
+* 定义的同时初始化
+* 先定义后初始化
+
+- 定义的同时初始化
+
+```c showLineNumbers
+int a[2][3]={ {80,75,92}, {61,65,71}};
+```
+
+- 先定义后初始化
+
+```c showLineNumbers
+int a[2][3];
+a[0][0] = 80;
+a[0][1] = 75;
+a[0][2] = 92;
+a[1][0] = 61;
+a[1][1] = 65;
+a[1][2] = 71;
+```
+
+- 按行分段赋值
+
+```c showLineNumbers
+int a[2][3]={ {80,75,92}, {61,65,71}};
+```
+
+- 按行连续赋值
+
+```c showLineNumbers
+int a[2][3]={ 80,75,92,61,65,71};
+```
+
+- 其它写法
+
+* 完全初始化,可以省略第一维的长度
+
+```c showLineNumbers
+int a[][3]={{1,2,3},{4,5,6}};int a[][3]={1,2,3,4,5,6};
+```
+
+- 部分初始化,可以省略第一维的长度
+
+```c showLineNumbers
+int a[][3]={{1},{4,5}};int a[][3]={1,2,3,4};
+```
+
+> - 注意: 有些人可能想不明白，为什么可以省略行数，但不可以省略列数。也有人可能会问，可不可以只指定行数，但是省略列数？其实这个问题很简单，如果我们这样写：
+>   `int a[2][] = {1, 2, 3, 4, 5, 6};  // 错误写法`
+>   大家都知道，二维数组会先存放第 1 行的元素，由于不确定列数，也就是不确定第 1 行要存放多少个元素，所以这里会产生很多种情况，可能 1、2 是属于第 1 行的，也可能 1、2、3、4 是第一行的，甚至 1、2、3、4、5、6 全部都是属于第 1 行的
+
+- 指定元素的初始化
+
+```c showLineNumbers
+int a[2][3]={[1][2]=10};int a[2][3]={[1]={1,2,3}}
+```
+
+### 二维数组的应用场景
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/f351a6ed231c8a1a5e6379da6816fd1c.png)
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/dd8a18bdb49031d24c98bc311e80ab78.png)
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/dee64b6cb0f5c043402880d0062d2393.png)
+
+### 二维数组的遍历和存储
+
+### 二维数组的遍历
+
+- 二维数组 a[3][4],可分解为三个一维数组,其数组名分别为:
+
+* 这三个一维数组都有 4 个元素,例如:一维数组 a[0]的 元素为 a[0][0],a[0][1],a[0][2],a[0][3]。
+* 所以遍历二维数组无非就是先取出二维数组中得一维数组, 然后再从一维数组中取出每个元素的值
+
+- 示例
+
+```c showLineNumbers
+    char cs[2][3] = {
+        {'a', 'b', 'c'},
+        {'d', 'e', 'f'}
+    };
+    printf("%c", cs[0][0]);// 第一个[0]取出一维数组, 第二个[0]取出一维数组中对应的元素
+```
+
+```c showLineNumbers
+    char cs[2][3] = {
+        {'a', 'b', 'c'},
+        {'d', 'e', 'f'}
+    };
+    for (int i = 0; i < 2; i++) { // 外循环取出一维数组
+        // i
+        for (int j = 0; j < 3; j++) {// 内循环取出一维数组的每个元素
+            printf("%c", cs[i][j]);
+        }
+        printf("\n");
+    }
+```
+
+> 注意: 必须强调的是,a[0],a[1],a[2]不能当作下标变量使用,它们是数组名,不是一个单纯的下标变量
+
+---
+
+### 二维数组的存储
+
+- 和以为数组一样
+
+* 给数组分配存储空间从内存地址大开始分配
+* 给数组元素分配空间, 从所占用内存地址小的开始分配
+* 往每个元素中存储数据从高地址开始存储
+
+```c showLineNumbers
+#include <stdio.h>
+int main()
+{
+    char cs[2][3] = {
+        {'a', 'b', 'c'},
+        {'d', 'e', 'f'}
+    };
+    // cs == &cs == &cs[0] == &cs[0][0]
+    printf("cs = %p\n", cs);                // 0060FEAA
+    printf("&cs = %p\n", &cs);              // 0060FEAA
+    printf("&cs[0] = %p\n", &cs[0]);        // 0060FEAA
+    printf("&cs[0][0] = %p\n", &cs[0][0]);  // 0060FEAA
+    return 0;
+}
+```
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/b3da2217fbaf93e346a390a47cad9a50.png)
+
+### 二维数组与函数
+
+- 值传递
+
+```c showLineNumbers
+#include <stdio.h>
+
+// 和一位数组一样, 只看形参是基本类型还是数组类型
+// 如果是基本类型在函数中修改形参不会影响实参
+void change(char ch){
+    ch = 'n';
+}
+int main()
+{
+    char cs[2][3] = {
+        {'a', 'b', 'c'},
+        {'d', 'e', 'f'}
+    };
+    printf("cs[0][0] = %c\n", cs[0][0]); // a
+    change(cs[0][0]);
+    printf("cs[0][0] = %c\n", cs[0][0]); // a
+    return 0;
+}
+```
+
+- 地址传递
+
+```c showLineNumbers
+#include <stdio.h>
+
+// 和一位数组一样, 只看形参是基本类型还是数组类型
+// 如果是数组类型在函数中修改形参会影响实参
+void change(char ch[]){
+    ch[0] = 'n';
+}
+int main()
+{
+    char cs[2][3] = {
+        {'a', 'b', 'c'},
+        {'d', 'e', 'f'}
+    };
+    printf("cs[0][0] = %c\n", cs[0][0]); // a
+    change(cs[0]);
+    printf("cs[0][0] = %c\n", cs[0][0]); // n
+    return 0;
+}
+```
+
+```c showLineNumbers
+#include <stdio.h>
+
+// 和一位数组一样, 只看形参是基本类型还是数组类型
+// 如果是数组类型在函数中修改形参会影响实参
+void change(char ch[][3]){
+    ch[0][0] = 'n';
+}
+int main()
+{
+    char cs[2][3] = {
+        {'a', 'b', 'c'},
+        {'d', 'e', 'f'}
+    };
+    printf("cs[0][0] = %c\n", cs[0][0]); // a
+    change(cs);
+    printf("cs[0][0] = %c\n", cs[0][0]); // n
+    return 0;
+}
+```
+
+- 形参错误写法
+
+```c showLineNumbers
+void test(char cs[2][]) // 错误写法
+{
+    printf("我被执行了\n");
+}
+
+void test(char cs[2][3]) // 正确写法
+{
+    printf("我被执行了\n");
+}
+
+void test(char cs[][3]) // 正确写法
+{
+    printf("我被执行了\n");
+}
+```
+
+- 二维数组作为函数参数，在被调函数中不能获得其有多少行，需要通过参数传入
+
+```c showLineNumbers
+void test(char cs[2][3])
+{
+    int row = sizeof(cs); // 输出4或8
+    printf("row = %zu\n", row);
+}
+```
+
+- 二维数组作为函数参数，在被调函数中可以计算出二维数组有多少列
+
+```c showLineNumbers
+void test(char cs[2][3])
+{
+    size_t col = sizeof(cs[0]); // 输出3
+    printf("col = %zd\n", col);
+}
+```
+
+
+### 字符串的基本概念
+
+- 字符串是位于双引号中的字符序列
+
+* 在内存中以“\0”结束,所占字节比实际多一个
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/e0f0831ff1b110569a7e34440ab62e9e.png)
+
+### 字符串的初始化
+
+- 在 C 语言中没有专门的字符串变量,通常用一个字符数组来存放一个字符串。
+- 当把一个字符串存入一个数组时,会把结束符‘\0’存入数组,并以此作为该字符串是否结束的标志。
+- 有了‘\0’标志后,就不必再用字符数组 的长度来判断字符串的长度了
+- 初始化
+
+```c showLineNumbers
+    char name[9] = "lnj"; //在内存中以“\0”结束， \0ASCII码值是0
+    char name1[9] = {'l','n','j','\0'};
+    char name2[9] = {'l','n','j',0};
+    // 当数组元素个数大于存储字符内容时, 未被初始化的部分默认值是0, 所以下面也可以看做是一个字符串
+    char name3[9] = {'l','n','j'};
+```
+
+- 错误的初始化方式
+
+```c showLineNumbers
+    //省略元素个数时, 不能省略末尾的\n
+    // 不正确地写法，结尾没有\0 ，只是普通的字符数组
+    char name4[] = {'l','n','j'};
+
+     //   "中间不能包含\0", 因为\0是字符串的结束标志
+     //    \0的作用：字符串结束的标志
+    char name[] = "c\0ool";
+     printf("name = %s\n",name);
+输出结果: c
+```
+
+### 字符串输出
+
+- 如果字符数组中存储的是一个字符串, 那么字符数组的输入输出将变得简单方便。
+
+* 不必使用循环语句逐个地输入输出每个字符
+* 可以使用 printf 函数和 scanf 函数一次性输出输入一个字符数组中的字符串
+
+- 使用的格式字符串为“%s”,表示输入、输出的是一个字符串 字符串的输出
+- **输出**
+
+* %s 的本质就是根据传入的 name 的地址逐个去取数组中的元素然后输出，直到遇到\0 位置
+
+```c showLineNumbers
+char chs[] = "lnj";
+printf("%s\n", chs);
+```
+
+- 注意点:
+
+* \0 引发的脏读问题
+
+```c showLineNumbers
+char name[] = {'c', 'o', 'o', 'l' , '\0'};
+char name2[] = {'l', 'n', 'j'};
+printf("name2 = %s\n", name2); // 输出结果: lnjcool
+```
+- **输入**
+
+```c showLineNumbers
+char ch[10];
+scanf("%s",ch);
+```
+
+- 注意点:
+
+* 对一个字符串数组, 如果不做初始化赋值, 必须指定数组长度
+* ch 最多存放由 9 个字符构成的字符串，其中最后一个字符的位置要留给字符串的结尾标示‘\0’
+* 当用 scanf 函数输入字符串时,字符串中不能含有空格,否则将以空格作为串的结束符
+
+### 字符串常用方法
+
+- C 语言中供了丰富的字符串处理函数,大致可分为字符串的输入、输出、合并、修改、比较、转 换、复制、搜索几类。
+
+* 使用这些函数可大大减轻编程的负担。
+* 使用输入输出的字符串函数,在使用前应包含头文件"stdio.h"
+* 使用其它字符串函数则应包含头文件"string.h"
+- 字符串输出函数:puts
+- 格式: puts(字符数组名)
+- 功能:把字符数组中的字符串输出到显示器。即在屏幕上显示该字符串。
+- 优点:
+
+* 自动换行
+* 可以是数组的任意元素地址
+
+- 缺点
+
+* 不能自定义输出格式, 例如 puts("hello %i");
+
+```c showLineNumbers
+char ch[] = "lnj";
+puts(ch); //输出结果: lnj
+```
+
+> - puts 函数完全可以由 printf 函数取代。当需要按一定格式输出时,通常使用 printf 函数
+- 字符串输入函数:gets
+- 格式: gets (字符数组名)
+- 功能:从标准输入设备键盘上输入一个字符串。
+
+```c showLineNumbers
+char ch[30];
+gets(ch); // 输入:lnj
+puts(ch); // 输出:lnj
+```
+
+> - 可以看出当输入的字符串中含有空格时,输出仍为全部字符串。说明 gets 函数并不以空格作为字符串输入结束的标志,而只以回车作为输入结束。这是与 scanf 函数不同的。
+> - 注意 gets 很容易导致数组下标越界，是一个不安全的字符串操作函数
+- 字符串长度
+- 利用 sizeof 字符串长度
+
+* 因为字符串在内存中是逐个字符存储的,一个字符占用一个字节,所以字符串的结束符长度也是占用的内存单元的字节数。
+
+```c showLineNumbers
+    char name[] = "it666";
+    int size = sizeof(name);// 包含\0
+    printf("size = %d\n", size); //输出结果:6
+```
+- 利用系统函数
+
+* 格式: strlen(字符数组名)
+* 功能:测字符串的实际长度(不含字符串结束标志‘\0’)并作为函数返回值。
+
+```c showLineNumbers
+    char name[] = "it666";
+    size_t len = strlen(name2);
+    printf("len = %lu\n", len); //输出结果:5
+```
+- 以“\0”为字符串结束条件进行统计
+
+```c showLineNumbers
+/**
+ *  自定义方法计算字符串的长度
+ *  @param name 需要计算的字符串
+ *  @return 不包含\0的长度
+ */
+int myStrlen2(char str[])
+{
+    //    1.定义变量保存字符串的长度
+    int length = 0;
+    while (str[length] != '\0')
+    {
+        length++;//1 2 3 4
+    }
+    return length;
+}
+/**
+ *  自定义方法计算字符串的长度
+ *  @param name  需要计算的字符串
+ *  @param count 字符串的总长度
+ *  @return 不包含\0的长度
+ */
+int myStrlen(char str[], int count)
+{
+//    1.定义变量保存字符串的长度
+    int length = 0;
+//    2.通过遍历取出字符串中的所有字符逐个比较
+    for (int i = 0; i < count; i++) {
+//        3.判断是否是字符串结尾
+        if (str[i] == '\0') {
+            return length;
+        }
+        length++;
+    }
+    return length;
+}
+```
+- 字符串连接函数:strcat
+- 格式: strcat(字符数组名 1,字符数组名 2)
+- 功能:把字符数组 2 中的字符串连接到字符数组 1 中字符串的后面,并删去字符串 1 后的串标志 “\0”。本函数返回值是字符数组 1 的首地址。
+
+```c showLineNumbers
+char oldStr[100] = "welcome to";
+char newStr[20] = " lnj";
+strcat(oldStr, newStr);
+puts(oldStr); //输出: welcome to lnj"
+```
+
+> - 本程序把初始化赋值的字符数组与动态赋值的字符串连接起来。要注意的是,字符数组 1 应定义足 够的长度,否则不能全部装入被连接的字符串。
+- 字符串拷贝函数:strcpy
+  `- 格式: strcpy(字符数组名1,字符数组名2)
+`- 功能:把字符数组 2 中的字符串拷贝到字符数组 1 中。串结束标志“\0”也一同拷贝。字符数名 2, 也可以是一个字符串常量。这时相当于把一个字符串赋予一个字符数组。
+
+```c showLineNumbers
+char oldStr[100] = "welcome to";
+char newStr[50] = " lnj";
+strcpy(oldStr, newStr);
+puts(oldStr); // 输出结果:  lnj // 原有数据会被覆盖
+```
+
+> - 本函数要求字符数组 1 应有足够的长度,否则不能全部装入所拷贝的字符串。
+- 字符串比较函数:strcmp
+- 格式: strcmp(字符数组名 1,字符数组名 2)
+- 功能:按照 ASCII 码顺序比较两个数组中的字符串,并由函数返回值返回比较结果。
+
+* 字符串 1=字符串 2,返回值=0;
+* 字符串 1`>`字符串 2,返回值`>`0;
+* 字符串 1`<`字符串 2,返回值`<`0。
+
+```c showLineNumbers
+    char oldStr[100] = "0";
+    char newStr[50] = "1";
+    printf("%d", strcmp(oldStr, newStr)); //输出结果:-1
+    char oldStr[100] = "1";
+    char newStr[50] = "1";
+    printf("%d", strcmp(oldStr, newStr));  //输出结果:0
+    char oldStr[100] = "1";
+    char newStr[50] = "0";
+    printf("%d", strcmp(oldStr, newStr)); //输出结果:1
+```
+
+
+
+## 结构体
+
+
+## 联合体

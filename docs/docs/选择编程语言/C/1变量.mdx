@@ -37,15 +37,14 @@ int value;
 value = 998; 
 
 // 定义时同时初始化
-int b = 4;
+int a = 4;
 
 // 连续定义多个变量，之间用逗号(,)号隔开
 int b = 4, c = 2;
 
 // 结合使用
-int a = 1, b = 2, c , d;
-c = 2;
-d = 3;
+int  d = 3, e;
+e = 5;
 
 // 多次赋值每次赋值都会覆盖原来的值
 int i = 10;
@@ -64,8 +63,7 @@ int b = a; // 相当于把a中存储的10拷贝了一份给b
 
 ## 常量
 
-定义常量有两种方式：`#define 常量名 常量值` 和 `const 数据类型 常量名 = 常量值;`
-
+定义**单个**常量有两种方式：`#define 常量名 常量值` 和 `const 数据类型 常量名 = 常量值;`
 
 - <Highlight>常量必须在定义时就初始化，不能先定义后赋值</Highlight>
 - <Highlight>常量名通常使用大写字母，遵循标识符的命名规则</Highlight>
@@ -74,26 +72,11 @@ int b = a; // 相当于把a中存储的10拷贝了一份给b
 :::info
 **#define 与 const 的区别**
 
-- **#define**: 没有类型检查。在编译预处理阶段进行简单的文本替换，不占用内存空间。
-- **const**: 有类型检查。在编译时进行类型检查，有明确的数据类型，占用内存空间。
+- **#define**: 没有类型检查。在编译预处理阶段进行简单的文本替换，不占用内存空间，不能直接一行定义多个。仅能定义整型常量。
+- **const**: 有类型检查。在编译时进行类型检查，有明确的数据类型，占用内存空间，可以直接一行定义多个。可以定义多种数据：整数常量、浮点数常量、数组等等。
 
-推荐使用 `const` 关键字。
+`const` 提供了更好的类型安全性和调试支持，是现代 C 编程的首选方式。
 :::
-
-### const
-
-```c showLineNumbers
-#include <stdio.h>
-
-int main(){
-    // 在程序中使用 const 关键字
-    const int MAX_SIZE = 100;
-    printf("MAX_SIZE = %d\n", MAX_SIZE);
-    return 0;
-}
-```
-
-
 ### #define
 
 ```c showLineNumbers
@@ -106,6 +89,120 @@ int main(){
     return 0;
 }
 ```
+
+### const
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main(){
+    // 在程序中使用 const 关键字
+    const int MAX_SIZE = 100;
+    // 一行定义多个 const 常量
+    const int MIN_SIZE = 10, DEFAULT_SIZE = 50;
+    // 定义多个 const 常量推荐分开写更清晰
+    const double AAA = 100.0, 
+                 BBB = 200.0, 
+                 CCC = 300.0;
+    printf("MAX_SIZE = %d\n", MAX_SIZE);
+    return 0;
+}
+```
+
+### enum
+
+枚举的类型的主要作用是提高代码的可读性。枚举在本质上更接近`#define`定义的整型常量，不支持浮点数和数组，多用作常量集合。了解基本使用即可。
+
+枚举主要是通过标识符赋值让你原本的数组更便于理解，你可以理解为`#define`的升级版。
+
+<Highlight color="#96cf54">枚举类型是基本数据类型(非构造类型)，表示有限集合的特殊类型，</Highlight>
+
+在实际生活中,有些变量的取值被限定在一个确定的范围内。例如：考试评分等级为A、B、C。星期的范围是1-7。
+
+“枚举”类型的定义中列举出所有可能的取值, 被说明为该“枚举”类型的变量取值不能超过定义的范围。
+
+* C 语言编译器会将枚举元素作为**整型常量**处理，称为枚举常量。
+* 枚举元素的值取决于定义时各枚举元素排列的先后顺序。未定义的情况下，元素值为前一个元素加 1，如果首个元素未定义则值为 0。
+* 也可以在定义枚举类型时改变枚举元素的值
+* 枚举内已经用过的标识符名称不能再用。
+
+枚举类型的定义格式:
+
+```c showLineNumbers
+enum　枚举名　{
+    枚举元素1,
+    枚举元素2,
+    ……
+};
+```
+
+#### 枚举的定义
+
+```c showLineNumbers
+#include <stdio.h>
+enum Demo {
+    Spring,      // 第一个枚举元素的值未定义，所以为 0
+    // Spring = 100, // 已经用过的标识符不能再用，会报错。
+    Summer = 10, // 第二个枚举元素定义值，所以为 10
+    Autumn,      // 第三个枚举元素未定义，所以为前一个元素加 1，即 11
+    Winter = 'A', // 第四个枚举元素定义值为char，所以为 'A'对应的ASCII码值 65
+    A,            // 第五个枚举元素未定义，所以为前一个元素加 1，即 66
+    //B = 1.0,      // ❌第六个枚举元素定义值为浮点数，会报错
+}; 
+
+int main(int argc, const char * argv[]) {
+    // 定义枚举变量 s
+    // 把 enum Demo 看作一个类型整体，类比 int，那这里写法和 int s; 是一样的
+    // 可以在初始化时赋值
+    // 也可以仅标识，在后续赋值  enum Demo s;
+    enum Demo s = Spring;
+    printf("s = %d\n", s); // 0
+    // 可以赋值为其他枚举元素
+    s = Summer;
+    printf("s = %d\n", s); // 10
+    s = Autumn;
+    printf("s = %d\n", s); // 11
+    s = Winter;
+    printf("s = %d\n", s); // 65
+    s = A;
+    printf("s = %d\n", s); // 66
+    // 枚举主要是通过标识符赋值让你原本的数组更便于理解，不阻止你直接赋值为数值
+    // 也可以赋值为枚举元素以外的值
+    s = 100; 
+    printf("s = %d\n", s); // 100
+    return 0;
+}
+```
+
+#### 枚举类型变量的赋值和使用
+
+```c showLineNumbers
+
+enum Season {
+    Spring,
+    Summer,
+    Autumn,
+    Winter
+} s;//直接在定义枚举类型时，定义枚举变量。
+
+//等价于 enum Season s;
+
+
+s = Spring; // 等价于 s = 0;
+// 也可以赋值为枚举元素以外的值
+s = 3; // 等价于 s = winter;
+printf("%d", s);
+
+
+// 枚举变量可以省略类型，直接赋值
+enum {
+    A,
+    B,
+} Num;
+
+```
+
+
 
 ## 作用域
 
@@ -264,7 +361,9 @@ int main(){
 | **浮点数类型** |
 | f     | float/double（默认保留 6 位小数）   | `%f` |
 | lf    | double（推荐用法）                  | `%lf` |
+| Lf    | long double（扩展精度浮点型）        | `%Lf` |
 | e / E | 科学计数法输出浮点数                | `%e`, `%E` |
+| Le / LE | long double（科学计数法）           | `%Le`, `%LE` |
 | g / G | 自动选择最短格式输出浮点数          | `%g`, `%G` |
 | **特殊类型** |
 | p     | 指针地址                            | `%p` |

@@ -11,9 +11,13 @@ class TrafficLight(Enum):
     RED = 1
     YELLOW = 2
     GREEN = 3
-    # YELLOW = 1  #常见错误：将枚举成员的值设置为相同类型
-    # RED = [255, 0, 0] # 常见错误：错误地将枚举成员的值设置为可变类型
-    # YELLOW = None # 常见错误：错误地将枚举成员的值设置为None、False、True等
+    # GREEN = 4 # 错误：枚举成员的值不支持重新定义
+
+    # 不推荐的写法，不符合使用枚举的目的
+    A = None # 将枚举成员的值设置为None、False、True等
+    B = [255, 0, 0] # 将枚举成员的值设置为可变类型
+    C = 1 # 将枚举成员的值设置为与其他枚举成员的值相同
+
 # 使用枚举
 light = TrafficLight.RED
 

@@ -1,0 +1,1079 @@
+---
+sidebar_position: 10
+title: （编写中）指针
+---
+
+
+## 指针基本概念
+
+- 什么是地址
+
+* 生活中的地址:
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/9485373b7cb46f41f6c996303419ba4c.png)
+* 内存地址:
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/e46d975be9e95178136726209b2c237f.png)
+
+- 地址与内存单元中的数据是两个完全不同的概念
+
+* 地址如同房间编号, 根据这个编号我们可以找到对应的房间
+* 内存单元如同房间, 房间是专门用于存储数据的
+
+- 变量地址:
+
+* 系统分配给"变量"的"内存单元"的起始地址
+
+```c showLineNumbers
+int num = 6; // 占用4个字节
+//那么变量num的地址为: 0ff06
+
+char c = 'a'; // 占用1个字节
+//那么变量c的地址为:0ff05
+```
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/13eb965757dd130d813a953506335b89.png)
+
+---
+
+## 什么是指针
+
+- 在计算机中所有数据都存储在内存单元中,而每个内存单元都有一个对应的地址, 只要通过这个地址就能找到对应单元中存储的数据.
+- 由于通过地址能找到所需的变量单元，所以我们说该地址指向了该变量单元。将地址形象化的称为“指针”
+
+- 内存单元的指针(地址)和内存单元的内容是两个不同的概念。
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/540000371e0da0fb105248642ef9db24.png)
+
+## 什么是指针变量
+
+- 在 C 语言中,允许用一个变量来存放其它变量的地址, 这种专门用于存储其它变量地址的变量, 我们称之为指针变量
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/02442ae9685e56146470369e56ca18ab.png)
+- 示例:
+
+```bash showLineNumbers
+    int age;// 定义一个普通变量
+    num = 10;
+    int *pnAge; // 定义一个指针变量
+    pnAge = &age;
+```
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/8b7b4d0976ad6e192e3ad6e26282fa8a.png)
+
+## 定义指针变量的格式
+
+- 指针变量的定义包括两个内容:
+
+* 指针类型说明,即定义变量为一个指针变量;
+* 指针变量名;
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/c051703dcae8535c264ef47c20881b53.png)
+
+- 示例:
+
+```c showLineNumbers
+char ch = 'a';
+char *p; // 一个用于指向字符型变量的指针
+p = &ch;
+int num = 666;
+int *q; // 一个用于指向整型变量的指针
+q = &num;
+```
+
+> - 其中,\*表示这是一个指针变量
+> - 变量名即为定义的指针变量名
+> - 类型说明符表示本指针变量所指向的变量的数据类型
+
+---
+
+## 指针变量的初始化方法
+
+- 指针变量初始化的方法有两种:定义的同时进行初始化和先定义后初始化
+
+* 定义的同时进行初始化
+
+```c showLineNumbers
+int a = 5;
+int *p = &a;
+```
+
+- 先定义后初始化
+
+```c showLineNumbers
+int a = 5;
+int *p;
+p=&a;
+```
+
+- 把指针初始化为 NULL
+
+```c showLineNumbers
+int *p=NULL;
+int *q=0;
+```
+
+- 不合法的初始化:
+
+* 指针变量只能存储地址, 不能存储其它类型
+
+```c showLineNumbers
+int *p;
+p =  250; // 错误写法
+```
+
+- 给指针变量赋值时,指针变量前不能再加“\*”
+
+```c showLineNumbers
+int *p;
+*p=&a; //错误写法
+```
+
+- 注意点:
+
+* 多个指针变量可以指向同一个地址
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/d4c9b29d8ddb808d1a12252fdcdf538a.png)
+
+- 指针的指向是可以改变的
+
+```c showLineNumbers
+int a = 5;
+int *p = &a;
+int b = 10;
+p = &b; // 修改指针指向
+```
+
+- 指针没有初始化里面是一个垃圾值,这时候我们这是一个野指针
+
+* 野指针可能会导致程序崩溃
+* 野指针访问你不该访问数据
+* 所以指针必须初始化才可以访问其所指向存储区域
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/e38cdad483acddca8cfcd85e7ac0be78.png)
+
+## 访问指针所指向的存储空间
+
+- C 语言中提供了地址运算符&来表示变量的地址。其一般形式为:
+
+* &变量名;
+
+- C 语言中提供了\*来定义指针变量和访问指针变量指向的内存存储空间
+
+* 在定义变量的时候 \* 是一个类型说明符,说明定义的这个变量是一个指针变量
+
+```c showLineNumbers
+int *p=NULL; // 定义指针变量
+```
+
+- 在不是定义变量的时候 \*是一个操作符,代表访问指针所指向存储空间
+
+```c showLineNumbers
+int a = 5;
+int *p = &a;
+printf("a = %d", *p); // 访问指针变量
+```
+
+## 指针类型
+
+- 在同一种编译器环境下,一个指针变量所占用的内存空间是固定的。
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/a95f575889111ad8d64cc2c1aa8ecb1e.png)
+
+- 虽然在同一种编译器下, 所有指针占用的内存空间是一样的,但不同类型的变量却占不同的字节数
+
+* 一个 int 占用 4 个字节，一个 char 占用 1 个字节，而一个 double 占用 8 字节；
+* 现在只有一个地址，我怎么才能知道要从这个地址开始向后访问多少个字节的存储空间呢，是 4 个，是 1 个，还是 8 个。
+* 所以指针变量需要它所指向的数据类型告诉它要访问多少个字节存储空间
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/af1fd05a523d9ba4e196e326f537589b.png)
+
+---
+
+## 二级指针
+
+- 如果一个指针变量存放的又是另一个指针变量的地址,则称这个指针变量为指向指针的指针 ￼ 变量。也称为“二级指针”
+
+```c showLineNumbers
+    char c = 'a';
+    char *cp;
+    cp = &c;
+    char **cp2;
+    cp2 = &cp;
+    printf("c = %c", **cp2);
+```
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/af331163ce03df7573810fc05ceb03c6.png)
+
+- 多级指针的取值规则
+
+```c showLineNumbers
+int ***m1;  //取值***m1
+int *****m2; //取值*****m2
+```
+
+---
+
+## 练习
+
+- 定义一个函数交换两个变量的值
+- 写一个函数，同时返回两个数的和与差
+
+## 数组指针的概念及定义
+
+- 数组元素指针
+
+* 一个变量有地址,一个数组包含若干元素,每个数组元素也有相应的地址, 指针变量也可以保存数组元素的地址
+* 只要一个指针变量保存了数组元素的地址, 我们就称之为数组元素指针
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/69b98c6401a04bf8fce52a78c80b9565.png)
+
+```c showLineNumbers
+    printf(“%p %p”, &(a[0]), a); //输出结果:0x1100, 0x1100
+```
+
+> - 注意: 数组名 a 不代表整个数组,只代表数组首元素的地址。
+> - “p=a;”的作用是“把 a 数组的首元素的地址赋给指针变量 p”,而不是“把数组 a 各元素的值赋给 p”
+
+##
+
+## 指针访问数组元素
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/13c0dd997ce619b1249220ce09610ad4.png)
+
+```c showLineNumbers
+    int main (void)
+{
+      int a[5] = {2, 4, 6, 8, 22};
+      int *p;
+      // p = &(a[0]);
+      p = a;
+      printf(“%d %d\n”,a[0],*p); // 输出结果: 2, 2
+}
+
+```
+
+- 在指针指向数组元素时,允许以下运算:
+
+* 加一个整数(用+或+=),如 p+1
+* 减一个整数(用-或-=),如 p-1
+* 自加运算,如 p++,++p
+* 自减运算,如 p--,--p
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/6c563fff4c62724055337604c2d31623.png)
+
+> - 如果指针变量 p 已指向数组中的一个元素,则 p+1`指向`同一数组中的下一个元素,p-1`指向`同 一数组中的上一个元素。
+
+- 结论: 访问数组元素,可用下面两种方法:
+
+* 下标法, 如 a[i]形式
+* 指针法, \*(p+i)形式
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/e00312fbc775c04e2a449d7d8d473eb9.png)
+
+- 注意:
+
+* 数组名虽然是数组的首地址，但是数组名所所保存的数组的首地址是不可以更改的
+
+```c showLineNumbers
+  int x[10];
+	x++;  //错误
+	int* p = x;
+	p++; //正确
+```
+
+##
+
+## 指针与字符串
+
+- 定义字符串的两种方式
+
+* 字符数组
+
+```c showLineNumbers
+char string[]=”I love lnj!”;
+printf("%s\n",string);
+```
+
+- 字符串指针指向字符串
+
+```c showLineNumbers
+// 数组名保存的是数组第0个元素的地址, 指针也可以保存第0个元素的地址
+char *str = "abc"
+```
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/cb21fae540cb3290bbc41e7e223d3a41.png)
+
+- 字符串指针使用注意事项
+
+* 可以查看字符串的每一个字符
+
+```c showLineNumbers
+har *str = "lnj";
+for(int i = 0; i < strlen(str);i++)
+{
+  printf("%c-", *(str+i)); // 输出结果:l-n-j
+}
+```
+
+- - 不可以修改字符串内容
+
+```c showLineNumbers
+//   + 使用字符数组来保存的字符串是保存栈里的,保存栈里面东西是可读可写,所有可以修改字符串中的的字符
+//   + 使用字符指针来保存字符串,它保存的是字符串常量地址,常量区是只读的,所以我们不可以修改字符串中的字符
+char *str = "lnj";
+*(str+2) = 'y'; // 错误
+```
+
+- - 不能够直接接收键盘输入
+
+```c showLineNumbers
+// 错误的原因是:str是一个野指针,他并没有指向某一块内存空间
+// 所以不允许这样写如果给str分配内存空间是可以这样用 的
+char *str;
+scanf("%s", str);
+```
+
+## 指向函数指针
+
+- 为什么指针可以指向一个函数？
+
+* 函数作为一段程序，在内存中也要占据部分存储空间，它也有一个起始地址
+* 函数有自己的地址，那就好办了，我们的指针变量就是用来存储地址的。
+* 因此可以利用一个指针指向一个函数。其中，函数名就代表着函数的地址。
+
+- 指针函数的定义
+
+* 格式: `返回值类型 (*指针变量名)(形参1, 形参2, ...);`
+
+```c showLineNumbers
+    int sum(int a,int b)
+    {
+        return a + b;
+    }
+
+    int (*p)(int,int);
+    p = sum;
+```
+
+- 指针函数定义技巧
+
+* 1、把要指向函数头拷贝过来
+* 2、把函数名称使用小括号括起来
+* 3、在函数名称前面加上一个\*
+* 4、修改函数名称
+
+- 应用场景
+
+* 调用函数
+* 将函数作为参数在函数间传递
+
+- 注意点:
+
+* 由于这类指针变量存储的是一个函数的入口地址，所以对它们作加减运算(比如 p++)是无意义的
+* 函数调用中"(指针变量名)"的两边的括号不可少,其中的不应该理解为求值运算,在此处它 只是一种表示符号
+
+## 什么是结构体
+
+- 结构体和数组一样属于构造类型
+- 数组是用于保存一组相同类型数据的, 而结构体是用于保存一组不同类型数组的
+- 例如,在学生登记表中,姓名应为字符型;学号可为整型或字符型;年龄应为整型;性别应为字符型;成绩可为整型或实型。
+- 显然这组数据不能用数组来存放, 为了解决这个问题,C 语言中给出了另一种构造数据类型——“结构(structure)”或叫“结构体”。
+
+---
+
+## 定义结构体类型
+
+- 在使用结构体之前必须先定义结构体类型, 因为 C 语言不知道你的结构体中需要存储哪些类型数据, 我们必须通过定义结构体类型来告诉 C 语言, 我们的结构体中需要存储哪些类型的数据
+- 格式:
+
+```c showLineNumbers
+struct　结构体名{
+     类型名1　成员名1;
+     类型名2　成员名2;
+     ……
+     类型名n　成员名n;
+ };
+```
+
+- 示例:
+
+```c showLineNumbers
+struct Student {
+    char *name; // 姓名
+    int age; // 年龄
+    float height; // 身高
+};
+```
+
+---
+
+## 定义结构体变量
+
+- 定好好结构体类型之后, 我们就可以利用我们定义的结构体类型来定义结构体变量
+- 格式: `struct 结构体名 结构体变量名;`
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/a19ef99bede1b3b0d689959881390bd0.png)
+
+- 先定义结构体类型，再定义变量
+
+```c showLineNumbers
+struct Student {
+     char *name;
+     int age;
+ };
+
+ struct Student stu;
+```
+
+- 定义结构体类型的同时定义变量
+
+```c showLineNumbers
+struct Student {
+    char *name;
+    int age;
+} stu;
+```
+
+- 匿名结构体定义结构体变量
+
+```c showLineNumbers
+struct {
+    char *name;
+    int age;
+} stu;
+```
+
+> - 第三种方法与第二种方法的区别在于,第三种方法中省去了结构体类型名称,而直接给出结构变量,这种结构体最大的问题是结构体类型不能复用
+
+---
+
+## 结构体成员访问
+
+- 一般对结构体变量的操作是以成员为单位进行的，引用的一般形式为：`结构体变量名.成员名`
+
+```c showLineNumbers
+struct Student {
+     char *name;
+     int age;
+ };
+ struct Student stu;
+ // 访问stu的age成员
+ stu.age = 27;
+ printf("age = %d", stu.age);
+```
+
+---
+
+## 结构体变量的初始化
+
+- 定义的同时按顺序初始化
+
+```c showLineNumbers
+struct Student {
+     char *name;
+     int age;
+ };
+struct Student stu = {“lnj", 27};
+```
+
+- 定义的同时不按顺序初始化
+
+```c showLineNumbers
+struct Student {
+     char *name;
+     int age;
+ };
+struct Student stu = {.age = 35, .name = “lnj"};
+```
+
+- 先定义后逐个初始化
+
+```c showLineNumbers
+struct Student {
+     char *name;
+     int age;
+ };
+ struct Student stu;
+stu.name = "lnj";
+stu.age = 35;
+```
+
+- 先定义后一次性初始化
+
+```c showLineNumbers
+struct Student {
+     char *name;
+     int age;
+ };
+struct Student stu;
+stu2 = (struct Student){"lnj", 35};
+```
+
+---
+
+## 结构体类型作用域
+
+- 结构类型定义在函数内部的作用域与局部变量的作用域是相同的
+
+* 从定义的那一行开始, 直到遇到 return 或者大括号结束为止
+
+- 结构类型定义在函数外部的作用域与全局变量的作用域是相同的
+
+* 从定义的那一行开始,直到本文件结束为止
+
+```c showLineNumbers
+//定义一个全局结构体,作用域到文件末尾
+struct Person{
+    int age;
+    char *name;
+};
+
+int main(int argc, const char * argv[])
+{
+    //定义局部结构体名为Person,会屏蔽全局结构体
+    //局部结构体作用域,从定义开始到“}”块结束
+    struct Person{
+        int age;
+    };
+    // 使用局部结构体类型
+    struct Person pp;
+    pp.age = 50;
+    pp.name = "zbz";
+
+    test();
+    return 0;
+}
+
+void test() {
+
+    //使用全局的结构体定义结构体变量p
+    struct Person p = {10,"sb"};
+    printf("%d,%s\n",p.age,p.name);
+}
+```
+
+## 结构体数组
+
+- 结构体数组和普通数组并无太大差异, 只不过是数组中的元素都是结构体而已
+- 格式: `struct 结构体类型名称 数组名称[元素个数]`
+
+```c showLineNumbers
+struct Student {
+    char *name;
+    int age;
+};
+struct Student stu[2];
+```
+
+- 结构体数组初始化和普通数组也一样, 分为先定义后初始化和定义同时初始化
+  - 定义同时初始化
+
+```c showLineNumbers
+struct Student {
+    char *name;
+    int age;
+};
+struct Student stu[2] = {{"lnj", 35},{"zs", 18}};
+```
+
+- - 先定义后初始化
+
+```c showLineNumbers
+struct Student {
+    char *name;
+    int age;
+};
+struct Student stu[2];
+stu[0] = {"lnj", 35};
+stu[1] = {"zs", 18};
+```
+
+## 结构体指针
+
+- 一个指针变量当用来指向一个结构体变量时,称之为结构体指针变量
+- 格式: `struct 结构名 *结构指针变量名`
+- 示例:
+
+```c showLineNumbers
+      // 定义一个结构体类型
+      struct Student {
+          char *name;
+          int age;
+      };
+
+     // 定义一个结构体变量
+     struct Student stu = {“lnj", 18};
+
+     // 定义一个指向结构体的指针变量
+     struct Student *p;
+
+    // 指向结构体变量stu
+    p = &stu;
+
+     /*
+      这时候可以用3种方式访问结构体的成员
+      */
+     // 方式1：结构体变量名.成员名
+     printf("name=%s, age = %d \n", stu.name, stu.age);
+
+     // 方式2：(*指针变量名).成员名
+     printf("name=%s, age = %d \n", (*p).name, (*p).age);
+
+     // 方式3：指针变量名->成员名
+     printf("name=%s, age = %d \n", p->name, p->age);
+
+     return 0;
+ }
+```
+
+- 通过结构体指针访问结构体成员, 可以通过以下两种方式
+
+* (\*结构指针变量).成员名
+* 结构指针变量->成员名(用熟)
+
+> - (pstu)两侧的括号不可少,因为成员符“.”的优先级高于“”。
+> - 如去掉括号写作 pstu.num 则等效于(pstu.num),这样,意义就完全不对了。
+
+## 结构体内存分析
+
+- 给结构体变量开辟存储空间和给普通开辟存储空间一样, 会从内存地址大的位置开始开辟
+- 给结构体成员开辟存储空间和给数组元素开辟存储空间一样, 会从所占用内存地址小的位置开始开辟
+- 结构体变量占用的内存空间永远是所有成员中占用内存最大成员的倍数(对齐问题)
+
+> +多实际的计算机系统对基本类型数据在内存中存放的位置有限制,它们会要求这些数据的起始地址的值是 某个数 k 的倍数,这就是所谓的内存对齐,而这个 k 则被称为该数据类型的对齐模数(alignment modulus)。
+>
+> - 这种强制的要求一来简化了处理器与内存之间传输系统的设计,二来可以提升读取数据的速度。比如这么一种处理器,它每次读写内存的时候都从某个 8 倍数的地址开始,一次读出或写入 8 个字节的数据,假如软件能 保证 double 类型的数据都从 8 倍数地址开始,那么读或写一个 double 类型数据就只需要一次内存操作。否则,我们就可能需要两次内存操作才能完成这个动作,因为数据或许恰好横跨在两个符合对齐要求的 8 字节 内存块上
+
+## 结构体变量占用存储空间大小
+
+```c showLineNumbers
+    struct Person{
+        int age; // 4
+        char ch; // 1
+        double score; // 8
+    };
+    struct Person p;
+    printf("sizeof = %i\n", sizeof(p)); // 16
+```
+
+- 占用内存最大属性是 score, 占 8 个字节, 所以第一次会分配 8 个字节
+- 将第一次分配的 8 个字节分配给 age4 个,分配给 ch1 个, 还剩下 3 个字节
+- 当需要分配给 score 时, 发现只剩下 3 个字节, 所以会再次开辟 8 个字节存储空间
+- 一共开辟了两次 8 个字节空间, 所以最终 p 占用 16 个字节
+
+```c showLineNumbers
+    struct Person{
+        int age; // 4
+        double score; // 8
+        char ch; // 1
+    };
+    struct Person p;
+    printf("sizeof = %i\n", sizeof(p)); // 24
+```
+
+- 占用内存最大属性是 score, 占 8 个字节, 所以第一次会分配 8 个字节
+- 将第一次分配的 8 个字节分配给 age4 个,还剩下 4 个字节
+- 当需要分配给 score 时, 发现只剩下 4 个字节, 所以会再次开辟 8 个字节存储空间
+- 将新分配的 8 个字节分配给 score, 还剩下 0 个字节
+- 当需要分配给 ch 时, 发现上一次分配的已经没有了, 所以会再次开辟 8 个字节存储空间
+- 一共开辟了 3 次 8 个字节空间, 所以最终 p 占用 24 个字节
+
+## 结构体嵌套定义
+
+- 成员也可以又是一个结构,即构成了嵌套的结构
+
+```c showLineNumbers
+struct Date{
+     int month;
+     int day;
+     int year;
+}
+struct  stu{
+     int num;
+    char *name;
+    char sex;
+    struct Date birthday;
+    Float score;
+}
+```
+
+- 在 stu 中嵌套存储 Date 结构体内容
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/de4aedd768012888dc7b2e70a744c86d.png)
+
+> - 注意:
+> - 结构体不可以嵌套自己变量,可以嵌套指向自己这种类型的指针
+>
+> ```c showLineNumbers
+> struct Student {
+>  int age;
+>  struct Student stu;
+> };
+> ```
+
+- 对嵌套结构体成员的访问
+  - 如果某个成员也是结构体变量，可以连续使用成员运算符"."访问最低一级成员
+
+```c showLineNumbers
+struct Date {
+       int year;
+       int month;
+       int day;
+  };
+
+  struct Student {
+      char *name;
+      struct Date birthday;
+ };
+
+ struct Student stu;
+ stu.birthday.year = 1986;
+ stu.birthday.month = 9;
+ stu.birthday.day = 10;
+```
+
+---
+
+## 结构体和函数
+
+- 结构体虽然是构造类型, 但是结构体之间赋值是值拷贝, 而不是地址传递
+
+```c showLineNumbers
+    struct Person{
+        char *name;
+        int age;
+    };
+    struct Person p1 = {"lnj", 35};
+    struct Person p2;
+    p2 = p1;
+    p2.name = "zs"; // 修改p2不会影响p1
+    printf("p1.name = %s\n", p1.name); // lnj
+    printf("p2.name = %s\n", p2.name); //  zs
+```
+
+- 所以结构体变量作为函数形参时也是值传递, 在函数内修改形参, 不会影响外界实参
+
+```c showLineNumbers
+#include <stdio.h>
+
+struct Person{
+    char *name;
+    int age;
+};
+
+void test(struct Person per);
+
+int main()
+{
+    struct Person p1 = {"lnj", 35};
+    printf("p1.name = %s\n", p1.name); // lnj
+    test(p1);
+    printf("p1.name = %s\n", p1.name); // lnj
+    return 0;
+}
+void test(struct Person per){
+    per.name = "zs";
+}
+```
+
+## 共用体
+
+- 和结构体不同的是, 结构体的每个成员都是占用一块独立的存储空间, 而共用体所有的成员都占用同一块存储空间
+- 和结构体一样, 共用体在使用之前必须先定义共用体类型, 再定义共用体变量
+- 定义共用体类型格式:
+
+```c showLineNumbers
+union 共用体名{
+    数据类型 属性名称;
+    数据类型 属性名称;
+    ...   ....
+};
+```
+
+- 定义共用体类型变量格式:
+
+```c showLineNumbers
+union 共用体名 共用体变量名称;
+```
+
+- 特点: 由于所有属性共享同一块内存空间, 所以只要其中一个属性发生了改变, 其它的属性都会受到影响
+- 示例:
+
+```c showLineNumbers
+    union Test{
+        int age;
+        char ch;
+    };
+    union Test t;
+    printf("sizeof(p) = %i\n", sizeof(t));
+
+    t.age = 33;
+    printf("t.age = %i\n", t.age); // 33
+    t.ch = 'a';
+    printf("t.ch = %c\n", t.ch); // a
+    printf("t.age = %i\n", t.age); // 97
+```
+
+- 共用体的应用场景
+  - （1）通信中的数据包会用到共用体，因为不知道对方会发送什么样的数据包过来，用共用体的话就简单了，定义几种格式的包，收到包之后就可以根据包的格式取出数据。
+  - （2）节约内存。如果有 2 个很长的数据结构，但不会同时使用，比如一个表示老师，一个表示学生，要统计老师和学生的情况，用结构体就比较浪费内存，这时就可以考虑用共用体来设计。 +（3）某些应用需要大量的临时变量，这些变量类型不同，而且会随时更换。而你的堆栈空间有限，不能同时分配那么多临时变量。这时可以使用共用体让这些变量共享同一个内存空间，这些临时变量不用长期保存，用完即丢，和寄存器差不多，不用维护。
+
+
+## 带参数的宏定义
+
+- C 语言允许宏带有参数。在宏定义中的参数称为形式参数,在宏调用中的参数称为实际参数。对带参数的宏,在调用中,不仅要宏展开,而且要用实参去代换形参
+- 格式: `#define 宏名(形参表) 字符串`
+
+```c showLineNumbers
+// 第1行中定义了一个带有2个参数的宏average，
+#define average(a, b) (a+b)/2
+
+int main ()
+  {
+  // 第4行其实会被替换成：int a = (10 + 4)/2;，
+    int a = average(10, 4);
+  // 输出结果为：7
+  // 是不是感觉这个宏有点像函数呢？
+    printf("平均值：%d", a);
+    return 0;
+ }
+```
+
+- **注意点:**
+- 1)宏名和参数列表之间不能有空格，否则空格后面的所有字符串都作为替换的字符串.
+
+```c showLineNumbers
+#define average (a, b) (a+b)/2
+
+ int main ()
+ {
+     int a = average(10, 4);
+     return 0;
+ }
+注意第1行的宏定义，宏名average跟(a, b)之间是有空格的，于是，第5行就变成了这样：
+int a = (a, b) (a+b)/2(10, 4);
+这个肯定是编译不通过的
+```
+
+- 2)带参数的宏在展开时，只作简单的字符和参数的替换，不进行任何计算操作。所以在定义宏时，一般用一个小括号括住字符串的参数。
+
+```c showLineNumbers
+#include <stdio.h>
+  // 下面定义一个宏D(a)，作用是返回a的2倍数值：
+  #define D(a) 2*a
+  // 如果定义宏的时候不用小括号括住参数
+
+  int main ()
+  {
+  // 将被替换成int b = 2*3+4;，输出结果10，如果定义宏的时候用小括号括住参数，把上面的第3行改成：#define D(a) 2*(a)，注意右边的a是有括号的，第7行将被替换成int b = 2*(3+4);，输出结果14
+
+     int b = D(3+4);
+     printf("%d", b);
+     return 0;
+ }
+```
+
+- 3)计算结果最好也用括号括起来
+
+```c showLineNumbers
+#include <stdio.h>
+// 下面定义一个宏P(a)，作用是返回a的平方
+#define Pow(a) (a) * (a) // 如果不用小括号括住计算结果
+
+int main(int argc, const char * argv[])      {
+// 代码被替换为:int b = (10) * (10) / (2) * (2);
+// 简化之后：int b = 10 * (10 / 2) * 2;，最后变量b为:100
+      int b = Pow(10) / Pow(2);
+
+      printf("%d", b);
+      return 0;
+}
+```
+
+```c showLineNumbers
+#include <stdio.h>
+// 计算结果用括号括起来
+#define Pow(a) ( (a) * (a) )
+
+int main(int argc, const char * argv[])      {
+// 代码被替换为:int b = ( (10) * (10) ) / ( (2) * (2) );
+// 简化之后：int b = (10 * 10) / (2 *2);，最后输出结果：25
+      int b = Pow(10) / Pow(2);
+
+      printf("%d", b);
+      return 0;
+}
+```
+
+## typedef 关键字
+
+- C 语言不仅 􏰀 供了丰富的数据类型,而且还允许由用户自己定义类型说明符,也就是说允许由用户为数据类型取“别名”。
+- 格式: `typedef 原类型名 新类型名;`
+
+* 其中原类型名中含有定义部分,新类型名一般用大写表示,以便于区别。
+* 有时也可用宏定义来代替 typedef 的功能,但是宏定义是由预处理完成的,而 typedef 则是在编译 时完成的,后者更为灵活方便。
+  ##typedef 使用
+
+- 基本数据类型
+
+```c showLineNumbers
+typedef int INTEGER
+INTEGER a; // 等价于 int a;
+```
+
+- 也可以在别名的基础上再起一个别名
+
+```c showLineNumbers
+typedef int Integer;
+
+typedef Integer MyInteger;
+
+```
+
+- 用 typedef 定义数组、指针、结构等类型将带来很大的方便,不仅使程序书写简单而且使意义更为 明确,因而增强了可读性。
+
+- 数组类型
+
+```c showLineNumbers
+typedef char NAME[20]; // 表示NAME是字符数组类型,数组长度为20。然后可用NAME 说明变量,
+NAME a; // 等价于 char a[20];
+```
+
+- 结构体类型
+
+* 第一种形式:
+
+```c showLineNumbers
+ struct Person{
+    int age;
+    char *name;
+};
+
+typedef struct Person PersonType;
+```
+
+    + 第二种形式:
+
+```c showLineNumbers
+typedef struct Person{
+    int age;
+    char *name;
+} PersonType;
+```
+
+    + 第三种形式:
+
+```c showLineNumbers
+typedef struct {
+    int age;
+    char *name;
+} PersonType;
+```
+
+- 枚举
+
+* 第一种形式:
+
+```c showLineNumbers
+enum Sex{
+    SexMan,
+    SexWoman,
+    SexOther
+};
+typedef enum Sex SexType;
+```
+
+    + 第二种形式:
+
+```c showLineNumbers
+typedef enum Sex{
+    SexMan,
+    SexWoman,
+    SexOther
+} SexType;
+```
+
+    + 第三种形式:
+
+```c showLineNumbers
+typedef enum{
+    SexMan,
+    SexWoman,
+    SexOther
+} SexType;
+```
+
+- 指针
+
+* typedef 与指向结构体的指针
+
+```c showLineNumbers
+ // 定义一个结构体并起别名
+  typedef struct {
+      float x;
+      float y;
+  } Point;
+
+ // 起别名
+ typedef Point *PP;
+
+```
+
+- typedef 与指向函数的指针
+
+```c showLineNumbers
+// 定义一个sum函数，计算a跟b的和
+  int sum(int a, int b) {
+      int c = a + b;
+      printf("%d + %d = %d", a, b, c);
+      return c;
+ }
+ typedef int (*MySum)(int, int);
+
+// 定义一个指向sum函数的指针变量p
+ MySum p = sum;
+```
+
+## 宏定义与函数以及 typedef 区别
+
+- 与函数的区别
+
+* 从整个使用过程可以发现，带参数的宏定义，在源程序中出现的形式与函数很像。但是两者是有本质区别的：
+* 1> 宏定义不涉及存储空间的分配、参数类型匹配、参数传递、返回值问题
+* 2> 函数调用在程序运行时执行，而宏替换只在编译预处理阶段进行。所以带参数的宏比函数具有更高的执行效率
+
+- typedef 和#define 的区别
+
+* 用宏定义表示数据类型和用 typedef 定义数据说明符的区别。
+* 宏定义只是简单的字符串替换,￼ 是在预处理完成的
+* typedef 是在编译时处理的,它不是作简单的代换,而是对类型说明符 ￼ 重新命名。被命名的标识符具有类型定义说明的功能
+
+```c showLineNumbers
+typedef char *String;
+int main(int argc, const char * argv[])
+{
+     String str = "This is a string!";
+     return 0;
+}
+
+
+#define String char *
+int main(int argc, const char * argv[])
+{
+    String str = "This is a string!";
+     return 0;
+}
+```
+
+```c showLineNumbers
+typedef char *String1; // 给char *起了个别名String1
+#define String2 char * // 定义了宏String2
+int main(int argc, const char * argv[]) {
+        /*
+        只有str1、str2、str3才是指向char类型的指针变量
+        由于String1就是char *，所以上面的两行代码等于:
+        char *str1;
+        char *str2;
+        */
+      String1 str1, str2;
+        /*
+        宏定义只是简单替换, 所以相当于
+        char *str3, str4;
+        *号只对最近的一个有效, 所以相当于
+        char *str3;
+        char str4;
+        */
+      String2 str3, str4;
+      return 0;
+}
+```
+
