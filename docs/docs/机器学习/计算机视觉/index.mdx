@@ -1163,45 +1163,495 @@ cv2.destroyAllWindows()
 
 下面是Opencv常用的算法，每个算法都比较复杂且可能随时间变化出现新的算法，因此随用随学即可。
 
+想获得认证可以参与[OpenCV Bootcamp](https://courses.opencv.org/courses/course-v1:OpenCV+Bootcamp+CV0/course/)
+
+### 特征点校准
+
+特征点校准主要用于图像校准、图像拼接、图像匹配等场景。
+
+```python showLineNumbers
+"""
+图像配准（Image Registration）程序
+功能：将一张扫描的表单图像与标准表单图像对齐
+应用场景：文档处理、图像拼接、消除扫描时产生的旋转、平移、缩放等变形
+
+图片地址：
+https://www.dropbox.com/s/zuwnn6rqe0f4zgh/opencv_bootcamp_assets_NB8.zip?dl=1
+
+程序流程：
+1. 读取参考图像和待对齐图像
+2. 转换为灰度图像
+3. 使用ORB算法检测特征点
+4. 匹配两幅图像的特征点
+5. 计算单应性变换矩阵
+6. 对待对齐图像进行透视变换
+7. 保存对齐后的结果图像
+"""
+
+# 导入必要的库
+import cv2              # OpenCV库，用于计算机视觉和图像处理
+import numpy as np      # 数值计算库，用于处理数组和矩阵运算
+import matplotlib.pyplot as plt  # 绘图库，用于显示图像
+
+# 读取参考图像（标准表单）
+refFilename = "form.jpg"
+print("Reading reference image:", refFilename)
+im1 = cv2.imread(refFilename, cv2.IMREAD_COLOR)  # 读取彩色图像
+# 将BGR颜色空间转换为RGB颜色空间
+# OpenCV默认使用BGR（蓝绿红）顺序，matplotlib使用RGB（红绿蓝）顺序
+im1 = cv2.cvtColor(im1, cv2.COLOR_BGR2RGB)
+
+# 读取待对齐的图像（扫描的表单）
+imFilename = "scanned-form.jpg"
+print("Reading image to align:", imFilename)
+im2 = cv2.imread(imFilename, cv2.IMREAD_COLOR)  # 读取彩色图像
+# 同样进行BGR到RGB的颜色空间转换
+im2 = cv2.cvtColor(im2, cv2.COLOR_BGR2RGB)
+
+# 将彩色图像转换为灰度图像
+# 特征检测算法通常在灰度图像上工作更好，计算更快，对光照变化更稳定
+im1_gray = cv2.cvtColor(im1, cv2.COLOR_BGR2GRAY)
+im2_gray = cv2.cvtColor(im2, cv2.COLOR_BGR2GRAY)
+
+# 创建ORB特征检测器
+MAX_NUM_FEATURES = 500  # 设置最大特征点数量为500个
+# ORB (Oriented FAST and Rotated BRIEF) 是一种特征检测算法
+# 它能够找到图像中的"关键点"（特征点），通常是角点、边缘等具有独特特征的位置
+orb = cv2.ORB_create(MAX_NUM_FEATURES)
+# 同时检测关键点和计算描述符
+# keypoints：特征点的位置信息
+# descriptors：每个特征点的描述符（数字化"指纹"）
+keypoints1, descriptors1 = orb.detectAndCompute(im1_gray, None)
+keypoints2, descriptors2 = orb.detectAndCompute(im2_gray, None)
+
+# 显示第一个特征点的描述符示例
+print(descriptors1[0])
+"""
+每个ORB描述符是一个32字节（256位）的二进制向量
+这些数字是该二进制向量的十进制表示
+这个描述符唯一地描述了图像中某个特征点周围的纹理模式
+简单来说，这些数字就是计算机"看到"的某个图像特征点的数字化"指纹"！
+描述符就像人的指纹一样，每个特征点都有独特的数字"指纹"
+计算机通过比较这些"指纹"来找到两幅图像中的相同特征点
+
+[  2 233  53 155 108 141 186 164 142 121  81  73 172 220  44  73 134  91
+  31  71 194  48  74 245 164  24  74 242  28  27 129 217]
+"""
+
+# 在图像上绘制检测到的特征点
+# color=(255, 0, 0)：用红色标记特征点
+# DRAW_RICH_KEYPOINTS：绘制带方向和尺度信息的特征点
+im1_display = cv2.drawKeypoints(im1, keypoints1, outImage=np.array([]), 
+                                color=(255, 0, 0), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+im2_display = cv2.drawKeypoints(im2, keypoints2, outImage=np.array([]), 
+                                color=(255, 0, 0), flags=cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+# 显示特征点图像（注释掉了，如需显示可取消注释）
+# cv2.imshow("im1_display", im1_display)
+# cv2.imshow("im2_display", im2_display)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
+
+# 创建特征匹配器
+# 暴力匹配器会把第一幅图像的每个特征点与第二幅图像的所有特征点进行比较
+# 找出最相似的特征点对，HAMMING距离用于比较二进制描述符的相似性
+matcher = cv2.DescriptorMatcher_create(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
+print(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE)
+print(cv2.DESCRIPTOR_MATCHER_BRUTEFORCE_HAMMING)
+
+
+# 进行特征匹配，转换为列表以便排序（元组是不可变对象）
+matches = list(matcher.match(descriptors1, descriptors2, None))
+
+# 按匹配距离排序（距离越小，匹配越好）
+matches.sort(key=lambda x: x.distance, reverse=False)
+
+# 筛选最佳匹配点，只保留前10%的最佳匹配
+# 这样做是因为不是所有匹配都是准确的，保留最好的匹配点可以提高后续计算的准确性
+numGoodMatches = int(len(matches) * 0.1)
+matches = matches[:numGoodMatches]
+
+# 提取匹配点的坐标
+# 创建两个数组存储匹配点的坐标
+points1 = np.zeros((len(matches), 2), dtype=np.float32)  # 参考图像中的点坐标
+points2 = np.zeros((len(matches), 2), dtype=np.float32)  # 待对齐图像中的对应点坐标
+
+# 从匹配结果中提取对应点的(x,y)坐标
+for i, match in enumerate(matches):
+    points1[i, :] = keypoints1[match.queryIdx].pt    # 参考图像中的特征点坐标
+    points2[i, :] = keypoints2[match.trainIdx].pt    # 待对齐图像中的特征点坐标
+
+# 计算单应性矩阵（Homography）
+# 单应性矩阵是一个3x3的变换矩阵，描述了两个图像之间的投影变换关系
+# 简单说就是：如何把第二幅图像变形成第一幅图像的样子
+# RANSAC算法用于排除错误匹配点的干扰
+h, mask = cv2.findHomography(points2, points1, cv2.RANSAC)
+
+# 对图像进行透视变换以实现对齐
+height, width, channels = im1.shape  # 获取参考图像的尺寸
+# 使用单应性矩阵对第二幅图像进行透视变换
+# warpPerspective函数会根据计算出的变换矩阵，将待对齐的图像扭曲变形，使其与参考图像对齐
+im2_reg = cv2.warpPerspective(im2, h, (width, height))
+
+# 保存对齐后的图像
+cv2.imwrite("im2_reg.jpg", im2_reg)
+
+
+[
+  (0,0),
+  (223,232),
+  (131,391),
+  (383,390)
+]
+```
+
 ### HDR
 
 HDR（高动态范围）技术主要应用于摄影、监控系统和医学影像中，通过多次曝光融合提升图像细节表现。
 
 HDR 是一种图像处理技术，用于提高图像的动态范围，使得图像中的高光和阴影细节更加清晰。给定多张不同曝光的图像，通过算法将这些图像融合成一张高动态范围的图像。
 
+```python showLineNumbers
+"""
+图片地址：
+https://www.dropbox.com/s/qa1hsyxt66pvj02/opencv_bootcamp_assets_NB10.zip?dl=1
+"""
+
+import os
+import cv2
+import numpy as np
+
+def readImagesAndTimes():
+    # 文件名需要保证是按照曝光时间排序的
+    filenames = ["img_0.033.jpg", "img_0.25.jpg", "img_2.5.jpg", "img_15.jpg"]
+
+    # List of exposure times
+    times = np.array([1 / 30.0, 0.25, 2.5, 15.0], dtype=np.float32)
+
+    # Read images
+    images = []
+    for filename in filenames:
+        im = cv2.imread(filename)
+        images.append(im)
+
+    return images, times
+
+# 对齐图片。不对齐的话，图片会重影
+
+images, times = readImagesAndTimes()
+
+# Align Images
+alignMTB = cv2.createAlignMTB()
+alignMTB.process(images, images)
+
+# 估计相机响应函数
+calibrateDebevec = cv2.createCalibrateDebevec()
+responseDebevec = calibrateDebevec.process(images, times)
+
+# 将曝光合并到 HDR 图像中
+mergeDebevec = cv2.createMergeDebevec()
+hdrDebevec = mergeDebevec.process(images, times, responseDebevec)
+
+# 色调映射
+
+# 方法1
+tonemapDrago = cv2.createTonemapDrago(1.0, 0.7)
+ldrDrago = tonemapDrago.process(hdrDebevec)
+ldrDrago = 3 * ldrDrago
+
+# 方法2
+tonemapReinhard = cv2.createTonemapReinhard(1.5, 0, 0, 0)
+ldrReinhard = tonemapReinhard.process(hdrDebevec)
+
+# 方法3
+tonemapMantiuk = cv2.createTonemapMantiuk(2.2, 0.85, 1.2)
+ldrMantiuk = tonemapMantiuk.process(hdrDebevec)
+ldrMantiuk = 3 * ldrMantiuk
+
+# Saving image
+cv2.imwrite("ldr-Drago.jpg", 255*ldrDrago)
+cv2.imwrite("ldr-Reinhard.jpg", 255*ldrReinhard)
+cv2.imwrite("ldr-Mantiuk.jpg", 255*ldrMantiuk)
+```
+
 ### 全景拼接
 
 全景拼接技术广泛应用于虚拟旅游、房地产展示、地图服务和VR/AR场景构建中。
 
-可以实现多张图片的拼接，形成一张完整的全景图。支持拼接为环形
+可以实现多张图片的拼接，形成一张完整的全景图。支持拼接为环形。
 
-### 对象检测
+```python showLineNumbers
+"""
+图片地址：
+https://www.dropbox.com/s/0o5yqql1ynx31bi/opencv_bootcamp_assets_NB9.zip?dl=1
+"""
+import os
+import cv2
+import math
+import glob
+import numpy as np
 
-对象检测算法主要用于自动驾驶、安防监控、零售分析、医疗诊断和工业质检等领域。
+
+def find_largest_rectangle(mask):
+    """
+    在二值掩码中找到最大的矩形区域
+    使用直方图方法高效计算最大矩形面积
+    """
+    def largest_rectangle_in_histogram(heights):
+        stack = []
+        max_area = 0
+        best_rect = (0, 0, 0, 0)  # (x, y, w, h)
+        
+        for i, h in enumerate(heights):
+            start = i
+            while stack and stack[-1][1] > h:
+                index, height = stack.pop()
+                area = height * (i - index)
+                if area > max_area:
+                    max_area = area
+                    best_rect = (index, 0, i - index, height)
+                start = index
+            stack.append((start, h))
+        
+        # 处理栈中剩余元素
+        for index, height in stack:
+            area = height * (len(heights) - index)
+            if area > max_area:
+                max_area = area
+                best_rect = (index, 0, len(heights) - index, height)
+        
+        return best_rect, max_area
+    
+    # 将掩码转换为灰度图
+    if len(mask.shape) == 3:
+        mask = cv2.cvtColor(mask, cv2.COLOR_BGR2GRAY)
+    
+    height, width = mask.shape
+    
+    # 计算每行的直方图
+    histogram = np.zeros(width, dtype=np.int32)
+    max_area = 0
+    best_rect = (0, 0, 0, 0)
+    
+    for row in range(height):
+        # 更新直方图
+        for col in range(width):
+            if mask[row, col] > 0:  # 有效像素
+                histogram[col] += 1
+            else:  # 无效像素，重置高度
+                histogram[col] = 0
+        
+        # 在当前直方图中找最大矩形
+        rect, area = largest_rectangle_in_histogram(histogram)
+        if area > max_area:
+            max_area = area
+            best_rect = (rect[0], row - rect[3] + 1, rect[2], rect[3])
+    
+    return best_rect
+
+
+def create_valid_mask(image, threshold=10):
+    """
+    创建有效区域掩码，标识非黑色区域
+    """
+    # 转换为灰度图
+    if len(image.shape) == 3:
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        gray = image.copy()
+    
+    # 创建掩码：非黑色区域为255，黑色区域为0
+    mask = np.where(gray > threshold, 255, 0).astype(np.uint8)
+    
+    # 形态学操作，填充小的空洞和去除噪声
+    kernel = np.ones((5, 5), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)  # 填充小空洞
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)   # 去除小噪声
+    
+    return mask
+
+
+def smart_crop_panorama(image, threshold=10, padding=5):
+    """
+    智能裁剪全景图，去除黑色填充区域
+    """
+    print(f"原始图像尺寸: {image.shape}")
+    
+    # 创建有效区域掩码
+    mask = create_valid_mask(image, threshold)
+    
+    # 找到最大矩形
+    x, y, w, h = find_largest_rectangle(mask)
+    
+    # 应用内边距
+    x = max(0, x + padding)
+    y = max(0, y + padding)
+    w = min(image.shape[1] - x, w - 2 * padding)
+    h = min(image.shape[0] - y, h - 2 * padding)
+    
+    if w <= 0 or h <= 0:
+        return image
+    cropped_image = image[y:y+h, x:x+w]
+    return cropped_image
+
+
+# 读取图像文件
+# 把需要拼接图片放到boat文件夹中
+imagefiles = glob.glob(f"boat{os.sep}*")
+imagefiles.sort()
+
+images = []
+for filename in imagefiles:
+    img = cv2.imread(filename)
+    images.append(img)
+
+stitcher = cv2.Stitcher_create()
+status, result = stitcher.stitch(images)
+
+if status == cv2.Stitcher_OK:
+    cv2.imwrite("result_raw.png", result)
+    cropped_result = smart_crop_panorama(result, threshold=10, padding=5)
+    cv2.imwrite("result.png", cropped_result)
+```
+
 
 ### 对象跟踪
 
 对象跟踪技术应用于视频监控、体感交互、体育分析、无人机导航和增强现实等场景。
 
-### 人体检测
+```python showLineNumbers
+"""
+图片地址：
+https://www.dropbox.com/s/ld535c8e0vueq6x/opencv_bootcamp_assets_NB11.zip?dl=1
+"""
+import os
+import sys
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
 
-人体检测算法广泛应用于智能安防、客流统计、健身应用、体感游戏和自动驾驶系统中。
+from zipfile import ZipFile
+from urllib.request import urlretrieve
 
-#### 人体姿态估计
+from IPython.display import HTML
+from matplotlib.animation import FuncAnimation
 
-人体姿态估计主要用于健身指导、医疗康复、运动分析、动作捕捉和人机交互界面。
+from IPython.display import YouTubeVideo, display, HTML
+from base64 import b64encode
+video_input_file_name = "race_car.mp4"
 
-#### 手势识别
 
-手势识别技术应用于智能家居控制、手语翻译、VR/AR交互、游戏控制和辅助残障人士交流。
+def drawRectangle(frame, bbox):
+    p1 = (int(bbox[0]), int(bbox[1]))
+    p2 = (int(bbox[0] + bbox[2]), int(bbox[1] + bbox[3]))
+    cv2.rectangle(frame, p1, p2, (255, 0, 0), 2, 1)
 
-#### 动作识别
 
-动作识别算法用于视频内容理解、体育比赛分析、异常行为检测、健身应用和人机交互。
+def displayRectangle(frame, bbox):
+    plt.figure(figsize=(20, 10))
+    frameCopy = frame.copy()
+    drawRectangle(frameCopy, bbox)
+    frameCopy = cv2.cvtColor(frameCopy, cv2.COLOR_RGB2BGR)
+    plt.imshow(frameCopy)
+    plt.axis("off")
 
-#### 行为识别
 
-行为识别技术主要应用于安防监控、智慧城市、客户行为分析、老人看护和异常事件预警。
+def drawText(frame, txt, location, color=(50, 170, 50)):
+    cv2.putText(frame, txt, location, cv2.FONT_HERSHEY_SIMPLEX, 1, color, 3)
+
+# Set up tracker
+tracker_types = [
+    "BOOSTING",
+    "MIL",
+    "KCF",
+    "CSRT",
+    "TLD",
+    "MEDIANFLOW",
+    "GOTURN",
+    "MOSSE",
+]
+
+# Change the index to change the tracker type
+tracker_type = tracker_types[2]
+
+if tracker_type == "BOOSTING":
+    tracker = cv2.legacy.TrackerBoosting.create()
+elif tracker_type == "MIL":
+    tracker = cv2.legacy.TrackerMIL.create()
+elif tracker_type == "KCF":
+    tracker = cv2.TrackerKCF.create()
+elif tracker_type == "CSRT":
+    tracker = cv2.TrackerCSRT.create()
+elif tracker_type == "TLD":
+    tracker = cv2.legacy.TrackerTLD.create()
+elif tracker_type == "MEDIANFLOW":
+    tracker = cv2.legacy.TrackerMedianFlow.create()
+elif tracker_type == "GOTURN":
+    tracker = cv2.TrackerGOTURN.create()
+else:
+    tracker = cv2.legacy.TrackerMOSSE.create()
+
+# Read video
+video = cv2.VideoCapture(video_input_file_name)
+ok, frame = video.read()
+
+# Exit if video not opened
+if not video.isOpened():
+    print("Could not open video")
+    sys.exit()
+else:
+    width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+video_output_file_name = "race_car-" + tracker_type + ".mp4"
+video_out = cv2.VideoWriter(video_output_file_name, cv2.VideoWriter_fourcc(*"XVID"), 10, (width, height))
+
+
+# Define a bounding box
+bbox = (1300, 405, 160, 120)
+# bbox = cv2.selectROI(frame, False)
+# print(bbox)
+displayRectangle(frame, bbox)
+
+
+ok = tracker.init(frame, bbox)
+
+while True:
+    ok, frame = video.read()
+
+    if not ok:
+        break
+
+    # Start timer
+    timer = cv2.getTickCount()
+
+    # Update tracker
+    ok, bbox = tracker.update(frame)
+
+    # Calculate Frames per second (FPS)
+    fps = cv2.getTickFrequency() / (cv2.getTickCount() - timer)
+
+    # Draw bounding box
+    if ok:
+        drawRectangle(frame, bbox)
+    else:
+        drawText(frame, "Tracking failure detected", (80, 140), (0, 0, 255))
+
+    # Display Info
+    drawText(frame, tracker_type + " Tracker", (80, 60))
+    drawText(frame, "FPS : " + str(int(fps)), (80, 100))
+
+    # Write frame to video
+    video_out.write(frame)
+
+video.release()
+video_out.release()
+
+
+```
+
+### 人体相关
 
 #### 人脸检测
 
@@ -1335,3 +1785,15 @@ if __name__ == "__main__":
     trainer_face(path="dataSet")
     recognizer()
 ```
+
+#### 其他
+
+人体检测算法广泛应用于智能安防、客流统计、健身应用、体感游戏和自动驾驶系统中。
+
+人体姿态估计主要用于健身指导、医疗康复、运动分析、动作捕捉和人机交互界面。
+
+手势识别技术应用于智能家居控制、手语翻译、VR/AR交互、游戏控制和辅助残障人士交流。
+
+动作识别算法用于视频内容理解、体育比赛分析、异常行为检测、健身应用和人机交互。
+
+行为识别技术主要应用于安防监控、智慧城市、客户行为分析、老人看护和异常事件预警。
