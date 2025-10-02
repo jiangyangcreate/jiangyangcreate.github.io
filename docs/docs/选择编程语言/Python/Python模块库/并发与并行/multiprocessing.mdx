@@ -1,0 +1,123 @@
+---
+sidebar_position: 1
+title: multiprocessing
+---
+### multiprocessing 模块
+
+进程是系统独立安排和分配系统资源（CPU、内存）的基本单位，操作系统以进程为单位分配存储空间，操作系统管理所有进程的执行，为它们合理的分配资源。
+
+一个进程就是 macOS 中的“活动监视器”、Windows 中的“任务管理器”的一个执行程序。
+
+#### 多进程
+
+进程之间是相互独立的，Python 中的进程通信一般由进程对 Queue 完成。
+
+进程绕过了全局解释器锁。因此，多进程模块允许程序员充分利用特定机器上的多个处理器。它在 Unix 和 Windows 上都能运行。
+
+进程的数量等于 CPU 核心的数量，这是最有效的。如果核数太多，就不能充分利用核数。如果太少，会造成进程切换，增加程序的运行时间。
+
+[multiprocessing](https://docs.python.org/zh-cn/3.10/library/multiprocessing.html?highlight=multiprocessing#module-multiprocessing):Multiprocessing Module Code Documentation
+
+```python showLineNumbers
+from multiprocessing import Pool
+
+def f(vaule):
+    x = vaule[0]
+    y = vaule[1]
+    return x*y
+
+if __name__ == '__main__':
+    p = Pool(16) # new 16 process pools ， because i have 16 cpu
+    print(p.map(f, [(1,1), (2,2), (3,3)])) # take in data
+    p.close() # close pool
+
+# [1, 4, 9]
+```
+
+我们来完成 1~100000000 求和的计算密集型任务，循环解决，暂时也不考虑列表切片操作花费的时间，只是把做运算和合并运算结果的时间统计出来。
+
+```python showLineNumbers
+from time import time
+
+
+def main():
+    total = 0
+    number_list = [x for x in range(1, 100000001)]
+    start = time()
+    for number in number_list:
+        total += number
+    print(total)
+    end = time()
+    print('Execution time: %.3fs' % (end - start))
+
+```
+
+```python showLineNumbers
+main()
+# 5000000050000000
+# Execution time: 6.798s
+```
+
+利用多进程“分而治之”，
+
+当我们将这个任务分解到 8 个进程中去执行：
+
+```python showLineNumbers
+from multiprocessing import Process, Queue
+from time import time
+
+core_num = 8
+
+
+def task_handler(curr_list, result_queue):
+    total = 0
+    for number in curr_list:
+        total += number
+    result_queue.put(total)
+
+
+def main():
+    processes = []
+    number_list = [x for x in range(1, 100000001)]
+    result_queue = Queue()
+    index = 0
+    # 启动core_num(8)个进程将数据切片后进行运算
+    index_batch = int(100000000 / core_num)
+    for _ in range(core_num):
+        p = Process(target=task_handler,
+                    args=(number_list[index:index + index_batch], result_queue))
+        index += index_batch
+        processes.append(p)
+        p.start()
+    # 开始记录所有进程执行完成花费的时间
+    start = time()
+    for p in processes:
+        p.join()
+    # 合并执行结果
+    total = 0
+    while not result_queue.empty():
+        total += result_queue.get()
+    print(total)
+    end = time()
+    print('Execution time: ', (end - start), 's', sep='')
+
+
+if __name__ == '__main__':
+    main()
+
+```
+
+以上代码保存为 multi_process.py
+
+```python showLineNumbers
+!python multi_process.py
+```
+
+```python showLineNumbers
+# 5000000050000000
+# Execution time: 0.7936668395996094s
+```
+
+明显，多进程更快。
+
+使用多进程后由于获得了更多的 CPU 执行时间以及更好的利用了 CPU 的多核特性，明显的减少了程序的执行时间，而且计算量越大效果越明显。

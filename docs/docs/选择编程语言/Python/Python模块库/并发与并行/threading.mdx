@@ -1,0 +1,206 @@
+---
+sidebar_position: 2
+title: threading
+---
+
+threading模块用于创建和管理线程。
+
+### threading 模块
+
+线程是系统调度资源的最小单位（CPU 通过计时器来切换线程）
+
+在 Python 中，同个时间只有一个线程在运行
+
+当然，如果你运行大量的 I/O 任务，多进程依然是最好的选择
+
+线程数等于 CPU 内核数的两倍是最高效的。
+
+GIL 是一个防止多个线程同时执行 Python 字节码的互斥锁。之所以需要这种锁，主要是因为 CPython 的内存管理不是线程安全的
+
+在这种环境下，GIL 限制解释器本身只能有一个线程运行，而且任何 Python 解释器级别的操作都是序列化的，因此任何时候都只能有一条语句抛出异常。与异常相关的共享变量也因此受到保护。
+
+线程间通信的目的主要是为了线程同步，因此线程没有像进程通信那样用于数据交换的通信机制。
+
+Python 的标准库提供了两个模块：\_thread 和 threading，\_thread 是低级模块，threading 是高级模块，对\_thread 进行了封装。绝大多数情况下，我们只需要使用 threading 这个高级模块。
+
+[threading](https://docs.python.org/zh-cn/3.10/library/threading.html?highlight=threading#module-threading):Threading Multiprocessing Module Code Documentation
+
+
+#### 多线程
+
+```python showLineNumbers
+
+import time
+import threading
+
+
+def test_thread(para='hi', sleep=3):
+    time.sleep(sleep)
+    print(para)
+
+
+def main():
+    # 创建线程
+    thread_hi = threading.Thread(target=test_thread)
+    thread_hello = threading.Thread(target=test_thread, args=('hello', 1))
+    # 运行线程
+    thread_hi.start()
+    thread_hello.start()
+
+    # join表示阻塞，直到子线程结束，再向下执行。可以加也可以不加。
+    thread_hi.join()
+    thread_hello.join()
+
+    print('Main thread has ended!')
+
+
+if __name__ == '__main__':
+    main()
+
+"""
+添加join后，输出：
+hello
+hi
+Main thread has ended!
+
+不添加join后，输出：
+Main thread has ended!
+hello
+hi
+"""
+
+```
+
+#### 守护线程
+
+设置守护线程的子线程会在主线程结束时自动结束。
+
+```python showLineNumbers
+import time
+import threading
+
+
+def test_thread(para='hi', sleep=3):
+    time.sleep(sleep)
+    print(para)
+
+
+
+# create thread
+thread_hi = threading.Thread(target=test_thread)
+thread_hello = threading.Thread(target=test_thread, args=('hello', 1))
+thread_hello.daemon = True
+thread_hi.daemon = True
+
+# run thread
+thread_hi.start()
+thread_hello.start()
+
+print('Main thread has ended!')
+
+
+"""
+添加守护线程后，输出：
+Main thread has ended!
+"""
+
+```
+
+这是因为主线程中没有阻塞等待子线程，执行到`print('Main thread has ended!')`时，主线程结束，此时子线程还在`time.sleep`，由于子线程是守护线程，所以会立即结束，还未执行的代码不会执行。
+
+#### 多线程实现下载任务
+
+
+如下所示的界面中，有“下载”和“关于”两个按钮，用休眠的方式模拟点击“下载”按钮会联网下载文件需要耗费 10 秒的时间，当点击“下载”按钮后，整个任务阻塞：
+
+```python showLineNumbers
+import time
+import tkinter
+import tkinter.messagebox
+
+
+def download():
+    # 模拟下载任务需要花费5秒钟时间
+    time.sleep(5)
+    tkinter.messagebox.showinfo('提示', '下载完成!')
+
+
+def show_about():
+    tkinter.messagebox.showinfo('关于', '作者: 123(v1.0)')
+
+
+def main():
+    top = tkinter.Tk()
+    top.title('单线程')
+    top.geometry('400x400')
+    top.wm_attributes('-topmost', True)
+
+    panel = tkinter.Frame(top)
+    button1 = tkinter.Button(panel, text='下载', command=download)
+    button1.pack(side='left')
+    button2 = tkinter.Button(panel, text='关于', command=show_about)
+    button2.pack(side='right')
+    panel.pack(side='bottom')
+
+    tkinter.mainloop()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+使用多线程后，不会阻塞了主线程：
+
+```python showLineNumbers
+import time
+import tkinter
+import tkinter.messagebox
+from threading import Thread
+
+
+def main():
+
+    class DownloadTaskHandler(Thread):
+
+        def run(self):
+            time.sleep(5)
+            tkinter.messagebox.showinfo('提示', '下载完成!')
+            # 启用下载按钮
+            button1.config(state=tkinter.NORMAL)
+
+    def download():
+        # 禁用下载按钮
+        button1.config(state=tkinter.DISABLED)
+        # 通过daemon参数将线程设置为守护线程(主程序退出就不再保留执行)
+        # 在线程中处理耗时间的下载任务
+        DownloadTaskHandler(daemon=True).start()
+
+    def show_about():
+        tkinter.messagebox.showinfo('关于', '作者: 123(v1.0)')
+
+    top = tkinter.Tk()
+    top.title('多线程')
+    top.geometry('400x400')
+    top.wm_attributes('-topmost', 1)
+
+    panel = tkinter.Frame(top)
+    button1 = tkinter.Button(panel, text='下载', command=download)
+    button1.pack(side='left')
+    button2 = tkinter.Button(panel, text='关于', command=show_about)
+    button2.pack(side='right')
+    panel.pack(side='bottom')
+
+    tkinter.mainloop()
+
+
+if __name__ == '__main__':
+    main()
+```
+
+会看到弹出的窗口是多模态的，点击下载按钮不影响其他按钮操作。
+
+**Python 的多线程并不能发挥 CPU 的多核特性**，这一点只要启动几个执行死循环的线程就可以得到证实了。
+
+之所以如此，是因为 Python 的解释器有一个“全局解释器锁”（GIL）的东西，任何线程执行前必须先获得 GIL 锁，然后每执行 100 条字节码，解释器就自动释放 GIL 锁，让别的线程有机会执行。
+
+好在Python3.13已经支持在禁用 GIL 的情况下运行。

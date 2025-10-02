@@ -1,0 +1,66 @@
+---
+sidebar_position: 3
+title: asyncio
+---
+### asyncio 模块
+
+协程是编写并发代码的库，是构建 IO 密集型和高级结构化网络代码的最佳选择。
+
+例程的运行方式是通过代码主动切换状态并等待处理，因此效率更高，语法也更详细。循环对象需要处于活动状态：创建、设置、提交、等待运行和停止。
+
+例行程序的最佳数量取决于内存使用情况。
+
+asyncio 模块包含了一些工具，用于编写异步代码。
+
+协程的工作原理是事件循环，事件循环是一个无限循环，它等待事件并执行它们。
+
+每次任务会被挂起至事件循环队列中，然后按顺序执行。
+
+await 关键字用于挂起协程，直到它被调用。
+
+async 关键字用于定义协程。
+
+asyncio 模块用于实现异步编程。
+
+[asyncio](https://docs.python.org/zh-cn/3.10/library/asyncio.html?highlight=asyncio#module-asyncio):asyncio Multiprocessing Module Code Documentation
+
+```python showLineNumbers
+import asyncio
+
+class TestA:
+    def __init__(self,loop) -> None:
+        self.loop = loop
+        asyncio.set_event_loop(loop=self.loop) # step 3.1
+
+    async def run_page(self,tid): # step 7
+        print(tid)
+        # 此处编写爬虫代码
+        return tid
+
+    async def close(self,):
+        for i in asyncio.all_tasks(): # step 9.1
+            i.cancel()
+        self.loop.stop() # step  9.2
+
+
+def test():
+    get_async_loop = asyncio.new_event_loop() # step 1
+    asyncio.set_event_loop(get_async_loop) # step 2
+
+    async def spider(task_obj):
+        async_task =  [asyncio.ensure_future(task_obj.run_page(1)),
+                    asyncio.ensure_future(task_obj.run_page(2)),] # step  6
+        await asyncio.wait(async_task) # step  8
+
+        await task_obj.close() # step 9
+
+    task_obj = TestA(get_async_loop) #step 3
+    asyncio.run_coroutine_threadsafe(spider(task_obj), loop=get_async_loop) #step  4
+    get_async_loop.run_forever() # step 5
+
+test()
+```
+
+生成器函数与协程（注：函数）非常相似，它们 yield 多次，它们具有多个入口点，并且它们的执行可以被挂起。唯一的区别是生成器函数不能控制在它在 yield 后交给哪里继续执行，控制权总是转移到生成器的调用者
+
+在 Python 创建协程时，task 是 future 的子类，所以 task 继承了 future 的属性和方法。几乎没有不同。

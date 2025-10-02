@@ -1,0 +1,35 @@
+---
+sidebar_position: 1
+title: dis
+---
+
+dis模块用于反编译Python字节码，查看Python代码的执行过程。
+
+```python showLineNumbers
+import dis
+def m():
+    x = [123,456]
+    match x:
+        case y:
+            pass
+print(dis.dis(m))
+"""
+输出：
+  2           0 RESUME                   0
+
+  3           2 LOAD_CONST               1 (123)
+              4 LOAD_CONST               2 (456)
+              6 BUILD_LIST               2
+              8 STORE_FAST               0 (x)
+
+  4          10 LOAD_FAST                0 (x)
+
+  5          12 STORE_FAST               1 (y)
+
+  6          14 RETURN_CONST             0 (None)
+None
+
+"""
+```
+
+
