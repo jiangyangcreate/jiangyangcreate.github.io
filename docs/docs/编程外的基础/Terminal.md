@@ -350,3 +350,64 @@ start  C:\"Program Files (x86)"\Tencent\WeChat\WeChat.exe
 
 不光是环境变量，其他命令的变量也遵循这个引号使用规则。正确理解和使用这些规则对于避免命令执行错误非常重要。
 
+## Makefile
+
+Makefile 本质是自动化脚本，把常用的项目编译、测试、部署等重复性命令写进去，省得每次手动输入。熟练使用后能大幅提升开发效率。
+
+创建名为 `Makefile` 的文件（无扩展名）：
+
+```makefile showLineNumbers
+# 基本示例
+# 目标: 依赖（可选）
+#	命令（必须用Tab缩进，不能用空格）
+
+hello:
+	echo "Hello World"
+
+# 多个命令用分号或换行
+clean:
+	echo "clean1"
+	echo "clean2"
+	echo "clean3";echo "clean4"
+
+# all 依赖 build 和 test
+# make all 等价于 
+# 先 make build 
+# 再 make test 
+# 最后执行命令 echo "all"
+all: hello clean
+	echo "all"
+
+# 使用变量
+PYTHON = python3.12
+# 声名伪目标（如果当前文件夹中没有与目标同名的文件、文件夹，那么可以不用声明伪目标）
+.PHONY: build clean
+build:
+	$(PYTHON) -v
+```
+
+使用：`make hello` → `make clean` → `make all` → `make build`
+
+当`make`后面的参数会优先被解读为是：执行指定文件、切换目录。
+
+如果我们工作空间中有名为:`build`的文件、文件夹，同时希望`make build`指向的不是文件。而是当前的`Makefile`中的`build`目标。
+
+那么可以通过 `.PHONY: 目标名1 目标名2`来声名：请优先当前`Makefile`中的`目标名1`、`目标名2`。
+
+
+### make 命令常用参数
+
+以下命令可以混合使用。
+
+| 参数 | 作用 | 示例 | 说明 |
+|------|------|------|------|
+| `make` | 执行默认目标 | `make` | 执行 Makefile 第一个目标 |
+| `make 目标名` | 执行指定目标 | `make hello` | 执行 hello 目标 |
+| `make -f 文件名` | 指定 Makefile | `make -f Makefile` | 使用自定义文件名 |
+| `make -C 目录` | 切换目录后再执行 | `make -C ./src` | 进入 src 目录后执行 |
+| `make -n` | 模拟执行（dry run） | `make -n build` | 只显示会执行的命令，不真实执行 |
+| `make -s` | 静默模式 | `make -s clean` | 不显示执行的命令 |
+| `make -j N` | 并行执行 | `make -j 4` | 用 4 个并行任务加速编译 |
+| `make -B` | 强制重新构建 | `make -B` | 忽略时间戳，全部重新执行 |
+| `make -k` | 遇错继续 | `make -k test` | 某个目标失败后继续执行其他目标 |
+| `make VAR=value` | 传递变量 | `make PORT=8080 run` | 覆盖 Makefile 中的变量 |
