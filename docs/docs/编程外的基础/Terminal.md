@@ -9,56 +9,92 @@ Terminals
 
 面试中命令行通常特指类Unix系统，如Linux、macOS、Ubuntu等，这些系统与生产环境保持一致。
 
-## WSL
-
-如果你是 Windows 10 版本 2004 及更高版本（内部版本 19041 及更高版本）或 Windows 11 ，推荐使用 <HoverText text="WSL（Windows Subsystem for Linux）" explanation="可以在 Windows 上直接使用 Linux 应用程序、实用工具和 Bash 命令行工具（未经修改），无需传统虚拟机或双包设置的开销。"/>
-
-:::info
-WSL的安装可以是通过命令在线安装，安装完成后，您需要为 Linux 环境创建一个用户名和密码。（Linux环境中密码不显示长度）
-
-如果网络不畅，也可以让其他安装好的人，导出为文件，再导入即可。（记得索要root密码哦）
-:::
-
-```bash showLineNumbers
-# 查看可用的Linux发行版列表
-wsl --list --online
-
-# 安装指定的Linux发行版
-wsl --install -d <distro-name>
-# 示例：wsl --install -d Ubuntu-24.04
-
-# 安装默认的 Ubuntu Linux 发行版。
-wsl --install
-
-# 导出发行版
-wsl --export <你的Ubuntu发行版名称> <导出的文件路径>.tar
-# 示例：wsl --export Ubuntu-24.04 ubuntu-24.04-wsl-ros2.tar
-
-# 从文件导入
-wsl --import <新实例的名称> C:\<新实例的文件夹> <压缩包的完整路径>
-# 示例：wsl --import Ubuntu-ROS2 C:\WSL_ROS2 D:\windows_app\systools\ubuntu-24.04-wsl-ros2.tar
-
-# 列出已安装的发行版的名称、运行状态、wsl版本
-wsl -l -v
-
-# 启动指定wsl
-wsl -d <新实例的名称>
-# 示例：wsl -d Ubuntu-ROS2
-
-# 设置默认发行版（配置后输入wsl命令即可进入）
-wsl --set-default <distro-name>
-```
-
 :::info
 Linux 内核衍生版本众多，譬如 ubuntu、debian、centos、fedora、archlinux 等。
 
 不同版本之间存在差异，譬如 ubuntu 大版本号之外，小版本号也很重要，此外有时候版本号和代号会混用
 :::
 
-
 [网道 bash 教程](https://wangdoc.com/bash/intro)是开源的 bash 文档，教科书式的篇章划分能帮助学习者系统的了解终端命令。
 
 [tldr](https://tldr.inbrowser.app/)是社区维护的命令行工具帮助页面合集，支持在线查询终端命令，有不同平台选择，支持不同语言显示
+
+## WSL
+
+如果你是 Windows 10 版本 2004 及更高版本（内部版本 19041 及更高版本）或 Windows 11 ，推荐使用 <HoverText text="WSL（Windows Subsystem for Linux）" explanation="可以在 Windows 上直接使用 Linux 应用程序、实用工具和 Bash 命令行工具（未经修改），无需传统虚拟机或双包设置的开销。"/>。
+
+详细内容请参考[WSL官方教程](https://learn.microsoft.com/zh-cn/windows/wsl/)。
+
+:::tip 提示
+- 某些版本的命令行需要使用 `wsl.exe` 而不是 `wsl`
+- `wsl --unregister` 会永久删除该发行版及其所有数据，无法恢复！
+:::
+
+### 安装
+
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 安装WSL和默认Ubuntu | `wsl --install` | `wsl --install` | - |
+| 安装指定发行版 | `wsl --install <DistributionName>` | `wsl --install Ubuntu-24.04` | - |
+| 列出可用发行版 | `wsl --list --online` | `wsl --list --online` | `wsl -l -o` |
+| 列出已安装发行版 | `wsl --list --verbose` | `wsl --list --verbose` | `wsl -l -v`|
+| 仅列出运行中的发行版 | `wsl --list --running` | `wsl --list --running` | `wsl -l --running` |
+| 列出所有发行版 | `wsl --list --all` | `wsl --list --all` | `wsl -l --all`/ `wsl -l` |
+
+### 网络与状态
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 获取Linux的IP地址 | `wsl hostname -I` | `wsl hostname -I` | - |
+| 获取Windows的IP地址 | `wsl ip route show \| grep -i default \| awk '{ print $3}'` | `wsl ip route show \| grep -i default \| awk '{ print $3}'` | - |
+| 查看WSL版本 | `wsl --version` | `wsl --version` | `wsl -v` |
+| 检查WSL状态 | `wsl --status` | `wsl --status` | - |
+| 获取帮助信息 | `wsl --help` | `wsl --help` | `wsl -h` |
+
+### 配置设置
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 设置默认发行版 | `wsl --set-default <DistributionName>` | `wsl --set-default Ubuntu-24.04` | `wsl -s Ubuntu-24.04` |
+| 设置WSL版本(1或2) | `wsl --set-version <DistributionName> <Version>` | `wsl --set-version Ubuntu-24.04 2` | - |
+| 设置默认WSL版本 | `wsl --set-default-version <Version>` | `wsl --set-default-version 2` | - |
+| 更改默认用户 | `<DistributionName> config --default-user <Username>` | `ubuntu config --default-user johndoe` | - |
+
+### 启动运行
+
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 启动默认发行版 | `wsl` | `wsl` | - |
+| 启动指定发行版 | `wsl --distribution <DistributionName>` | `wsl --distribution Ubuntu-24.04` | `wsl -d Ubuntu-24.04` |
+| 以指定用户启动 | `wsl --user <Username>` | `wsl --user root` | `wsl -u root` |
+| 指定发行版和用户 | `wsl -d <DistributionName> -u <Username>` | `wsl -d Ubuntu-24.04 -u root` | - |
+| 在用户主目录启动 | `wsl ~` | `wsl ~` | - |
+
+### 导入导出
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 导出发行版 | `wsl --export <DistributionName> <FileName>` | `wsl --export Ubuntu-24.04 ubuntu-backup.tar` | - |
+| 导出为VHD格式 | `wsl --export <DistributionName> <FileName> --vhd` | `wsl --export Ubuntu-24.04 ubuntu-backup.vhdx --vhd` | - |
+| 导入发行版 | `wsl --import <DistributionName> <InstallLocation> <FileName>` | `wsl --import Ubuntu-ROS2 C:\WSL_ROS2 ubuntu-backup.tar` | - |
+| 导入VHD格式 | `wsl --import <DistributionName> <InstallLocation> <FileName> --vhd` | `wsl --import Ubuntu-New C:\WSL_New backup.vhdx --vhd` | - |
+| 就地导入VHD | `wsl --import-in-place <DistributionName> <FileName>` | `wsl --import-in-place Ubuntu-New ubuntu.vhdx` | - |
+
+### 管理维护
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 终止指定发行版 | `wsl --terminate <DistributionName>` | `wsl --terminate Ubuntu-24.04` | `wsl -t Ubuntu-24.04` |
+| 关闭所有发行版 | `wsl --shutdown` | `wsl --shutdown` | - |
+| 注销并卸载发行版 | `wsl --unregister <DistributionName>` | `wsl --unregister Ubuntu-24.04` | - |
+| 更新WSL | `wsl --update` | `wsl --update` | - |
+| 从GitHub下载更新 | `wsl --update --web-download` | `wsl --update --web-download` | - |
+
+### 磁盘管理
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 挂载磁盘 | `wsl --mount <DiskPath>` | `wsl --mount \\.\PHYSICALDRIVE1` | - |
+| 挂载VHD | `wsl --mount <DiskPath> --vhd` | `wsl --mount C:\disk.vhdx --vhd` | - |
+| 挂载指定分区 | `wsl --mount <DiskPath> --partition <PartitionNumber>` | `wsl --mount \\.\PHYSICALDRIVE1 --partition 1` | - |
+| 挂载指定文件系统 | `wsl --mount <DiskPath> --type <Filesystem>` | `wsl --mount \\.\PHYSICALDRIVE1 --type ext4` | `wsl --mount <DiskPath> -t <Filesystem>` |
+| 卸载磁盘 | `wsl --unmount <DiskPath>` | `wsl --unmount \\.\PHYSICALDRIVE1` | - |
+| 卸载所有磁盘 | `wsl --unmount` | `wsl --unmount` | - |
 
 ## 有趣的命令行体验
 
@@ -80,6 +116,68 @@ Linux 内核衍生版本众多，譬如 ubuntu、debian、centos、fedora、arch
 - `su 用户名`表示切换到该用户，如果不填用户名`sudo su` 则默认切换到`root`
 
 - 管道符 `|`  将前一个命令的输出作为后一个命令的输入 ,示例 `command1 | command2` |
+
+## Makefile
+
+Makefile 本质是自动化脚本，把常用的项目编译、测试、部署等重复性命令写进去，省得每次手动输入。熟练使用后能大幅提升开发效率。
+
+创建名为 `Makefile` 的文件（无扩展名）：
+
+```makefile showLineNumbers
+# 基本示例
+# 目标: 依赖（可选）
+#	命令（必须用Tab缩进，不能用空格）
+
+hello:
+	echo "Hello World"
+
+# 多个命令用分号或换行
+clean:
+	echo "clean1"
+	echo "clean2"
+	echo "clean3";echo "clean4"
+
+# all 依赖 build 和 test
+# make all 等价于 
+# 先 make build 
+# 再 make test 
+# 最后执行命令 echo "all"
+all: hello clean
+	echo "all"
+
+# 使用变量
+PYTHON = python3.12
+# 声名伪目标（如果当前文件夹中没有与目标同名的文件、文件夹，那么可以不用声明伪目标）
+.PHONY: build clean
+build:
+	$(PYTHON) -v
+```
+
+使用：`make hello` → `make clean` → `make all` → `make build`
+
+当`make`后面的参数会优先被解读为是：执行指定文件、切换目录。
+
+如果我们工作空间中有名为:`build`的文件、文件夹，同时希望`make build`指向的不是文件。而是当前的`Makefile`中的`build`目标。
+
+那么可以通过 `.PHONY: 目标名1 目标名2`来声名：请优先当前`Makefile`中的`目标名1`、`目标名2`。
+
+
+### make 命令常用参数
+
+以下命令可以混合使用。
+
+| 参数 | 作用 | 示例 | 说明 |
+|------|------|------|------|
+| `make` | 执行默认目标 | `make` | 执行 Makefile 第一个目标 |
+| `make 目标名` | 执行指定目标 | `make hello` | 执行 hello 目标 |
+| `make -f 文件名` | 指定 Makefile | `make -f Makefile` | 使用自定义文件名 |
+| `make -C 目录` | 切换目录后再执行 | `make -C ./src` | 进入 src 目录后执行 |
+| `make -n` | 模拟执行（dry run） | `make -n build` | 只显示会执行的命令，不真实执行 |
+| `make -s` | 静默模式 | `make -s clean` | 不显示执行的命令 |
+| `make -j N` | 并行执行 | `make -j 4` | 用 4 个并行任务加速编译 |
+| `make -B` | 强制重新构建 | `make -B` | 忽略时间戳，全部重新执行 |
+| `make -k` | 遇错继续 | `make -k test` | 某个目标失败后继续执行其他目标 |
+| `make VAR=value` | 传递变量 | `make PORT=8080 run` | 覆盖 Makefile 中的变量 |
 
 
 ## 基本语法
@@ -349,65 +447,3 @@ start  C:\"Program Files (x86)"\Tencent\WeChat\WeChat.exe
 :::
 
 不光是环境变量，其他命令的变量也遵循这个引号使用规则。正确理解和使用这些规则对于避免命令执行错误非常重要。
-
-## Makefile
-
-Makefile 本质是自动化脚本，把常用的项目编译、测试、部署等重复性命令写进去，省得每次手动输入。熟练使用后能大幅提升开发效率。
-
-创建名为 `Makefile` 的文件（无扩展名）：
-
-```makefile showLineNumbers
-# 基本示例
-# 目标: 依赖（可选）
-#	命令（必须用Tab缩进，不能用空格）
-
-hello:
-	echo "Hello World"
-
-# 多个命令用分号或换行
-clean:
-	echo "clean1"
-	echo "clean2"
-	echo "clean3";echo "clean4"
-
-# all 依赖 build 和 test
-# make all 等价于 
-# 先 make build 
-# 再 make test 
-# 最后执行命令 echo "all"
-all: hello clean
-	echo "all"
-
-# 使用变量
-PYTHON = python3.12
-# 声名伪目标（如果当前文件夹中没有与目标同名的文件、文件夹，那么可以不用声明伪目标）
-.PHONY: build clean
-build:
-	$(PYTHON) -v
-```
-
-使用：`make hello` → `make clean` → `make all` → `make build`
-
-当`make`后面的参数会优先被解读为是：执行指定文件、切换目录。
-
-如果我们工作空间中有名为:`build`的文件、文件夹，同时希望`make build`指向的不是文件。而是当前的`Makefile`中的`build`目标。
-
-那么可以通过 `.PHONY: 目标名1 目标名2`来声名：请优先当前`Makefile`中的`目标名1`、`目标名2`。
-
-
-### make 命令常用参数
-
-以下命令可以混合使用。
-
-| 参数 | 作用 | 示例 | 说明 |
-|------|------|------|------|
-| `make` | 执行默认目标 | `make` | 执行 Makefile 第一个目标 |
-| `make 目标名` | 执行指定目标 | `make hello` | 执行 hello 目标 |
-| `make -f 文件名` | 指定 Makefile | `make -f Makefile` | 使用自定义文件名 |
-| `make -C 目录` | 切换目录后再执行 | `make -C ./src` | 进入 src 目录后执行 |
-| `make -n` | 模拟执行（dry run） | `make -n build` | 只显示会执行的命令，不真实执行 |
-| `make -s` | 静默模式 | `make -s clean` | 不显示执行的命令 |
-| `make -j N` | 并行执行 | `make -j 4` | 用 4 个并行任务加速编译 |
-| `make -B` | 强制重新构建 | `make -B` | 忽略时间戳，全部重新执行 |
-| `make -k` | 遇错继续 | `make -k test` | 某个目标失败后继续执行其他目标 |
-| `make VAR=value` | 传递变量 | `make PORT=8080 run` | 覆盖 Makefile 中的变量 |
