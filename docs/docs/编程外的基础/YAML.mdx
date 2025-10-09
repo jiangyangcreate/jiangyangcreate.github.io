@@ -1,0 +1,378 @@
+---
+sidebar_position: 2
+title: 👍YAML
+---
+
+YAML 在 GitHub/Docker 等程序员工具中被广泛用于定义配置文件，语法简单，学习成本低。
+
+YAML 的配置文件后缀为 `.yml` 或 `.yaml`，如：`abc.yml`、`config.yaml`。
+
+YAML 很简单，还在更新中，可以查看最新的 [YAML 官方文档](https://yaml.org/)。
+
+测试自己的 YAML 文件是否正确，可以使用 [online-yaml-tools](https://onlineyamltools.com/validate-yaml)。
+
+由于 YAML 文件往往会和 JSON 文件转换使用，所以本文会给出等价 JSON 格式。将 YAML 文件转换为 JSON 文件，可以使用 [https://nodeca.github.io/js-yaml/](https://nodeca.github.io/js-yaml/)。
+
+## YAML 语法
+
+### 基本语法
+
+YAML 是一种基于缩进的、用来表达数据序列化的格式。它的基本语法规则如下：
+
+- 大小写敏感。
+- 冒号后面要加空格。
+- 使用空格缩进表示层级关系，不允许使用 Tab 键。
+- 空格数目不重要，只要相同层级的元素左侧对齐即可表示层级关系。
+- `#` 表示注释，从这个字符一直到行尾，都会被解析器忽略。
+
+### 基本数据类型
+
+YAML 支持以下几种数据类型：
+
+- 对象：键值对的集合，又称为映射（mapping）/ 哈希（hashes） / 字典（dictionary）。
+- 数组：一组按次序排列的值，又称为序列（sequence） / 列表（list）。
+- 纯量（scalars）：单个的、不可再分的值。
+
+## 对象
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Highlight>对象键值对使用冒号结构表示，冒号后面要加一个空格：</Highlight>
+
+<Tabs>
+  <TabItem value="yaml" label="YAML">
+```yaml showLineNumbers
+# 对象键值对
+key: value
+
+# 对象可以包含对象
+key2:
+  child-key2: child-value
+```
+  </TabItem>
+  <TabItem value="json" label="等价JSON">
+
+```json showLineNumbers
+{
+  "key": "value",
+  "key2": {
+    "child-key2": "child-value"
+  }
+}
+```
+  </TabItem>
+</Tabs>
+
+### 引用
+
+YAML 支持引用，用 `&` 和 `*` 表示，其中 `&` 用于定义锚点，`<<` 表示合并到当前数据，`*` 用于引用锚点：
+
+```yaml showLineNumbers
+defaults: &defaults
+  adapter: postgres
+  host: localhost
+
+development:
+  database: myapp_development
+  <<: *defaults
+
+test:
+  database: myapp_test
+  <<: *defaults
+```
+
+相当于：
+
+<Tabs>
+  <TabItem value="yaml" label="YAML">
+```yaml showLineNumbers
+defaults:
+  adapter: postgres
+  host: localhost
+
+development:
+  database: myapp_development
+  adapter: postgres
+  host: localhost
+
+test:
+  database: myapp_test
+  adapter: postgres
+  host: localhost
+```
+  </TabItem>
+  <TabItem value="json" label="等价JSON">
+```json showLineNumbers
+{
+  "defaults": {
+    "adapter": "postgres",
+    "host": "localhost"
+  },
+  "development": {
+    "database": "myapp_development",
+    "adapter": "postgres",
+    "host": "localhost"
+  },
+  "test": {
+    "database": "myapp_test",
+    "adapter": "postgres",
+    "host": "localhost"
+  }
+}
+```
+  </TabItem>
+</Tabs>
+
+
+### 多文档
+
+多文档是 YAML 格式的一个重要特性，允许在一个单一的文件中包含多个独立的 YAML 文档。这对于需要将多个相关但独立的配置块、数据集或资源定义组合在一起的场景非常有用。
+
+:::tip
+在线的转换工具往往不支持多文档，python的`pyyaml`库提供了对多文档的原生支持。
+:::
+
+- 文档开始：`---`
+
+这个标记表示一个新文档的开始。文件的第一个文档前可以有 `---`，也可以没有。
+
+- 文档结束：`...`
+
+这个标记是可选的，表示当前文档的结束。在实践中，`...` 的使用远不如 `---` 普遍。
+
+<Tabs>
+  <TabItem value="yaml" label="YAML">
+```yaml showLineNumbers
+---
+# 第一个文档：数据库配置
+database:
+  host: localhost
+  port: 5432
+  name: myapp_db
+
+---
+# 第二个文档：服务器配置
+server:
+  host: 0.0.0.0
+  port: 8080
+  debug: true
+
+---
+# 第三个文档：功能开关
+features:
+  - user_registration
+  - email_notifications
+  - premium_content
+...
+```
+  </TabItem>
+  <TabItem value="json" label="等价表示">
+```json showLineNumbers
+[
+  {
+    "database": {
+      "host": "localhost",
+      "port": 5432,
+      "name": "myapp_db"
+    }
+  },
+  {
+    "server": {
+      "host": "0.0.0.0",
+      "port": 8080,
+      "debug": true
+    }
+  },
+  {
+    "features": [
+      "user_registration",
+      "email_notifications",
+      "premium_content"
+    ]
+  }
+]
+```
+  </TabItem>
+</Tabs>
+
+
+
+## 数组
+
+直接定义数组（较少见）：
+
+<Tabs>
+  <TabItem value="yaml" label="YAML">
+
+```yaml showLineNumbers
+# 使用 `-` 加空格表示数组中的一个元素
+- Python
+- C
+
+# 嵌套数组（数组中的元素也是数组）
+- - A
+  - B
+
+# 数组包含两个数组元素
+- - A   
+- - B   
+
+# 数组中可以包含对象
+- name: Python
+  level: senior
+
+# 使用问号表示复杂 key（数组作为 key），配合冒号表示 value
+# 不易被转换为 JSON
+? - complexkey1
+  - complexkey2
+: - complexvalue1
+  - complexvalue2
+```
+</TabItem>
+  <TabItem value="json" label="等价JSON">
+```json showLineNumbers
+// 简单数组
+["Python","C"]
+
+// 嵌套数组（数组的元素也是数组）
+[
+  ["A", "B"]
+]
+
+// 数组包含两个数组元素
+[ 
+  [ "A" ], 
+  [ "B" ] 
+]
+
+// 数组中包含对象
+[
+  {
+    "name": "Python",
+    "level": "senior"
+  }
+]
+
+// 复杂 key（数组作为 key）
+{ "complexkey1,complexkey2": [ "complexvalue1", "complexvalue2" ] }
+
+```
+  </TabItem>
+</Tabs>
+
+数组和对象可以构成复合结构：
+
+<Tabs>
+  <TabItem value="yaml" label="YAML">
+```yaml showLineNumbers
+languages:
+  - YAML
+  - Python
+# 行内定义数组
+web: [HTML, CSS, JavaScript]
+websites:
+  YAML: yaml.org
+  Python: python.org
+
+companies:
+  - id: 1
+    name: company1
+    price: 200W
+  - id: 2
+    name: company2
+    price: 500W
+```
+  </TabItem>
+  <TabItem value="json" label="等价JSON">
+```json showLineNumbers
+{
+  "languages": ["YAML", "Python"],
+  "web": ["HTML", "CSS", "JavaScript"],
+  "websites": {
+    "YAML": "yaml.org",
+    "Python": "python.org"
+  },
+  "companies": [
+    { "id": 1, "name": "company1", "price": "200W" },
+    { "id": 2, "name": "company2", "price": "500W" }
+  ]
+}
+```
+  </TabItem>
+</Tabs>
+
+
+## 纯量
+
+纯量是最基本的、不可再分的值。下面是一些常见的纯量：
+
+- 字符串：普通的字符串。
+- 布尔值：true 或 false。
+- 整数：如 1、2、3。
+- 浮点数：如 1.2、3.14159。
+- Null：空值。
+- 时间：如 2018-12-29 12:00:00。
+- 日期：如 2018-12-29。
+
+<Tabs>
+  <TabItem value="yaml" label="YAML">
+```yaml showLineNumbers
+boolean:
+  - TRUE # true、True都可以
+  - FALSE # false、False都可以
+float:
+  - 3.14
+  - 6.8523015e+5 # 可以使用科学计数法
+int:
+  - 123
+  - 0b1010_0111_0100_1010_1110 # 二进制表示
+null:
+  nodeName: "node"
+  parent: ~ # 使用 ~ 表示 null
+string:
+  - 哈哈 # 默认不使用引号表示
+  - 'labor''s day' # 单引号之中如果还有单引号，必须连续使用两个单引号转义
+  - "Hello world" # 可以使用双引号或者单引号包裹特殊字符
+  - "内容\n字符串" # 双引号会对特殊字符转义，比如 \n 表示换行，\t 表示制表符
+  - A
+    B # 字符串可以拆成多行，每一行会被转化成一个空格
+  - | # 使用 | 保留换行符
+    C
+    D
+  - > # 使用 > 折叠换行符
+    E
+    F
+  
+date:
+  - 2018-02-17 # 日期必须使用 ISO 8601 格式，即 yyyy-MM-dd
+datetime:
+  - 2018-02-17T15:02:31+08:00 # 时间使用 ISO 8601 格式，时间和日期之间使用 T 连接，最后使用 + 代表时区
+```
+
+</TabItem>
+  <TabItem value="json" label="等价JSON">
+```json showLineNumbers
+{
+  "boolean": [true, false],
+  "float": [3.14, 685230.15],
+  "int": [123, 685230],
+  "null": {
+    "nodeName": "node",
+    "parent": null
+  },
+  "string": [
+    "哈哈",
+    "labor's day",
+    "Hello world",
+    "内容\n字符串",
+    "A B",
+    "C\nD\n",
+    "E F\n"
+  ],
+  "date": ["2018-02-17"],
+  "datetime": ["2018-02-17T15:02:31+08:00"]
+}
+```
+  </TabItem>
+</Tabs>
