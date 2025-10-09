@@ -1,0 +1,304 @@
+---
+sidebar_position: 8
+title: 数据库基础
+---
+
+import Highlight from '@site/src/components/Highlight';
+
+:::info
+了解不同数据库的特点和适用场景，而不必深入底层实现。重点关注：数据存储、向量检索、缓存管理。
+:::
+
+## 快速入门SQL
+
+SQL（结构化查询语言）是操作关系型数据库的标准语言。不同数据库的SQL语法90%相同，学会一种即可触类旁通。
+
+**推荐学习资源**：
+- <Highlight color="green">[SQLBolt](https://sqlbolt.com/) - 交互式SQL教程（1-2小时快速入门）</Highlight>
+- [W3Schools SQL](https://www.w3schools.com/sql/) - 中文入门教程
+- [LeetCode数据库题](https://leetcode.com/problemset/database/) - 实战练习
+
+**常用SQL速查**：
+```sql
+-- 查询
+SELECT * FROM table WHERE condition ORDER BY column LIMIT 10;
+
+-- 插入
+INSERT INTO table (col1, col2) VALUES (val1, val2);
+
+-- 更新
+UPDATE table SET col1 = val1 WHERE condition;
+
+-- 删除
+DELETE FROM table WHERE condition;
+
+-- 连接查询
+SELECT * FROM table1 JOIN table2 ON table1.id = table2.id;
+```
+
+## 常用数据库选择指南
+
+### 关系型数据库 - PostgreSQL
+
+<Highlight color="green">**推荐用于：结构化数据存储、复杂查询、向量检索（pgvector）**</Highlight>
+
+**核心特点**：
+- 支持JSON、数组等丰富数据类型
+- **pgvector扩展**：向量存储和相似度搜索
+- 完整的ACID事务支持
+- 性能稳定，适合复杂查询
+
+**快速上手**：
+```sql
+-- 安装pgvector扩展进行向量检索
+CREATE EXTENSION vector;
+
+-- 创建带向量字段的表
+CREATE TABLE embeddings (
+  id serial PRIMARY KEY,
+  text text,
+  embedding vector(1536)  -- OpenAI embedding维度
+);
+
+-- 查询最相似的向量
+SELECT text FROM embeddings 
+ORDER BY embedding <-> '[0.1,0.2,...]'::vector 
+LIMIT 5;
+```
+
+**参考资源**：
+- [PostgreSQL官方文档](https://www.postgresql.org/docs/)
+- [pgvector GitHub](https://github.com/pgvector/pgvector)
+
+---
+
+### 文档数据库 - MongoDB
+
+<Highlight color="blue">**推荐用于：非结构化数据、日志存储、快速原型开发**</Highlight>
+
+**核心特点**：
+- 存储JSON格式文档，灵活的schema
+- 水平扩展能力强
+- 适合存储对话历史、用户画像等动态数据
+
+**典型应用场景**：
+- 聊天机器人对话记录
+- 用户行为日志
+- 配置文件和元数据
+
+**Python快速使用**：
+```python
+from pymongo import MongoClient
+
+client = MongoClient('mongodb://localhost:27017/')
+db = client['ai_app']
+
+# 存储对话历史
+db.conversations.insert_one({
+    'user_id': 'user123',
+    'messages': [
+        {'role': 'user', 'content': '你好'},
+        {'role': 'assistant', 'content': '你好！有什么可以帮助你的吗？'}
+    ],
+    'timestamp': '2024-01-01'
+})
+```
+
+---
+
+### 内存数据库 - Redis
+
+<Highlight color="red">**推荐用于：缓存、会话管理、实时排行榜**</Highlight>
+
+**核心特点**：
+- 微秒级响应速度（内存存储）
+- 支持多种数据结构：String、List、Set、Hash、Sorted Set
+- 适合做缓存、消息队列、API限流
+
+**常用数据类型**：
+| 类型 | 说明 | 典型场景 |
+|------|------|-----------|
+| String | 键值对 | 缓存数据、Token存储 |
+| Hash | 字典 | 用户会话信息 |
+| List | 队列 | 消息队列、任务列表 |
+| Sorted Set | 有序集合 | 排行榜、延时队列 |
+
+**Python示例**：
+```python
+import redis
+
+r = redis.Redis(host='localhost', port=6379)
+
+# 缓存数据
+r.setex('cache:key123', 3600, '缓存内容')  # 1小时过期
+
+# 获取缓存
+cached = r.get('cache:key123')
+```
+
+**持久化方式**：
+- **RDB**：定期快照（默认）
+- **AOF**：记录每次写操作（更安全但稍慢）
+
+---
+
+## 向量数据库
+
+<Highlight color="purple">**推荐用于：Embedding存储、语义搜索、相似度检索**</Highlight>
+
+向量数据库是专门用于处理高维向量数据的数据库系统。
+
+### 什么是向量数据库？
+
+向量数据库专门用于存储和检索高维向量数据（如文本、图像的embedding），支持快速的相似度搜索。
+
+**核心能力**：
+- 存储高维向量（通常512-4096维）
+- 向量相似度搜索（余弦相似度、欧氏距离等）
+- 支持百万到亿级向量的快速检索
+
+### 主流向量数据库对比
+
+| 数据库 | 类型 | 特点 | 推荐场景 |
+|-------|------|------|---------|
+| **pgvector** | PostgreSQL扩展 | 成熟稳定、与SQL无缝集成 | 中小规模、需要事务支持 |
+| **Pinecone** | 云服务 | 托管服务、开箱即用 | 快速原型、不想自己运维 |
+| **Milvus** | 专用向量库 | 高性能、支持大规模 | 大规模生产环境 |
+| **Chroma** | 轻量级 | 易用、适合开发测试 | 本地开发、小型项目 |
+| **Qdrant** | 专用向量库 | Rust开发、性能好 | 需要高性能的场景 |
+
+### 快速示例：使用pgvector
+
+```python
+import psycopg2
+from openai import OpenAI
+
+# 连接数据库
+conn = psycopg2.connect("dbname=mydb user=myuser")
+cur = conn.cursor()
+
+# 获取文本的embedding
+client = OpenAI()
+text = "人工智能是什么？"
+response = client.embeddings.create(
+    model="text-embedding-3-small",
+    input=text
+)
+embedding = response.data[0].embedding
+
+# 存储向量
+cur.execute(
+    "INSERT INTO documents (content, embedding) VALUES (%s, %s)",
+    (text, embedding)
+)
+
+# 语义搜索：找到最相似的5条记录
+query_embedding = client.embeddings.create(
+    model="text-embedding-3-small",
+    input="AI的定义"
+).data[0].embedding
+
+cur.execute("""
+    SELECT content, embedding <-> %s::vector AS distance
+    FROM documents
+    ORDER BY distance
+    LIMIT 5
+""", (query_embedding,))
+
+results = cur.fetchall()
+for content, distance in results:
+    print(f"{content} (相似度: {1-distance:.3f})")
+```
+
+---
+
+## 核心概念速查
+
+### ACID vs BASE
+
+**ACID**（关系型数据库）：
+- **A**tomicity：原子性 - 事务全部成功或全部失败
+- **C**onsistency：一致性 - 数据符合约束规则
+- **I**solation：隔离性 - 并发事务互不干扰
+- **D**urability：持久性 - 提交后永久保存
+
+**BASE**（NoSQL数据库）：
+- **B**asically Available：基本可用
+- **S**oft-state：软状态（允许短暂不一致）
+- **E**ventually Consistent：最终一致性
+
+### 事务隔离级别（从低到高）
+
+| 隔离级别 | 脏读 | 不可重复读 | 幻读 | 性能 |
+|---------|-----|-----------|------|-----|
+| Read Uncommitted | ✗ | ✗ | ✗ | 最快 |
+| Read Committed | ✓ | ✗ | ✗ | 快 |
+| Repeatable Read（MySQL默认） | ✓ | ✓ | ✗ | 中 |
+| Serializable | ✓ | ✓ | ✓ | 慢 |
+
+:::tip 实践建议
+- 大部分场景使用**Read Committed**即可
+- 需要强一致性时使用**Repeatable Read**
+- 高并发场景可以接受**最终一致性**，选NoSQL
+:::
+
+---
+
+## 总结：如何选择数据库？
+
+### 典型应用场景推荐
+
+| 应用场景 | 推荐数据库 | 理由 |
+|---------|-----------|------|
+| **语义搜索** | PostgreSQL + pgvector | 结构化数据 + 向量检索一体化 |
+| **聊天应用** | MongoDB + Redis | 灵活schema存对话 + Redis缓存 |
+| **推荐系统** | Redis + PostgreSQL | Redis实时推荐 + PG存用户数据 |
+| **全文检索** | Elasticsearch/Milvus | 专业检索性能优 |
+| **内容管理** | PostgreSQL | 事务支持 + 复杂查询 |
+| **实时缓存** | Redis | 毫秒级响应速度 |
+
+### 快速决策流程
+
+```
+开始
+  ↓
+需要向量搜索？
+  ├─ 是 → 数据量 < 100万？
+  │         ├─ 是 → pgvector（推荐）
+  │         └─ 否 → Milvus/Qdrant
+  │
+  └─ 否 → 数据结构化？
+            ├─ 是 → 需要事务？
+            │        ├─ 是 → PostgreSQL
+            │        └─ 否 → SQLite（小型）
+            │
+            └─ 否 → 需要缓存/高速读写？
+                     ├─ 是 → Redis
+                     └─ 否 → MongoDB
+```
+
+### 技能建议
+
+根据项目需求，建议掌握：
+
+1. <Highlight color="green">**优先掌握**：PostgreSQL（含pgvector）+ Redis</Highlight>
+2. **推荐了解**：MongoDB、向量数据库（Pinecone/Chroma）
+3. **了解即可**：MySQL、SQLite
+
+:::info 学习路径
+- **2小时**：完成SQLBolt SQL教程，掌握基础语法
+- **半天**：动手搭建 PostgreSQL + pgvector
+- **1天**：实践一个完整的数据库应用
+- **长期**：在项目中积累经验，根据需求深入学习
+
+你不需要成为数据库专家，但要能快速选择合适的工具并用起来。
+:::
+
+### 推荐资源
+
+- <Highlight color="green">[SQLBolt](https://sqlbolt.com/) - SQL快速入门</Highlight>
+- [PostgreSQL官方文档](https://www.postgresql.org/docs/)
+- [pgvector GitHub](https://github.com/pgvector/pgvector)
+- [Redis官方文档](https://redis.io/docs/)
+- [MongoDB University](https://university.mongodb.com/) - 免费课程
+- [Pinecone文档](https://docs.pinecone.io/) - 向量数据库入门

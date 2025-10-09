@@ -3,8 +3,6 @@ sidebar_position: 2
 title: YAML
 ---
 
-YAML
-
 YAML 在 github/docker 等程序员工具被广泛用于定义配置文件，非常简单也很有必要学习。
 
 YAML 的配置文件后缀为 .yml，如：abc.yml
