@@ -401,6 +401,7 @@
 <p>基于不同的目的，我们会选择不同的传感器结合不同的算法来实现。</p>
 <table><thead><tr><th>传感器</th><th>应用场景</th><th>优势</th><th>劣势</th></tr></thead><tbody><tr><td><strong>激光雷达</strong></td><td>SLAM建图、避障</td><td>精度高，不受光照影响</td><td>价格贵，无颜色信息</td></tr><tr><td><strong>摄像头</strong></td><td>目标识别、视觉SLAM</td><td>成本低，信息丰富</td><td>受光照影响，计算量大</td></tr><tr><td><strong>深度相机</strong></td><td>室内SLAM、3D重建</td><td>提供RGB+深度，实时性好</td><td>仅室内可用，范围有限(5m)</td></tr><tr><td><strong>IMU</strong></td><td>姿态估计、传感器融合</td><td>高频输出，不依赖环境</td><td>存在漂移，需融合其他传感器</td></tr></tbody></table>
 <p>机器人专业可以参考<a href="https://gazebosim.org/docs/latest/sensors/" target="_blank" rel="noopener noreferrer">官方文档教程</a>，其中使用的是IMU 传感器、接触式传感器和激光雷达传感器。</p>
+<p>人工智能专业可以下载我设计的<a href="https://github.com/jiangyangcreate/AI-Practice-Collection/tree/main/Gazebo_CV" target="_blank" rel="noopener noreferrer">简易地图</a></p>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="ros_gz_bridge">ros_gz_bridge<a href="https://jiangmiemie.com/blog/2025/7/30/#ros_gz_bridge" class="hash-link" aria-label="Direct link to ros_gz_bridge" title="Direct link to ros_gz_bridge">​</a></h2>
 <p>此部分代码来自官方文档<a href="https://gazebosim.org/docs/latest/ros2_integration/" target="_blank" rel="noopener noreferrer">https://gazebosim.org/docs/latest/ros2_integration/</a></p>
 <p><strong>数据流向</strong>：</p>
