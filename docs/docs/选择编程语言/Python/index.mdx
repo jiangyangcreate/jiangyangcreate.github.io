@@ -158,7 +158,9 @@ cd example
 uv python find
 
 # 添加包，添加时会自动创建venv环境，同时更新项目依赖文件pyproject.toml，无需python -m venv，无需反复pip freeze
-uv add ruff
+uv add ruff 
+# uv 的 pip 默认可用，但是不安装于 .venv 中，如果某些包（如 ipynb 内核）需要安装于 .venv 中且依赖 pip，可以使用 uv add pip 命令。
+uv add pip
 
 # 自动检查代码格式
 uv run ruff check
