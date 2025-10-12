@@ -1,14 +1,205 @@
 ---
 sidebar_position: 13
-title: （编写中）位操作
+title: （编写中）⭐位操作
 ---
 
 ## 二进制数、位、字节
 
+在C语言中，位操作是底层编程的核心技能，特别在Python-C互操作中用于：
+- 处理硬件寄存器
+- 优化数据存储
+- 实现位标志和掩码
+
+### 二进制表示
+```c
+int binary = 0b1010; // C99支持的二进制字面量
+printf("%d", binary); // 输出: 10
+```
+
 ## 其他进制数
+
+```c
+int decimal = 10;    // 十进制
+int octal = 012;     // 八进制 (0开头)
+int hex = 0xA;       // 十六进制 (0x开头)
+int binary = 0b1010; // 二进制 (0b开头, C99+)
+```
 
 ## C按位运算符
 
+### 基本位运算符
+```c
+unsigned char a = 0b10101010; // 170
+unsigned char b = 0b11001100; // 204
+
+// 按位与 &
+unsigned char and_result = a & b; // 0b10001000 (136)
+
+// 按位或 |
+unsigned char or_result = a | b;  // 0b11101110 (238)
+
+// 按位异或 ^
+unsigned char xor_result = a ^ b; // 0b01100110 (102)
+
+// 按位取反 ~
+unsigned char not_result = ~a;    // 0b01010101 (85)
+```
+
+### 移位运算符
+```c
+unsigned char num = 0b10101010; // 170
+
+// 左移 <<
+unsigned char left_shift = num << 2; // 0b1010101000 (680)
+
+// 右移 >>
+unsigned char right_shift = num >> 2; // 0b00101010 (42)
+```
+
 ## 位字段
 
+位字段在Python-C互操作中非常有用，可以紧凑地存储多个布尔标志：
+
+```c
+// 定义位字段结构
+struct StatusFlags {
+    unsigned int is_ready : 1;     // 1位
+    unsigned int has_error : 1;    // 1位
+    unsigned int error_code : 4;   // 4位
+    unsigned int reserved : 2;     // 2位
+};
+
+// 使用示例
+struct StatusFlags status;
+status.is_ready = 1;
+status.has_error = 0;
+status.error_code = 5; // 最大15 (4位)
+```
+
 ## 对齐特性
+
+### 内存对齐
+```c
+#include <stdalign.h>
+
+// 指定对齐要求
+alignas(16) double data[4]; // 16字节对齐
+
+// 查询对齐要求
+printf("Alignment: %zu\n", alignof(double));
+```
+
+### 结构体对齐控制
+```c
+// 紧凑包装（可能降低性能）
+#pragma pack(push, 1)
+struct PackedData {
+    char a;
+    int b;
+    short c;
+};
+#pragma pack(pop)
+
+// 或者使用GCC属性
+struct __attribute__((packed)) PackedData {
+    char a;
+    int b;
+    short c;
+};
+```
+
+## Python-C互操作中的应用
+
+### 位掩码与Python交互
+```c
+// C函数：处理位标志
+export int process_flags(int flags) {
+    if (flags & 0x01) {
+        // 处理第一个标志
+    }
+    if (flags & 0x02) {
+        // 处理第二个标志
+    }
+    return flags | 0x80; // 设置完成标志
+}
+```
+
+```python
+# Python调用
+from ctypes import CDLL, c_int
+
+lib = CDLL('./mylib.so')
+lib.process_flags.argtypes = [c_int]
+lib.process_flags.restype = c_int
+
+result = lib.process_flags(0x03)  # 同时设置两个标志
+print(f"Result: 0x{result:02x}")  # 输出: Result: 0x83
+```
+
+### 性能优化示例
+
+使用位操作替代布尔数组：
+```c
+// 使用单个整数存储32个布尔值
+unsigned int flags = 0;
+
+// 设置第5位
+flags |= (1 << 4);
+
+// 检查第5位
+if (flags & (1 << 4)) {
+    // 第5位被设置
+}
+
+// 清除第5位
+flags &= ~(1 << 4);
+```
+
+## 常见位操作技巧
+
+### 判断奇偶性
+```c
+int is_even(int x) {
+    return (x & 1) == 0;
+}
+```
+
+### 交换两个变量
+```c
+void swap(int *a, int *b) {
+    *a = *a ^ *b;
+    *b = *b ^ *a;
+    *a = *a ^ *b;
+}
+```
+
+### 计算二进制中1的个数
+```c
+int count_ones(unsigned int x) {
+    int count = 0;
+    while (x) {
+        count += x & 1;
+        x >>= 1;
+    }
+    return count;
+}
+
+// 更高效的方法（Brian Kernighan算法）
+int count_ones_fast(unsigned int x) {
+    int count = 0;
+    while (x) {
+        x &= x - 1;
+        count++;
+    }
+    return count;
+}
+```
+
+## 注意事项
+
+1. **符号位问题**：右移位操作对有符号数和无符号数行为不同
+2. **移位范围**：避免移位超过数据类型位数
+3. **可移植性**：位字段的具体实现可能因编译器而异
+4. **性能考量**：现代CPU通常能高效处理位操作，但要注意缓存友好性
+
+位操作是C语言底层编程的核心技能，在Python-C互操作中尤其重要，可以显著提高性能并减少内存使用。

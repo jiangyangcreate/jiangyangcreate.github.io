@@ -1,10 +1,238 @@
 ---
 sidebar_position: 12
-title: （编写中）结构和其他数据形式
+title: （编写中）⭐结构和其他数据形式
 ---
-
 
 ## 结构体
 
+结构体是C语言中组织相关数据的核心机制，在Python-C互操作中用于：
+- 定义复杂的数据结构
+- 与Python类进行映射
+- 高效传递多个相关数据
+
+### 基本结构体定义
+```c
+// 定义结构体
+struct Person {
+    char name[50];
+    int age;
+    float height;
+};
+
+// 使用typedef简化
+typedef struct {
+    char name[50];
+    int age;
+    float height;
+} Person;
+
+// 声明变量
+Person p1;
+Person *p2 = malloc(sizeof(Person));
+```
+
+### 结构体初始化和访问
+```c
+// 初始化
+Person p1 = {"张三", 25, 175.5};
+Person p2 = {.name = "李四", .age = 30, .height = 180.0};
+
+// 访问成员
+printf("姓名: %s\n", p1.name);
+printf("年龄: %d\n", p1.age);
+
+// 指针访问
+Person *ptr = &p1;
+printf("身高: %.1f\n", ptr->height);
+```
+
+### 结构体嵌套
+```c
+typedef struct {
+    int year;
+    int month;
+    int day;
+} Date;
+
+typedef struct {
+    char name[50];
+    Date birthdate;
+    float salary;
+} Employee;
+
+Employee emp = {
+    .name = "王五",
+    .birthdate = {1990, 5, 15},
+    .salary = 8000.0
+};
+```
 
 ## 联合体
+
+联合体允许在同一内存位置存储不同的数据类型，在Python-C互操作中用于：
+- 节省内存空间
+- 实现变体类型
+- 处理网络协议数据
+
+### 基本联合体
+```c
+union Data {
+    int i;
+    float f;
+    char str[20];
+};
+
+union Data data;
+data.i = 10;
+printf("data.i: %d\n", data.i);
+
+data.f = 3.14;
+printf("data.f: %.2f\n", data.f);
+```
+
+### 带标签的联合体
+```c
+typedef struct {
+    enum { INT, FLOAT, STRING } type;
+    union {
+        int i;
+        float f;
+        char str[20];
+    } value;
+} Variant;
+
+Variant var;
+var.type = INT;
+var.value.i = 42;
+
+if (var.type == INT) {
+    printf("整数值: %d\n", var.value.i);
+}
+```
+
+## 枚举
+
+枚举提供有意义的名称来代替数字常量：
+
+```c
+typedef enum {
+    RED,    // 0
+    GREEN,  // 1
+    BLUE    // 2
+} Color;
+
+Color c = GREEN;
+if (c == GREEN) {
+    printf("这是绿色\n");
+}
+```
+
+## Python-C互操作中的应用
+
+### 结构体与Python类的映射
+```c
+// C结构体
+typedef struct {
+    double x;
+    double y;
+} Point;
+
+export Point* create_point(double x, double y) {
+    Point *p = malloc(sizeof(Point));
+    p->x = x;
+    p->y = y;
+    return p;
+}
+
+export double point_distance(Point *p1, Point *p2) {
+    double dx = p1->x - p2->x;
+    double dy = p1->y - p2->y;
+    return sqrt(dx*dx + dy*dy);
+}
+```
+
+```python
+# Python包装类
+from ctypes import Structure, c_double, CDLL, POINTER
+
+class Point(Structure):
+    _fields_ = [("x", c_double), ("y", c_double)]
+
+lib = CDLL('./geometry.so')
+lib.create_point.argtypes = [c_double, c_double]
+lib.create_point.restype = POINTER(Point)
+lib.point_distance.argtypes = [POINTER(Point), POINTER(Point)]
+lib.point_distance.restype = c_double
+
+# 使用
+p1 = lib.create_point(1.0, 2.0)
+p2 = lib.create_point(4.0, 6.0)
+distance = lib.point_distance(p1, p2)
+print(f"距离: {distance}")
+```
+
+### 复杂数据结构的传递
+```c
+// 图像数据结构
+typedef struct {
+    int width;
+    int height;
+    int channels;
+    unsigned char *data;
+} Image;
+
+export void process_image(Image *img) {
+    // 处理图像数据
+    for (int i = 0; i < img->width * img->height * img->channels; i++) {
+        img->data[i] = 255 - img->data[i]; // 反色处理
+    }
+}
+```
+
+## 内存布局和对齐
+
+### 结构体大小和对齐
+```c
+#include <stdio.h>
+
+typedef struct {
+    char a;     // 1字节
+    int b;      // 4字节
+    short c;    // 2字节
+} Example;
+
+int main() {
+    printf("Sizeof Example: %zu\n", sizeof(Example));
+    printf("Offset of a: %zu\n", offsetof(Example, a));
+    printf("Offset of b: %zu\n", offsetof(Example, b));
+    printf("Offset of c: %zu\n", offsetof(Example, c));
+    return 0;
+}
+```
+
+### 手动内存对齐
+```c
+// 确保结构体按8字节对齐
+typedef struct __attribute__((aligned(8))) {
+    char a;
+    int b;
+    short c;
+} AlignedExample;
+```
+
+## 最佳实践
+
+1. **使用typedef**：简化结构体类型名称
+2. **初始化所有字段**：避免未初始化数据
+3. **考虑内存布局**：合理安排字段顺序减少填充
+4. **文档化结构体**：说明每个字段的用途和单位
+5. **验证输入数据**：在Python-C边界进行数据验证
+
+## 常见陷阱
+
+1. **内存对齐问题**：不同平台对齐要求可能不同
+2. **字节序问题**：网络传输时需要注意字节序
+3. **填充字节**：结构体中的填充字节可能导致数据不一致
+4. **指针生命周期**：确保C中分配的内存在Python中正确管理
+
+结构体和联合体是C语言中组织数据的强大工具，在Python-C互操作中尤为重要。正确使用它们可以创建高效、类型安全的数据接口。
