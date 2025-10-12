@@ -1,0 +1,25 @@
+
+glob 模块会按照 Unix shell 所使用的规则找出所有匹配特定模式的路径名称，但返回结果的顺序是不确定的。
+
+##  匹配规则
+glob 模块的语法和 Unix shell 所使用的规则类似，下面是一些例子：
+
+- `*.py` 匹配所有以 `.py` 结尾的文件
+- `[abc]` 匹配 `a`、`b` 或 `c`
+- `[!abc]` 匹配除 `a`、`b` 和 `c` 以外的任何字符
+
+[glob 官方模块文档](https://docs.python.org/zh-cn/3/library/glob.html#module-glob)
+
+```python showLineNumbers
+import glob
+
+print(glob.glob('*.py'))
+```
+
+##  glob.glob
+
+##  glob.iglob
+
+##  glob.escape
+
+##  glob.translate

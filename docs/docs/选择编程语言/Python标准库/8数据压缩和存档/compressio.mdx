@@ -1,0 +1,158 @@
+---
+sidebar_position: 3
+title: compression
+---
+
+`compression`包包含规范的压缩模块，其中包含几种不同压缩算法的接口。
+
+:::info
+其中一些模块在历史上是作为单独的模块提供的；出于兼容性原因，它们将继续以其原始名称提供，并且在没有弃用周期的情况下不会被删除。
+:::
+
+| 模块 | 算法 | 压缩率 | 速度 | 应用场景 |
+|------|--------|------|------|----------|
+| compression.zstd | zstd | 高 | 快 | 实时数据、大数据 |
+| compression.lzma | lzma | 很高 | 很慢 | 长期存档 |
+| compression.bz2 | bzip2 | 高 | 慢 | 归档存储 |
+| compression.gzip | gzip | 中等 | 中等 | 传统Web传输 |
+
+这里只介绍 `Python 3.14` 新增的 `compression.zstd`，综合性能最好的压缩算法。
+
+## compression.zstd
+
+### 压缩等级
+
+常规压缩等级需大于 0。当等级值超过 20 时，将被视为"极致"压缩级别，该级别需要比其他等级消耗更多内存。负数值可用于以牺牲压缩率为代价换取更快的压缩速度。
+
+```python showLineNumbers
+from compression import zstd
+
+# 压缩等级范围
+lower, upper = zstd.CompressionParameter.compression_level.bounds()
+print(lower, upper)
+# -131072 22
+```
+:::info
+-131072 即 -2^17 是最快的压缩。
+
+22 是最极致的压缩，速度最慢。
+
+推荐使用1-19之间的等级，速度和压缩率都比较平衡。
+:::
+
+### 压缩与解压
+
+函数签名：`compression.zstd.open(file, /, mode='rb', *, level=None, options=None, zstd_dict=None, encoding=None, errors=None, newline=None)`
+
+参数说明：
+- `file`：文件路径
+- `mode`：文件模式
+- `level`：压缩级别
+- `options`：压缩选项
+- `zstd_dict`：zstd字典
+- `encoding`：编码
+- `errors`：错误处理
+- `newline`：换行处理
+
+
+返回值：
+- 返回一个文件对象
+
+```python showLineNumbers
+from compression import zstd
+
+def compress_file(input_file, output_file, level=3):
+    """
+    压缩单个文件
+    参数:
+        input_file: 输入文件路径
+        output_file: 输出文件路径
+        level: 压缩级别
+    """
+    """压缩单个文件"""
+    with open(input_file, 'rb') as f_in:
+        data = f_in.read()
+    
+    with zstd.open(output_file, 'wb', level) as f_out:
+        f_out.write(data)
+
+
+def decompress_file(input_file, output_file):
+    """解压单个文件"""
+    with zstd.open(input_file, 'rb') as f_in:
+        data = f_in.read()
+    
+    with open(output_file, 'wb') as f_out:
+        f_out.write(data)
+```
+
+:::tip
+
+压缩文件夹和解压文件夹需要借助 `tarfile` 模块将文件夹打包成 `tar` 文件，然后再用 `zstd` 压缩。
+
+使用 `tarfile` 和 `zstd` 压缩文件夹：
+
+```python showLineNumbers
+import tarfile
+from compression import zstd
+
+def compress_folder(folder_path, output_file):
+    """压缩整个文件夹为 .tar.zst"""
+    # 步骤1：创建 tar 归档
+    tar_file = "temp.tar"
+    with tarfile.open(tar_file, 'w') as tar:
+        tar.add(folder_path)
+    
+    # 步骤2：用 zstd 压缩 tar 文件
+    with open(tar_file, 'rb') as f_in:
+        with zstd.open(output_file, 'wb', level=3) as f_out:
+            f_out.write(f_in.read())
+    
+    # 删除临时文件
+    import os
+    os.remove(tar_file)
+
+
+def decompress_folder(input_file, output_dir="."):
+    """解压 .tar.zst 文件"""
+    # 步骤1：解压 zstd
+    tar_file = "temp.tar"
+    with zstd.open(input_file, 'rb') as f_in:
+        with open(tar_file, 'wb') as f_out:
+            f_out.write(f_in.read())
+    
+    # 步骤2：解压 tar
+    with tarfile.open(tar_file, 'r') as tar:
+        tar.extractall(path=output_dir)
+    
+    # 删除临时文件
+    import os
+    os.remove(tar_file)
+```
+:::
+
+
+### 在内存中压缩和解压缩数据
+
+函数签名：`compression.zstd.compress(data, level=None, options=None, zstd_dict=None)`
+
+参数说明：
+- `data`：要压缩的数据
+- `level`：压缩级别，0-19，0为最快，19为最慢
+
+返回值：
+- 返回压缩后的数据
+
+
+```python showLineNumbers
+from compression import zstd
+
+def compress_bytes_data():
+    """直接压缩字节数据"""
+    data = b"hello world" * 1000
+    compressed = zstd.compress(data, level=3)
+    decompressed = zstd.decompress(compressed)
+    print(f"原始大小: {len(data)} 字节")
+    print(f"压缩后: {len(compressed)} 字节")
+    print(f"解压后匹配: {data == decompressed}")
+```

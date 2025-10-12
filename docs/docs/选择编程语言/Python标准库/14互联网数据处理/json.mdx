@@ -1,0 +1,75 @@
+
+## json 模块
+
+json 模块提供了 python->json 以及 json->python 两种格式，转换规则如下
+
+| JSON ->        | Python -> | JSON           |
+| -------------- | --------- | -------------- |
+| object -- 对象  | dict      | object -- 对象 |
+| array          | list      | array          |
+| string         | str       | string         |
+| number (int)   | int       | number         |
+| number (real)  | float     | number         |
+| true           | True      | true           |
+| false          | False     | false          |
+| null           | None      | null           |
+|                | tuple     | array          |
+
+注意：JSON 中的键-值对中的键永远是 str 类型的。当一个对象被转化为
+JSON 时，字典中所有的键都会被强制转换为字符串。这所造成的结果是字典被转换为 JSON 然后转换回字典时可能和原来的不相等。换句话说，如果 x 具有非字符串的键，则有 loads(dumps(x)) != x。
+
+json 模块还有一些其他参数可以控制：编码形式、格式化输出等，不过很少用到
+
+[json 官方模块文档](https://docs.python.org/zh-cn/3/library/json.html#module-json)
+
+### json.load 与 json.dump
+
+json.load 与 json.dump 是基于文件的转换。
+
+```python showLineNumbers
+import json
+
+data = {
+    "name": "Satyam kumar",
+    "place": "patna",
+    "skills": [
+        "Raspberry pi",
+        "Machine Learning",
+        "Web Development"
+    ],
+    "email": "xyz@gmail.com",
+    "projects": [
+        "Python Data Mining",
+        "Python Data Science"
+    ]
+}
+with open("data_file.json", "w") as write:
+    json.dump(data, write)
+
+with open("data_file.json", "r") as read_content:
+    print(json.load(read_content))
+```
+
+### json.loads 与 json.dumps
+
+`json.loads` 与 `json.dumps` 是直接基于数据的转换，这里的`s`表示`string`(字符串)。
+
+```python showLineNumbers
+import json
+
+# JSON string:
+# Multi-line string
+data = """{
+    "Name": "Jennifer Smith",
+    "Contact Number": 7867567898,
+    "Email": "jen123@gmail.com",
+    "Hobbies":["Reading", "Sketching", "Horse Riding"]
+    }"""
+
+# parse data:
+res_p = json.loads(data)
+print(type(res_p)) # <class 'dict'>
+
+res_j = json.dumps(res_p)
+print(type(res_j)) # <class 'str'>
+```

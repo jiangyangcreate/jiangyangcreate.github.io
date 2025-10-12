@@ -152,7 +152,7 @@ def fun1(*args, **kwargs):
 fun1(2, 3, a="bar", b=10)  # (2, 3) {'a': u'bar', 'b': 10}
 ```
 
-#### 函数参数分隔符
+### 函数参数分隔符
 
 `/` - 位置专用参数分隔符
 
@@ -194,6 +194,18 @@ print(func3(1,  kwd_only=3))           # ✅ "1-3"
 # 其他调用都为错误调用
 ```
 
+### 类型注解
+
+类型注解是可选的，用于描述函数参数和返回值的类型。如果需要更加复杂的类型注解，可以使用 typing 模块。
+
+```python
+# 声名 T 可以是 int 或 str
+def add[T: (int, str)](a: T, b: T) -> T:
+    return a + b
+
+print(add(1, 2))  # 3
+print(add('foo', 'bar'))  # foobar
+```
 
 ## 内置函数
 
