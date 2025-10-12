@@ -46,7 +46,7 @@ Python环境管理工具经历了从简单到复杂，再到智能化的演进�
 :::info
 在生活中,人们使用汉语、英语、法语、德语、日语等不同的语言跟不同国家的人进行交流。在使用计算机时，人们不能直接使用英语等人类的语言和计算机交流，而是使用编程语言(Programming Language)将人们的想法编写成程序，再通过执行程序控制计算机去解决各种问题。我们将这个编程语言与计算机之间的"翻译员"称为编程环境，简称"环境"。
 
-Python环境主要由2部分组成：解释器和<HoverText text="模块库" explanation="包括标准库和第三方库，也叫包、模块、库、框架、依赖等"/>。环境管理的重点就是如何管理这些依赖，如何保证不同的模块库之间的兼容性，如何保证不同的模块库之间的可复用性。。
+Python环境主要由2部分组成：解释器和<HoverText text="模块库" explanation="包括标准库和第三方库，也叫模块、包、库、框架、依赖。"/>。环境管理的重点就是如何管理这些依赖，如何保证不同的模块库之间的兼容性，如何保证不同的模块库之间的可复用性。
 :::
 
 在 Windows 下安装 Python 是一件非常简单的事情，[Python 官网下载网址](https://www.python.org/downloads/)提供了windows安装的可执行文件，安装过程<Highlight>全部勾选</Highlight>，一路点击下一步就可以了。
@@ -136,7 +136,8 @@ docker是很典型的用空间换时间，它让开发者在任何地方都可�
 对于专业的开发者来说，绝大部分时间我们都是在创建项目、发布项目、查看别人的项目并在本地复现，这些操作比较频繁。每周 `uv` 能为你节省 1 ~ 5 个小时，要知道我每周才工作 35 ~ 40 个小时！
 :::
 
-下面是uv的常用命令示例，按项目构建顺序整理，可以参考。
+
+下面是基于[uv官方文档](https://docs.astral.sh/uv/getting-started/features)的 UV 代表性命令参考表（不含完整参数），按项目构建顺序整理，可以参考。
 
 ```bash showLineNumbers
 # Linux/macOS安装uv
@@ -184,82 +185,6 @@ uv init --app
 # 快速启动项目
 uv run fastapi dev
 ```
-
-#### UV 命令完整参考表
-
-基于[uv官方文档](https://docs.astral.sh/uv/getting-started/features)的 UV 代表性命令参考表（不含完整参数）
-
-##### Python版本管理
-
-| 命令 | 功能描述 |
-|------|----------|
-| `uv python install` | 安装Python版本 |
-| `uv python list` | 查看可用的Python版本 |
-| `uv python find` | 查找已安装的Python版本 |
-| `uv python pin` | 将当前项目固定到特定Python版本 |
-| `uv python uninstall` | 卸载Python版本 |
-
-##### 脚本执行
-
-| 命令 | 功能描述 |
-|------|----------|
-| `uv run` | 运行脚本 |
-| `uv add --script` | 为脚本添加依赖 |
-| `uv remove --script` | 从脚本中移除依赖 |
-
-##### 项目管理
-
-| 命令 | 功能描述 |
-|------|----------|
-| `uv init` | 创建新的Python项目 |
-| `uv add` | 向项目添加依赖 |
-| `uv remove` | 从项目中移除依赖 |
-| `uv sync` | 同步项目依赖到环境 |
-| `uv lock` | 为项目依赖创建锁定文件 |
-| `uv run` | 在项目环境中运行命令 |
-| `uv tree` | 查看项目的依赖树 |
-| `uv build` | 将项目构建为分发包 |
-| `uv publish` | 将项目发布到包索引 |
-
-##### 工具管理
-
-| 命令 | 功能描述 |
-|------|----------|
-| `uvx` / `uv tool run` | 在临时环境中运行工具 |
-| `uv tool install` | 全局安装工具 |
-| `uv tool uninstall` | 卸载工具 |
-| `uv tool list` | 列出已安装的工具 |
-| `uv tool update-shell` | 更新shell以包含工具可执行文件 |
-
-##### pip与venv接口兼容
-
-| 命令 | 功能描述 |
-|------|----------|
-| `uv venv` | 创建新的虚拟环境 |
-| `uv pip install` | 将包安装到当前环境 |
-| `uv pip show` | 显示已安装包的详细信息 |
-| `uv pip freeze` | 列出已安装的包及其版本 |
-| `uv pip check` | 检查当前环境是否有兼容的包 |
-| `uv pip list` | 列出已安装的包 |
-| `uv pip uninstall` | 卸载包 |
-| `uv pip tree` | 查看环境的依赖树 |
-
-##### 依赖锁定
-| 命令 | 功能描述 |
-|------|----------|
-| `uv pip compile` | 将需求编译到锁定文件 |
-| `uv pip sync` | 将环境与锁定文件同步 |
-
-##### 实用工具
-
-| 命令 | 功能描述 |
-|------|----------|
-| `uv cache clean` | 移除缓存条目 |
-| `uv cache prune` | 移除过期的缓存条目 |
-| `uv cache dir` | 显示uv缓存目录路径 |
-| `uv tool dir` | 显示uv工具目录路径 |
-| `uv python dir` | 显示uv已安装Python版本路径 |
-| `uv self update` | 将uv更新到最新版本 |
 
 ### C++开发环境搭建
 

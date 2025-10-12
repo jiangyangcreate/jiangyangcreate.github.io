@@ -12,13 +12,13 @@ title: 控制流
 
 ## 选择结构
 
-- C 语言中提供了两大选择结构, 分别是 if 和 switch
+- C 语言中提供了两大选择结构，分别是 if 和 switch
 
 ### if 与 else
 
 - if 第一种形式
 
-  - 表示如果表达式为真,执行语句块 1,否则不执行
+  - 表示如果表达式为真，执行语句块 1，否则不执行
 
 ```c showLineNumbers
 if(表达式) {
@@ -28,14 +28,19 @@ if(表达式) {
 ```
 
 ```c showLineNumbers
-if(age >= 18) {
-  printf("18岁会打印成年了！\n");
+#include <stdio.h>
+int main() {
+    int age = 20;
+    if(age >= 18) {
+        printf("满18岁，已成年！\n");
+    }
+    printf("此时语句和if条件已经无关了\n");
+    return 0;
 }
-printf("此时语句和if条件已经无关了\n");
 ```
 
 - if 第二种形式
-  - 如果表达式为真,则执行语句块 1,否则执行语句块 2
+  - 如果表达式为真，则执行语句块 1，否则执行语句块 2
   - else 不能脱离 if 单独使用
 
 ```c showLineNumbers
@@ -48,19 +53,24 @@ if(表达式){
 ```
 
 ```c showLineNumbers
-// if else 结构中，一定会有一个语句块被执行
-if(age >= 18){
-  printf("可以上网了\n");
-}else{
-  printf("未成年不准上网\n");
+#include <stdio.h>
+int main() {
+    int age = 16;
+    // if else 结构中，一定会有一个语句块被执行
+    if(age >= 18){
+        printf("可以上网了\n");
+    }else{
+        printf("未成年不准上网\n");
+    }
+    printf("此时语句和if条件已经无关了\n");
+    return 0;
 }
-printf("此时语句和if条件已经无关了\n");
 ```
 
 - if 第三种形式
-  - 如果"表达式 1"为真,则执行"语句块 1",否则判断"表达式 2",如果为真执行"语句块 2",否则再判断"表达式 3",如果真执行"语句块 3", 当表达式 1、2、3 都不满足,会执行最后一个 else 语句
-  - 众多大括号中,只有一个大括号中的内容会被执行
-  - 只有前面所有添加都不满足, 才会执行 else 大括号中的内容
+  - 如果"表达式 1"为真，则执行"语句块 1"，否则判断"表达式 2"，如果为真执行"语句块 2"，否则再判断"表达式 3"，如果真执行"语句块 3"，当表达式 1、2、3 都不满足，会执行最后一个 else 语句
+  - 众多大括号中，只有一个大括号中的内容会被执行
+  - 只有前面所有条件都不满足，才会执行 else 大括号中的内容
 
 ```c showLineNumbers
 if(表达式1) {
@@ -76,20 +86,25 @@ if(表达式1) {
 ```
 
 ```c showLineNumbers
-if(age>40){
-  printf("成熟的中年人");
-}else if(age>25){
-  printf("年轻的青年人");
-}else if(age>18){
-  printf("小伙子");
-}else{
-  printf("未成年人");
+#include <stdio.h>
+int main() {
+    int age = 30;
+    if(age>40){
+        printf("成熟的中年人\n");
+    }else if(age>25){
+        printf("年轻的青年人\n");
+    }else if(age>18){
+        printf("小伙子\n");
+    }else{
+        printf("未成年人\n");
+    }
+    printf("此时语句和if条件已经无关了\n");
+    return 0;
 }
-printf("此时语句和if条件已经无关了\n");
 ```
 
 - if 嵌套
-  - if 中可以继续嵌套 if, else 中也可以继续嵌套 if
+  - if 中可以继续嵌套 if，else 中也可以继续嵌套 if
 
 ```c showLineNumbers
 if(表达式1){
@@ -113,97 +128,122 @@ if(表达式1){
 #include <stdio.h>
 int main(){
     if(0){
-        printf("执行了if");
+        printf("执行了if\n");
     }else{
-        printf("执行了else"); // 被执行
+        printf("执行了else\n"); // 被执行
     }
+    return 0;
 }
 ```
 
-- 当 if else 后面只有一条语句时, if else 后面的大括号可以省略，极其不推荐写法，可读性差。
+- 当 if else 后面只有一条语句时，if else 后面的大括号可以省略，但极其不推荐这种写法，可读性差。
 
-<Highlight>C 语言中,仅分号`;`也是一条语句, 称之为空语句</Highlight>
+<Highlight>C 语言中，仅分号`;`也是一条语句，称之为空语句</Highlight>
 
 ```c showLineNumbers
-if(10 > 2);
-{
-printf("10 > 2");
-// 输出结果: 10 > 2
-}
-
-/*
-因为if(10 > 2)后面有一个分号, 所以系统会认为if省略了大括号
-if省略大括号时只能管控紧随其后的那条语句, 所以只能管控一个空分号语句。
-
-等价于
-*/
-if(10 > 2){/*受if条件管控的空语句*/};
-{
-printf("此时和if条件已经无关了");
-// 输出结果: 此时和if条件已经无关了
+#include <stdio.h>
+int main(){
+    if(10 > 2);
+    {
+        printf("10 > 2\n");
+        // 输出结果: 10 > 2
+    }
+    
+    /*
+    因为if(10 > 2)后面有一个分号，所以系统会认为if省略了大括号
+    if省略大括号时只能管控紧随其后的那条语句，所以只能管控一个空分号语句。
+    
+    等价于
+    */
+    if(10 > 2){/*受if条件管控的空语句*/};
+    {
+        printf("此时和if条件已经无关了\n");
+        // 输出结果: 此时和if条件已经无关了
+    }
+    return 0;
 }
 ```
 
-- 当 if else 后面的大括号被省略时, else 会自动和距离最近的一个 if 匹配
+- 当 if else 后面的大括号被省略时，else 会自动和距离最近的一个 if 匹配
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
     if(0)
-    if(1)
-    printf("A\n");
-    else // 和if(1)匹配
-    printf("B\n");
+        if(1)
+            printf("A\n");
+        else // 和if(1)匹配
+            printf("B\n");
     else // 和if(0)匹配, 因为if(1)已经被匹配过了
-    if (1)
-    printf("C\n"); // 输出C
-    else // 和if(1)匹配
-    printf("D\n");
+        if (1)
+            printf("C\n"); // 输出C
+        else // 和if(1)匹配
+            printf("D\n");
+    return 0;
 }
 ```
 
-- - 如果 if else 省略了大括号, 那么后面不能定义变量
+- 如果 if else 省略了大括号，那么后面不能定义变量
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
-    if(1)
-        int number = 10; // 系统会报错
-    printf("number = %i\n", number);
+    // 错误示例：if省略大括号后不能定义变量
+    // if(1)
+    //     int number = 10; // 系统会报错
+    // printf("number = %i\n", number);
+    
+    // 正确示例：
+    if(1){
+        int number = 10;
+        printf("number = %i\n", number);
+    }
+    return 0;
 }
 ```
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
+    // 错误示例：else省略大括号后不能定义变量
+    // if(0){
+    //     int number = 10;
+    // }else
+    //     int value = 20; // 系统会报错
+    // printf("value = %i\n", value);
+    
+    // 正确示例：
     if(0){
         int number = 10;
-    }else
-        int value = 20; // 系统会报错
-    printf("value = %i\n", value);
+    }else{
+        int value = 20;
+        printf("value = %i\n", value);
+    }
+    return 0;
 }
 ```
 
 
-- 但凡遇到比较一个变量等于或者不等于某一个常量的时候，把常量写在前面
+- 编程建议：在比较变量与常量是否相等时，建议将常量写在前面（防止误将 `==` 写成 `=`）
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
     int a = 8;
-//    if(a = 10){// 错误写法, 但不会报错
-    if (10 == a){
-      printf("a的值是10\n");
+    // if(a = 10){// 错误写法, 但不会报错, 会将10赋值给a
+    if (10 == a){ // 正确写法, 常量写在前面
+        printf("a的值是10\n");
     }else{
-     printf("a的值不是10\n");
+        printf("a的值不是10\n");
     }
+    return 0;
 }
 ```
 
 ### switch case 与 default
 
-- 由于 if else if 还是不够简洁，所以 switch 就应运而生了，他跟 if else if 互为补充关系。switch 提供了点的多路选择
-- 格式:
+- 由于 `if...else if...else` 结构还是不够简洁，所以 switch 就应运而生了，它跟 if 结构互为补充关系。switch 提供了基于具体值的多路选择
+- 格式：
 
 ```c showLineNumbers
 switch(表达式){
@@ -222,10 +262,10 @@ switch(表达式){
 }
 ```
 
-- 语义:
-  - 计算"表达式"的值, 逐个与其后的"常量表达式"值相比较,当"表达式"的值与某个"常量表达式"的值相等时, 即执行其后的语句, 然后跳出 switch 语句
-  - 如果"表达式"的值与所有 case 后的"常量表达式"均不相同时,则执行 default 后的语句
-- 示例:
+- 执行规则：
+  - 计算"表达式"的值，逐个与其后的"常量表达式"值相比较，当"表达式"的值与某个"常量表达式"的值相等时，即执行其后的语句，然后跳出 switch 语句
+  - 如果"表达式"的值与所有 case 后的"常量表达式"均不相同时，则执行 default 后的语句
+- 示例：
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -259,12 +299,13 @@ int main() {
         printf("回火星去\n");
         break;
     }
+    return 0;
 }
 ```
 
-- switch 注意点
+- **switch 注意点**
 
-* switch 条件表达式的类型必须是整型, 或者可以被提升为整型的值(char、short)
+- switch 条件表达式的类型必须是整型，或者可以被提升为整型的值（char、short）
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -282,10 +323,11 @@ int main() {
         printf("回火星去\n");
         break;
     }
+    return 0;
 }
 ```
 
-- +case 的值只能是常量, 并且还必须是整型, 或者可以被提升为整型的值(char、short)
+- case 的值只能是常量，并且还必须是整型，或者可以被提升为整型的值（char、short）
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -310,6 +352,7 @@ int main() {
         printf("回火星去\n");
         break;
     }
+    return 0;
 }
 ```
 
@@ -330,10 +373,11 @@ int main() {
         printf("回火星去\n");
         break;
     }
+    return 0;
 }
 ```
 
-- case 后面要想定义变量,必须给 case 加上大括号
+- case 后面要想定义变量，必须给 case 加上大括号
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -353,10 +397,11 @@ int main() {
         printf("回火星去\n");
         break;
     }
+    return 0;
 }
 ```
 
-- switch 中只要任意一个 case 匹配, 其它所有的 case 和 default 都会失效. 所以如果 case 和 default 后面没有 break 就会出现穿透问题
+- switch 中只要任意一个 case 匹配，其它所有的 case 和 default 都会失效。所以如果 case 和 default 后面没有 break 就会出现穿透问题
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -376,6 +421,7 @@ int main() {
         printf("回火星去\n"); // 被输出
         break;
     }
+    return 0;
 }
 ```
 
@@ -393,10 +439,11 @@ int main() {
         printf("星期一\n");
         break;
     }
+    return 0;
 }
 ```
 
-- switch 中 default 的位置不一定要写到最后, 无论放到哪都会等到所有 case 都不匹配才会执行(穿透问题除外)
+- switch 中 default 的位置不一定要写到最后，无论放到哪都会等到所有 case 都不匹配才会执行（穿透问题除外）
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -413,14 +460,15 @@ int main() {
         printf("星期一\n");
         break;
     }
+    return 0;
 }
 ```
 
-- **_if 和 Switch 转换_**
-- 看上去 if 和 switch 都可以实现同样的功能, 那么在企业开发中我们什么时候使用 if, 什么时候使用 switch 呢?
-  - if else if 针对于范围的多路选择
-  - switch 是针对点的多路选择
-- 判断用户输入的数据是否大于 100
+- **if 和 switch 的选择**
+- 看上去 if 和 switch 都可以实现同样的功能，那么在企业开发中我们什么时候使用 if，什么时候使用 switch 呢？
+  - `if...else if...else` 适用于范围判断的多路选择
+  - `switch` 适用于基于具体值的多路选择
+- 示例：判断用户输入的数据是否大于 100
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -429,10 +477,11 @@ int main() {
     int a = -1;
     scanf("%d", &a);
     if(a > 100){
-        printf("用户输入的数据大于100");
+        printf("用户输入的数据大于100\n");
     }else{
-        printf("用户输入的数据不大于100");
+        printf("用户输入的数据不大于100\n");
     }
+    return 0;
 }
 ```
 
@@ -455,21 +504,20 @@ int main() {
             printf("不大于\n");
             break;
     }
+    return 0;
 }
 ```
 
-- 实现+ - \* / 简单计算器
-
 ## 循环结构
 
-- C 语言中提供了三大循环结构, 分别是 while、dowhile 和 for
+- C 语言中提供了三大循环结构，分别是 while、do-while 和 for
 - 循环结构是程序中一种很重要的结构。
-  - 其特点是,在给定条件成立时,反复执行某程序段, 直到条件不成立为止。
-  - 给定的条件称为"循环条件",反复执行的程序段称为"循环体"
+  - 其特点是，在给定条件成立时，反复执行某程序段，直到条件不成立为止。
+  - 给定的条件称为"循环条件"，反复执行的程序段称为"循环体"
 
 ### while
 
-- 格式:
+- 格式：
 
 ```c showLineNumbers
 while (  循环控制条件 ) {
@@ -482,40 +530,14 @@ while (  循环控制条件 ) {
 - 构成循环结构的几个条件
 
   - 循环控制条件
-    - 循环退出的主要依据,来控制循环到底什么时候退出
+    - 循环退出的主要依据，来控制循环到底什么时候退出
   - 循环体
     - 循环的过程中重复执行的代码段
-  - 能够让循环结束的语句(递增、递减、真、假等)
-    - 能够让循环条件为假的依据,否则退出循环
+  - 能够让循环结束的语句（递增、递减、真、假等）
+    - 能够让循环条件为假的依据，否则退出循环
 
-- 示例:
+- 示例：
 
-```c showLineNumbers
-int count = 0;
-while (count < 3) { // 循环控制条件
-    printf("发射子弹~哔哔哔哔\n"); // 需要反复执行的语句
-    count++; // 能够让循环结束的语句
-}
-```
-
-- while 循环执行流程
-  - 首先会判定"循环控制条件"是否为真, 如果为假直接跳到循环语句后面
-  - 如果"循环控制条件"为真, 执行一次循环体, 然后再次判断"循环控制条件"是否为真, 为真继续执行循环体,为假跳出循环
-  - 重复以上操作, 直到"循环控制条件"为假为止
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    int count = 4;
-    // 1.判断循环控制条件是否为真,此时为假所以跳过循环语句
-    while (count < 3) {
-        printf("发射子弹~哔哔哔哔\n");
-        count++;
-    }
-    // 2.执行循环语句后面的代码, 打印"循环执行完毕"
-    printf("循环执行完毕\n");
-}
-```
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -537,6 +559,27 @@ int main(){
     }
     // 11.执行循环语句后面的代码, 打印"循环执行完毕"
     printf("循环执行完毕\n");
+    return 0;
+}
+```
+
+- while 循环执行流程
+  - 首先会判定"循环控制条件"是否为真，如果为假直接跳到循环语句后面
+  - 如果"循环控制条件"为真，执行一次循环体，然后再次判断"循环控制条件"是否为真，为真继续执行循环体，为假跳出循环
+  - 重复以上操作，直到"循环控制条件"为假为止
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int count = 4;
+    // 1.判断循环控制条件是否为真,此时为假所以跳过循环语句
+    while (count < 3) {
+        printf("发射子弹~哔哔哔哔\n");
+        count++;
+    }
+    // 2.执行循环语句后面的代码, 打印"循环执行完毕"
+    printf("循环执行完毕\n");
+    return 0;
 }
 ```
 
@@ -546,59 +589,96 @@ int main(){
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
+    // 注意：这是一个死循环示例！运行后需要手动终止（Ctrl+C）
     while (1) { // 死循环
          printf("发射子弹~哔哔哔哔\n");
          // 没有能够让循环结束的语句
     }
+    return 0;
 }
 ```
 
-- 当 while 后面只有一条语句时,while 后面的大括号可以省略
+- 当 while 后面只有一条语句时，while 后面的大括号可以省略
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
+    // 注意：这是一个死循环示例，省略了大括号！运行后需要手动终止（Ctrl+C）
     while (1)  // 死循环
          printf("发射子弹~哔哔哔哔\n");
-         // 没有能够让循环结束的语句
+         // 上面的语句会无限执行，下面的return永远不会执行
+    return 0;
 }
 ```
 
-- 如果 while 省略了大括号, 那么后面不能定义变量
+- 如果 while 省略了大括号，那么后面不能定义变量
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
-    while (1)  // 死循环
-         int num = 10; // 报错
-         // 没有能够让循环结束的语句
+    // 错误示例：while省略大括号后不能定义变量
+    // 以下代码无法编译，会报错
+    /*
+    while (1)
+         int num = 10; // 报错：循环体不能直接定义变量
+    */
+    
+    // 正确写法：
+    while (1) {
+        int num = 10; // 需要加大括号
+        printf("num = %i\n", num);
+        break; // 避免死循环，这里用break跳出
+    }
+    return 0;
 }
 ```
 
-- C 语言中分号(;)也是一条语句, 称之为空语句
+<Highlight>注意：C 语言中分号（;）也是一条语句，称之为空语句</Highlight>
 
 ```c showLineNumbers
 #include <stdio.h>
 int main(){
     int count = 0;
-    while (count < 3);{ // 死循环
-       printf("发射子弹~哔哔哔哔\n");
-       count++;
+    
+    // 错误示例：注意分号！这会导致死循环
+    // while (count < 3); 后面的分号导致while只管控空语句
+    // 下面的大括号内容与while无关，永远不会执行
+    
+    /*
+    while (count < 3); // 分号导致这是一个死循环的空语句
+    {
+        printf("发射子弹~哔哔哔哔\n");
+        count++;
     }
+    */
+    
+    // 正确写法：
+    while (count < 3){ // 没有分号
+        printf("发射子弹~哔哔哔哔\n");
+        count++;
+    }
+    return 0;
 }
 ```
 
 - 最简单的死循环
 
 ```c showLineNumbers
-// 死循环一般在操作系统级别的应用程序会比较多, 日常开发中很少用
-while (1);
+#include <stdio.h>
+int main(){
+    // 注意：这是最简单的死循环形式！运行后需要手动终止（Ctrl+C）
+    // 死循环一般在操作系统级别的应用程序会比较多，日常开发中很少用
+    while (1); // 什么都不做的死循环
+    
+    printf("这行代码永远不会执行\n");
+    return 0;
+}
 ```
 
 
-### do while
+### do-while
 
-- 格式:
+- 格式：
 
 ```c showLineNumbers
 do {
@@ -608,27 +688,31 @@ do {
 } while (循环控制条件 );
 ```
 
-- 示例
+- 示例：
 
 ```c showLineNumbers
-int count = 0;
-do {
-   printf("发射子弹~哔哔哔哔\n");
-   count++;
-}while(count < 10);
+#include <stdio.h>
+int main(){
+    int count = 0;
+    do {
+        printf("发射子弹~哔哔哔哔\n");
+        count++;
+    }while(count < 10);
+    return 0;
+}
 ```
 
 - do-while 循环执行流程
 
-  - 首先不管 while 中的条件是否成立, 都会执行一次"循环体"
-  - 执行完一次循环体,接着再次判断 while 中的条件是否为真, 为真继续执行循环体,为假跳出循环
-  - 重复以上操作, 直到"循环控制条件"为假为止
+  - 首先不管 while 中的条件是否成立，都会执行一次"循环体"
+  - 执行完一次循环体，接着再次判断 while 中的条件是否为真，为真继续执行循环体，为假跳出循环
+  - 重复以上操作，直到"循环控制条件"为假为止
 
 - 应用场景
   - 口令校验
 
 ```c showLineNumbers
-#include<stdio.h>
+#include <stdio.h>
 int main()
 {
     int num = -1;
@@ -637,83 +721,137 @@ int main()
         scanf("%d", &num);
     }while(123456 != num);
     printf("您终于回来了\n");
+    return 0;
 }
 ```
 
-- while 和 dowhile 应用场景
-  - 绝大多数情况下 while 和 dowhile 可以互换, 所以能用 while 就用 while
-  - 无论如何都需要先执行一次循环体的情况, 才使用 dowhile
-  - do while 曾一度提议废除，但是他在输入性检查方面还是有点用的
+- **do-while 注意点**
+  - do-while 也可以形成死循环
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    // 注意：这是do-while的死循环形式！运行后需要手动终止（Ctrl+C）
+    do {
+        printf("无限循环\n");
+    } while(1);
+    return 0;
+}
+```
+
+- while 和 do-while 应用场景
+  - 绝大多数情况下 while 和 do-while 可以互换，所以能用 while 就用 while
+  - 无论如何都需要先执行一次循环体的情况，才使用 do-while
+  - do-while 曾一度提议废除，但是它在输入校验方面还是有一定用处的
 
 ### for
 
-- 格式:
+- 格式：
 
 ```c showLineNumbers
-for(初始化表达式；循环条件表达式；循环后的操作表达式) {
+for(初始化表达式; 循环条件表达式; 循环后的操作表达式) {
     循环体中的语句;
 }
 ```
 
-- 示例
+- 示例：
 
 ```c showLineNumbers
-for(int i = 0; i < 10; i++){
-    printf("发射子弹~哔哔哔哔\n");
+#include <stdio.h>
+int main(){
+    for(int i = 0; i < 10; i++){
+        printf("发射子弹~哔哔哔哔\n");
+    }
+    return 0;
 }
 ```
 
 - for 循环执行流程
 
-  - 首先执行"初始化表达式"，而且在整个循环过程中,**_只会执行一次_**初始化表达式
+  - 首先执行"初始化表达式"，而且在整个循环过程中，**只会执行一次**初始化表达式
   - 接着判断"循环条件表达式"是否为真，为真执行循环体中的语句
-  - 循环体执行完毕后，接下来会执行"循环后的操作表达式"，然后再次判断条件是否为真,为真继续执行循环体,为假跳出循环
+  - 循环体执行完毕后，接下来会执行"循环后的操作表达式"，然后再次判断条件是否为真，为真继续执行循环体，为假跳出循环
   - 重复上述过程，直到条件不成立就结束 for 循环
 
-- for 循环注意点:
+- for 循环注意点：
 
   - 和 while 一模一样
-  - 最简单的死循环`for(;;);`
+  - 最简单的死循环 `for(;;);`
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    // 注意：这是for循环的死循环形式！运行后需要手动终止（Ctrl+C）
+    for(;;); // 什么都不做的死循环
+    
+    printf("这行代码永远不会执行\n");
+    return 0;
+}
+```
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    // 注意：这也是for循环的死循环形式！运行后需要手动终止（Ctrl+C）
+    for(;;){
+        printf("无限循环\n");
+    }
+    return 0;
+}
+```
 
 - for 和 while 应用场景
-  - while 能做的 for 都能做, 所以企业开发中能用 for 就用 for, 因为 for 更为灵活
+  - while 能做的 for 都能做，所以企业开发中能用 for 就用 for，因为 for 更为灵活
   - 而且对比 while 来说 for 更节约内存空间
 
 ```c showLineNumbers
-int count = 0; // 初始化表达式
-while (count < 10) { // 条件表达式
-      printf("发射子弹~哔哔哔哔 %i\n", count);
-      count++; // 循环后增量表达式
+#include <stdio.h>
+int main(){
+    int count = 0; // 初始化表达式
+    while (count < 10) { // 条件表达式
+        printf("发射子弹~哔哔哔哔 %i\n", count);
+        count++; // 循环后增量表达式
+    }
+    // 如果初始化表达式的值, 需要在循环之后使用, 那么就用while
+    printf("count = %i\n", count);
+    return 0;
 }
-// 如果初始化表达式的值, 需要在循环之后使用, 那么就用while
-printf("count = %i\n", count);
 ```
 
 ```c showLineNumbers
-// 注意: 在for循环初始化表达式中定义的变量, 只能在for循环后面的{}中访问
-// 所以: 如果初始化表达式的值, 不需要在循环之后使用, 那么就用for
-// 因为如果初始化表达式的值, 在循环之后就不需要使用了 , 那么用while会导致性能问题
-for (int count = 0; count < 10; count++) {
-     printf("发射子弹~哔哔哔哔 %i\n", count);
+#include <stdio.h>
+int main(){
+    // 注意: 在for循环初始化表达式中定义的变量, 只能在for循环后面的{}中访问
+    // 所以: 如果初始化表达式的值, 不需要在循环之后使用, 那么就用for
+    // 因为如果初始化表达式的值, 在循环之后就不需要使用了 , 那么用while会导致性能问题
+    for (int count = 0; count < 10; count++) {
+        printf("发射子弹~哔哔哔哔 %i\n", count);
+    }
+    // printf("count = %i\n", count); // 这行会报错，因为count只在for循环内有效
+    return 0;
 }
-//     printf("count = %i\n", count);
 ```
 
 ```c showLineNumbers
-// 如果需要使用初始化表达式的值, 也可以将初始化表达式写到外面
-int count = 0;
-for (; count < 10; count++) {
-     printf("发射子弹~哔哔哔哔\n", count);
+#include <stdio.h>
+int main(){
+    // 如果需要使用初始化表达式的值, 也可以将初始化表达式写到外面
+    int count = 0;
+    for (; count < 10; count++) {
+        printf("发射子弹~哔哔哔哔 %i\n", count);
+    }
+    printf("count = %i\n", count);
+    return 0;
 }
-printf("count = %i\n", count);
 ```
 
 ## 跳转语句
 
-- C 语言中提供了四大跳转语句, 分别是 return、break、continue、goto
+- C 语言中提供了四大跳转语句，分别是 return、break、continue、goto
+
 ### break
 
-* 立即跳出 switch 语句 或 循环语句
+- 立即跳出 switch 语句或循环语句
 
 ```c showLineNumbers
 switch(表达式){
@@ -730,42 +868,60 @@ for(表达式){
 ```
 
 
-- break 注意点:
+- **break 注意点**
   - break 离开应用范围，存在是没有意义的
 
 ```c showLineNumbers
-if(1) {
-  break; // 会报错
+#include <stdio.h>
+int main(){
+    // if(1) {
+    //   break; // 会报错，break只能用在循环或switch中
+    // }
+    return 0;
 }
 ```
 
-- 在多层循环中,一个 break 语句只向外跳一层
+- 在多层循环中，一个 break 语句只向外跳一层
 
 ```c showLineNumbers
-while(1) {
-  while(2) {
-    break;// 只对while2有效, 不会影响while1
-  }
-  printf("while1循环体\n");
+#include <stdio.h>
+int main(){
+    int outer_count = 0;
+    while(outer_count < 3) {
+        int inner_count = 0;
+        while(inner_count < 2) {
+            printf("内层循环\n");
+            break;// 只跳出内层循环, 不会影响外层循环
+        }
+        printf("外层循环体\n");
+        outer_count++;
+    }
+    return 0;
 }
 ```
 
 - break 下面不可以有语句，因为执行不到
 
 ```c showLineNumbers
-while(2){
-  break;
-  printf("!");// 执行不到
+#include <stdio.h>
+int main(){
+    int count = 0;
+    while(count < 2){
+        break;
+        printf("这行代码永远不会执行!\n");// 执行不到，因为break直接跳出循环
+    }
+    return 0;
 }
 ```
 
 ### continue
 
-continue语句只能用在循环语句中，不能用在选择语句中。
+- continue 语句只能用在循环语句中，不能用在选择语句中。
 
-作用是结束**本轮**循环，进入**下一轮**循环
+- 作用是结束**本轮**循环，进入**下一轮**循环
 
 ```c showLineNumbers
+#include <stdio.h>
 int main(){
     int i = 0;
     while (i < 10) {
@@ -777,63 +933,92 @@ int main(){
         }
         printf("i = %d\n", i);
     }
+    return 0;
 }
 ```
 
-- 注意continue 离开应用范围，存在是没有意义的:
+- **continue 注意点**
+  - continue 离开应用范围，存在是没有意义的
 
 ```c showLineNumbers
-if(1) {
-  continue; // 会报错
+#include <stdio.h>
+int main(){
+    // if(1) {
+    //   continue; // 会报错，continue只能用在循环中
+    // }
+    return 0;
 }
 ```
 
 ### return
 
-在函数中任意位置都可以使用return语句，结束当前函数，将结果返回给调用者
+- 在函数中任意位置都可以使用 return 语句，结束当前函数，将结果返回给调用者
 
 ```c showLineNumbers
+#include <stdio.h>
 int main(){
+    printf("程序开始\n");
     while (1) {
-        while(2){
-            // 立刻结束main函数
+        while(1){
+            printf("内层循环\n");
+            // 立刻结束main函数，跳出所有循环
             return 0;
         }
+        printf("这行代码永远不会执行\n");
     }
+    printf("这行代码也永远不会执行\n");
 }
 ```
 
 ### goto
 
 :::warning
-goto 语句，仅能在本函数内实现跳转，不能实现跨函数跳转(短跳转)。
+goto 语句，仅能在本函数内实现跳转，不能实现跨函数跳转（短跳转）。
 
-goto 会破坏结构化程序设计流程，它将使程序层次不清，且不易读，所以慎用
+goto 会破坏结构化程序设计流程，它将使程序层次不清，且不易读，所以慎用。
 :::
 
 ```c showLineNumbers
 #include <stdio.h>
+
+// 示例1：跳出多层循环
 int main(){
-    while (1) {
-        while(2){
-            // 转到标签的位置
-            goto lnj;
+    int outer = 0;
+    while (outer < 3) {
+        int inner = 0;
+        while(inner < 3){
+            printf("外层: %d, 内层: %d\n", outer, inner);
+            if(outer == 1 && inner == 1){
+                // 转到标签的位置，跳出所有循环
+                goto end_loops;
+            }
+            inner++;
         }
+        outer++;
     }
     //标签（label）是C语言中的一个语法元素，主要用于配合 goto 语句实现程序流程的跳转。
     //标签就是一个标识符后面跟着冒号 :
-    lnj:printf("跳过了所有循环");
+end_loops:
+    printf("跳过了所有循环\n");
+    return 0;
 }
+```
 
-int call(){
+```c showLineNumbers
+#include <stdio.h>
+
+// 示例2：使用goto实现循环
+int main(){
     int num = 0;
-// loop:是定义的label
-loop:if(num < 10){
+    // loop:是定义的label
+loop:
+    if(num < 10){
         printf("num = %d\n", num);
         num++;
         // goto loop代表跳转到loop的位置
         goto loop;
     }
+    return 0;
 }
 ```
 

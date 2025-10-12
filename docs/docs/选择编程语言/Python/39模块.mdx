@@ -231,6 +231,128 @@ math = __import__('math')
 print(math.sqrt(16)) # 4.0
 ```
 
+## 获取模块
+
+从一次 import 开始 ，你写了一行代码：  
+
+```python showLineNumbers
+import requests  
+```  
+
+这行代码背后，Python 解释器做了三件事：  
+
+1. **找**：在 `sys.path` 列出的路径中搜索 `requests`。  
+2. **读**：找到后，读取模块内容，执行其中的代码。  
+3. **存**：把执行结果存入 `sys.modules`，避免重复导入。  
+
+这个过程，就是 Python 包管理的**运行时视图**。  
+
+那么，包是怎么出现在 `sys.path` 里的？  
+
+答案是：`pip install requests`。  
+
+pip 做了什么？  
+
+1. **下载**：从 PyPI 下载 `requests` 的 wheel 包。  
+2. **解压**：把包内容解压到 `site-packages` 目录。  
+3. **记录**：在 `site-packages` 下生成一个 `requests-X.X.X.dist-info` 目录，里面存着元数据。  
+
+这个过程，就是 Python 包管理的**安装时视图**。  
+
+当我们在命令行执行 `pip install requests` 时，pip 实际上会向 PyPI（Python Package Index）发送一系列 HTTP 请求来查找、下载和验证包。
+
+pip 首先会向 PyPI 发送一个 GET 请求，以获取包的元数据信息，例如版本号、依赖关系等。
+```
+GET /pypi/requests/json HTTP/1.1
+Host: pypi.org
+User-Agent: pip/21.0.1
+Accept: application/json
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+```
+
+一旦 pip 获取了包的元数据，它会根据元数据中的下载链接发送另一个 GET 请求来下载包文件（通常是 wheel 文件或源码包）。
+```
+GET /packages/66/49/7b6c842e994f9353296cb2865fc206635286b27415336348f39/requests-2.25.1-py2.py3-none-any.whl HTTP/1.1
+Host: files.pythonhosted.org
+User-Agent: pip/21.0.1
+Accept: */*
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+```
+
+下载完成后，pip 会使用元数据中提供的哈希值来验证包的完整性，确保包在传输过程中没有被篡改。
+
+:::info
+你可以提前获得包的wheel压缩文件，例如`requests-2.32.5-py3-none-any.whl`
+
+它通常在 `PYPI` 侧边`Download files`中，记得选择适配你Python与计算平台版本的压缩文件。
+
+那么你就可以通过`pip install requests-2.32.5-py3-none-any.whl`安装它，等价于跳过了前面的网络通信下载时间。
+:::
+
+验证通过后，pip 会将包文件解压并安装到 Python 的 site-packages 目录中，并记录安装信息以便后续管理。
+
+如果包有依赖关系，pip 会递归地对每个依赖包重复上述过程，直到所有依赖都被满足。
+
+为了提高效率，pip 还会使用本地缓存和索引，避免重复下载相同的包文件。
+
+在整个过程中，pip 会处理各种网络错误，如超时、连接失败等，并根据配置进行重试。
+
+对于私有包或需要认证的包，pip 会使用适当的认证机制，如 API 密钥或 OAuth，来发送请求。
+
+pip 会记录详细的日志信息，包括请求的 URL、响应状态码、下载速度等，以便用户排查问题。
+
+用户可以通过 pip 的配置文件或命令行选项来定制请求行为，例如使用代理、指定镜像源、设置超时时间等。
+
+通过这些步骤，pip 确保了 Python 包的可靠、高效和安全的安装。
+
+### 元数据
+
+很多人以为，pip install 就是“把文件拷过去”。但真正关键的是那个 `.dist-info` 目录。  
+
+它就像包的"身份证"，记录了：  
+- **包名、版本、作者、描述** —— `METADATA` 文件  
+- **所有安装的文件列表** —— `RECORD` 文件（卸载时用）  
+- **依赖哪些其他包** —— `METADATA` 中的 `Requires-Dist` 字段  
+- **顶级模块名称** —— `top_level.txt` 文件（import 时用）  
+- **安装工具** —— `INSTALLER` 文件（通常写着 `pip`）  
+
+没有这个身份证，pip 就不知道这个包是谁、从哪来、依赖谁、能不能卸载。  
+
+当你执行 `pip list` 或 `pip show requests`，看到的信息，全都来自这个 `.dist-info`。  
+
+### 离线安装
+
+如果你完全没有网络，能不能不 pip，直接把模块文件复制到 `site-packages`？  
+
+可以。但你复制的只是“身体”，没有“灵魂”。  
+
+你复制了 `.py` 文件，Python 能 import，没问题。  
+但 pip 不知道它的存在，无法卸载，也无法管理依赖。  
+
+更严重的是：如果这个包有依赖，比如 `requests` 依赖 `urllib3`，你手动复制 `requests`，却忘了 `urllib3`，运行时就会报错。  
+
+pip 的价值，不在于“复制文件”，而在于“解析依赖 + 安装 + 记录元数据”这一整套自动化流程。  
+
+你必须把代码和元数据文件，以及相关的依赖库与依赖库元数据文件都复制过去，才能成功。
+
+### 包管理三要素
+
+Python 包管理的本质，是三个要素的闭环：  
+
+1. **代码**（Code）：真正的 `.py` 文件，实现功能。  
+2. **结构**（Structure）：包目录、`__init__.py`、子模块，构成可导入的层级。  
+3. **元数据**（Metadata）：`.dist-info`，让包可发现、可管理、可依赖。  
+
+只有三者齐全，一个包才算真正“安装”完成。
+
+看到 `ImportError`，你能立刻判断是“没安装”、“路径不对”还是“依赖缺失”。  
+看到 `.dist-info`，你知道它不是垃圾，而是包的“灵魂”。  
+
+Python 包管理，管的是模块与解释器的关系，是包与依赖的关系，是开发者与生态的关系。  
+
+
 ## 发布模块
 
 我们安装的模块来自于`pypi.org`，我们也可以分享我们的模块到`pypi.org`。

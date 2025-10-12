@@ -8,9 +8,9 @@ description: Markdown和MDX的各种用法及示例
 
 ### MDX
 
-MDX 允许在 <Highlight >Markdown</Highlight> 内容中使用 <Highlight >JSX</Highlight> 来<Highlight color="#96cf54">高亮文本</Highlight>。也可以导入例如：鼠标悬浮展示这样的<HoverText text="组件" explanation="（如交互式图表或警报），并将其嵌入到内容中。这使得编写包含组件的长篇内容变得非常有趣。"/>。
+MDX 允许高度自定义样式，例如像<HoverText text="鼠标悬浮展示" explanation="将需要说明的内容嵌入。这使得编写包含组件的长篇内容变得非常有趣。"/>。
 
-也可以加载第三方组件
+也可以加载第三方思维导图组件，用于系统展示框架：
 
 <MarkmapHooks initialMarkdown={`
 
@@ -59,13 +59,71 @@ MDX 允许在 <Highlight >Markdown</Highlight> 内容中使用 <Highlight >JSX</
 
 `} />
 
+### 选项卡
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+对比展示多种语言可以使用选项卡：
+
+<Tabs>
+  <TabItem value="Python" label="Python" default>
+使用Python打印Hello, World!
+```python showLineNumbers title="test.py"
+print("Hello, World!")
+```
+  </TabItem>
+  <TabItem value="C" label="C">
+使用C打印Hello, World!
+```c showLineNumbers {3} title="test.c"
+#include <stdio.h>
+int main(){
+    printf("Hello, World!");
+    return 0;
+}
+```
+  </TabItem>
+  <TabItem value="html" label="html">
+使用html展示Hello, World!
+```html showLineNumbers title="test.html"
+<p>Hello, World!</p>
+```
+  </TabItem>
+</Tabs>
+
+### 高亮提示
+
+不同颜色的高亮提示：
+
+这是行内<Highlight color="#e13238">危险提醒</Highlight>、<Highlight>警示提醒</Highlight>、<Highlight color="#009400">建议提醒</Highlight>、<Highlight color="#4cb3d4">信息提醒</Highlight>。
+
+:::danger
+用于危险操作的警告。例如 `rm -rf /` 会删除所有文件。
+:::
+
+:::warning
+用于警示操作的警告。例如 C语言中`5/2` 结果是 `2` 而不是 `2.5`。
+:::
+
+:::tip
+这是块级的建议提醒。例如 Python 中 type 有另外一个截然不同的用法，它是一个元类，用于创建类。
+:::
+
+:::info
+这是块级的信息提醒。例如 技术演进的历史背景，辅助读者理解技术原理。
+:::
+
+:::note
+这是块级的注解提醒。例如 福柯的《规训与惩罚》不仅是对现代社会的批判，也是对权力运作机制的深刻反思。其主要著作有：《规训与惩罚》、《疯癫与文明》、《性史》、《知识考古学》。
+
+主要用在读书笔记中，类似注脚。
+:::
+
 ### 数学公式
 
-$\Delta \delta\\$
 $\cos (2\theta) = \cos^2 \theta - \sin^2 \theta\\$
 
 ```markdown
-$\Delta \delta\\$
 $\cos (2\theta) = \cos^2 \theta - \sin^2 \theta\\$
 ```
 
