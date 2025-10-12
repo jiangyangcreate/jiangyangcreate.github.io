@@ -1,0 +1,80 @@
+
+`pip` 是 Python 的包安装器，但它本身是一个独立的项目，拥有自己的发布周期。Python 解释器在发布时会捆绑一个最新版本的 `pip`。
+
+可能你首次安装 Python 时无意间跳过了 `pip` 引导 或 `pip` 被意外卸载。
+
+`ensurepip` 的核心任务是在<Highlight>离线环境</Highlight> 下，为 Python 环境引导 `pip` 安装器。
+
+
+`ensurepip` 提供了命令行接口和模块 API 两种使用方式。
+
+## 命令行接口
+
+大多数情况下，通过命令行调用是最简单直接的方式。
+
+```bash showLineNumbers
+# 在当前未安装 pip 的情况下安装 pip
+python -m ensurepip
+
+# 确保安装的 pip 版本至少为 ensurepip 所支持的最新版本
+python -m ensurepip --upgrade
+```
+
+你还可以控制 `pip` 的安装位置：
+
+```bash showLineNumbers
+# 将 pip 安装到指定的根目录
+python -m ensurepip --root <dir>
+
+# 将 pip 安装到用户的站点包目录（不能在激活的虚拟环境内部使用）
+python -m ensurepip --user
+```
+
+默认情况下，`pipX` 和 `pipX.Y`（X.Y 为 Python 版本，如 `pip3` 和 `pip3.14`）脚本会被安装。你也可以通过 `--altinstall` 或 `--default-pip` 来控制：
+
+```bash showLineNumbers
+# 只安装 pipX.Y 脚本，不安装 pipX
+python -m ensurepip --altinstall
+
+# 在常规脚本基础上，额外安装 pip 脚本（方便直接使用 pip 命令）
+python -m ensurepip --default-pip
+```
+
+:::warning
+[Python 3.14 官方文档](https://docs.python.org/zh-cn/3.14/library/ensurepip.html#module-ensurepip) 提示，同时提供 `--altinstall` 和 `--default-pip` 这两个脚本选择选项将会触发异常。
+:::
+
+## 模块 API
+
+对于需要在程序中动态管理 `pip` 安装的场景，`ensurepip` 提供了两个函数：
+
+### `ensurepip.version()`
+
+返回一个字符串，指明在`ensurepip`初始创建环境时,将被安装的 `pip` 版本。
+
+```python showLineNumbers
+import ensurepip
+print(ensurepip.version()) # 例如输出: '25.2'
+```
+
+### `ensurepip.bootstrap()`
+
+初始创建 `pip` 到当前的或指定的环境中。它提供了与命令行选项对应的参数。
+
+```python showLineNumbers
+import ensurepip
+
+# 在当前环境中引导 pip
+ensurepip.bootstrap()
+
+# 升级 pip 并设置详细输出
+ensurepip.bootstrap(upgrade=True, verbosity=1)
+
+# 将 pip 安装到指定目录，并只安装 pipX.Y 脚本
+# ensurepip.bootstrap(root='/path/to/my/env', altinstall=True)
+```
+
+:::tip
+[Python 3.14 官方文档](https://docs.python.org/zh-cn/3.14/library/ensurepip.html#module-ensurepip) 强调，`bootstrap` 过程可能会对 `sys.path` 和 `os.environ` 产生附带影响。为了避免这些影响，推荐在子进程中唤起命令行接口。
+:::
+

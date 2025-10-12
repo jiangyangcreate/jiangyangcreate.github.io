@@ -1,0 +1,29 @@
+---
+sidebar_position: 4
+title: Adam与BatchNorm
+---
+
+
+## Adam
+
+提出了一种高效且自适应的随机优化算法，通过结合一阶矩（动量）和二阶矩（自适应学习率）的估计，为每个模型参数独立调整学习率。
+
+大幅简化了深度学习模型的训练过程，减少了手动调整学习率的需要，并保证了在稀疏梯度（尤其是在 NLP 中）下的稳定收敛。
+
+成为深度学习，特别是自然语言处理（NLP）和 Transformer 架构的默认优化器之一。
+
+:::info
+《Adam: A Method for Stochastic Optimization》截止2025年，谷歌学术总引用次数排名第6。
+:::
+
+## Batch Normalizations
+
+提出了一种规范化网络层输入的方法，解决了训练深度网络时“内部协变量偏移”（Internal Covariate Shift）的问题，即中间层输入的分布在训练过程中不断变化的现象。
+
+使得研究人员能够使用更高的学习率和更深的（更复杂的）网络架构进行训练，同时极大地加速了模型的收敛速度。
+
+有效充当正则化器，减少了对 Dropout 等其他正则化技术的依赖。
+
+:::info
+《Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift》截止2025年，谷歌学术总引用次数排名第8。
+:::
