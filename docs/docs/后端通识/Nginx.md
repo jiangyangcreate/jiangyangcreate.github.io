@@ -1,249 +1,998 @@
 ---
 sidebar_position: 6
 title: Nginx
+description: 深入理解Nginx配置与企业级实战
 ---
 
-Nginx 是异步框架的网页服务器，也可以用作反向代理、负载平衡器和HTTP缓存。
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-## Nginx配置文件结构
+## 什么是Nginx
 
-打开conf文件夹的nginx.conf文件，Nginx服务器的基础配置，默认的配置也存放在此。
+Nginx (engine x) 是一个高性能的HTTP和反向代理服务器，特点是占用内存少，并发能力强。Nginx专为性能优化而开发，在高并发场景下能够支持高达 50,000 个并发连接数的响应。
 
-在 nginx.conf 的注释符号为： #
-默认的 nginx 配置文件 nginx.conf 内容如下：
+:::info Nginx的核心优势
+- **高并发高性能**：基于事件驱动架构，采用异步非阻塞方式处理请求
+- **反向代理与负载均衡**：可将请求分发到多个后端服务器
+- **静态资源服务**：高效处理静态文件
+- **热部署**：可以在不停机的情况下升级
+:::
+
+## 快速开始
+
+### 安装Nginx
+
+<Tabs>
+  <TabItem value="docker" label="Docker" default>
 
 ```bash
-#user  nobody;
-worker_processes  1;
+# 拉取官方镜像
+docker pull nginx:latest
 
-#error_log  logs/error.log;
-#error_log  logs/error.log  notice;
-#error_log  logs/error.log  info;
+# 运行容器
+docker run -d \
+  --name mynginx \
+  -p 80:80 \
+  -v /path/to/html:/usr/share/nginx/html:ro \
+  -v /path/to/nginx.conf:/etc/nginx/nginx.conf:ro \
+  nginx
+```
 
-#pid        logs/nginx.pid;
+  </TabItem>
+  <TabItem value="ubuntu" label="Ubuntu/Debian">
 
+```bash
+# 更新软件包索引
+sudo apt update
 
+# 安装nginx
+sudo apt install nginx
+
+# 启动nginx服务
+sudo systemctl start nginx
+
+# 设置开机自启
+sudo systemctl enable nginx
+```
+
+  </TabItem>
+  <TabItem value="centos" label="CentOS/RHEL">
+
+```bash
+# 安装nginx
+sudo yum install nginx
+
+# 启动nginx服务
+sudo systemctl start nginx
+
+# 设置开机自启
+sudo systemctl enable nginx
+```
+
+  </TabItem>
+</Tabs>
+
+### 常用命令
+
+```bash
+# 测试配置文件语法
+nginx -t
+
+# 重新加载配置（无需停止服务）
+nginx -s reload
+
+# 优雅停止（等待worker进程完成当前请求）
+nginx -s quit
+
+# 立即停止
+nginx -s stop
+
+# 查看nginx版本
+nginx -v
+
+# 查看编译配置参数
+nginx -V
+```
+
+## 配置文件结构
+
+Nginx 配置文件由**指令(directives)**组成，分为**简单指令**和**块指令**两种。
+
+### 指令类型
+
+**简单指令**：由指令名称、参数和分号组成
+
+```nginx
+worker_processes  4;          # 设置worker进程数
+pid        /var/run/nginx.pid; # 指定pid文件路径
+```
+
+**块指令**：使用大括号 `{}` 包裹其他指令，不用分号结尾
+
+```nginx
 events {
     worker_connections  1024;
 }
 
-
 http {
-    include       mime.types;
-    default_type  application/octet-stream;
-
-    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
-    #                  '$status $body_bytes_sent "$http_referer" '
-    #                  '"$http_user_agent" "$http_x_forwarded_for"';
-
-    #access_log  logs/access.log  main;
-
-    sendfile        on;
-    #tcp_nopush     on;
-
-    #keepalive_timeout  0;
-    keepalive_timeout  65;
-
-    #gzip  on;
-
     server {
-        listen       80;
-        server_name  localhost;
-
-        #charset koi8-r;
-
-        #access_log  logs/host.access.log  main;
-
         location / {
-            root   html;
-            index  index.html index.htm;
+            # 配置内容
         }
-
-        #error_page  404              /404.html;
-
-        # redirect server error pages to the static page /50x.html
-        #
-        error_page   500 502 503 504  /50x.html;
-        location = /50x.html {
-            root   html;
-        }
-
-        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
-        #
-        #location ~ \.php$ {
-        #    proxy_pass   http://127.0.0.1;
-        #}
-
-        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
-        #
-        #location ~ \.php$ {
-        #    root           html;
-        #    fastcgi_pass   127.0.0.1:9000;
-        #    fastcgi_index  index.php;
-        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
-        #    include        fastcgi_params;
-        #}
-
-        # deny access to .htaccess files, if Apache's document root
-        # concurs with nginx's one
-        #
-        #location ~ /\.ht {
-        #    deny  all;
-        #}
     }
-
-
-    # another virtual host using mix of IP-, name-, and port-based configuration
-    #
-    #server {
-    #    listen       8000;
-    #    listen       somename:8080;
-    #    server_name  somename  alias  another.alias;
-
-    #    location / {
-    #        root   html;
-    #        index  index.html index.htm;
-    #    }
-    #}
-
-
-    # HTTPS server
-    #
-    #server {
-    #    listen       443 ssl;
-    #    server_name  localhost;
-
-    #    ssl_certificate      cert.pem;
-    #    ssl_certificate_key  cert.key;
-
-    #    ssl_session_cache    shared:SSL:1m;
-    #    ssl_session_timeout  5m;
-
-    #    ssl_ciphers  HIGH:!aNULL:!MD5;
-    #    ssl_prefer_server_ciphers  on;
-
-    #    location / {
-    #        root   html;
-    #        index  index.html index.htm;
-    #    }
-    #}
-
 }
 ```
 
+### Context 作用域
 
-缓存是一种将经常使用的数据或信息存储在本地内存中一段时间​​的技术。因此，下次客户端请求相同的信息时，不再从数据库中检索信息，而是从本地内存中获取信息。缓存的主要优点是它通过减少处理负担来提高性能。
+Nginx 的配置有层级结构，每个块指令形成一个作用域（context）：
 
-## CDN
+```mermaid
+graph TD
+    A[main context<br/>全局配置] --> B[events context<br/>连接处理]
+    A --> C[http context<br/>HTTP配置]
+    C --> D[server context<br/>虚拟主机]
+    D --> E[location context<br/>URI匹配规则]
+    A --> F[stream context<br/>TCP/UDP代理]
+```
 
-CDN(Content Delivery Network)是指内容分发网络，也称为内容传送网络，这个概念始于1996年，由于CDN是为加快网络访问速度而被优化的网络覆盖层，因此被形象地称为“网络加速器”。尽管使用 CDN 的好处因 Internet 资产的规模和需求而异，但对大多数用户而言，主要好处可以分为 4 个不同的组成部分：
+:::tip 配置继承规则
+子context会继承父context的配置，子context中的同名指令会覆盖父context的配置
+:::
 
-- 改善网站加载时间- 通过使用附近的 CDN 服务器（以及其他优化）将内容分发到更靠近网站访问者的位置，访问者可以体验更快的页面加载时间。由于访问者更倾向于点击离开加载缓慢的网站，CDN 可以降低跳出率并增加人们在网站上花费的时间。换句话说，网站速度越快，访问者停留时间越长。
-- 降低带宽成本——网站托管的带宽消耗成本是网站的主要支出。通过缓存和其他优化，CDN 能够减少源服务器必须提供的数据量，从而降低网站所有者的托管成本。
-- 增加内容的可用性和冗余——大量的流量或硬件故障会中断正常的网站功能。由于其分布式特性，与许多源服务器相比，CDN 可以处理更多流量并更好地承受硬件故障。
-- 提高网站安全性- CDN 可以通过提供DDoS 缓解、安全证书改进和其他优化来提高安全性。
+### 标准配置文件结构
 
-## Server Side
+```nginx title="/etc/nginx/nginx.conf" showLineNumbers
+# ==================== 全局配置 ====================
+user  nginx;                    # worker进程运行用户
+worker_processes  auto;         # worker进程数，auto表示自动检测CPU核心数
 
-服务器端缓存将 Web 文件和数据临时存储在源服务器上，以备后用。
+error_log  /var/log/nginx/error.log notice;  # 错误日志路径和级别
+pid        /var/run/nginx.pid;               # pid文件路径
 
-当用户第一次请求网页时，网站进入正常的从服务器获取数据的过程，生成或构建网站的网页。在请求发生并且响应被发回后，服务器复制网页并将其存储为缓存。下次用户重新访问该网站时，它会加载已保存或缓存的网页副本，从而加快访问速度。
+# ==================== 事件模块 ====================
+events {
+    worker_connections  1024;   # 每个worker进程的最大连接数
+    use epoll;                  # 使用epoll事件驱动模型（Linux推荐）
+}
 
-服务器端缓存的主要问题是延迟。延迟可以定义为数据包从源行进到目的地的总时间。高延迟意味着用户请求和服务器响应的显着延迟。服务器端缓存的另一个问题是，如果网页上的数据发生变化，服务器必须从头开始重建。
+# ==================== HTTP模块 ====================
+http {
+    # MIME类型配置
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
 
-## Client Side
+    # 日志格式定义
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
 
-客户端缓存通常称为浏览器缓存，浏览器缓存也包含很多内容： HTTP 缓存、indexDB、cookie、localstorage 等等。
+    access_log  /var/log/nginx/access.log  main;
 
-尽管客户端缓存是一个稍微宽泛的术语。其运行原理如：一旦浏览器从服务器请求数据，它就会将其存储到浏览器创建的文件夹中。 下次打开网页时，它不会调用服务器获取数据，而是从浏览器缓存文件夹中提取数据。
+    # 性能优化
+    sendfile        on;         # 高效文件传输
+    tcp_nopush      on;         # 优化数据包发送
+    tcp_nodelay     on;         # 禁用Nagle算法，减少延迟
+    keepalive_timeout  65;      # 长连接超时时间
 
-客户端缓存的缺点之一是它是特定于浏览器的，如果你使用多个浏览器，那么同一个网页就会有不同的缓存文件。客户端缓存的另一个缺点是它比服务器端缓存更复杂。
+    # Gzip压缩
+    gzip  on;
+    gzip_vary on;
+    gzip_comp_level 6;
+    gzip_types text/plain text/css text/xml text/javascript 
+               application/json application/javascript application/xml+rss;
 
-## 面试常问
+    # 引入其他配置文件
+    include /etc/nginx/conf.d/*.conf;
+    include /etc/nginx/sites-enabled/*;
+}
+```
 
-### 浏览器具体的缓存策略有哪些？
+## 核心模块详解
 
-具体的缓存策略，分为强缓存和协商缓存两种。
+### Core Module (核心模块)
 
-#### 优先进行强缓存
+核心模块提供Nginx的基础功能配置：
 
-1. 浏览器针对资源 A 初次发起请求，依次查看 ServiceWorker Cache、Memory Cache 和 Disk Cache 是否有缓存。因为没有，所以请求到达服务器，服务器返回资源和携带在头部字段中的缓存策略
-2. 浏览器这边自动缓存资源的引用到 Memory Cache 中，同时根据头部字段将资源缓存到 Disk Cache 中，如果开发者使用了 Service Worker Cache，也会对应做一个缓存
-3. 片刻后，用户再次针对资源 A 发起请求，浏览器会依次查看 Memory Cache 和 Disk Cache 是否有缓存，接着查看缓存是否新鲜（是否没有过期）
-4. 如果缓存没有过期，那么恭喜，这时候可以直接从 Disk Cache 中获取资源 A 并返回，我们称这种情况为命中强缓存、走强缓存路线。
+| 指令 | 说明 | 示例 |
+| :---- | :---- | :---- |
+| `worker_processes` | worker进程数量 | `worker_processes auto;` |
+| `worker_connections` | 每个worker的最大连接数 | `worker_connections 1024;` |
+| `error_log` | 错误日志路径和级别 | `error_log logs/error.log warn;` |
+| `pid` | 主进程PID文件路径 | `pid /var/run/nginx.pid;` |
+| `include` | 引入其他配置文件 | `include /etc/nginx/conf.d/*.conf;` |
 
-- 在 http/1.0 中，服务端会返回一个 Expires 头部字段，它是一个绝对的到期时间，只要浏览器再次发送请求的时候没有过这个时间，就认为缓存没有过期。
-- 在 http/1.1 中，Expires 被 Cache-Control 取代。而 Cache-Control 可以设置一个 max-age = `<seconds>`，指的是从请求发起过了多少秒之后，缓存才会过期
+:::warning 性能优化建议
+- `worker_processes` 通常设置为CPU核心数或设为 `auto`
+- `worker_connections` 默认1024，高并发场景可设为4096或更高
+- 需同时调整系统的 `ulimit -n` 参数
+:::
 
-#### 其次进行协商缓存
+### HTTP Module (HTTP模块)
 
-如果缓存已经过期，那么浏览器就需要和服务器进行协商，协商的内容就是：我应该继续使用这个已经过期的缓存资源，还是使用可能已经发生更新的新资源？这时候称为没有命中强缓存、走协商缓存路线。
+HTTP模块是Nginx最重要的模块，用于配置HTTP/HTTPS服务。
 
-1. 【对比哈希值】如果第一次的响应携带了 ETag 字段：浏览器将 ETag 的字段值作为 If-None-Match 的字段值，向服务器发送条件请求，相当于是在问服务器：==当时发送资源给我的时候，这个资源的唯一标识是 ETag，是否这个哈希值仍然和资源的目前最新的哈希值一致呢？==服务器就会拿收到的这个字段值与目前最新的资源哈希值进行比较，如果一致说明资源没有发生修改，此时返回 304 状态码，让浏览器使用之前的旧缓存；如果不一致说明资源发生了修改，此时重新响应 200 和新资源给浏览器
-2. 【对比修改时间】如果第一次的响应没有携带 ETag 字段，但是携带了 Last-Modified 字段：浏览器将 Last-Modified 的字段值作为 If-Modified-Since 的字段值，向服务器发送条件请求，相当于是在问服务器：==当时发送资源给我的时候，最后一次修改资源的时间是 Last-Modified，是否自从这个时间之后，资源没有再次被修改呢？==服务器就会拿收到的这个字段值与目前最新的资源修改时间进行比较，如果时间吻合说明资源没有发生修改，此时返回 304 状态码，让浏览器使用之前的旧缓存；如果时间不吻合说明资源发生了修改，此时重新响应 200 和新资源给浏览器
-3. 如果两个字段都没有携带：此时就进行正常的请求响应
+#### server 块 - 虚拟主机
 
-> ETag 进行校验:
+`server` 块定义虚拟主机，可配置多个虚拟主机监听不同端口或域名：
 
-- 优点：因为它本质上是基于文件内容进行编码所产生的哈希值，可以精确地感知文件内容的变化，所以用来判断资源是否发生修改，准确性会很高。
-- 缺点：每次 ETag 的生成都需要进行一次哈希计算，对服务器的性能有一定的影响。
+```nginx title="基础虚拟主机配置" {2,3,5-7}
+server {
+    listen       80;                    # 监听端口
+    server_name  example.com www.example.com;  # 域名
 
-> Last-Modified 校验:
+    # 访问日志（可为每个虚拟主机单独配置）
+    access_log  /var/log/nginx/example.access.log  main;
+    error_log   /var/log/nginx/example.error.log   warn;
 
-- 优点：只需要记录一个时间，性能要好很多。
-- 缺点：最小只能精确到秒这个量级，这就是说，如果资源在一秒内发生了多次修改，其实服务器是看不出来的，给出的结果依然是资源没有发生修改。
+    location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+    }
+}
+```
 
-### Redis 与 Memcached作为缓存的优缺点
+#### location 块 - URI匹配
 
-1. 都是内存数据库。Redis和Memcache都是将数据存放在内存中；
-2. 数据类型不同。redis有五种(list set string hash zset),memcached只有一种string；
-3. Redis支持数据的持久化。可以将内存中的数据保持在磁盘中，重启的时候可以再次加载进行使用；
-4. Redis支持数据的备份，即master-slave模式的数据备份；
-5. memcache挂掉后，数据不可恢复; redis数据丢失后可以通过aof恢复；
-6. 由于 redis 只使用单核，而 memcached 可以使用多核，所以平均每一个核上 redis 在存储小数据时比 memcached 性能更高。而在 100k 以上的数据中，memcached 性能要高于 redis，虽然 redis 最近也在存储大数据的性能上进行优化，但是比起 memcached，还是稍有逊色。
+`location` 用于匹配URI路径，支持多种匹配模式：
 
-Redis做缓存的优点：速度快，完全基于内存，使用C语言实现，网络层使用epoll解决高并发问题。
+| 匹配模式 | 语法 | 优先级 | 说明 |
+| :---- | :---- | :----: | :---- |
+| 精确匹配 | `location = /path` | 1 | 完全匹配URI |
+| 前缀匹配（优先） | `location ^~ /path` | 2 | 前缀匹配，匹配成功后停止搜索 |
+| 正则匹配（区分大小写） | `location ~ pattern` | 3 | 正则表达式匹配 |
+| 正则匹配（不区分大小写） | `location ~* pattern` | 3 | 正则表达式匹配 |
+| 前缀匹配 | `location /path` | 4 | 普通前缀匹配 |
 
-### Redis 四种缓存机制
+```nginx title="location匹配示例"
+server {
+    listen 80;
+    server_name example.com;
 
-redis四种缓存机制：分为缓存穿透，缓存雪崩，缓存击穿，缓存预热。
+    # 精确匹配：只匹配 /
+    location = / {
+        return 200 "精确匹配首页";
+    }
 
-#### 一. 缓存雪崩
+    # 优先前缀匹配：匹配 /api/ 开头的所有请求
+    location ^~ /api/ {
+        proxy_pass http://backend:8080;
+    }
 
-缓存雪崩是指在短时间内，有大量缓存同时过期，导致大量的请求直接查询数据库，从而对数据库造成了巨大的压力，严重情况下可能会导致数据库宕机的情况叫做缓存雪崩。
+    # 正则匹配：匹配图片文件
+    location ~* \.(gif|jpg|jpeg|png|webp)$ {
+        root /data/images;
+        expires 30d;  # 缓存30天
+    }
 
-当缓存失效时，大量请求直接绕过 Redis 去请求数据库，导致会对数据库造成很大压力。
+    # 正则匹配：匹配静态资源
+    location ~ \.(css|js)$ {
+        root /data/static;
+        expires 7d;
+    }
 
-解决方法：
+    # 普通前缀匹配：匹配所有 /docs/ 开头的请求
+    location /docs/ {
+        root /usr/share/nginx;
+    }
 
-1. 加锁排队
-2. 随机化过期时间
+    # 默认匹配：其他所有请求
+    location / {
+        root /usr/share/nginx/html;
+        index index.html;
+    }
+}
+```
 
-#### 二.缓存穿透
+## 企业级实战配置
 
-缓存穿透说白了就是查询一个一定不存在的数据，由于缓存是未命中从数据库去查询，查不到数据则不写入缓存，这将导致这个不存在的数据每次请求都要到数据库去查询，造成缓存穿透。
+### 静态资源服务
 
-解决方法：
+```nginx title="/etc/nginx/conf.d/static.conf" showLineNumbers
+server {
+    listen       80;
+    server_name  static.example.com;
 
-1. 布隆过滤器：
-   我们可以使用布隆过滤器来解决,可以将布隆过滤器想象成一个map,请求一个不存在的数据,我们就把它放到这个map中，每次请求前先通过map过滤一遍，如果map中存在这个值就直接将请求拦截掉。
-2. 缓存空结果:
-   我们可以把每次从数据库查询的数据都保存到缓存中，我们可以将空结果的缓存时间设置得短一些，例如 1-3 分钟。
+    # 访问日志
+    access_log  /var/log/nginx/static.access.log  main;
 
-#### 三、缓存击穿
+    # 网站根目录
+    root /data/www;
 
-缓存击穿指的是某个热点缓存，在某一时刻恰好失效了，然后客户端访问数据的时候，redis中没有数据，mysql中有数据，相当于直接跳过了redis。
+    # 默认首页
+    location / {
+        index  index.html index.htm;
+        try_files $uri $uri/ =404;
+    }
 
-解决方法：
+    # 图片资源目录
+    location /images/ {
+        alias /data/images/;           # 使用alias重定向路径
+        
+        # 缓存配置
+        expires 30d;                   # 浏览器缓存30天
+        add_header Cache-Control "public, immutable";
+        
+        # 跨域配置
+        add_header Access-Control-Allow-Origin *;
+    }
 
-1. 加锁排队
-   在查数据库时进行加锁，缓冲大量请求, 以减少数据库压力
-2. 设置永不过期
-   对于某些热点缓存，我们可以设置永不过期，这样就能保证缓存的稳定性，但需要注意在数据更改之后，要及时更新此热点缓存，不然就会造成查询结果的误差。
+    # 匹配特定扩展名的静态资源
+    location ~* \.(gif|jpg|jpeg|png|webp|svg|ico)$ {
+        root /data/images;
+        expires 30d;
+        access_log off;                # 不记录访问日志
+    }
 
-#### 四、缓存预热
+    # CSS和JS文件
+    location ~* \.(css|js)$ {
+        root /data/www;
+        expires 7d;
+        add_header Cache-Control "public";
+    }
 
-缓存预热并不是一个问题，而是使用缓存时的一个优化方案，它可以提高前台用户的使用体验。
+    # 字体文件
+    location ~* \.(woff|woff2|ttf|otf|eot)$ {
+        root /data/fonts;
+        expires 1y;
+        add_header Access-Control-Allow-Origin *;
+    }
 
-缓存预热指的是在系统启动的时候，先把查询结果预存到缓存中，以便用户后面查询时可以直接从缓存中读取，以节约用户的等待时间。
+    # 禁止访问隐藏文件
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+}
+```
 
+### 单页应用(SPA)部署
+
+单页应用（React/Vue/Angular）使用前端路由，需要特殊配置：
+
+```nginx title="/etc/nginx/conf.d/spa.conf" showLineNumbers
+server {
+    listen       80;
+    server_name  app.example.com;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # 前端路由配置：所有路径都返回 index.html
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    # API请求代理到后端
+    location /api/ {
+        proxy_pass http://backend:8080/;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # 静态资源缓存
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # Service Worker不缓存
+    location = /service-worker.js {
+        expires off;
+        add_header Cache-Control "no-cache, no-store, must-revalidate";
+    }
+
+    # 安全头部
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+}
+```
+
+:::tip SPA配置要点
+`try_files $uri $uri/ /index.html;` 的作用：
+1. 先尝试访问 `$uri` 对应的文件
+2. 如果不存在，尝试访问 `$uri/` 对录
+3. 都不存在时，返回 `index.html`，交由前端路由处理
+:::
+
+### 反向代理
+
+```nginx title="/etc/nginx/conf.d/proxy.conf" showLineNumbers
+server {
+    listen       80;
+    server_name  api.example.com;
+
+    # 代理到后端服务
+    location /api/ {
+        # 代理目标（注意末尾的 / 会替换掉 /api/）
+        proxy_pass http://localhost:8080/;
+
+        # === 请求头配置 ===
+        proxy_set_header Host $host;                      # 传递原始Host
+        proxy_set_header X-Real-IP $remote_addr;          # 客户端真实IP
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;  # 代理链IP
+        proxy_set_header X-Forwarded-Proto $scheme;       # 原始协议(http/https)
+
+        # === 超时配置 ===
+        proxy_connect_timeout 60s;   # 连接后端超时时间
+        proxy_send_timeout 60s;      # 发送请求超时时间
+        proxy_read_timeout 60s;      # 读取响应超时时间
+
+        # === 缓冲配置 ===
+        proxy_buffering on;              # 启用缓冲
+        proxy_buffer_size 4k;            # 缓冲区大小
+        proxy_buffers 8 4k;              # 缓冲区数量和大小
+        proxy_busy_buffers_size 8k;      # 忙碌缓冲区大小
+
+        # === 其他配置 ===
+        proxy_redirect off;              # 不修改重定向响应
+        proxy_http_version 1.1;          # 使用HTTP/1.1
+        proxy_set_header Connection ""; # 支持长连接
+    }
+
+    # WebSocket代理
+    location /ws/ {
+        proxy_pass http://localhost:8080/ws/;
+        
+        # WebSocket必需配置
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        
+        # 超时时间（WebSocket通常需要更长的超时）
+        proxy_read_timeout 3600s;
+        proxy_send_timeout 3600s;
+    }
+}
+```
+
+:::warning proxy_pass的路径规则
+- `proxy_pass http://backend;` - 保留location匹配的路径
+- `proxy_pass http://backend/;` - 替换location匹配的路径
+- `proxy_pass http://backend/api;` - 使用指定路径替换
+
+示例：
+```nginx
+location /api/ {
+    # 访问 /api/users 会代理到 http://backend/users
+    proxy_pass http://backend/;
+}
+
+location /api/ {
+    # 访问 /api/users 会代理到 http://backend/api/users
+    proxy_pass http://backend;
+}
+```
+:::
+
+### 负载均衡
+
+Nginx支持将请求分发到多个后端服务器，实现高可用和负载均衡。
+
+#### 负载均衡算法
+
+Nginx支持三种负载均衡算法：
+
+<Tabs>
+  <TabItem value="round-robin" label="轮询(默认)" default>
+
+**轮询(round-robin)**：依次将请求分配给每个服务器，支持按权重比例分配。
+
+```nginx title="轮询算法"
+upstream backend {
+    server backend1.example.com;
+    server backend2.example.com;
+    server backend3.example.com;
+}
+
+# 加权轮询
+upstream backend_weighted {
+    server backend1.example.com weight=3;  # 权重3，接收3/6的请求
+    server backend2.example.com weight=2;  # 权重2，接收2/6的请求
+    server backend3.example.com weight=1;  # 权重1，接收1/6的请求
+}
+```
+
+**适用场景**：各服务器性能相近的场景
+**优点**：配置简单，请求分配均匀
+**缺点**：不考虑服务器当前负载状态
+
+  </TabItem>
+  <TabItem value="least-conn" label="最少连接">
+
+**最少连接(least_conn)**：将请求分配给当前活跃连接数最少的服务器。
+
+```nginx title="最少连接算法"
+upstream backend {
+    least_conn;  # 启用最少连接算法
+    
+    server backend1.example.com;
+    server backend2.example.com;
+    server backend3.example.com;
+}
+```
+
+**适用场景**：请求处理时间差异较大的场景
+**优点**：更智能的负载分配，避免某台服务器过载
+**缺点**：相比轮询，计算开销略大
+
+  </TabItem>
+  <TabItem value="ip-hash" label="IP哈希">
+
+**IP哈希(ip_hash)**：根据客户端IP计算哈希值，固定分配到特定服务器。
+
+```nginx title="IP哈希算法"
+upstream backend {
+    ip_hash;  # 启用IP哈希算法
+    
+    server backend1.example.com;
+    server backend2.example.com;
+    server backend3.example.com;
+}
+```
+
+**适用场景**：需要会话保持（session sticky）的场景
+**优点**：同一客户端的请求固定路由到同一服务器
+**缺点**：可能导致负载不均，不支持weight参数
+
+  </TabItem>
+</Tabs>
+
+#### 完整的负载均衡配置
+
+```nginx title="/etc/nginx/conf.d/loadbalance.conf" showLineNumbers
+# ==================== 上游服务器定义 ====================
+upstream backend_servers {
+    # 负载均衡算法（默认轮询，可选 least_conn 或 ip_hash）
+    least_conn;
+
+    # 后端服务器列表
+    server 192.168.1.101:8080 weight=3 max_fails=2 fail_timeout=30s;
+    server 192.168.1.102:8080 weight=2 max_fails=2 fail_timeout=30s;
+    server 192.168.1.103:8080 weight=1 max_fails=2 fail_timeout=30s;
+    server 192.168.1.104:8080 backup;  # 备份服务器，仅在其他服务器都不可用时使用
+    
+    # 长连接配置（提高性能）
+    keepalive 32;  # 保持32个长连接
+}
+
+# ==================== 虚拟主机配置 ====================
+server {
+    listen       80;
+    server_name  www.example.com;
+
+    location / {
+        # 代理到上游服务器组
+        proxy_pass http://backend_servers;
+
+        # 请求头配置
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+        # 支持长连接
+        proxy_http_version 1.1;
+        proxy_set_header Connection "";
+
+        # 超时配置
+        proxy_connect_timeout 5s;
+        proxy_send_timeout 60s;
+        proxy_read_timeout 60s;
+
+        # 错误处理：如果后端返回502/503/504，尝试下一个服务器
+        proxy_next_upstream error timeout http_502 http_503 http_504;
+        proxy_next_upstream_tries 2;      # 最多尝试2次
+        proxy_next_upstream_timeout 10s;  # 尝试总超时时间
+    }
+
+    # 健康检查页面（用于负载均衡器检查Nginx状态）
+    location /health {
+        access_log off;
+        return 200 "healthy\n";
+        add_header Content-Type text/plain;
+    }
+}
+```
+
+#### 服务器参数说明
+
+| 参数 | 说明 | 示例 |
+| :---- | :---- | :---- |
+| `weight` | 权重，默认为1 | `weight=3` |
+| `max_fails` | 失败次数，超过后标记为不可用 | `max_fails=2` |
+| `fail_timeout` | 失败超时时间 | `fail_timeout=30s` |
+| `backup` | 备份服务器 | `backup` |
+| `down` | 标记服务器永久不可用 | `down` |
+| `max_conns` | 最大连接数限制 | `max_conns=100` |
+
+:::info 健康检查机制
+Nginx自带被动健康检查：
+- 当后端服务器连续失败 `max_fails` 次后，标记为不可用
+- 在 `fail_timeout` 时间内不再分配请求
+- 时间到期后自动尝试恢复
+- 主动健康检查需要商业版Nginx Plus或使用第三方模块
+:::
+
+### HTTPS/SSL配置
+
+```nginx title="/etc/nginx/conf.d/ssl.conf" showLineNumbers
+# ==================== HTTP重定向到HTTPS ====================
+server {
+    listen       80;
+    server_name  example.com www.example.com;
+
+    # 将所有HTTP请求重定向到HTTPS
+    return 301 https://$server_name$request_uri;
+}
+
+# ==================== HTTPS配置 ====================
+server {
+    listen       443 ssl http2;  # 启用SSL和HTTP/2
+    server_name  example.com www.example.com;
+
+    # === SSL证书配置 ===
+    ssl_certificate      /etc/nginx/ssl/example.com.crt;      # 证书文件
+    ssl_certificate_key  /etc/nginx/ssl/example.com.key;      # 私钥文件
+    ssl_trusted_certificate /etc/nginx/ssl/ca-bundle.crt;     # CA证书链
+
+    # === SSL协议和加密套件 ===
+    ssl_protocols        TLSv1.2 TLSv1.3;  # 仅支持TLS 1.2和1.3
+    ssl_ciphers          HIGH:!aNULL:!MD5:!RC4:!3DES;  # 加密套件
+    ssl_prefer_server_ciphers on;  # 优先使用服务器端加密套件
+
+    # === SSL会话缓存 ===
+    ssl_session_cache    shared:SSL:10m;   # 共享缓存，大小10MB
+    ssl_session_timeout  10m;              # 会话超时时间10分钟
+    ssl_session_tickets  off;              # 关闭session ticket（更安全）
+
+    # === OCSP Stapling（提高SSL握手性能）===
+    ssl_stapling on;
+    ssl_stapling_verify on;
+    resolver 8.8.8.8 8.8.4.4 valid=300s;   # DNS解析器
+    resolver_timeout 5s;
+
+    # === 安全头部 ===
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;  # HSTS
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+
+    # === 站点配置 ===
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+```
+
+:::tip 免费SSL证书
+推荐使用 [Let's Encrypt](https://letsencrypt.org/) 获取免费SSL证书：
+
+```bash
+# 安装certbot
+sudo apt install certbot python3-certbot-nginx
+
+# 自动配置Nginx SSL
+sudo certbot --nginx -d example.com -d www.example.com
+
+# 自动续期（添加到crontab）
+0 0 * * * certbot renew --quiet
+```
+:::
+
+## 常用变量参考
+
+Nginx提供了丰富的内置变量，可在配置中使用：
+
+| 变量 | 说明 | 示例值 |
+| :---- | :---- | :---- |
+| `$host` | 请求的主机名 | `example.com` |
+| `$uri` | 当前请求的URI（不含参数） | `/api/users` |
+| `$request_uri` | 完整的原始请求URI（含参数） | `/api/users?id=1` |
+| `$args` | 请求参数 | `id=1&name=test` |
+| `$remote_addr` | 客户端IP地址 | `192.168.1.100` |
+| `$remote_port` | 客户端端口 | `54321` |
+| `$server_addr` | 服务器IP地址 | `10.0.0.1` |
+| `$server_port` | 服务器端口 | `80` |
+| `$scheme` | 请求协议 | `http` 或 `https` |
+| `$request_method` | 请求方法 | `GET` `POST` 等 |
+| `$content_type` | Content-Type头 | `application/json` |
+| `$http_user_agent` | User-Agent头 | `Mozilla/5.0...` |
+| `$http_referer` | Referer头 | `https://google.com` |
+
+## 性能优化
+
+### 工作进程优化
+
+```nginx
+# 自动设置为CPU核心数
+worker_processes auto;
+
+# 将worker进程绑定到特定CPU核心（避免进程切换开销）
+worker_cpu_affinity auto;
+
+# 每个worker进程的最大连接数
+events {
+    worker_connections 4096;
+    use epoll;  # Linux使用epoll
+    multi_accept on;  # 允许一次接受多个连接
+}
+```
+
+### 文件传输优化
+
+```nginx
+http {
+    # 高效文件传输
+    sendfile on;
+    tcp_nopush on;
+    tcp_nodelay on;
+
+    # 文件句柄缓存
+    open_file_cache max=10000 inactive=60s;
+    open_file_cache_valid 30s;
+    open_file_cache_min_uses 2;
+    open_file_cache_errors on;
+}
+```
+
+### Gzip压缩优化
+
+```nginx
+http {
+    gzip on;
+    gzip_vary on;
+    gzip_proxied any;
+    gzip_comp_level 6;  # 压缩级别1-9，6是性能和压缩比的平衡点
+    gzip_types text/plain text/css text/xml text/javascript 
+               application/json application/javascript 
+               application/xml+rss application/rss+xml 
+               font/truetype font/opentype 
+               application/vnd.ms-fontobject 
+               image/svg+xml;
+    gzip_disable "msie6";  # 禁用IE6的gzip
+    gzip_min_length 1000;  # 小于1KB的文件不压缩
+}
+```
+
+### 缓存配置
+
+```nginx
+# 代理缓存配置
+proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m 
+                 max_size=1g inactive=60m use_temp_path=off;
+
+server {
+    location / {
+        proxy_pass http://backend;
+        
+        # 启用缓存
+        proxy_cache my_cache;
+        proxy_cache_valid 200 304 12h;  # 成功响应缓存12小时
+        proxy_cache_valid any 1m;        # 其他响应缓存1分钟
+        
+        # 缓存键
+        proxy_cache_key "$scheme$request_method$host$request_uri";
+        
+        # 显示缓存状态
+        add_header X-Cache-Status $upstream_cache_status;
+    }
+}
+```
+
+## 故障排查
+
+### 查看日志
+
+```bash
+# 实时查看访问日志
+tail -f /var/log/nginx/access.log
+
+# 实时查看错误日志
+tail -f /var/log/nginx/error.log
+
+# 查看最近100行错误日志
+tail -n 100 /var/log/nginx/error.log
+
+# 搜索特定错误
+grep "error" /var/log/nginx/error.log | tail -n 50
+```
+
+### 常见错误排查
+
+:::danger 502 Bad Gateway
+**原因**：
+- 后端服务未启动或无法连接
+- 后端服务响应超时
+- SELinux阻止连接
+
+**排查步骤**：
+```bash
+# 1. 检查后端服务是否运行
+systemctl status backend-service
+
+# 2. 测试能否连接后端
+curl http://localhost:8080
+
+# 3. 检查SELinux状态（CentOS/RHEL）
+getenforce
+# 临时关闭SELinux
+sudo setenforce 0
+
+# 4. 允许Nginx网络连接
+sudo setsebool -P httpd_can_network_connect 1
+```
+:::
+
+:::warning 413 Request Entity Too Large
+**原因**：上传文件大小超过限制
+
+**解决方案**：
+```nginx
+http {
+    client_max_body_size 100M;  # 设置最大上传大小
+}
+```
+:::
+
+:::warning 504 Gateway Timeout
+**原因**：后端处理请求超时
+
+**解决方案**：
+```nginx
+location / {
+    proxy_pass http://backend;
+    proxy_connect_timeout 300s;
+    proxy_send_timeout 300s;
+    proxy_read_timeout 300s;
+}
+```
+:::
+
+### 测试配置文件
+
+```bash
+# 测试配置文件语法
+nginx -t
+
+# 查看详细错误信息
+nginx -t -v
+
+# 测试配置并查看所有配置项
+nginx -T
+```
+
+## 安全加固
+
+### 隐藏版本号
+
+```nginx
+http {
+    server_tokens off;  # 隐藏Nginx版本号
+}
+```
+
+### 限制请求速率
+
+```nginx
+http {
+    # 定义限流区域：每个IP每秒最多10个请求
+    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=10r/s;
+
+    server {
+        location /api/ {
+            # 应用限流：允许突发20个请求，延迟处理超出的请求
+            limit_req zone=api_limit burst=20 nodelay;
+            
+            proxy_pass http://backend;
+        }
+    }
+}
+```
+
+### 限制连接数
+
+```nginx
+http {
+    # 定义限制区域：每个IP最多10个并发连接
+    limit_conn_zone $binary_remote_addr zone=addr:10m;
+
+    server {
+        # 应用连接限制
+        limit_conn addr 10;
+        
+        location /download/ {
+            limit_conn addr 1;       # 下载目录每个IP只允许1个连接
+            limit_rate 500k;         # 限速500KB/s
+        }
+    }
+}
+```
+
+### 防止恶意访问
+
+```nginx
+server {
+    # 禁止特定User-Agent
+    if ($http_user_agent ~* (bot|spider|crawler|scanner)) {
+        return 403;
+    }
+
+    # 禁止特定请求方法
+    if ($request_method !~ ^(GET|POST|HEAD)$) {
+        return 405;
+    }
+
+    # 防止目录遍历攻击
+    location ~ /\. {
+        deny all;
+        access_log off;
+        log_not_found off;
+    }
+
+    # 禁止访问敏感文件
+    location ~* \.(sql|bak|swp|old|tmp)$ {
+        deny all;
+    }
+}
+```
+
+## 最佳实践总结
+
+:::tip 配置文件组织
+1. **模块化配置**：将不同功能拆分到独立文件
+   ```
+   /etc/nginx/
+   ├── nginx.conf           # 主配置
+   ├── conf.d/             # 通用配置
+   │   ├── gzip.conf
+   │   └── security.conf
+   └── sites-enabled/      # 站点配置
+       ├── example.com.conf
+       └── api.example.com.conf
+   ```
+
+2. **使用include指令**：提高可维护性
+   ```nginx
+   http {
+       include /etc/nginx/conf.d/*.conf;
+       include /etc/nginx/sites-enabled/*.conf;
+   }
+   ```
+
+3. **注释重要配置**：便于团队协作
+:::
+
+:::tip 性能优化清单
+- ✅ 设置合理的 `worker_processes` 和 `worker_connections`
+- ✅ 启用 `sendfile`、`tcp_nopush`、`tcp_nodelay`
+- ✅ 配置 Gzip 压缩
+- ✅ 启用静态资源浏览器缓存
+- ✅ 使用 `upstream` 的 `keepalive` 长连接
+- ✅ 配置合理的超时时间
+:::
+
+:::tip 安全加固清单
+- ✅ 隐藏Nginx版本号 (`server_tokens off`)
+- ✅ 使用HTTPS并配置HSTS
+- ✅ 配置请求速率限制和连接数限制
+- ✅ 设置安全响应头（X-Frame-Options、X-XSS-Protection等）
+- ✅ 禁止访问隐藏文件和敏感文件
+- ✅ 定期更新Nginx版本
+:::
+
+## 参考资源
+
+- [Nginx官方文档](http://nginx.org/en/docs/)
+- [Nginx新手指南](http://nginx.org/en/docs/beginners_guide.html)
+- [Nginx配置指令索引](http://nginx.org/en/docs/dirindex.html)
+- [Nginx变量索引](http://nginx.org/en/docs/varindex.html)
+- [使用Nginx作为HTTP负载均衡器](http://nginx.org/en/docs/http/load_balancing.html)
+- [配置HTTPS服务器](http://nginx.org/en/docs/http/configuring_https_servers.html)

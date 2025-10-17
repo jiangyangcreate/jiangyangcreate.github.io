@@ -123,6 +123,7 @@ module.exports = {
         showReadingTime: true,
         // postsPerPage: 9,
         blogSidebarCount: 0,
+        onUntruncatedBlogPosts: 'ignore', // 忽略博客文章缺少截断标记的警告
 
         feedOptions: {
           type: "all",
