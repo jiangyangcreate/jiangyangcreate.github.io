@@ -14,9 +14,9 @@
 
 - 配置生成式 AI 文章总结，完全的Github部署。[访问 博客文本摘要](https://jiangmiemie.com/blog/2024/1/31/)
 
-- 集成 React Photo Album，布局优雅，点击照片可放大并展示照片描述、拍摄地、照片尺寸等信息。[访问 照片墙](https://jiangmiemie.com/gallery/)
+- 内置多种字体高亮、集成 mermaid 、markmap、 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown](https://jiangmiemie.com/docs/编程外的基础/Markdown/)
 
-- 集成 mermaid 、markmap、 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown](https://jiangmiemie.com/docs/编程外的基础/Markdown/)
+- 集成 React Photo Album，布局优雅，点击照片可放大并展示照片描述、拍摄地、照片尺寸等信息。[访问 照片墙](https://jiangmiemie.com/gallery/)
 
 - 集成 giscus，使用 GitHub 账号评论，还能一键分享至 twitter。[访问 博客页](https://jiangmiemie.com/blog/)
 
@@ -80,6 +80,45 @@
 - `npm audit`：检查漏洞
 - `npm install`：下载所需依赖包
 - `npm run start`：启动站点
+- `npm run build`: 打包为静态站点
+
+## Docker参考
+
+### 构建 Docker
+
+在项目目录下执行以下命令，将 Dockerfile 中定义的内容构建为版本号为 `0.0.1` 的镜像：
+
+```bash
+docker build -t jiangmiemie:0.0.1 .
+```
+   
+   说明：该命令会读取当前目录下的 Dockerfile 并构建出镜像 `jiangmiemie:0.0.1`。
+
+### 保存镜像为 tar 文件
+
+使用 `docker save` 命令将刚构建好的镜像导出成 tar 文件：
+
+```bash
+docker save -o jiangmiemie_0.0.1.tar jiangmiemie:0.0.1
+```
+   
+说明：生成的 `jiangmiemie_0.0.1.tar` 文件包含了该镜像的所有数据，方便后续的传输。
+
+Ubuntu使用 `docker load` 加载镜像：
+     
+```bash
+docker load -i jiangmiemie_0.0.1.tar
+```
+
+### 运行 Docker 容器
+
+加载完成后，使用下面的命令运行容器，并将服务器的端口 8080 映射至容器的 8080 端口：
+
+```bash
+docker run -d -p 8080:80 --name jiangmiemie jiangmiemie:0.0.1
+```
+
+说明：该命令会以后台模式运行镜像 `jiangmiemie:0.0.1`，容器名称为 `jiangmiemie`，使得你可以通过 Ubuntu 服务器上的 `8080` 端口访问该应用。
 
 ## 许可证信息
 

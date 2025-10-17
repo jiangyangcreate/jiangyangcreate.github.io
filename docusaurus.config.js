@@ -142,6 +142,7 @@ module.exports = {
   markdown: {
     mermaid: true,
   },
+  // 如不添加可能会样式异常，展示2次
   stylesheets: [
     {
       href: "/katex/katex.min.css",
