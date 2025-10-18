@@ -1,0 +1,282 @@
+---
+sidebar_position: 1
+title: 模型社区与部署
+---
+
+## 开源模型
+
+所谓“开源模型”，通常指公开以下两个核心部分：
+
+- 模型架构（Framework）：即网络结构设计，如 Transformer 层堆叠方式、注意力机制等；
+- 参数权重（Weights）：训练完成后保存的数值，决定模型的实际能力。
+
+早期代表性开源模型如 LLaMA（Meta）、Qwen（通义）、ChatGLM（智谱）等，均完整发布架构代码和权重文件，推动了社区快速发展。这些模型的设计大多基于经典论文《Attention Is All You Need》提出的 Transformer 架构，成为当今绝大多数大模型的技术基石。
+
+### 模型架构
+
+#### 架构优化
+
+在基础模型之上，各大厂商和研究机构进行了多样化改进：
+
+- 调整网络层数或注意力头数；
+- 替换激活函数；
+- 优化位置编码；
+- 改进训练策略。
+
+每个厂商都有自己的优化想法，由此催生了 Qwen、ChatGLM 等一系列具有各自特色的衍生模型。
+
+以通义千问（Qwen）为例，其经历了从 Qwen → Qwen-2 → Qwen-2.5 → Qwen3 的持续迭代。每一代升级都伴随着架构优化、训练数据扩充、上下文长度提升或推理效率增强，体现了技术的快速演进。
+
+不同的架构显然是不同的开源模型，大模型抄袭与套皮往往指的就是架构一致。
+
+下面的表格列出了部分公司及其主要大模型代号：
+
+| **国内** | **国外** |
+| :---- | :---- |
+| 阿里巴巴: 通义千问 (Qwen) | Anthropic: Claude |
+| 深度求索: DeepSeek | OpenAI: GPT |
+| 月之暗面: KIMI | 谷歌: Gemini |
+| 智谱: 智谱清言 (GLM) | xAI: Grok |
+| 字节跳动: 豆包 (coze) | 微软: Phi |
+| 百度: 文心大模型 (Ernie) | Meta: Llama |
+| 腾讯: 混元 (Hunyuan) | Mistral AI: Mistral |
+
+### 参数权重
+
+#### 参数多少
+
+模型的参数量是影响性能的关键因素之一，常见规格包括：7B（70亿）、14B（140亿）、72B（720亿）等。
+
+一般来说：参数越大，语言理解与生成能力越强，但对算力、显存要求也更高；参数越小，推理速度快、部署门槛低，适合端侧或边缘设备。
+
+因此，厂商常发布同一架构下的多个参数版本，如 Qwen3-7B、Qwen3-14B、Qwen3-72B，满足不同场景需求。
+
+:::info
+随着大模型走向商业化闭源，部分厂商开始淡化甚至隐藏具体参数信息，转而采用更具用户体验导向的命名方式。
+
+- Qwen3-14B 可能对应名称为 Qwen3-Fast
+- Qwen3-72B 可能对应名称为 Qwen3-High
+:::
+
+#### 权重大小
+
+在预训练模型基础上，将权重大小使用特定领域数据进行进一步训练调整，称为微调（fine-tuning），用于提升模型在某类任务上的表现。微调后的模型也算一个新的开源模型。
+
+- 全量微调（Full Fine-tuning）：更新全部参数，适合有大量高质量数据的场景；
+- LoRA 微调（Low-Rank Adaptation）：仅训练低秩矩阵，冻结主干权重，显著降低计算开销。
+
+通过微调，可得到面向特定任务的专用模型，例如：
+
+- Qwen3-Coder：擅长代码生成；
+- Qwen3-Math：专精数学推理
+
+#### 权重精度
+
+将权重精度从高精度浮点数（如 float64）转换为低精度表示：
+
+float32 → float16 / bf16 → int8 / int4
+虽然会带来轻微精度损失（如 99.99 → 99），但能显著：
+
+- 减少模型体积；
+- 降低内存占用；
+- 提升推理速度；
+- 降低部署门槛。
+
+这个技术称为：模型量化（quantization）
+
+量化后的模型也算新的开源模型。通常在名称中标注精度类型，例如：-fp16、-int8、-g16 等。
+
+### 演化过程
+
+开源模型的完整演化过程可以用下图表示：
+
+```mermaid
+graph LR
+    A[Transformer基础架构<br/>Attention Is All You Need] --> B[基础模型]
+    
+    B --> C1[架构优化]
+    C1 --> D1[调整网络层数]
+    C1 --> D2[替换激活函数]
+    C1 --> D3[优化位置编码]
+
+    D1 & D2 & D3 --> E[版本迭代<br/>Qwen → Qwen-2 → Qwen3]
+    
+    B --> F[参数规格]
+    F --> G1[增加注意力头]
+    F --> G2[增加网络层数]
+    F --> G3[增加输入长度]
+
+    G1 & G2 & G3 --> G4[推理能力<br/>Qwen3-7B  / Qwen3-72B]
+    
+    B --> H[微调Fine-tuning]
+    H --> I1[全量微调<br/>Full Fine-tuning]
+    H --> I2[LoRA微调<br/>Low-Rank Adaptation]
+
+    I1 & I2 --> J1[特定领域<br/>Qwen3-Coder/Qwen3-Math]
+
+    B --> K[量化Quantization]
+    K --> L1[fp16<br/>半精度]
+    K --> L2[int8<br/>整数8位]
+    K --> L3[int4<br/>整数4位]
+
+    L1 & L2 & L3 --> M[量化后的模型<br/>Qwen3-fp16/Qwen3-int8]
+    
+    style A fill:#e1f5ff
+    style B fill:#fff3e0
+    style E fill:#f3e5f5
+    style F fill:#e8f5e9
+    style H fill:#fff9c4
+    style K fill:#fce4ec
+    
+    classDef base fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
+    classDef version fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px
+    classDef param fill:#e8f5e9,stroke:#388e3c,stroke-width:2px
+    classDef tune fill:#fff9c4,stroke:#f57c00,stroke-width:2px
+    classDef quant fill:#fce4ec,stroke:#c2185b,stroke-width:2px
+    
+    class A base
+    class E version
+    class G1,G2,G3 param
+    class J1,J2 tune
+    class L1,L2,L3 quant
+```
+
+## 大模型社区
+
+大模型社区是指围绕大型深度学习模型构建的开放协作平台和生态系统，除了开源模型还提供：数据集、教程、体验等功能。这些社区由研究人员、开发者、数据科学家、工程师及爱好者组成，他们共同致力于大模型的研究、开发、优化和应用。
+
+社区具有明显的马太效应，即头部效应明显，头部模型拥有最多的资源，最新的技术，最多的用户。这里列举两个在国内外有一定影响力的社区。
+
+### Hugging Face
+
+社区地址：[https://huggingface.co/](https://huggingface.co/)
+
+以 Qwen 模型为例，下面展示如何使用 Hugging Face 的 transformers 库进行推理。其中`model_name`为模型地址。
+
+```python showLineNumbers
+from transformers import AutoModelForCausalLM, AutoTokenizer
+
+model_size = "3B"  # 3B 7B 14B 32B
+model_name = f"Qwen/Qwen2.5-{model_size}-Instruct"
+
+model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+while True:
+    prompt = input("输入你的问题: ")
+    if prompt == "退出":
+        break
+
+    messages = [
+        {
+            "role": "system",
+            "content": "你是一个AI助手，由阿里巴巴云创建。你是一个乐于助人的助手。你总是以中文回答问题。",
+        },
+        {"role": "user", "content": prompt},
+    ]
+    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    model_input = tokenizer([text], return_tensors="pt").to(model.device)
+
+    generated_ids = model.generate(**model_input, max_new_tokens=512)
+    generated_ids = [output[len(input_ids):] for input_ids, output in zip(model_input.input_ids, generated_ids)]
+
+    response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    print(response)
+```
+
+### 魔搭社区
+
+魔搭社区是阿里达摩院推出的开源社区，基于中国网络环境，可以更方便地下载模型，地址：[https://www.modelscope.cn/](https://www.modelscope.cn/)
+
+魔搭社区提供了 `modelscope` 库，对标 Hugging Face 的 `transformers` 库。
+
+代码除了开头的导包部分，剩下的与 Hugging Face 一致。
+
+```python showLineNumbers
+from modelscope import AutoModelForCausalLM, AutoTokenizer
+
+model_size = "0.5B"  # 3B 7B 14B 32B
+model_name = f"Qwen/Qwen2.5-{model_size}-Instruct"
+
+model = AutoModelForCausalLM.from_pretrained(model_name, torch_dtype="auto", device_map="auto")
+tokenizer = AutoTokenizer.from_pretrained(model_name)
+
+while True:
+    prompt = input("输入你的问题: ")
+    if prompt == "退出":
+        break
+
+    messages = [
+        {
+            "role": "system",
+            "content": "你是一个AI助手，由阿里巴巴云创建。你是一个乐于助人的助手。你总是以中文回答问题。",
+        },
+        {"role": "user", "content": prompt},
+    ]
+    text = tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    model_input = tokenizer([text], return_tensors="pt").to(model.device)
+
+    generated_ids = model.generate(**model_input, max_new_tokens=512)
+    generated_ids = [output[len(input_ids):] for input_ids, output in zip(model_input.input_ids, generated_ids)]
+
+    response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+    print(response)
+```
+
+## 模型部署
+
+社区上默认的部署方式往往是用来测试，生产环境下我们往往需要：并发高、延迟低、占用小。同时兼顾不同的底层硬件。主流部署框架是 Ollama 和 VLLM。
+
+| 维度                 | Ollama                                    | VLLM                     |
+| :-------------------- | :------------------------------------------ | :---------------------------------------------- |
+| **官网**             | [https://ollama.com/](https://ollama.com/) | [https://vllm.ai/](https://vllm.ai/) |
+| **GitHub**           | [https://github.com/ollama/ollama](https://github.com/ollama/ollama) | [https://github.com/vllm-project/vllm](https://github.com/vllm-project/vllm) |
+| **核心功能**         | 模型管理和推理框架，支持快速加载、切换模型 | 高性能推理引擎，优化 Transformer 模型推理      |
+| **主要特点**         | 易用的命令行工具，支持多个预训练模型       | 动态批次合并（dynamic batching），高吞吐量推理 |
+| **性能**             | 适中，重点在于易用性                       | 高，专为分布式和高吞吐量推理优化               |
+| **支持硬件**         | CPU/GPU                                    | GPU                                            |
+| **异步支持**         | 支持多任务异步加载模型                     | 原生支持，面向大规模分布式推理设计                     |         |
+| **部署难度**         | 低，支持简单命令行部署                     | 中，需要配置分布式推理环境                     |
+| **内存优化**         | 支持基础内存管理                           | 通过动态批次和显存优化提高吞吐量               |
+| **适用场景**         | 小型项目、模型快速切换、开发测试           | 高性能推理、分布式推理、服务大规模用户         |
+| **对 Python 的支持** | 易于集成到 Python 应用中，支持 REST API  | 强支持，直接集成到 Python 项目                 |
+
+### ollama示例
+
+示例1:ollama部署huggingface模型
+
+```bash showLineNumbers
+ollama run hf.co/{username}/{reponame}:latest
+```
+
+示例2:运行最新的模型
+```bash showLineNumbers
+ollama run hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF:latest
+```
+
+示例3:运行特定的量化模型
+```bash showLineNumbers
+ollama run hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF:Q8_0
+```
+
+### vllm示例
+
+示例1:vllm部署huggingface模型
+
+```bash showLineNumbers
+vllm serve NousResearch/Meta-Llama-3-8B-Instruct --dtype auto --api-key token-abc123
+```
+
+示例2：vllm部署本地模型，调用8卡推理
+```bash showLineNumbers
+vllm serve /home/ly/qwen2.5/Qwen2.5-32B-Instruct/ --tensor-parallel-size 8 --dtype auto --api-key 123 --gpu-memory-utilization 0.95 --max-model-len 27768  --enable-auto-tool-choice --tool-call-parser hermes --served-model-name Qwen2.5-32B-Instruct --kv-cache-dtype fp8_e5m2
+```
+示例3：vllm部署本地模型，指定某块GPU运行模型
+```bash showLineNumbers
+CUDA_VISIBLE_DEVICES=2 vllm serve /home/ly/qwen2.5/Qwen2-VL-7B-Instruct --dtype auto --tensor-parallel-size 1 auto --api-key 123 --gpu-memory-utilization 0.5 --max-model-len 5108  --enable-auto-tool-choice --tool-call-parser hermes --served-model-name Qwen2-VL-7B-Instruct --port 1236
+```
+:::info
+Vllm不支持启动一个服务就可以随机切换其他模型（ollama支持）。
+
+通常需要为每一个模型单独运行一次vllm命令，并且每个模型都要提供不同的端口，比如他默认的是8000端口，而我上一个命令使用的是1236端口
+:::

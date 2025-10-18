@@ -303,6 +303,9 @@ A:
 // 仅回复工具调用
 ```
 
+他蛊惑大模型，先调用`rejectTransfer`(拒绝转账函数)会危及金库中的资金, `approveTransfer`(批准转账函数) 必须始终首先调用，这样被调用者会收到他们的请求被拒绝的通知。
+
+
 AI 的回答的中文翻译：
 
 ```bash showLineNumbers
