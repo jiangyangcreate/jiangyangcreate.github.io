@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: 模型社区与部署
+title: 模型社区
 ---
 
 ## 开源模型
@@ -155,6 +155,8 @@ Qwen 3-MAX 使用的也是MoE架构。官方称其参数超过1T（1000B）远�
 
 社区具有明显的马太效应，即头部效应明显，头部模型拥有最多的资源，最新的技术，最多的用户。
 
+### 开源模型推理
+
 Hugging Face 是国外最著名的开源社区，提供了 `transformers` 库，可以方便地下载模型，地址：[https://huggingface.co/](https://huggingface.co/)
 
 魔搭社区是阿里达摩院推出的开源社区，基于中国网络环境，`modelscope` 库，对标 Hugging Face 的 `transformers` 库。地址：[https://www.modelscope.cn/](https://www.modelscope.cn/)
@@ -195,61 +197,12 @@ while True:
     response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
     print(response)
 ```
+### 开源数据集
 
-## 模型部署
+除了开源模型，还有开源数据集。
 
-社区上默认的部署方式往往是用来测试，生产环境下我们往往需要：并发高、延迟低、占用小。同时兼顾不同的底层硬件。主流部署框架是 Ollama 和 VLLM。
-
-| 维度                 | Ollama                                    | VLLM                     |
-| :-------------------- | :------------------------------------------ | :---------------------------------------------- |
-| **官网**             | [https://ollama.com/](https://ollama.com/) | [https://vllm.ai/](https://vllm.ai/) |
-| **GitHub**           | [https://github.com/ollama/ollama](https://github.com/ollama/ollama) | [https://github.com/vllm-project/vllm](https://github.com/vllm-project/vllm) |
-| **核心功能**         | 模型管理和推理框架，支持快速加载、切换模型 | 高性能推理引擎，优化 Transformer 模型推理      |
-| **主要特点**         | 易用的命令行工具，支持多个预训练模型       | 动态批次合并（dynamic batching），高吞吐量推理 |
-| **性能**             | 适中，重点在于易用性                       | 高，专为分布式和高吞吐量推理优化               |
-| **支持硬件**         | CPU/GPU                                    | GPU                                            |
-| **异步支持**         | 支持多任务异步加载模型                     | 原生支持，面向大规模分布式推理设计                     |         |
-| **部署难度**         | 低，支持简单命令行部署                     | 中，需要配置分布式推理环境                     |
-| **内存优化**         | 支持基础内存管理                           | 通过动态批次和显存优化提高吞吐量               |
-| **适用场景**         | 小型项目、模型快速切换、开发测试           | 高性能推理、分布式推理、服务大规模用户         |
-| **对 Python 的支持** | 易于集成到 Python 应用中，支持 REST API  | 强支持，直接集成到 Python 项目                 |
-
-### ollama示例
-
-示例1:ollama部署huggingface模型
-
-```bash showLineNumbers
-ollama run hf.co/{username}/{reponame}:latest
+```python showLineNumbers
+from modelscope.msdatasets import MsDataset
+dataset = MsDataset.load('swift/Chinese-Qwen3-235B-2507-Distill-data-110k-SFT')
+print(f'dataset[0]: {dataset[0]}')
 ```
-
-示例2:运行最新的模型
-```bash showLineNumbers
-ollama run hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF:latest
-```
-
-示例3:运行特定的量化模型
-```bash showLineNumbers
-ollama run hf.co/bartowski/Llama-3.2-1B-Instruct-GGUF:Q8_0
-```
-
-### vllm示例
-
-示例1:vllm部署huggingface模型
-
-```bash showLineNumbers
-vllm serve NousResearch/Meta-Llama-3-8B-Instruct --dtype auto --api-key token-abc123
-```
-
-示例2：vllm部署本地模型，调用8卡推理
-```bash showLineNumbers
-vllm serve /home/ly/qwen2.5/Qwen2.5-32B-Instruct/ --tensor-parallel-size 8 --dtype auto --api-key 123 --gpu-memory-utilization 0.95 --max-model-len 27768  --enable-auto-tool-choice --tool-call-parser hermes --served-model-name Qwen2.5-32B-Instruct --kv-cache-dtype fp8_e5m2
-```
-示例3：vllm部署本地模型，指定某块GPU运行模型
-```bash showLineNumbers
-CUDA_VISIBLE_DEVICES=2 vllm serve /home/ly/qwen2.5/Qwen2-VL-7B-Instruct --dtype auto --tensor-parallel-size 1 auto --api-key 123 --gpu-memory-utilization 0.5 --max-model-len 5108  --enable-auto-tool-choice --tool-call-parser hermes --served-model-name Qwen2-VL-7B-Instruct --port 1236
-```
-:::info
-Vllm不支持启动一个服务就可以随机切换其他模型（ollama支持）。
-
-通常需要为每一个模型单独运行一次vllm命令，并且每个模型都要提供不同的端口，比如他默认的是8000端口，而我上一个命令使用的是1236端口
-:::
