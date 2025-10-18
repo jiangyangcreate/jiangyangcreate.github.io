@@ -22,18 +22,72 @@ result = [x**2 for x in range(10) if x % 2 == 0]
 [PEP 202 – 列表推导式](https://peps.python.org/pep-0202/)
 :::
 
-介绍列表的方法及示例演示其使用，包括：长度、修改列表、取值、排序
+### 列表方法概览
 
-### list函数
+<MarkmapHooks initialMarkdown={`
+## 列表方法分类
+
+### 添加元素
+- append: 在列表末尾添加一个元素
+- extend: 在列表末尾追加另一个可迭代对象的所有元素
+- insert: 在指定位置插入一个元素
+
+### 删除元素
+- remove: 删除列表中第一个匹配的元素
+- pop: 删除并返回指定位置的元素（默认为最后一个）
+- clear: 清空列表中的所有元素
+
+### 查找元素
+- index: 返回元素在列表中首次出现的位置
+- count: 返回元素在列表中出现的次数
+
+### 排序和反转
+- sort: 对列表进行原地排序
+- reverse: 原地反转列表中的元素
+
+### 其他
+- copy: 返回列表的浅拷贝
+`} />
+
+### list() 函数
+
+`list()` 函数用于创建一个新的列表，或者将一个可迭代对象转换为列表。
+
+`list()` 函数签名: `list([iterable]) -> new list`
+
+**参数说明:**
+- `iterable` (可选): 一个可迭代对象，如字符串、元组、集合、字典等。如果省略，则创建一个空列表。
+
+**返回值:**
+- 返回一个新的列表。
 
 ```python showLineNumbers
-empty_list = list()
-print(empty_list)  # []
+# 创建空列表
+empty_list_literal = []
+empty_list_constructor = list()
+print(f"空列表 (字面量): {empty_list_literal}")
+print(f"空列表 (构造函数): {empty_list_constructor}")
 
-'''
-[]是解析后的list，所以[]比list()更快
-'''
+# 从字符串创建列表
+char_list = list("hello")
+print(f"从字符串创建: {char_list}")
+
+# 从元组创建列表
+tuple_to_list = list((1, 2, 3))
+print(f"从元组创建: {tuple_to_list}")
+
+# 从字典创建列表（只包含键）
+dict_keys_list = list({'a': 1, 'b': 2})
+print(f"从字典创建: {dict_keys_list}")
+
+# 从集合创建列表
+set_to_list = list({1, 2, 3})
+print(f"从集合创建: {set_to_list}")
 ```
+
+:::tip
+使用 `[]` (字面量) 创建空列表通常比 `list()` (构造函数) 更快，因为它不需要函数调用开销。在性能敏感的代码中，推荐使用 `[]`。
+:::
 
 查看列表长度：
 
@@ -43,21 +97,14 @@ a = [1, 2, 3]
 b = [2, 3, 'hello']
 c = a + b
 print(c)  # [1, 2, 3, 2, 3, 'hello']
-```
-
-```python showLineNumbers
 print(len(c))  # 6
 ```
 
-Python 字符串可以和列表可以方便扩展：
+Python 列表和字符串一样可以使用乘法扩展：
 
 ```python showLineNumbers
 d = b * 2
 print(d)  # [2, 3, 'hello', 2, 3, 'hello']
-```
-
-```python showLineNumbers
-print(d[-1])  # 'hello'
 ```
 
 ### 列表的内置方法
@@ -293,6 +340,10 @@ print(squares)  # [9, 64]
 
 ## 字典
 
+字典是 Python 中另一种非常重要的数据结构，它是一个**无序**、**可变**的键值对（key-value pair）集合。
+
+每个键都必须是<HoverText text="唯一的" explanation="重复的键会覆盖原来的值。"/>，并且是`hashable`(可哈希)的。大部分不可变类型都是可哈希的，如字符串、数字、<HoverText text="元组" explanation="元组内可以包含可变和不可变类型，但只有元组内所有元素都是不可变类型时，元组才是可哈希的。"/>。
+
 :::info
 字典推导式让字典的创建变得更加简洁和直观。它遵循了Python"应该有一种，最好只有一种显而易见的方法来做事"的原则。
 
@@ -304,47 +355,109 @@ squares = {x: x**2 for x in range(5)}
 [PEP 274 – 字典推导式](https://peps.python.org/pep-0274/)
 :::
 
-字典 dictionary ，在一些编程语言中也称为 hash ， map ，
-是一种由键值对组成的数据结构。
+### 字典方法概览
+
+<MarkmapHooks initialMarkdown={`
+## 字典方法分类
+
+### 访问和获取
+- get: 安全地获取键对应的值，可指定默认值
+- keys: 返回一个包含所有键的视图对象
+- values: 返回一个包含所有值的视图对象
+- items: 返回一个包含所有键值对的视图对象
+
+### 添加和更新
+- update: 用另一个字典或键值对序列更新字典
+- setdefault: 如果键不存在，则插入带默认值的键
+
+### 删除元素
+- pop: 删除并返回指定键的值
+- popitem: 删除并返回一个任意的键值对
+- clear: 清空字典中的所有元素
+
+### 其他
+- copy: 返回字典的浅拷贝
+- fromkeys: 用指定的键和值创建一个新字典
+`} />
+
+### dict() 函数
+
+`dict()` 函数用于创建一个新的字典。
+
+`dict()` 函数签名:
+1. `dict(**kwargs) -> new dictionary`
+2. `dict(mapping, **kwargs) -> new dictionary`
+3. `dict(iterable, **kwargs) -> new dictionary`
+
+**参数说明:**
+- `**kwargs`: 关键字参数，用于创建字典。
+- `mapping`: 一个映射对象（如另一个字典）。
+- `iterable`: 一个包含键值对的可迭代对象。
+
+**返回值:**
+- 返回一个新的字典。
 
 ```python showLineNumbers
-a = {}
-print(type(a))  # <class 'dict'>
-a = dict()
-print(type(a))  # <class 'dict'>
+# 创建空字典
+empty_dict_literal = {}
+empty_dict_constructor = dict()
+print(f"空字典 (字面量): {empty_dict_literal}")
+print(f"空字典 (构造函数): {empty_dict_constructor}")
+
+# 使用关键字参数创建字典
+kw_dict = dict(name="Alice", age=30)
+print(f"从关键字参数创建: {kw_dict}")
+
+# 从另一个字典创建
+mapping_dict = dict({'a': 1, 'b': 2})
+print(f"从映射对象创建: {mapping_dict}")
+
+# 从键值对列表创建
+iterable_dict = dict([('x', 10), ('y', 20)])
+print(f"从可迭代对象创建: {iterable_dict}")
 ```
 
-### dict函数
-
-```python showLineNumbers
-# 插入键值
-a['f'] = 'num 1'
-a['s'] = 'num 2'
-print(a)  # {'s': 'num 2', 'f': 'num 1'}
-```
-
-```python showLineNumbers
-# 查看键值
-print(a['s'])  # num 2
-```
-
-```python showLineNumbers
-# 更新
-a['f'] = 'num 3'
-print(a)  # {'s': 'num 2', 'f': 'num 3'}
-```
+:::tip
+与列表类似，使用 `{}` (字面量) 创建空字典通常比 `dict()` 更快。
+:::
 
 ```python showLineNumbers
 # 初始化字典
 a = {'first': 'num 1', 'second': 'num 2', 3: 'num 3'}
 print(a['first'])  # num 1
 print(a[3])  # num 3
+
+# 插入键值
+a['f'] = 'num 1'
+a['s'] = 'num 2'
+print(a)  # {'s': 'num 2', 'f': 'num 1'}
+
+# 查看键值
+print(a['s'])  # num 2
+
+# 更新
+a['f'] = 'num 3'
+print(a)  # {'s': 'num 2', 'f': 'num 3'}
+
+# 利用索引直接更新键值对
+my_dict = {'age': 32}
+my_dict['age'] += 1
+print(my_dict['age'])  # 33
+
+# dict 可以使用元组作为键值
+# 例如，可以用元组做键来表示从第一个城市飞往第二个城市航班数的多少：
+connections = {}
+connections[('New York', 'Seattle')] = 100
+connections[('Austin', 'New York')] = 200
+connections[('New York', 'Austin')] = 400
+
+# 元组是有序的，
+# 因此 ('New York', 'Austin') 和 ('Austin', 'New York') 是两个不同的键：
+print(connections[('Austin', 'New York')])  # 200
+print(connections[('New York', 'Austin')])  # 400
 ```
 
-Python 中不能用支持用数字索引按顺序查看字典中的值，
-而且数字本身也有可能成为键值，这样会引起混淆:
-
-a[0] 会报错
+Python 中不支持用数字索引按顺序查看字典中的值，因为数字本身也有可能成为键值，这样会引起混淆:
 
 ```python showLineNumbers
 try:
@@ -354,7 +467,7 @@ except KeyError as e:
 # KeyError: 0
 ```
 
-dict 的应用示例
+字典的值也可以是另一个字典，这样就可以实现嵌套的字典。
 
 ```python showLineNumbers
 # 定义四个字典
@@ -365,66 +478,14 @@ e4 = {'mag': 0.03, 'width': 30}
 
 # 以字典作为值传入新的字典
 events = {500: e1, 760: e2, 3001: e3, 4180: e4}
-# {760: {u'width': 25, u'mag': 0.04},
-# 3001: {u'width': 80, u'mag': 0.05},
-# 500: {u'width': 20, u'mag': 0.05},
-# 4180: {u'width': 30, u'mag': 0.03}}
-print(events)
-```
-
-```python showLineNumbers
-# 另一个例子
-people = [
-    {'first': 'Sam', 'last': 'Malone', 'age': 35},
-    {'first': 'Woody', 'last': 'Boyd', 'age': 21},
-    {'first': 'Norm', 'last': 'Peterson', 'age': 34},
-    {'first': 'Diane', 'last': 'Chambers', 'age': 33}
-]
-print(people)
-# [{'first': 'Sam', 'last': 'Malone', 'age': 35},
-#  {'first': 'Woody', 'last': 'Boyd', 'age': 21}, 
-#  {'first': 'Norm', 'last': 'Peterson', 'age': 34},
-#  {'first': 'Diane', 'last': 'Chambers', 'age': 33}]
-```
-
-使用 dict 初始化字典：
-
-```python showLineNumbers
-# 除了通常的定义方式，还可以通过 dict() 转化来生成字典：
-my_dict = dict([('name', 'lili'),
-                ('sex', 'female'),
-                ('age', 32),
-                ('address', 'beijing')])
-# {u'age': 32,
-# u'address': u'beijing',
-# u'name': u'lili',
-# u'sex': u'female'}
-print(my_dict)
-```
-
-利用索引直接更新键值对：
-
-```python showLineNumbers
-my_dict['age'] += 1
-print(my_dict['age'])  # 33
-```
-
-dict 可以使用元组作为键值：
-
-```python
-# 例如，可以用元组做键来表示从第一个城市飞往第二个城市航班数的多少：
-connections = {}
-connections[('New York', 'Seattle')] = 100
-connections[('Austin', 'New York')] = 200
-connections[('New York', 'Austin')] = 400
-connections
-```
-
-```python
-# 元组是有序的，
-# 因此 ('New York', 'Austin') 和 ('Austin', 'New York') 是两个不同的键：
-print(connections[('Austin', 'New York')])  # 200
-print(connections[('New York', 'Austin')])  # 400
+import pprint
+pprint.pprint(events)
+"""
+{500: {'mag': 0.05, 'width': 20},
+ 760: {'mag': 0.04, 'width': 25},
+ 3001: {'mag': 0.05, 'width': 80},
+ 4180: {'mag': 0.03, 'width': 30}}
+"""
 ```
 
 ### 字典的内置方法
@@ -540,6 +601,8 @@ print(keys_list)      # ['cows', 'dogs', 'cats', 'sheep']
 
 ## 集合
 
+集合是 Python 中的一种**无序**、**可变**的数据结构，它只包含**唯一**的元素。集合中的元素必须是不可变类型。
+
 :::info
 集合字面量语法让集合的创建变得更加直观和高效。使用花括号`{}`创建集合，体现了Python"应该有一种显而易见的方法来做事"的原则。
 
@@ -557,29 +620,115 @@ squares = {x**2 for x in range(5)}
 [PEP 3106 – 在2.6中重新激活集合字面量](https://peps.python.org/pep-3106/)
 :::
 
+### 集合方法概览
 
-### 创建集合
+<MarkmapHooks initialMarkdown={`
+## 集合方法分类
 
-```python
-# 可以用set()函数来显示的生成空集合：
-a = set()
-print(a)
-print(type(a))
+### 添加元素
+- add: 添加一个元素到集合中
+- update: 用另一个可迭代对象中的所有元素更新集合
+
+### 删除元素
+- remove: 删除指定的元素，如果不存在则引发 KeyError
+- discard: 删除指定的元素，如果不存在则不执行任何操作
+- pop: 删除并返回集合中的一个任意元素
+- clear: 清空集合中的所有元素
+
+### 集合运算
+- union: 返回两个集合的并集
+- intersection: 返回两个集合的交集
+- difference: 返回两个集合的差集
+- symmetric_difference: 返回两个集合的对称差集
+
+### 集合关系
+- issubset: 判断一个集合是否是另一个集合的子集
+- issuperset: 判断一个集合是否是另一个集合的超集
+- isdisjoint: 判断两个集合是否没有交集
+
+### 其他
+- copy: 返回集合的浅拷贝
+`} />
+
+
+### frozenset() 函数
+
+`frozenset` 是 `set` 的不可变版本。一旦创建，`frozenset` 的元素就不能被修改。这使得 `frozenset` 可以作为字典的键或集合中的元素。
+
+`frozenset()` 函数用于创建一个新的不可变集合。
+
+`frozenset()` 函数签名: `frozenset([iterable]) -> new frozenset`
+
+**参数说明:**
+- `iterable` (可选): 一个可迭代对象。
+
+**返回值:**
+- 返回一个新的不可变集合。
+
+```python showLineNumbers
+# 创建一个 frozenset
+frozen = frozenset([1, 2, 3, 4, 5])
+print(frozen)
+
+# frozenset 可以作为字典的键
+data = {frozen: 'my_frozen_set'}
+print(data[frozen])
+
+# frozenset 支持所有不修改集合的 set 方法
+other_set = {4, 5, 6, 7}
+print(frozen.difference(other_set)) # frozenset({1, 2, 3})
 ```
+
+:::tip
+由于 `frozenset` 是不可变的，它不支持 `add`, `remove`, `pop`, `update` 等会修改集合内容的方法。
+:::
+
+### set() 函数
+
+`set()` 函数用于创建一个新的集合。
+
+`set()` 函数签名: `set([iterable]) -> new set`
+
+**参数说明:**
+- `iterable` (可选): 一个可迭代对象，如列表、元组、字符串等。
+
+**返回值:**
+- 返回一个新的集合。
+
+```python showLineNumbers
+# 创建空集合
+empty_set = set()
+print(f"空集合: {empty_set}")
+
+# 从列表创建集合（自动去重）
+list_to_set = set([1, 2, 2, 3])
+print(f"从列表创建: {list_to_set}")
+
+# 从字符串创建集合
+string_to_set = set("hello")
+print(f"从字符串创建: {string_to_set}")
+```
+
+:::warning
+创建空集合时必须使用 `set()`，因为 `{}` 创建的是一个空字典。
+```python
+empty_dict = {}
+print(type(empty_dict)) # <class 'dict'>
+```
+:::
+
+
+
 
 ```python
 # 使用一个列表来初始化一个集合：
 a = set([1, 2, 3, 1])
 a  # 集合会自动去除重复元素 1。
-```
 
-```python
 # 集合中的元素是用大括号{}包含起来的，这意味着可以用{}的形式来创建集合：
 a = {1, 2, 3, 1}
 print(a)  # {1, 2, 3}
-```
 
-```python
 # 但是创建空集合的时候只能用set来创建，因为在Python中{}创建的是一个空的字典：
 s = {}
 print(type(s))  # <type 'dict'>
@@ -587,70 +736,31 @@ print(type(s))  # <type 'dict'>
 
 ### 集合操作
 
-```python
+#### 并、交、差、对称差
+
+```python showLineNumbers
 a = {1, 2, 3, 4}
 b = {2, 3, 4, 5}
-```
 
-#### 并
-
-两个集合的并，返回包含两个集合所有元素的集合（去除重复）。
-可以用方法 a.union(b) 或者操作 a | b 实现。
-
-```python
+# 两个集合的并，返回包含两个集合所有元素的集合（去除重复）。
 c = a.union(b)
-print(c)  # {1, 2, 3, 4, 5, 6}
+# 等价于
+d = a | b # {1, 2, 3, 4, 5}
 
-# 操作 a | b 实现
-d = a | b
-print(c)
-```
-
-```python
-c == d
-```
-
-#### 交
-
-两个集合的交，返回包含两个集合共有元素的集合。
-
-可以用方法 a.intersection(b) 或者操作 a & b 实现。
-
-```python
+# 两个集合的交，返回包含两个集合共有元素的集合。
 c = a.intersection(b)
-print(c)  # set([2, 3, 4])
+# 等价于
+d = a & b # {2, 3, 4}
 
-d = a & b
-print(d)
-
-c == d
-```
-
-#### 差
-
-a 和 b 的差集，返回只在 a 不在 b 的元素组成的集合。
-
-可以用方法 a.difference(b) 或者操作 a - b 实现。
-
-```python
+# a 和 b 的差集，返回只在 a 不在 b 的元素组成的集合。
 c = a.difference(b)
-print(c)  # set([1])
-d = a - b
-print(d)
-```
+# 等价于
+d = a - b # {1}
 
-#### 对称差
-
-a 和 b 的对称差集，返回在 a 或在 b 中，但是不同时在 a 和 b 中的元素组成的集合。
-
-可以用方法 a.symmetric_difference(b) 或者操作 a ^ b 实现（异或操作符）。
-
-```python
+# a 和 b 的对称差集，返回在 a 或在 b 中，但是不同时在 a 和 b 中的元素组成的集合。
 c = a.symmetric_difference(b)
-print(c)  # set([1, 5])
-
-d = a ^ b
-print(d)
+# 等价于
+d = a ^ b # {1, 5}
 ```
 
 #### 包含关系
@@ -693,10 +803,10 @@ s.add(a) 将元素 a 加入集合 s 中。
 ```python
 s = {1, 3, 4}
 s.add(4)
-print(s)  # set([1, 3, 4])
+print(s)  # {1, 3, 4}
 
 s.add(5)
-print(s)  # set([1, 3, 4, 5])
+print(s)  # {1, 3, 4, 5}
 ```
 
 跟列表的 extend 方法类似，用来向集合添加多个元素。
@@ -705,7 +815,7 @@ s.update(seq)
 
 ```python
 s.update([10, 11, 12])
-print(s)  # set([1, 3, 4, 5, 10, 11, 12])
+print(s)  # {1, 3, 4, 5, 10, 11, 12}
 ```
 
 #### remove方法、discard方法
@@ -714,7 +824,7 @@ print(s)  # set([1, 3, 4, 5, 10, 11, 12])
 # remove 方法移除单个元素
 s = {1, 3, 4}
 s.remove(1)
-print(s)  # set([3, 4])
+print(s)  # {3, 4}
 ```
 
 #### pop 方法弹出元素
@@ -733,7 +843,7 @@ print(s, d)
 # discard 方法作用与 remove 一样
 s = {1, 3, 4}
 s.discard(3)
-print(s)  # set([1, 4])
+print(s)  # {1, 4}
 ```
 
 #### difference_update 方法
@@ -744,26 +854,10 @@ a.difference_update(b) 从 a 中去除所有属于 b 的元素：
 a = {1, 2, 3, 4}
 b = {2, 3, 4, 5}
 a.difference_update(b)
-print(a)  # set([1])
+print(a)  # {1}
 ```
 
-
-## 不可变集合
-
-列表和字符串都是一种有序序列，而集合 set 是一种无序的序列。
-
-因为集合是无序的，所以当集合中存在两个同样的元素的时候，只会保存其中的一个（唯一性）；
-同时为了确保其中不包含同样的元素，集合中放入的元素只能是不可变的对象（确定性）。
-
-### frozenset
-
-frozenset 是不可变集合，因此可以作为字典的键，也可以作为其他集合的元素。
-
-```python
-a = frozenset([1, 2, 3, 4, 5])
-print(a)
-```
-
+## 元组
 
 :::info
 扩展解包操作让元组和其他可迭代对象的解包更加灵活。使用`*`操作符可以捕获多个值，让函数调用和赋值操作更加优雅。
@@ -786,43 +880,63 @@ result = func(*args)  # 等同于 func(1, 2, 3)
 
 [PEP 3132 – 扩展可迭代对象解包](https://peps.python.org/pep-3132/)
 :::
-## 元组
 
-与列表相似，元组 tuple 也是个有序序列，用`,`生成，有些教程中会额外使用`()`来包裹数据，让数据看起来更清晰。
+元组是有序的、不可变的序列。通常用于存储异构数据的集合，例如数据库记录。元组的性能略优于列表，因为它们是不可变的。
+
+### 元组方法概览
+
+<MarkmapHooks initialMarkdown={`
+
+## 元组方法概览
+- count: 返回元素出现的次数
+- index: 返回元素首次出现的索引
+`} />
+
+### tuple() 函数
+
+`tuple()` 函数用于创建一个新的元组。
+
+`tuple()` 函数签名: `tuple([iterable]) -> new tuple`
+
+**参数说明:**
+- `iterable` (可选): 一个可迭代对象。
+
+**返回值:**
+- 返回一个新的元组。
 
 ```python showLineNumbers
 # 创建空元组
-a = ()
-# 等价于
-a = tuple()
-print(type(a)) # <class 'tuple'>
+empty_tuple = tuple()
+print(f"空元组: {empty_tuple}")
 
-# 将其他序列转化成元组
-a = [1, 2, 3]
-b = tuple(a)
-print(b)  # (1, 2, 3)
+# 从列表创建元组
+list_to_tuple = tuple([1, 2, 3])
+print(f"从列表创建: {list_to_tuple}")
 
-# 创建多个元素的元组
-a = 10, 11, 12, 13, 14
-# 通常也可以写作 a = (10, 11, 12, 13, 14)
-print(a)
+# 元组解包
+x, y, z = list_to_tuple
+print(f"解包: x={x}, y={y}, z={z}")
 
-# 创建单个元素的元组
-b = 10,
-# 或者是 b = (10,)
-print(b) # (10,)
-print(type(b))  # <class 'tuple'>
+# 访问元组元素
+print(f"访问索引0: {list_to_tuple[0]}")
+```
 
+:::tip
+要创建一个只包含一个元素的元组，你需要在元素后面加上一个逗号。
+```python
+single_tuple = (42,)
+not_a_tuple = (42)
+print(type(single_tuple)) # <class 'tuple'>
+print(type(not_a_tuple))  # <class 'int'>
+```
+:::
 
-# 可以索引，切片：
-c = a[0]
-print(c)
+:::tip
+不可变对象的优化
 
-c = a[1:3]
-print(c)  # (11, 12)
+原则上来说下面的代码执行结果应该都是False，但是Python对不可变对象进行了驻留优化，所以结果都是True。
 
-# 不可变对象的优化
-# 原则上来说下面的代码执行结果应该都是False，但是Python对不可变对象进行了驻留优化，所以结果都是True。
+```python
 import copy
 a= (1,2,3)
 b = a[:]
@@ -842,6 +956,7 @@ print(a is b) # False
 print(a is c) # False
 print(a is d) # False
 ```
+:::
 
 大部分教程中指出元组是不可变的，但是严格来说，元组只是每个元素的id不能被改变。
 
@@ -857,9 +972,9 @@ a.append(4)
 print(a) # [1, 2, 3, 4]
 print(id(a)) # 2060220698944
 
-tuples = (1, 2, [1,2,3])
-tuples[2][0].append(4)
-print(tuples)  # (1, 2, [1,2,3,4])
+tuples = (1, 2, [1, 2, 3])
+tuples[2].append(4)
+print(tuples)  # (1, 2, [1, 2, 3, 4])
 ```
 
 ## 内置函数
@@ -884,7 +999,6 @@ print(len([1, 2, 3])) # 3
 print(len((1, 2, 3))) # 3
 print(len({1, 2, 3})) # 3
 print(len(range(10))) # 10
-print(len(b)) # 3
 ```
 
 

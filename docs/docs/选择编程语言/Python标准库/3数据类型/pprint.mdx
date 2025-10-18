@@ -1,0 +1,159 @@
+## pprint 模块
+
+`pprint` 模块用于美化打印复杂的Python数据结构，让嵌套的字典、列表等以层次清晰的格式输出。
+
+### 基本使用
+
+```python showLineNumbers
+import pprint
+
+data = {
+    'name': 'Python项目',
+    'config': {
+        'debug': True,
+        'database': {
+            'host': 'localhost',
+            'credentials': {'user': 'admin', 'password': '***'}
+        }
+    },
+    'users': [
+        {'id': 1, 'name': '张三', 'email': 'zhangsan@example.com'},
+        {'id': 2, 'name': '李四', 'email': 'lisi@example.com'},
+    ]
+}
+
+# print输出：单行显示，难以阅读
+print(data)
+
+# pprint.pp输出：结构化显示，层次清晰
+pprint.pp(data)
+```
+
+### 核心函数
+
+```python showLineNumbers
+import pprint
+
+data = {'z': 1, 'a': 2, 'b': [1, 2, 3], 'c': {'d': 4}}
+
+# pp() - 推荐使用，默认不排序字典
+pprint.pp(data, 
+    width=40,        # 每行最多40字符
+    indent=4,        # 缩进4个空格
+    depth=2,         # 只显示2层
+    compact=True,    # 紧凑模式
+    sort_dicts=False # 保持字典插入顺序
+)
+
+# pformat() - 返回字符串而不是打印
+formatted = pprint.pformat(data, indent=4)
+with open('output.txt', 'w') as f:
+    f.write(formatted)
+
+# pprint() - 自动排序字典键
+pprint.pprint(data)  # 输出: {'a': 2, 'b': [...], 'c': {...}, 'z': 1}
+```
+
+### 处理递归引用
+
+```python showLineNumbers
+import pprint
+
+# 自引用列表
+recursive_list = [1, 2, 3]
+recursive_list.append(recursive_list)
+
+pprint.pp(recursive_list)
+# 输出: [1, 2, 3, <Recursion on list with id=...>]
+
+# 检查是否可读/递归
+print(pprint.isreadable(recursive_list))  # False
+print(pprint.isrecursive(recursive_list))  # True
+```
+
+### 实际应用
+
+#### API响应调试
+
+```python showLineNumbers
+import requests
+import pprint
+
+response = requests.get('https://api.github.com/repos/python/cpython')
+pprint.pp(response.json(), depth=2)  # 限制深度避免输出过多
+
+# 交互式环境中替换print
+print = pprint.pp
+```
+
+#### 日志记录
+
+```python showLineNumbers
+import logging
+import pprint
+
+logging.basicConfig(level=logging.DEBUG)
+
+def process_order(order):
+    logging.debug(f"订单:\n{pprint.pformat(order, indent=4)}")
+    
+order = {
+    'id': '12345',
+    'items': [{'name': '商品A', 'price': 99.9, 'qty': 2}],
+    'customer': {'name': '张三', 'address': '北京市'}
+}
+process_order(order)
+```
+
+#### 配置可视化
+
+```python showLineNumbers
+import json
+import pprint
+
+with open('config.json') as f:
+    config = json.load(f)
+
+# 显示并保存格式化配置
+pprint.pp(config, indent=4, sort_dicts=True)
+with open('config_formatted.txt', 'w') as f:
+    f.write(pprint.pformat(config, indent=4))
+```
+
+### PrettyPrinter类
+
+重复使用相同配置时创建实例：
+
+```python showLineNumbers
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4, width=60, depth=3, compact=True)
+
+data1 = {'name': 'Alice', 'scores': [95, 87, 92]}
+data2 = {'name': 'Bob', 'scores': [88, 90, 85]}
+
+pp.pprint(data1)
+pp.pprint(data2)
+```
+
+### 性能与最佳实践
+
+:::warning 性能考虑
+- ✅ 适合：调试、开发环境、日志记录
+- ❌ 避免：生产环境高频打印、超大数据结构
+:::
+
+```python showLineNumbers
+import os
+import pprint
+
+# 仅开发环境使用pprint
+if os.getenv('ENV') == 'development':
+    pprint.pp(data)
+else:
+    logging.info(str(data))
+```
+
+### 参考资料
+
+- [Python官方文档 - pprint](https://docs.python.org/zh-cn/3/library/pprint.html)
