@@ -3,6 +3,240 @@ sidebar_position: 28
 title: 装饰器与作用域
 ---
 
+
+## 装饰器
+
+### callable函数
+
+`callable`函数用于检查一个对象是否是可调用的。即是否可以通过`()`调用。返回 True 或 False，用于条件判断。
+
+```python showLineNumbers
+def test():
+    print('test')
+
+demo = lambda x: x + 1
+
+# 内置函数是可callable的
+print(callable(print)) # True
+# 匿名函数是可callable的
+print(callable(demo)) # True
+# 自定义函数是可callable的
+print(callable(test)) # True
+
+class Test:
+    def __call__(self):
+        """实例被调用时，会执行__call__方法"""
+        print('called')
+
+a = Test()
+a() # 打印 called
+# 类是可callable的
+print(callable(Test)) # True
+# 定义了__call__方法的实例是可callable的，调用实例会执行__call__方法
+print(callable(a))    # True
+
+
+class NoCall:
+    pass
+b = NoCall()
+# 没有定义__call__方法的实例是不可callable的
+print(callable(b))  # False
+```
+
+### @装饰器语法
+
+装饰器也叫修饰器，用于将一个`callable`对象指向另一个`callable`对象。
+
+在一个`callable`对象定义前使用`@装饰器名`，装饰器名下的`callable`对象的引用，会作为装饰器对象的参数被传入。
+
+大部分装饰器的使用场景都是围绕函数，下面这个装饰器只是将函数重定向到自己，没有改变`callable`对象（原test函数）的功能、传参方式。
+
+```python showLineNumbers
+def mark(func):
+    """
+    装饰器函数，用于将函数重定向到另一个函数。
+    装饰器函数的第一个参数，默认是被装饰的函数。
+    """
+    # 返回被装饰的函数，即test函数。
+    return func
+
+@mark
+def test(a):
+    print('test', a)
+
+test(1) # 打印test 1
+
+```
+
+装饰器的其他使用示例：记录函数运行时间、用于自动测试。
+
+```python
+import time
+
+def log(func):
+    """
+    你可以返回被装饰的函数、也可以返回匿名函数、自然也可以在函数中再定义一个函数然后返回他。
+    只要是callable对象都可以。
+    """
+    def wrapper(*args,**kwargs):
+        print('测试开始：现在时间是',time.time())
+        ret = func(*args,**kwargs)
+        print('测试结束：现在时间是',time.time())
+        return ret
+    return wrapper
+
+@log
+def test1(s):
+    """test1 function"""
+    print('test1 ..', s)
+    return s
+@log
+def test2(s1, s2):
+    """test2 function"""
+    print('test2 ..', s1, s2)
+    return s1 + s2
+
+test1(1)
+"""
+测试开始：现在时间是 1760794859.3488584
+test1 .. 1
+测试结束：现在时间是 1760794859.3490396
+"""
+test2(1,2)
+"""
+测试开始：现在时间是 1760794859.3491104
+test2 .. 1 2
+测试结束：现在时间是 1760794859.349173
+"""
+
+# 装饰器会让函数名称指向装饰器返回的callable对象的名称
+print(test1.__name__) # wrapper
+print(test2.__name__) # wrapper
+
+# 知名的`pytest`模块就是通过装饰器指定测试函数，因此如果你的框架中使用了装饰器，需要注意。
+
+# 获取本地变量所有函数
+for k,v in locals().copy().items():
+    # 如果f是函数
+    if callable(v):
+        # 如果函数名以test开头，并且有文档字符串，则执行函数
+        if v.__doc__ and v.__name__.startswith('test'):
+            v()# 不会执行test1和test2函数，因为它们此时的名称是wrapper
+```
+
+如果不想改写函数名称、文档字符串等属性，可以使用`functools`模块
+
+```python showLineNumbers
+from functools import wraps
+ 
+def my_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+ 
+@my_decorator
+def say_hello(name):
+    """A function that says hello"""
+    print(f'Hello, {name}!')
+ 
+print(say_hello.__name__)   # 输出 'say_hello'
+print(say_hello.__doc__)    # 输出 'A function that says hello'
+```
+
+
+也可以使用装饰器实现单例模式。
+
+```python
+def singleton(cls):
+    instances = {}
+    '''
+    instances 是在 singleton 装饰器函数中定义的局部变量。
+    由于 wrapper 函数引用了 instances，instances 成为了 wrapper 的闭包变量。
+    闭包变量的生命周期会延长到 wrapper 函数的存在期间，即使 singleton 函数已经执行完毕。
+    '''
+    def wrapper(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+
+    return wrapper
+
+@singleton
+class MyClass:
+    def __init__(self, name):
+        self.name = name
+
+    def greet(self):
+        print(f"Hello, {self.name}!")
+
+# 测试单例模式
+obj1 = MyClass("Alice")
+obj2 = MyClass("Bob")
+
+print(obj1 is obj2)  # 输出 True，说明是同一个实例
+obj1.greet()         # 输出 "Hello, Alice!"
+obj2.greet()         # 输出 "Hello, Alice!"（因为 obj2 实际上是 obj1）
+```
+
+### 多重装饰器
+
+定义两个装饰器函数
+
+```python showLineNumbers
+def plus_one(f):
+    def new_func(x):
+        return f(x) + 1
+    return new_func
+
+def times_two(f):
+    def new_func(x):
+        return f(x) * 2
+    return new_func
+
+@plus_one # 再执行plus_one装饰器
+@times_two # 先执行times_two装饰器
+def foo(x):
+    return int(x)
+
+b = foo(2)
+print(b) # 5
+```
+
+### 修饰器工厂
+
+decorators factories 是返回修饰器的函数，它的作用在于产生一个可以接受参数的修饰器
+
+可以用作多次执行某个函数
+
+```python showLineNumbers
+import functools
+
+def moretime(times):                 # 1 装饰器工厂（接收参数）
+    print(locals())                  # 打印局部变量，可以看到times参数被注册
+    def decorator(func):             # 2 真正的装饰器（接收函数）
+        @functools.wraps(func)       # 3 保留原函数元信息
+        def wrapper(*args, **kwargs):# 4 包装函数（执行多次原函数）
+            for _ in range(times):
+                func(*args, **kwargs)
+        return wrapper               # 返回包装后的函数
+    return decorator                 # 返回装饰器
+
+@moretime(times = 3) # 这是第一次出现()调用的位置，直接执行，注册times参数为5，并返回 decorator 函数作为真正的装饰器
+def test2():
+    print('test2')
+print('准备执行test2函数')
+# 这是第二次出现()调用的位置，执行 decorator 函数，返回 wrapper 函数并执行
+test2()
+"""
+{'times': 3}
+准备执行test2函数
+test2
+test2
+test2
+"""
+```
+
 ## 作用域
 
 作用域是变量可以被访问的区域。Python的LEGB作用域规则（Local → Enclosing → Global → Built-in），即：
@@ -11,7 +245,6 @@ title: 装饰器与作用域
 - 闭包作用域（Enclosing）：在嵌套函数中，内部函数可以访问外部函数中定义的变量。
 - 全局作用域（Global）：在模块文件中定义的变量，可以在模块文件的任何地方访问。全局作用域是全局变量。
 - 内置作用域（Built-in）：Python 内置的变量、函数、类、关键字等，可以在任何地方访问。
-
 
 ### global
 
@@ -56,6 +289,18 @@ print("函数外的z",z)
 # 函数外的z 30
 ```
 
+### locals
+
+locals 函数返回当前作用域的局部变量的字典。
+
+```python showLineNumbers
+def test():
+    x = 1
+    print(locals())
+test()
+# {'x': 1}
+```
+
 
 ### nonlocal
 
@@ -81,572 +326,64 @@ outer()
 # 2
 ```
 
-## 装饰器
-
-装饰器也叫修饰器
-
-如果你有一批变量想统一按一个规则处理，并且需要缩减代码，你需要函数。
-
-如果你有一批函数想统一按一个规则处理，并且需要缩减代码，你需要装饰器（Decorator）
-
-理清下面 2 点：
-
-函数
-
-- 接受参数
-- 做点事情
-- 返回结果
-
-装饰器
-
-- 接受函数作为参数
-- 做点事情
-- 返回一个函数
-
-用 @ 来使用装饰器
-
-使用 @ 符号来将某个函数替换为装饰符之后的函数：
-
-例如这个函数：
-
-```python
-def dec(f):
-    print('I am decorating function', id(f))
-    return f
-
-def foo(x):
-    print(x)  # I am decorating function 45206384
-
-foo = dec(foo)
-```
-
-可以替换为：
-
-```python
-def dec(f):
-    print('I am decorating function', id(f))
-    return f
-
-@dec
-def foo(x):
-    print(x)
-```
-
-那么他有什么实际作用？故事的开始是这样的，你写好了 2 个函数：
-
-```python
-def test1():
-  print('test1 ..')
-
-def test2():
-  print('test2 ..')
-
-test1()
-test2()
-```
-
-当你准备把它放到服务器上，这个时候领导提醒你要输出日志，不然查错跑断腿。
-输出要求是：在每次函数调用的前后加上时间。
-于是你写成了下面这个样子
-
-```python
-import time
-def test1():
-    print('测试开始：现在时间是',time.time())
-    print('test1 ..')
-    print('测试结束：现在时间是',time.time())
-
-def test2():
-    print('测试开始：现在时间是',time.time())
-    print('test2 ..')
-    print('测试结束：现在时间是',time.time())
-
-test1()
-test2()
-```
-
-领导说，他有 3 个问题：
-
-- 首先代码 1 和代码 2 是一样的，也就是说把同样的代码写了 2 遍，这一点也不程序员！
-- 而且，你修改了你的核心代码，使得它变得很长。后面要再删也很麻烦，万一手抖删错了就完了。
-- 最后，在大项目合作中，可能 test 代码是 A 同事写的，输出日志代码是 B 同事写的，代码保密，每个程序员只能拿到部分片段，所以你根本不知道对方的代码，要提供一个通用的打印日志的方式。
-
-思考下，可以怎么修改能既不修改源代码，又对代码结构影响最小呢？
-
-我说，这样子，那我可以写成这样？
-
-```python
-import time
-
-def a_decorator(func):
-    print('测试开始：现在时间是',time.time())
-    func()
-    print('测试结束：现在时间是',time.time())
-
-def test1():
-    print('test1 ..')
-
-def test2():
-    print('test2 ..')
-
-a_decorator(test1)
-a_decorator(test2)
-```
-
-领导说：有进步，但是原本调用 test1()的语法被你改成了 a_decorator(test1)，这要是再多几个功能不得把我绕晕了啊。
-
-看来函数嵌套掌握的不熟啊，给你点提示，我带你透过现象看本质
-
-- 变量的本质：就是变量指向的内存地址
-- 函数名的本质：就是函数的内存地址
-- 变量可以作为函数的参数，因此函数名可以用做函数的参数
-- 变量可以作为函数的返回值，同理，函数名也可以作为函数的返回值
-
-我说，那就写成这样？
-
-```python
-import time
-
-def a_decorator(func):
-    def wrap_the_func():
-        print('测试开始：现在时间是',time.time())
-        func()
-        print('测试结束：现在时间是',time.time())
-    return wrap_the_func
-
-def test1():
-    print('test1 ..')
-
-def test2():
-    print('test2 ..')
-
-test1 = a_decorator(test1) #这里a_decorator(test1) 代指wrap_the_func()，把这个wrap_the_func()函数的地址赋值给test1，由于代码从上而下执行，从而替换掉原本test1的指向。
-test2 = a_decorator(test2)
-
-test1()
-test1()
-```
-
-领导说：这倒数 3、4 行看着很碍眼，且会占据命名空间，你不会修饰符吗？我教你啊。
-
-- 我们先定义一个函数（名字随便起，这里只是用 a_decorator 做示例）
-- 然后简单的设置下这个函数运行逻辑，
-- 最后在原有的函数的头上加@函数名就行啦
-
-直接使用@函数修饰符是很方便的，你也看出来所谓【@函数修饰符】其实就是【函数】嵌入。
-
-这里我再假设你的函数是带参数的。我也用修饰符写一下吧。好好看，好好学。
-
-核心代码（下方的 test 函数）无需知道我（下方的 log 函数）是怎么写的，我也无需知道核心代码是怎么写的，我们就能快速完成协作。
-
-### 装饰器经典写法
-
-#### 注释函数
-
-```python
-def mark(func):
-    return lambda : print('该函数已被弃用，请使用xxxx方法')
-
-
-@mark
-def t():
-    print('t')
-
-t() # 仅打印该函数已被弃用，请使用xxxx方法
-```
-
-
-#### 改写函数名称
-
-知名的`pytest`模块就是通过装饰器指定测试函数
-
-```python 
-def pytest(func):
-    def test(*args, **kwargs):
-        return func(*args, **kwargs)
-    return test
-
-@pytest
-def get_url():
-    print('url')
-
-# 获取本地变量所有函数
-for k,v in locals().copy().items():
-    # 如果f是函数
-    if callable(v):
-        if v.__doc__ and v.__name__.startswith('test'):
-            v()
-```
-
-如果不想改写函数名称等属性，可以使用`functools`模块
-
-```python 
-from functools import wraps
- 
-def my_decorator(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        return func(*args, **kwargs)
-    return wrapper
- 
-@my_decorator
-def say_hello(name):
-    """A function that says hello"""
-    print(f'Hello, {name}!')
- 
-print(say_hello.__name__)   # 输出 'say_hello'
-print(say_hello.__doc__)    # 输出 'A function that says hello'
-
-```
-
-#### 记录运行时间
-
-```python
-import time
-
-#args 是 arguments 的缩写，表示位置参数；
-#kwargs 是 keyword arguments 的缩写，表示关键字参数。
-#这其实就是 Python 中可变参数的两种形式，
-#并且 *args 必须放在 **kwargs 的前面，因为位置参数在关键字参数的前面。
-
-def log(func):
-  def wrapper(*args,**kwargs):
-    print('测试开始：现在时间是',time.time())
-    ret = func(*args,**kwargs)
-    print('测试结束：现在时间是',time.time())
-    return ret
-  return wrapper
-
-@log
-def test1(s):
-  print('test1 ..', s)
-  return s
-@log
-def test2(s1, s2):
-  print('test2 ..', s1, s2)
-  return s1 + s2
-
-test1(1)
-test2(1,2)
-```
-
-#### 单例模式
-
-```python
-def singleton(cls):
-    instances = {}
-    '''
-    instances 是在 singleton 装饰器函数中定义的局部变量。
-    由于 wrapper 函数引用了 instances，instances 成为了 wrapper 的闭包变量。
-    闭包变量的生命周期会延长到 wrapper 函数的存在期间，即使 singleton 函数已经执行完毕。
-    '''
-    def wrapper(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-
-    return wrapper
-
-@singleton
-class MyClass:
-    def __init__(self, name):
-        self.name = name
-
-    def greet(self):
-        print(f"Hello, {self.name}!")
-
-# 测试单例模式
-obj1 = MyClass("Alice")
-obj2 = MyClass("Bob")
-
-print(obj1 is obj2)  # 输出 True，说明是同一个实例
-obj1.greet()         # 输出 "Hello, Alice!"
-obj2.greet()         # 输出 "Hello, Alice!"（因为 obj2 实际上是 obj1）
-```
-
-
-#### 赋予函数新功能
-
-```python 
-import getpass
-
-def login_auth(func):
-    is_login = {'is_login':False,} #判断如果有一个函数成功等候后面的函数就不需要登录了
-    def login(*args, **kwargs):
-        if not is_login['is_login']:
-            is_login['is_login'] = func(*args, **kwargs)  
-        print('验证失败') if not is_login['is_login'] else print('验证成功')
-    return login
-
-@login_auth
-def user_login():
-    name = input('username：')
-    password = getpass.getpass('password:')  # 输入不会显示，更安全
-    return (name,password) == ('kevin', '123')
-user_login()
-user_login()
-```
-
-### 多重装饰器
-
-定义两个装饰器函数，一个将原来的函数值加一，另一个乘二：
-
-```python
-def plus_one(f):
-    def new_func(x):
-        return f(x) + 1
-
-    return new_func
-```
-
-```python
-def times_two(f):
-    def new_func(x):
-        return f(x) * 2
-
-    return new_func
-```
-
-定义函数，先乘二再加一：
-
-```python
-@plus_one
-@times_two
-def foo(x):
-    return int(x)
-```
-
-```python
-b = foo(2)
-b  # 5
-```
-
-### 修饰器工厂
-
-decorators factories 是返回修饰器的函数
-
-它的作用在于产生一个可以接受参数的修饰器，
-
-例如我们想将 函数 输出的内容写入一个文件去，可以这样做：
-
-```python
-def super_loud(filename):
-    fp = open(filename, 'w')
-
-    def loud(f):
-        def new_func(*args, **kw):
-            fp.write(str(args))
-            fp.writelines('\n')
-            fp.write('calling with' + str(args) + str(kw))
-            # 确保内容被写入
-            fp.flush()
-            fp.close()
-            rtn = f(*args, **kw)
-            return rtn
-
-        return new_func
-
-    return loud
-
-@super_loud('test.txt')
-def foo(x):
-    print(x)
-
-
-# 调用 foo 就会在文件中写入内容：
-foo(100)
-
-import os
-os.remove('test.txt')
-```
-
-也可以用作多次执行某个函数
-
-```python 
-def moretime(times):
-    def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            for _ in range(times):
-                func(*args, **kwargs)
-        return wrapper
-    return decorator
-
-@moretime(times = 5)
-def test2():
-    print(2)
-
-test2()
-```
-
-于是你回想起之前 Python 也提供了一些自带函数，例如：print()、input()
-
-那会不会也有一些自带的【@函数修饰符】呢？还真有，常见的包括：@property、@classmethod、@staticmethod 还有 typing 里面各种用于测试的函数。
-
-默认的self结构，可以通过self访问类的属性、方法。但是需要先实例化。
-
-@staticmethod (静态方法)不需要 self 参数，也不需要 cls 参数。它们与类或实例没有任何绑定，只是类中的一个普通函数。静态方法通常用于与类相关，但不依赖于实例或类属性的操作。调用时不需要实例化类。
-
-@classmethod (类方法)使用 cls 作为第一个参数，表示调用该方法的类本身，而不是实例。它可以访问类级别的属性和方法。调用时可以实例化类，也可以不实例化类。
-
-不过这些结构相对复杂，当你理解普通的@修饰符之后，这些自带的你只需要记得用法即可，原理都是一样的。
-
-
-### @classmethod 装饰器
-
-在 Python 标准库中，有很多自带的装饰器，
-
-例如 classmethod 将一个对象方法转换了类方法：
-
-```python
-class Foo(object):
-    @classmethod
-    def bar(cls, x):
-        print('the input is', x)
-
-    def __init__(self):
-        pass
-```
-
-类方法可以通过 类名.方法 来调用：
-
-```python
-Foo.bar(10)
-```
-
-### @property 装饰器
-
-有时候，我们希望像 Java 一样支持 getters 和 setters 的方法，
-
-这时候就可以使用 property 装饰器：
-
-```python
-class Foo(object):
-    def __init__(self, data):
-        self.data = data
-
-    @property
-    def x(self):
-        return self.data
-
-```
-
-此时可以使用 .x 这个属性查看数据（不需要加上括号）：
-
-```python
-foo = Foo(22)
-print(foo.x)
-```
-
-这样做的好处在于，这个属性是只读的：
-
-foo.x = 1 会报错
-
-如果想让它变成可读写，可以加上一个装饰符 @x.setter：
-
-```python
-class Foo(object):
-    def __init__(self, data):
-        self.data = data
-
-    @property
-    def x(self):
-        return self.data
-
-    @x.setter
-    def x(self, value):
-        self.data = value
-```
-
-```python
-foo = Foo(1000)
-foo.x
-```
-
-```python
-foo.x = 2222
-foo.x
-```
-
-
-### 命名空间与闭包
-
-- 全局命名空间：创建的存储“变量名与值的关系”的空间叫做全局命名空间
-- 局部命名空间：在函数的运行中开辟的临时的空间叫做局部命名空间
-- 内置命名空间：内置命名空间中存放了 python 解释器为我们提供的名字：input,print,str,list,tuple...它们都是我们熟悉的，拿过来就可以用的方法。
-
-三种命名空间之间的加载顺序和取值顺序：
-
-- 加载顺序：内置（程序运行前加载）-->全局（从上到下顺序加载进来的）-->局部（调用的时候加载）--->内置
-- 取值：在局部调用：局部命名空间--->全局命名空间--->内置命名空间
-- 在全局范围找：全局----内置----局部
-  使用：
-  全局不能使用局部的，局部的可以使用全局的
-
-#### 作用域
-
-作用域：就是作用范围，为了函数内的变量不会影响到全局。作用域分为两种：
-
-- 全局作用域：全局命名空间与内置命名空间的名字都属于全局范围在整个文件的任意位置都能被引用，全局有效
-- 局部作用域：局部命名空间，只能在局部范围内生效
-  站在全局看：使用名字的时候：如果全局有，用全局的。如果全局没有，用内置的。
-- globals 方法：查看全局作用域的名字【print(globals())】
-- locals 方法：查看局部作用域的名字【print(locals())】
+### 闭包
 
 闭包的特别之处在于，生命周期的延长。普通函数内部的变量会随着函数被调用而创建，函数执行结束而被销毁。
 
 而闭包可以让函数内部的变量变成函数对象的属性，生命周期与函数定义本身绑定。每次函数执行结束不会被销毁，只有函数被删除才会被销毁。
 
-#### 闭包失败示例
-
-```python
-name = 1 #变量在函数外部,inner可以访问，但是全局也能访问。直接闭包失败
-def func():
-    def inner():
-        print(name)
-        print(inner.__closure__)
-        return name
-    return inner
-
-p = func()
-print(p())#输出的__closure__为None ：不是闭包函数
-print(name)
-```
-
-#### 闭包成功示例
-
 ```python showLineNumbers
 def func():
-    name = 1 #变量在函数内部,inner可以访问,但是全局不能访问。闭包成功！此时加上nonlocal
+    name = 1 # 变量在局部作用域
     def inner():
+        """
+        nonlocal 简单说就是让内部函数中的变量在上一层函数中生效
+        非局部声明变量指代的已有标识符是最近外面函数的已声明变量，但是不包括全局变量。
+        这个是很重要的，因为绑定的默认行为是首先搜索本地命名空间。nonlocal声明的变量只对局部起作用，离开封装函数，那么该变量就无效。
+        """
         nonlocal name
-        # nonlocal非局部声明变量 是python3.2的语法,简单说就是让内部函数中的变量在上一层函数中生效
-        # 非局部声明变量指代的已有标识符是最近外面函数的已声明变量，但是不包括全局变量。这个是很重要的，因为绑定的默认行为是首先搜索本地命名空间。nonlocal声明的变量只对局部起作用，离开封装函数，那么该变量就无效。
         name += 1
-        print(inner.__closure__)
+        """
+        __closure__ 是函数对象的一个属性（仅当该函数是闭包时才非 None）。
+        它是一个 元组（tuple），每个元素是 cell 对象（类型为 <class 'cell'>）。
+        每个 cell 对象封装了被内部函数引用的、来自外层作用域的自由变量（free variables）。
+        """
+        print("闭包单元:", inner.__closure__)
+        print("自由变量名:", inner.__code__.co_freevars)  # ('name',)
+        print("当前值:", inner.__closure__[0].cell_contents)
         return name
     return inner
 
 p = func()
-print(p())
-print(p())
-print(p())
+print(p()) # 2
+print(p()) # 3
+"""
+闭包单元: (<cell at 0x0000021E4197FAC0: function object at 0x0000021E41930C20>, <cell at 0x0000021E4197FAF0: int object at 0x00007FF9AB1673C8>)      
+自由变量名: ('inner', 'name')
+当前值: <function func.<locals>.inner at 0x0000021E41930C20>
+2
+闭包单元: (<cell at 0x0000021E4197FAC0: function object at 0x0000021E41930C20>, <cell at 0x0000021E4197FAF0: int object at 0x00007FF9AB1673E8>)      
+自由变量名: ('inner', 'name')
+当前值: <function func.<locals>.inner at 0x0000021E41930C20>
+3
 
-print(name)
+闭包元组中，同个函数对象没有发生变化，延续之前的值+1后再绑定为新的属性值，即你看到的 int object 地址是不同的。
+"""
+
+
+print(func()()) # 2
+print(func()()) # 2
+"""
+闭包单元: (<cell at 0x000001A3FDDBFDF0: function object at 0x000001A3FDC618A0>, <cell at 0x000001A3FDDBFE20: int object at 0x00007FF9AB1673C8>)
+自由变量名: ('inner', 'name')
+当前值: <function func.<locals>.inner at 0x000001A3FDC618A0>
+2
+闭包单元: (<cell at 0x000001A3FDDBFE80: function object at 0x000001A3FDDE0B80>, <cell at 0x000001A3FDDBFE50: int object at 0x00007FF9AB1673C8>)
+自由变量名: ('inner', 'name')
+当前值: <function func.<locals>.inner at 0x000001A3FDDE0B80>
+2
+
+每次 func() 都是全新调用，创建新的局部作用域，name = 1 重新初始化；
+"""
+
 ```
-
-## 内置函数
-
-### callable函数
-
-### globals函数
-
-### locals函数
-
-### property函数
-
-### classmethod函数
-
-### staticmethod函数
-
-
