@@ -17,25 +17,20 @@ title: 文件操作
 
 函数签名：`open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)`
 
-### 参数详解
-
 -   **`file`**：
     -   一个 [path-like object](https://docs.python.org/zh-cn/3/glossary.html#term-path-like-object)，表示将要打开的文件的路径（绝对路径或相对当前工作目录的路径）。
     -   也可以是要封装文件对应的整数类型文件描述符（如果给出的是文件描述符，则当返回的 I/O 对象关闭时它也会关闭，除非将 `closefd` 设为 `False`）。
 
 -   **`mode`**：
     -   一个指明文件打开模式的可选字符串，默认为 `'r'` (以文本模式读取)。
-    -   详细模式字符及含义见下表。
-
-| 字符 | 含意                       |
-|------|----------------------------|
-| `'r'`  | 读取（默认）               |
-| `'w'`  | 写入，并先截断文件（清空） |
-| `'x'`  | 排它性创建，如果文件已存在则失败 |
-| `'a'`  | 打开文件用于写入，如果文件存在则在末尾追加 |
-| `'b'`  | 二进制模式                 |
-| `'t'`  | 文本模式（默认）           |
-| `'+'`  | 打开用于更新（读取与写入） |
+    -   详细模式字符及含义见下表。参数 mode 可以叠加使用，例如 `rb` 表示以二进制模式读取并写入。
+    - `'r'`：读取（默认）               
+    - `'w'`：写入，并先截断文件（清空） 
+    - `'x'`：排它性创建，如果文件已存在则失败 
+    - `'a'`：打开文件用于写入，如果文件存在则在末尾追加 
+    - `'b'`：二进制模式                 
+    - `'t'`：文本模式（默认）           
+    - `'+'`：打开用于更新（读取与写入） 
 
 -   **`buffering`**：
     -   一个可选的整数，用于设置缓冲策略。
@@ -50,17 +45,18 @@ title: 文件操作
 
 -   **`errors`**：
     -   可选字符串参数，指定如何处理编码和解码错误，不能在二进制模式下使用。
-    -   常见值：`'strict'` (默认，引发 `ValueError`)、`'ignore'`、`'replace'`、`'surrogateescape'`、`'xmlcharrefreplace'`、`'backslashreplace'`、`'namereplace'`。
+    -  `'strict'` (默认，引发 `ValueError`)
+    -  `'ignore'`：忽略错误，继续执行。
+    -  `'replace'`：替换为 `?`。
+    -  `'surrogateescape'`：使用代理字符。
+    -  `'xmlcharrefreplace'`：替换为 XML 字符引用。
+    -  `'backslashreplace'`：替换为反斜杠。
+    -  `'namereplace'`：替换为名称。
 
 -   **`newline`**：
-    -   决定如何解析来自流的换行符。可为 `None`, `''`, `'
-'`, `'
-'` 和 `'
-'`。
-    -   读取时：`None` 启用通用换行模式并转换为 `'
-'`；`''` 启用通用换行模式但不转换；其他值则按给定字符串终止行且不转换。
-    -   写入时：`None` 转换为系统默认行分隔符 `os.linesep`；`''` 或 `'
-'` 不进行翻译；其他值转换为给定字符串。
+    -   决定如何解析来自流的换行符。可为 `None`, `''`, `'\n'`, `'\r'` 和 `'\r\n'`。 
+    -   读取时：`None` 启用通用换行模式并转换为 `'\n'`；`''` 启用通用换行模式但不转换；其他值则按给定字符串终止行且不转换。
+    -   写入时：`None` 转换为系统默认行分隔符 `os.linesep`；`''` 或 `'\n'` 不进行翻译；其他值转换为给定字符串。
 
 -   **`closefd`**：
     -   如果为 `False` 且 `file` 是文件描述符，则当文件对象关闭时，底层文件描述符保持打开状态。如果 `file` 是文件名，则 `closefd` 必须为 `True`（默认值）。
@@ -69,10 +65,7 @@ title: 文件操作
     -   一个可调用的自定义开启器。通过 `opener(file, flags)` 获取文件对象的基础文件描述符。
 
 
-
-## 文本文件操作
-
-### 写入文件
+### 读写文本文件
 
 使用 `'w'` 模式（写入并清空）、`'a'` 模式（追加写入）或 `'w+'` （读写并清空）模式打开文件进行写入。如果文件不存在，这些模式会自动创建文件。
 
@@ -99,8 +92,6 @@ print(f.read())  # 输出：lo world. morning.
 f.close()
 ```
 
-### 读取文件
-
 使用 `'r'` 模式（默认）或 `'r+'` （读写但不清空）模式打开文件进行读取。如果文件不存在，会引发 `FileNotFoundError`。
 
 ```python showLineNumbers
@@ -124,11 +115,9 @@ for line in f:
 f.close()
 ```
 
-## 二进制文件操作
+### 读写二进制文件
 
 当需要处理图片、音频、视频等非文本数据时，应以二进制模式（`'b'`）打开文件。
-
-### 读写二进制数据
 
 在二进制模式下，所有数据都以 `bytes` 对象形式读写，不进行任何编码或解码。
 
@@ -146,15 +135,13 @@ print(repr(f.read())) # 输出：b'...' (bytes representation)
 f.close()
 ```
 
-## 上下文管理器 (with 语句)
+## with 语句
 
 `with` 语句是 Python 中处理文件（及其他需要资源清理的操作）的最佳实践。它确保文件在使用完毕后，无论是否发生异常，都会被正确关闭。
 
 :::info `with` 语句的优势
 `with` 语句通过上下文管理器协议 (`__enter__` 和 `__exit__` 方法) 自动管理资源的获取和释放。它替代了传统的 `try...finally` 模式，使代码更简洁、更安全，有效避免了资源泄漏。
 :::
-
-### 使用 `with open()`
 
 这是打开文件的推荐方式。
 
@@ -171,116 +158,14 @@ finally:
     fp.close()
 ```
 
-### 自定义上下文管理器
 
-你可以通过实现 `__enter__` 和 `__exit__` 方法来创建自己的上下文管理器。
-
-```python showLineNumbers
-class ContextManager(object):
-    def __enter__(self):
-        print("Entering")
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-
-with ContextManager():
-    print("Inside operate")
-# 输出：
-# Entering
-# Inside operate
-# Exiting
-```
-
-#### `__enter__` 的返回值
-
-`__enter__` 方法可以返回一个值，该值会被 `as` 关键字绑定到 `with` 语句的变量上。
-
-```python showLineNumbers
-class ContextManagerWithReturn:
-    def __enter__(self):
-        print("Entering")
-        return "my value" # 返回一个字符串
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-
-with ContextManagerWithReturn() as val:
-    print(val)
-# 输出：
-# Entering
-# my value
-# Exiting
-```
-
-一个常见的做法是让 `__enter__` 返回上下文管理器对象本身，就像文件对象那样。
-
-#### 错误处理与 `__exit__`
-
-`__exit__` 方法接收三个参数：`exc_type` (异常类型), `exc_value` (异常值), `traceback` (堆栈信息)。如果 `with` 块中发生了异常，这些参数将包含异常信息。
-
--   如果 `__exit__` 返回 `True`，则表示该异常已被处理，不会再次向上抛出。
--   如果 `__exit__` 返回 `False` (或 `None`)，则异常会继续传播。
-
-```python showLineNumbers
-class ContextManagerWithErrorHandling:
-    def __enter__(self):
-        print("Entering")
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        print("Exiting")
-        if exc_type is not None:
-            print(f"  Exception Type: {exc_type.__name__}")
-            print(f"  Exception Value: {exc_value}")
-            return True  # 阻止异常向外传播
-
-with ContextManagerWithErrorHandling():
-    print(1 / 0) # 会引发 ZeroDivisionError
-print("程序继续执行") # 如果 __exit__ 返回 True，这行会被执行
-# 输出：
-# Entering
-# Exiting
-#   Exception Type: ZeroDivisionError
-#   Exception Value: division by zero
-# 程序继续执行
-```
-
-## memoryview：高效处理大型二进制数据
+## memoryview 函数
 
 `memoryview` 函数主要用于需要高性能和低内存开销的场景，特别是在处理大型二进制数据时。它提供了一个“视图”来直接、高效地访问和操作底层对象的内存，而不需要为数据创建昂贵的副本。
 
 考虑一个场景，你需要从二进制文件中读取大量结构化的记录（例如，每条记录包含一个整数和一个浮点数），并且可能需要修改它们。
 
-### 传统低效方式
-
-每次读取和解包一条记录都会创建新的 `bytes` 对象，效率低下。
-
-```python showLineNumbers
-import struct
-
-record_size = 4 + 8 # int (4 bytes) + double (8 bytes) = 12 bytes
-
-# 假设 data.bin 已存在并有数据
-# 这里先创建一个模拟文件
-with open("data.bin", "wb") as f:
-    for i in range(5): # 写入5条记录
-        f.write(struct.pack('<id', i, i * 1.5))
-
-with open("data.bin", "rb") as f:
-    # 假设我们只关心文件中的第2条记录 (索引为1)
-    f.seek(1 * record_size) # 定位到第2条记录的起始位置
-
-    # 读取12个字节，并将其转换为 bytes 对象
-    record_bytes = f.read(record_size)
-
-    # 从 bytes 对象中解包数据
-    # 注意：这里会创建一个新的 bytes 对象，并进行解包
-    record_id, value = struct.unpack('<id', record_bytes)
-
-    print(f"Record ID: {record_id}, Value: {value}")
-# 输出：Record ID: 1, Value: 1.5
-```
-
-### 使用 memoryview 优化
+传统低效方式每次读取和解包一条记录都会创建新的 `bytes` 对象，效率低下。
 
 `memoryview` 允许我们一次性读取一个较大的块，然后通过“视图”来遍历和修改这块内存，避免不必要的数据拷贝。
 
@@ -333,27 +218,3 @@ with open("data.bin", "rb") as f:
     #     record_id, value = modified_structured_mv[i]
     #     print(f"Modified Record {i}: ID={record_id}, Value={value}")
 ```
-
-## 文件清理
-
-在使用文件操作时，经常需要在操作完成后清理创建的临时文件。
-
-### 删除文件
-
-使用 `os.remove()` 函数可以删除指定路径的文件。
-
-```python showLineNumbers
-import os
-
-# 清理测试文件
-if os.path.exists('test.txt'):
-    os.remove('test.txt')
-if os.path.exists('binary.bin'):
-    os.remove('binary.bin')
-if os.path.exists('my_file.txt'):
-    os.remove('my_file.txt')
-if os.path.exists('data.bin'):
-    os.remove('data.bin')
-```
-
-

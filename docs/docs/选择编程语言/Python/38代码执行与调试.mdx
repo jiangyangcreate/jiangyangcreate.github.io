@@ -16,43 +16,91 @@ title: 代码执行与调试
 返回值：
 - 无返回值
 
-
-
 ### compile函数
 
-函数签名：`compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1) -> code`
+`compile()` 函数将 Python 源代码编译为代码对象，可被 `eval()` 或 `exec()` 执行。预编译可提高重复执行效率。
+
+函数签名：`compile(source, filename, mode, flags=0, dont_inherit=False, optimize=-1) -> code object`
 
 参数说明：
-- `source`：要编译的源代码
-- `filename`：要编译的文件名
-- `mode`：要编译的模式
-- `flags`：要编译的标志
-- `dont_inherit`：是否不继承父类
-- `optimize`：优化级别
+- **`source`** (必需)：
+ - 要编译的 Python 源代码
+ - 可以是字符串、字节串或 AST 对象
+ - 示例：`"x = 1 + 2"`、`"print('hello')"`
 
+- **`filename`** (必需)：
+ - 字符串，指定代码来源文件名（用于错误提示）
+ - 约定：`'<string>'`（字符串）、`'<stdin>'`（标准输入）、`'script.py'`（实际文件）
+
+- **`mode`** (必需)：
+ 编译模式，决定代码类型和执行方式：
+ - `'eval'`：单个表达式，配合 `eval()` 使用、
+ - `'single'`：单个交互式语句，自动打印非None结果，配合`eval()`。
+ - `'exec'`：任意代码块，配合 `exec()` 使用
+
+- **`flags`** (可选，默认 0)：
+ - 控制编译行为的标志位，可使用 `__future__` 模块常量
+
+- **`dont_inherit`** (可选，默认 False)：
+ - `False`：继承当前模块的 `__future__` 特性
+ - `True`：不继承，仅使用 `flags` 指定的特性
+
+- **`optimize`** (可选，默认 -1)：
+ - 优化级别：`-1`（默认）、`0`（不优化）、`1`（移除assert）、`2`（移除assert和文档字符串）
 返回值：
-- 返回编译后的代码对象
+-   返回代码对象，可传递给 `eval()` 或 `exec()` 执行
 
 
+```python showLineNumbers
+# eval模式 - 编译表达式
+code = compile("1 + 2 * 3", '<string>', 'eval')
+result = eval(code)  # 7
+
+# exec模式 - 编译代码块
+code = compile("x = 10\nprint(x)", '<string>', 'exec')
+exec(code)  # 打印 10
+
+# single模式 - 交互式（自动打印非None结果）
+code = compile("42", '<string>', 'single')
+eval(code)  # 自动打印 42
+exec(code)  # 自动打印 42
+
+# 预编译提高性能
+code = compile("x ** 2", '<string>', 'eval')
+for x in range(5):
+    print(eval(code))  # 比每次编译字符串更快
+```
 
 ### eval函数和exec函数
 
 eval函数签名：`eval(expression, globals=None, locals=None) -> value`
 exec函数签名：`exec(object, globals=None, locals=None) -> value`
 
-
 参数说明：
-- `expression`：要执行的表达式
+- `expression`/`object`：要执行的表达式或代码对象
+  - `expression`：只能是单个表达式，一个字符串形式的 Python 表达式，或一个代码对象（由 compile() 编译得到）
+  - `object`：可以包含任意 Python 代码：赋值、循环、函数定义、类定义等。可以是一个字符串，也可以是一个代码对象，也可以是打开的文件对象。
 - `globals`：全局命名空间
+  - 一个字典，指定代码执行时的全局命名空间
+  - 默认为 None，使用当前全局命名空间
+  - 如果提供且不包含 __builtins__ 键，会自动添加对内置模块的引用
+  - 必须是字典类型，不能是其他映射对象
+  - 在此字典中定义的变量可被执行的代码访问和修改
 - `locals`：局部命名空间
+  - 一个映射对象，指定代码执行时的局部命名空间
+  - 默认为 None，此时使用 globals 作为局部命名空间
+  - 可以是任何映射类型
+  - 注意：对 locals 的修改可能不会影响到外部局部变量（取决于实现）
 
 返回值：
-- 返回表达式的值
+- eval 返回表达式的值
+- exec 返回 None
 
 ```python showLineNumbers
 code = compile("print('Hello, World!')", 'test.py', 'exec')
-exec(code) # 执行编译后的代码、代码块
+return_value = exec(code) # 执行编译后的代码、代码块，返回None
+print(return_value) # None
 
-eval("1 + 1") # 执行表达式，返回2
-
+return_value = eval("1 + 1") # 执行表达式，返回表达式的值
+print(return_value) # 2
 ```

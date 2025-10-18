@@ -638,11 +638,25 @@ __next__
 ```python showLineNumbers
 class ContextManager(object):
     def __enter__(self):
+        """
+        __enter__ 方法可以返回一个值，该值会被 `as` 关键字绑定到 `with` 语句的变量上。
+        """
         print("Entering")
+        # 一个常见的做法是让 `__enter__` 返回上下文管理器对象本身。
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        """
+        __exit__ 方法接收三个参数：exc_type (异常类型), exc_value (异常值), traceback (堆栈信息)。如果 `with` 块中发生了异常，这些参数将包含异常信息。
+        
+        如果 __exit__ 返回 True，则表示该异常已被处理，不会再次向上抛出。
+        如果 __exit__ 返回 False (或 None)，则异常会继续传播。
+        """
         print("Exiting")
+        if exc_type is not None:
+            print(f"  Exception Type: {exc_type.__name__}")
+            print(f"  Exception Value: {exc_value}")
+            return True  # 阻止异常向外传播
 
 with ContextManager():
     print("inside operate")
@@ -650,6 +664,16 @@ with ContextManager():
 Entering
 inside operate
 Exiting
+"""
+with ContextManager():
+    print(1 / 0) # 会引发 ZeroDivisionError
+print("程序继续执行") # 如果 __exit__ 返回 True，这行会被执行
+"""
+Entering
+Exiting
+  Exception Type: ZeroDivisionError
+  Exception Value: division by zero
+程序继续执行
 """
 ```
 
