@@ -572,7 +572,6 @@ print(my_clothes())  # Wearing blue clothes for the 2 time
 如果同时实现了 `__next__()` 方法，那它是可迭代对象的同时，也是迭代器。
 
 如果只实现了 `__next__()` 方法，那它可以像手动迭代器一样工作，但是，它不是一个有效的可迭代对象。
-
 ```mermaid
 graph TD
     subgraph 对象
@@ -626,6 +625,7 @@ __next__
 __next__
 """
 ```
+
 
 ###  \_\_enter\_\_和\_\_exit\_\_ 与 with 语句
 

@@ -66,14 +66,23 @@ expression1 if condition else expression2
 
 当`condition`为True时，返回`expression1`，否则返回`expression2`。
 
-下面通过括号（可省）将同个表达式的部分标注了出来，更加可读。
-
 ```python showLineNumbers
+# 下面通过括号（可省）将同个表达式的部分标注了出来，更加可读。
 x = -1
 y = ("A") if (x > 0) else ("B")
 print(y) # B
 y = (x + 1) if (x > 0) else (x - 1)
 print(y) # -2
+
+# 示例：将负数转为0，正数保持不变
+numbers = [-3, -1, 0, 2, 5]
+processed = [x if x >= 0 else 0 for x in numbers]
+print(processed)  # [0, 0, 0, 2, 5]
+
+# 根据条件设置不同的值
+scores = [85, 92, 78, 96, 73]
+grades = ['A' if score >= 90 else 'B' if score >= 80 else 'C' for score in scores]
+print(grades)  # ['B', 'A', 'C', 'A', 'C']
 ```
 :::
 

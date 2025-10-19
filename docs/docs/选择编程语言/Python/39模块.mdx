@@ -337,8 +337,6 @@ pip 的价值，不在于“复制文件”，而在于“解析依赖 + 安装 
 
 你必须把代码和元数据文件，以及相关的依赖库与依赖库元数据文件都复制过去，才能成功。
 
-### 包管理三要素
-
 Python 包管理的本质，是三个要素的闭环：  
 
 1. **代码**（Code）：真正的 `.py` 文件，实现功能。  
@@ -358,21 +356,6 @@ Python 包管理，管的是模块与解释器的关系，是包与依赖的关�
 我们安装的模块来自于`pypi.org`，我们也可以分享我们的模块到`pypi.org`。
 
 截至2025年8月，UV 已经成为最现代化和高效的 Python 包管理工具，它集成了包管理、虚拟环境和打包发布功能，比传统的 pip + setuptools 方案更快更简单。
-
-
-
-### 安装 UV
-
-```bash
-# Windows (PowerShell)
-powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
-
-# macOS/Linux
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 或者通过 pip 安装
-pip install uv
-```
 
 ### 目录结构
 
@@ -396,7 +379,7 @@ your_project/
 └── uv.lock（UV 生成的锁文件）
 ```
 
-### pyproject.toml 示例
+### pyproject.toml
 
 :::info
 pyproject.toml为Python项目提供了统一的配置文件格式，取代了传统的setup.py。它让项目配置更加清晰和标准化。
@@ -451,45 +434,7 @@ dev-dependencies = [
 ]
 ```
 
-### 使用 UV 进行项目管理
-
-#### 初始化项目
-```bash
-# 创建新项目
-uv init your_project
-cd your_project
-
-# 或在现有项目中初始化
-uv init
-```
-
-#### 添加依赖
-```bash
-# 添加运行时依赖
-uv add schedule
-
-# 添加开发依赖
-uv add --dev pytest black ruff
-
-# 从 requirements.txt 添加
-uv add -r requirements.txt
-```
-
-#### 管理虚拟环境
-```bash
-# UV 会自动创建和管理虚拟环境
-uv run python your_script.py
-
-# 激活虚拟环境
-uv shell
-
-# 安装项目（开发模式）
-uv pip install -e .
-```
-
-### 打包发布
-
-#### 本地打包
+### 构建包
 ```bash
 # 构建包（生成 wheel 和 sdist）
 uv build
@@ -503,19 +448,17 @@ uv build --sdist
 
 该命令将在 `dist/` 目录下生成 `.tar.gz` 和 `.whl` 文件。
 
-#### 发布到 PyPI
-```bash
-# 安装 twine（如果需要）
-uv add --dev twine
+### PyPI 密钥配置
 
-# 上传到 PyPI
-uv run twine upload dist/*
+在 PyPI 中获取 API Token：
 
-# 上传到测试 PyPI
-uv run twine upload --repository testpypi dist/*
-```
+1. 访问：https://pypi.org/manage/account/token/
+2. 选择 "Add API token"
+3. 设置名称和权限范围
+4. 复制生成的 token
 
-#### 配置 PyPI 凭据
+### 配置 PyPI 凭据
+
 编辑用户目录下的 `.pypirc` 文件：
 
 ```ini showLineNumbers title="~/.pypirc"
@@ -529,7 +472,19 @@ username = __token__
 password = your_test_api_token
 ```
 
-### 通过 GitHub Actions 自动发布
+#### 发布到 PyPI
+```bash
+# 安装 twine（如果需要）
+uv add --dev twine
+
+# 上传到 PyPI
+uv run twine upload dist/*
+
+# 上传到测试 PyPI
+uv run twine upload --repository testpypi dist/*
+```
+
+### GitHub Actions 发布
 
 ```yaml showLineNumbers title=".github/workflows/python-publish.yml"
 name: Upload Python Package
@@ -575,37 +530,7 @@ jobs:
         password: ${{ secrets.PYPI_API_TOKEN }}
 ```
 
-
-### 常用 UV 命令
-
-```bash
-# 项目管理
-uv init                    # 初始化项目
-uv add package            # 添加依赖
-uv remove package         # 移除依赖
-uv sync                   # 同步依赖
-
-# 运行和构建
-uv run script.py          # 运行脚本
-uv run pytest            # 运行测试
-uv build                  # 构建包
-
-# 环境管理
-uv venv                   # 创建虚拟环境
-uv shell                  # 激活环境
-uv python install 3.11   # 安装 Python 版本
-```
-
-### PyPI 密钥配置
-
-在 PyPI 中获取 API Token：
-
-1. 访问：https://pypi.org/manage/account/token/
-2. 选择 "Add API token"
-3. 设置名称和权限范围
-4. 复制生成的 token
-
-在 GitHub 项目中添加密钥：
+在 GitHub 项目中添加PyPI密钥：
 
 ```bash
 Settings -> Secrets and variables -> Actions -> New repository secret
@@ -615,22 +540,6 @@ Value: 刚刚复制的 API token
 ```
 
 这样当我们在 GitHub 上**创建 release** 时，会自动将包上传到 PyPI。注意不是 push 代码自动上传。
-
-### 迁移现有项目到 UV
-
-```bash
-# 从 requirements.txt 迁移
-uv add -r requirements.txt
-
-# 从 poetry 迁移
-uv add $(poetry show --only=main --quiet | cut -d' ' -f1)
-
-# 从 pipenv 迁移
-uv add $(pipenv requirements | grep -v '^-')
-```
-
-UV 提供了更现代化、更高效的 Python 包管理体验，强烈推荐在新项目中使用！
-
 
 ## Python 导入 C 模块
 

@@ -58,6 +58,8 @@ add(2, b=3)  # 5
 
 return 语句用于从函数中返回值。如果函数没有 return 语句，则返回 None。
 
+当执行到 return，后续的逻辑代码不再执行，直接返回。
+
 ```python showLineNumbers
 def add(a, b):
     return a + b
@@ -67,7 +69,25 @@ print(add(2, 3))  # 5
 
 ### yield
 
-yield 语句用于从函数中返回一个生成器。
+:::info
+生成器让Python能够以内存高效的方式处理大量数据。它们实现了惰性求值，只在需要时计算值，体现了Python对性能和内存使用的关注。
+
+```python
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+```
+
+[PEP 255 – 简单生成器](https://peps.python.org/pep-0255/)
+:::
+
+yield 是暂停的意思(它有程序中起着类似红绿灯中等红灯的作用)
+
+使用了 yield 的函数被称为生成器函数（generator function），调用生成器函数会返回一个<Highlight>生成器（generator）对象</Highlight>。
+
+如果要返回的数据是通过 for 等循环生成的迭代器类型数据（如列表、元组），yeild 则可以在循环内部逐个元素返回。
 
 ```python showLineNumbers
 def fibonacci(n):
@@ -76,6 +96,50 @@ def fibonacci(n):
         yield a
         a, b = b, a + b
 ```
+
+yiled from 还可以使一个生成器可以委派子生成器，建立双向通道
+
+```python showLineNumbers
+
+def g1(x):
+   yield range(x, 0, -1)
+   yield range(x)
+print(list(g1(5)))
+#[range(5, 0, -1), range(0, 5)]
+
+def g2(x):
+   yield from range(x, 0, -1)
+   yield from range(x)
+print(list(g2(5)))
+#[5, 4, 3, 2, 1, 0, 1, 2, 3, 4]
+```
+
+:::tip
+创建生成器对象的另一个方式是使用生成器表达式。
+
+
+生成器表达式与列表推导式类似，但使用圆括号，返回生成器对象而不是列表，具有内存效率优势。
+
+基本语法：
+
+```python
+(expression for item in iterable)
+```
+
+示例：
+
+```python
+# 创建生成器
+squares_gen = (x**2 for x in range(10))
+print(type(squares_gen))  # <class 'generator'>
+
+# 迭代生成器
+for square in squares_gen:
+    print(square, end=' ')  # 0 1 4 9 16 25 36 49 64 81
+```
+
+:::
+
 
 ### lambda
 

@@ -1,0 +1,162 @@
+---
+sidebar_position: 25
+title: 迭代器
+---
+
+## 迭代器
+
+:::info
+迭代器协议是 Python 中的核心概念之一。它定义了对象如何支持迭代操作，使得 for 循环、列表推导式等语法成为可能。迭代器提供了一种惰性求值的方式，节省内存并提高效率。
+
+```python
+# 迭代器使得这些操作成为可能
+for item in [1, 2, 3]:
+    print(item)
+
+# 列表推导式也依赖于迭代器
+squares = [x**2 for x in range(10)]
+```
+
+[PEP 234 – 迭代器](https://peps.python.org/pep-0234/)
+:::
+
+迭代器是一个可以记住遍历位置的对象。迭代器对象从集合的第一个元素开始访问，直到所有元素被访问完结束。
+
+**迭代器的特点：**
+- **单向性**：只能往前不会后退
+- **惰性求值**：按需生成数据，节省内存
+- **一次性**：耗尽后不能重用，需要重新创建
+- **协议支持**：实现了 `__iter__()` 和 `__next__()` 方法
+
+```python showLineNumbers
+# 字符串、列表、元组都是可迭代对象，可用于创建迭代器
+lists = [1, 2, 3, 4]
+it = iter(lists)    # 创建迭代器对象
+
+print(next(it))  # 1 - 输出迭代器的下一个元素
+print(next(it))  # 2 - 再输出下一个元素
+print(next(it))  # 3
+print(next(it))  # 4
+
+# 耗尽后会抛出 StopIteration 异常
+try:
+    print(next(it))
+except StopIteration:
+    print("迭代器已耗尽")
+```
+
+:::tip
+for 循环会自动处理 StopIteration 异常，所以我们不需要手动捕获：
+```python
+lists = [1, 2, 3]
+for item in lists:  # for 循环内部调用 iter() 和 next()
+    print(item)
+```
+:::
+
+:::tip
+实际开发中，生成器（generator）通常比自定义迭代器类更简洁。生成器使用 `yield` 关键字。
+```python
+def countdown(start):
+    while start > 0:
+        yield start
+        start -= 1
+
+for num in countdown(5):
+    print(num)  # 5, 4, 3, 2, 1
+```
+:::
+
+## 内置函数
+
+Python 提供了多个处理迭代器的内置函数，这些函数让迭代操作更加便捷和强大。
+
+### iter 函数
+
+`iter()` 函数用于从可迭代对象创建迭代器，或创建一个调用函数直到返回哨兵值的迭代器。
+
+**函数签名：**
+1. `iter(iterable) -> iterator`
+2. `iter(callable, sentinel) -> iterator`
+
+```python showLineNumbers
+# 基本用法：从可迭代对象创建迭代器
+numbers = [1, 2, 3, 4, 5]
+it = iter(numbers)
+print(next(it))  # 1
+print(next(it))  # 2
+
+# 高级用法：使用哨兵值
+# 读取文件直到空行
+with open('data.txt') as f:
+    for line in iter(f.readline, '\n'):
+        print(line.strip())
+```
+
+### next 函数
+
+`next()` 函数用于从迭代器获取下一个元素。
+
+**函数签名：** `next(iterator, default=None) -> value`
+
+```python showLineNumbers
+# 基本用法
+numbers = iter([1, 2, 3])
+print(next(numbers))  # 1
+print(next(numbers))  # 2
+print(next(numbers))  # 3
+
+# 使用默认值避免 StopIteration 异常
+print(next(numbers, 'No more items'))  # No more items
+
+# 不使用默认值会抛出异常
+try:
+    numbers2 = iter([1, 2])
+    next(numbers2)
+    next(numbers2)
+    next(numbers2)  # 抛出 StopIteration
+except StopIteration:
+    print("迭代器已耗尽")
+```
+
+### enumerate 函数
+
+`enumerate()` 函数为可迭代对象添加计数器，返回一个枚举对象（也是迭代器）。
+
+**函数签名：** `enumerate(iterable, start=0) -> iterator`
+
+```python showLineNumbers
+# 基本用法：同时获取索引和值
+fruits = ['apple', 'banana', 'cherry']
+for i, fruit in enumerate(fruits):
+    print(f"{i}: {fruit}")
+# 0: apple
+# 1: banana
+# 2: cherry
+
+# 指定起始索引
+for i, fruit in enumerate(fruits, start=1):
+    print(f"{i}. {fruit}")
+# 1. apple
+# 2. banana
+# 3. cherry
+
+# enumerate 返回的是迭代器
+enum_obj = enumerate(fruits)
+print(type(enum_obj))  # <class 'enumerate'>
+print(next(enum_obj))  # (0, 'apple')
+print(next(enum_obj))  # (1, 'banana')
+
+# 验证 enumerate 对象是迭代器
+print({'__iter__', '__next__'} <= set(dir(enum_obj)))  # True
+
+# 实际应用：查找元素位置
+numbers = [10, 20, 30, 40, 50]
+target = 30
+for i, num in enumerate(numbers):
+    if num == target:
+        print(f"找到 {target} 在索引 {i}")
+        break
+```
+
+
