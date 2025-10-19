@@ -1,6 +1,6 @@
 ---
 sidebar_position: 1
-title: Python标准库
+title: 🔨Python标准库
 ---
 
 本部分侧重于介绍常用的，与开发息息相关的[Python标准库](https://docs.python.org/zh-cn/3.13/library/index.html)。
@@ -11,42 +11,8 @@ Python 标准库非常庞大(合并子模块仍有百余个库)，所提供的�
 
 Windows 版本的 Python 安装程序通常包含整个标准库，往往还包含许多额外组件。对于类 Unix 操作系统，Python 通常会分成一系列的软件包，因此可能需要使用操作系统所提供的包管理工具来获取部分或全部可选组件。
 
-这里会挑选一部分相对重要、常用的标准库进行讲解。
+一部分标准库已被第三方库事实性取代。例如：`urllib`、`array`被`requests`、`numpy`取代。
 
-## 优秀的第三方库
-
-numpy：支持高性能的大规模数组运算，是大部分科学计算的基础库。可用于进一步的数据处理。
-
-pandas：支持十多种常见文档格式的输入与输出，一站式搞定数据存取与处理。
-
-opencv：支持图像处理、特征匹配、目标跟踪、校准等一系列工具。
-
-其他推荐的第三方库：[awesome-python](https://awesome-python.com/)
-
-### 第三方模块使用的基本流程
-
-第三方模块使用的基本流程 以 opencv 为例
-
-- 下载 `pip install opencv-python`
-- 导入 `import cv2`
-- 使用 模块名.方法名 示例 ： `cv2.imread('./img/cat.jpg')`
-
-这里需要注意的是：opencv 模块的下载名、导入名均不是 opencv，opencv 共有4种不同的下载名：`opencv-python`、`opencv-python-headless`、`opencv-contrib-python`、`opencv-contrib-python-headless`。
-
-事实上，模块名、下载名与导入名更多是开发者出于习惯会将名称统一，并非一种强制的规则。建议在下载模块之前先通过搜索引擎搜索。
-
-对于复杂的模块来说，使用 help()方法、dir()方法不能很好的满足我们的需求。如果是新手需要搭配官方文档，查阅使用实例。
-
-### 第三方模块的版本问题
-
-第三方模块与系统模块一样，都是自定义好的一系列模块，这些模块也自然存在一些版本差异。
-
-在使用的过程之中很可能因为版本的不匹配、方法的弃用导致示例的代码失效。
-
-我们可以通过升级至最新版本或安装指定的版本来解决：
-
-- 安装指定的版本示例: `pip install pandas==2.0.2`
-- 升级至最新版本示例: `pip install --upgrade pandas`
-
+这里会挑选一部分相对重要、仍有竞争力的标准库进行讲解。
 
 <DocCardList />

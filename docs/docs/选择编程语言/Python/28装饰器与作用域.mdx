@@ -8,7 +8,9 @@ title: 装饰器与作用域
 
 ### callable函数
 
-`callable`函数用于检查一个对象是否是可调用的。即是否可以通过`()`调用。返回 True 或 False，用于条件判断。
+`callable`函数用于检查一个对象是否是可调用的。返回 True 或 False，用于条件判断。
+
+下面是一些示例，总之就是<Highlight>可以被`()`调用的对象都是可callable的</Highlight>。
 
 ```python showLineNumbers
 def test():
@@ -37,10 +39,13 @@ print(callable(a))    # True
 
 
 class NoCall:
-    pass
+    def some_method(self):
+        print('some_method')
 b = NoCall()
 # 没有定义__call__方法的实例是不可callable的
 print(callable(b))  # False
+# 类方法是可callable的
+print(callable(b.some_method))  # True
 ```
 
 ### @装饰器语法
@@ -222,11 +227,11 @@ def moretime(times):                 # 1 装饰器工厂（接收参数）
         return wrapper               # 返回包装后的函数
     return decorator                 # 返回装饰器
 
-@moretime(times = 3) # 这是第一次出现()调用的位置，直接执行，注册times参数为5，并返回 decorator 函数作为真正的装饰器
+@moretime(times = 3) # 出现()表示调用，直接执行，注册times参数为5，并返回 decorator 函数作为真正的装饰器
 def test2():
     print('test2')
 print('准备执行test2函数')
-# 这是第二次出现()调用的位置，执行 decorator 函数，返回 wrapper 函数并执行
+# 出现()表示调用，执行 decorator 函数，返回 wrapper 函数并执行
 test2()
 """
 {'times': 3}

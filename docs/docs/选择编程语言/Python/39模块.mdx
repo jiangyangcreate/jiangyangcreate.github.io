@@ -231,7 +231,32 @@ math = __import__('math')
 print(math.sqrt(16)) # 4.0
 ```
 
-## 获取模块
+## 第三方库
+
+优秀的第三方库有很多，例如[awesome-python](https://awesome-python.com/)中列举了大量优秀的第三方库。
+
+这里第三方模块使用的基本流程 以 opencv 为例
+
+- 下载 `pip install opencv-python`
+- 导入 `import cv2`
+- 使用 模块名.方法名 示例 ： `cv2.imread('./img/cat.jpg')`
+
+这里需要注意的是：opencv 模块的下载名、导入名均不是 opencv，opencv 共有4种不同的下载名：`opencv-python`、`opencv-python-headless`、`opencv-contrib-python`、`opencv-contrib-python-headless`。
+
+事实上，模块名、下载名与导入名更多是开发者出于习惯会将名称统一，并非一种强制的规则。建议在下载模块之前先通过搜索引擎搜索。
+
+对于复杂的模块来说，使用 help()方法、dir()方法不能很好的满足我们的需求。如果是新手需要搭配官方文档，查阅使用实例。
+
+第三方模块与系统模块一样，都是自定义好的一系列模块，这些模块也自然存在一些版本差异。
+
+在使用的过程之中很可能因为版本的不匹配、方法的弃用导致示例的代码失效。
+
+我们可以通过升级至最新版本或安装指定的版本来解决：
+
+- 安装指定的版本示例: `pip install opencv-python==x.x.x` （x.x.x为版本号）
+- 升级至最新版本示例: `pip install --upgrade opencv-python`
+
+### 运行时与安装时视图
 
 从一次 import 开始 ，你写了一行代码：  
 
@@ -245,7 +270,7 @@ import requests
 2. **读**：找到后，读取模块内容，执行其中的代码。  
 3. **存**：把执行结果存入 `sys.modules`，避免重复导入。  
 
-这个过程，就是 Python 包管理的**运行时视图**。  
+这个过程，就是 Python 包管理的<Highlight color="g">运行时视图</Highlight>。  
 
 那么，包是怎么出现在 `sys.path` 里的？  
 
@@ -257,7 +282,7 @@ pip 做了什么？
 2. **解压**：把包内容解压到 `site-packages` 目录。  
 3. **记录**：在 `site-packages` 下生成一个 `requests-X.X.X.dist-info` 目录，里面存着元数据。  
 
-这个过程，就是 Python 包管理的**安装时视图**。  
+这个过程，就是 Python 包管理的<Highlight color="g">安装时视图</Highlight>。  
 
 当我们在命令行执行 `pip install requests` 时，pip 实际上会向 PyPI（Python Package Index）发送一系列 HTTP 请求来查找、下载和验证包。
 
@@ -351,7 +376,7 @@ Python 包管理的本质，是三个要素的闭环：
 Python 包管理，管的是模块与解释器的关系，是包与依赖的关系，是开发者与生态的关系。  
 
 
-## 发布模块
+## 发布第三方库
 
 我们安装的模块来自于`pypi.org`，我们也可以分享我们的模块到`pypi.org`。
 
