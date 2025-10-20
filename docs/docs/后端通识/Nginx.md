@@ -7,11 +7,11 @@ description: 深入理解Nginx配置与企业级实战
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## 什么是Nginx
+## 什么是 Nginx
 
-Nginx (engine x) 是一个高性能的HTTP和反向代理服务器，特点是占用内存少，并发能力强。Nginx专为性能优化而开发，在高并发场景下能够支持高达 50,000 个并发连接数的响应。
+Nginx (engine x) 是一个高性能的 HTTP 和反向代理服务器，特点是占用内存少，并发能力强。Nginx 专为性能优化而开发，在高并发场景下能够支持高达 50,000 个并发连接数的响应。
 
-:::info Nginx的核心优势
+:::info Nginx 的核心优势
 - **高并发高性能**：基于事件驱动架构，采用异步非阻塞方式处理请求
 - **反向代理与负载均衡**：可将请求分发到多个后端服务器
 - **静态资源服务**：高效处理静态文件
@@ -20,7 +20,7 @@ Nginx (engine x) 是一个高性能的HTTP和反向代理服务器，特点是�
 
 ## 快速开始
 
-### 安装Nginx
+### 安装 Nginx
 
 <Tabs>
   <TabItem value="docker" label="Docker" default>
@@ -45,10 +45,10 @@ docker run -d \
 # 更新软件包索引
 sudo apt update
 
-# 安装nginx
+# 安装 Nginx
 sudo apt install nginx
 
-# 启动nginx服务
+# 启动 Nginx 服务
 sudo systemctl start nginx
 
 # 设置开机自启
@@ -59,10 +59,10 @@ sudo systemctl enable nginx
   <TabItem value="centos" label="CentOS/RHEL">
 
 ```bash
-# 安装nginx
+# 安装 Nginx
 sudo yum install nginx
 
-# 启动nginx服务
+# 启动 Nginx 服务
 sudo systemctl start nginx
 
 # 设置开机自启
@@ -81,13 +81,13 @@ nginx -t
 # 重新加载配置（无需停止服务）
 nginx -s reload
 
-# 优雅停止（等待worker进程完成当前请求）
+# 优雅停止（等待 worker 进程完成当前请求）
 nginx -s quit
 
 # 立即停止
 nginx -s stop
 
-# 查看nginx版本
+# 查看 Nginx 版本
 nginx -v
 
 # 查看编译配置参数
@@ -96,15 +96,15 @@ nginx -V
 
 ## 配置文件结构
 
-Nginx 配置文件由**指令(directives)**组成，分为**简单指令**和**块指令**两种。
+Nginx 配置文件由**指令（directives）**组成，分为**简单指令**和**块指令**两种。
 
 ### 指令类型
 
 **简单指令**：由指令名称、参数和分号组成
 
 ```nginx
-worker_processes  4;          # 设置worker进程数
-pid        /var/run/nginx.pid; # 指定pid文件路径
+worker_processes  4;          # 设置 worker 进程数
+pid        /var/run/nginx.pid; # 指定 pid 文件路径
 ```
 
 **块指令**：使用大括号 `{}` 包裹其他指令，不用分号结尾
@@ -137,23 +137,23 @@ graph TD
 ```
 
 :::tip 配置继承规则
-子context会继承父context的配置，子context中的同名指令会覆盖父context的配置
+子 context 会继承父 context 的配置，子 context 中的同名指令会覆盖父 context 的配置
 :::
 
 ### 标准配置文件结构
 
 ```nginx title="/etc/nginx/nginx.conf" showLineNumbers
 # ==================== 全局配置 ====================
-user  nginx;                    # worker进程运行用户
-worker_processes  auto;         # worker进程数，auto表示自动检测CPU核心数
+user  nginx;                    # worker 进程运行用户
+worker_processes  auto;         # worker 进程数，auto 表示自动检测 CPU 核心数
 
 error_log  /var/log/nginx/error.log notice;  # 错误日志路径和级别
-pid        /var/run/nginx.pid;               # pid文件路径
+pid        /var/run/nginx.pid;               # pid 文件路径
 
 # ==================== 事件模块 ====================
 events {
-    worker_connections  1024;   # 每个worker进程的最大连接数
-    use epoll;                  # 使用epoll事件驱动模型（Linux推荐）
+    worker_connections  1024;   # 每个 worker 进程的最大连接数
+    use epoll;                  # 使用 epoll 事件驱动模型（Linux 推荐）
 }
 
 # ==================== HTTP模块 ====================
@@ -172,10 +172,10 @@ http {
     # 性能优化
     sendfile        on;         # 高效文件传输
     tcp_nopush      on;         # 优化数据包发送
-    tcp_nodelay     on;         # 禁用Nagle算法，减少延迟
+    tcp_nodelay     on;         # 禁用 Nagle 算法，减少延迟
     keepalive_timeout  65;      # 长连接超时时间
 
-    # Gzip压缩
+    # Gzip 压缩
     gzip  on;
     gzip_vary on;
     gzip_comp_level 6;
@@ -203,14 +203,14 @@ http {
 | `include` | 引入其他配置文件 | `include /etc/nginx/conf.d/*.conf;` |
 
 :::warning 性能优化建议
-- `worker_processes` 通常设置为CPU核心数或设为 `auto`
-- `worker_connections` 默认1024，高并发场景可设为4096或更高
+- `worker_processes` 通常设置为 CPU 核心数或设为 `auto`
+- `worker_connections` 默认 1024，高并发场景可设为 4096 或更高
 - 需同时调整系统的 `ulimit -n` 参数
 :::
 
-### HTTP Module (HTTP模块)
+### HTTP Module（HTTP 模块）
 
-HTTP模块是Nginx最重要的模块，用于配置HTTP/HTTPS服务。
+HTTP 模块是 Nginx 最重要的模块，用于配置 HTTP/HTTPS 服务。
 
 #### server 块 - 虚拟主机
 
@@ -232,9 +232,9 @@ server {
 }
 ```
 
-#### location 块 - URI匹配
+#### location 块 - URI 匹配
 
-`location` 用于匹配URI路径，支持多种匹配模式：
+`location` 用于匹配 URI 路径，支持多种匹配模式：
 
 | 匹配模式 | 语法 | 优先级 | 说明 |
 | :---- | :---- | :----: | :---- |
@@ -395,7 +395,7 @@ server {
 :::tip SPA配置要点
 `try_files $uri $uri/ /index.html;` 的作用：
 1. 先尝试访问 `$uri` 对应的文件
-2. 如果不存在，尝试访问 `$uri/` 对录
+2. 如果不存在，尝试访问 `$uri/` 目录
 3. 都不存在时，返回 `index.html`，交由前端路由处理
 :::
 

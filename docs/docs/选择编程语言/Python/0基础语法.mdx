@@ -28,11 +28,11 @@ title: 基础语法
 
 ## 缩进
 
-Python 最具特色的就是使用缩进来表示代码块。不需要使用大括号 {} 。
+Python 最具特色的就是使用缩进来表示代码块。不需要使用大括号 {}。
 
-缩进的空格数是可变的，常见的有2个空格、4个空格、8个空格。但是同一个代码块的语句必须包含相同的缩进空格数。
+缩进的空格数是可变的，常见的有 2 个空格、4 个空格、8 个空格。但是同一个代码块的语句必须包含相同的缩进空格数。
 
-后来出台的代码规范PEP 8，建议使用4个空格作为缩进。
+后来出台的代码规范 PEP 8，建议使用 4 个空格作为缩进。
 
 ```python showLineNumbers {2,4} title="test.py"
 if True:
@@ -42,16 +42,16 @@ else:
 ```
 
 :::info
-PEP由社区讨论、起草 PEP、社区公开评议和修改、指导委员会决策、开发者编码实现。
+PEP 由社区讨论、起草 PEP、社区公开评议和修改、指导委员会决策、开发者编码实现。
 
-查看[官方PEP索引](https://www.python.org/dev/peps/)，你可以回到过去，了解当年开发者们的想法。
+查看 [官方 PEP 索引](https://www.python.org/dev/peps/)，你可以回到过去，了解当年开发者们的想法。
 
-[PEP 8](https://peps.python.org/pep-0008/) 即 Python Enhancement Proposal 8，直译是Python增强提案第8号，规定了Python代码的**编写规范**，是必读PEP之一。
+[PEP 8](https://peps.python.org/pep-0008/) 即 Python Enhancement Proposal 8，直译是 Python 增强提案第 8 号，规定了 Python 代码的**编写规范**，是必读 PEP 之一。
 :::
 
 ## 注释
 
-注释是代码中不会被Python解释器执行的文本。用于解释代码，方便阅读。
+注释是代码中不会被 Python 解释器执行的文本。用于解释代码，方便阅读。
 
 Python 支持单行注释和多行注释。
 
@@ -59,7 +59,7 @@ Python 支持单行注释和多行注释。
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-# 在过去，需要py文件编码声明utf-8才能正常显示中文，不过现在只有使用其他编码（如 GBK）时才需要声明。
+# 在过去，需要 py 文件编码声明 utf-8 才能正常显示中文，不过现在只有使用其他编码（如 GBK）时才需要声明。
 
 # 单行注释使用#号，可以单独一行写在代码上方 
 a = 1 
@@ -118,7 +118,7 @@ print(Person.__init__.__doc__)
 
 ## 丰富的内置内容
 
-Python易于学习的另外一个原因，就是丰富的内置内容。所有的内置对象在代码编辑器中都会有<HoverText text="Code Highlight" explanation="代码高亮,在Vscode中，关键字（保留字）是紫色，模块和类是绿色，函数是黄色，变量是蓝色,不同主体或IDE的代码高亮规则有所不同"/>。
+Python 易于学习的另外一个原因，就是丰富的内置内容。所有的内置对象在代码编辑器中都会有<HoverText text="Code Highlight" explanation="代码高亮，在 VSCode 中，关键字（保留字）是紫色，模块和类是绿色，函数是黄色，变量是蓝色，不同主体或 IDE 的代码高亮规则有所不同"/>。
 
 ### 关键字
 
@@ -135,13 +135,13 @@ print(keyword.kwlist)
 # ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield']
 ```
 
-某些标识符仅在特定上下文中被保留。 它们被称为软关键字。
+某些标识符仅在特定上下文中被保留。它们被称为软关键字。
 
-- `match, case, _`中`case`和`_`只有在`match`语句下才有特殊功能。
+- `match, case, _` 中 `case` 和 `_` 只有在 `match` 语句下才有特殊功能。
 
-- `type`在语法这一部分中仅被解释为关键字。巧合的是：内置函数中也有名为`type()`的函数。
+- `type` 在语法这一部分中仅被解释为关键字。巧合的是：内置函数中也有名为 `type()` 的函数。
 
-软关键字虽然没有收录在`keyword.kwlist`中，但本文亦将其列出。
+软关键字虽然没有收录在 `keyword.kwlist` 中，但本文亦将其列出。
 
 <MarkmapHooks initialMarkdown={`
 
@@ -195,12 +195,12 @@ print(keyword.kwlist)
 ### 内置数据类型
 
 有部分教材会归纳为六类基础数据类型：数字、字符串、列表、元组、字典、集合。
-> 如果只追求学习Python基础语法，确实可以只学习这六类基础数据类型。
+> 如果只追求学习 Python 基础语法，确实可以只学习这六类基础数据类型。
 
-事实上，Python3.14内置有数据类型非常多。
-> 注意：Python中，`bool` 是 `int` 的子类。
+事实上，Python3.14 内置有数据类型非常多。
+> 注意：Python 中，`bool` 是 `int` 的子类。
 
-而且Python中你自己创建一个新类，设置一下实例，就是一种新的数据类型。
+而且 Python 中你自己创建一个新类，设置一下实例，就是一种新的数据类型。
 
 <MarkmapHooks initialMarkdown={`
 
@@ -264,7 +264,7 @@ print(keyword.kwlist)
 
 ### 内置异常
 
-异常是Python中用于处理错误和异常情况的关键机制。
+异常是 Python 中用于处理错误和异常情况的关键机制。
 
 <MarkmapHooks initialMarkdown={`
 # Python异常继承体系

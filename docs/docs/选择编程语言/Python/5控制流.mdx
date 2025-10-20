@@ -3,13 +3,13 @@ sidebar_position: 5
 title: 控制流
 ---
 :::info
-代码布局不仅影响可读性，更体现了对代码质量的态度。一致的缩进、适当的空行、合理的行长度，这些细节共同构成了优雅的Python代码。
+代码布局不仅影响可读性，更体现了对代码质量的态度。一致的缩进、适当的空行、合理的行长度，这些细节共同构成了优雅的 Python 代码。
 
-- 使用4个空格进行缩进
-- 每行不超过79个字符  
+- 使用 4 个空格进行缩进
+- 每行不超过 79 个字符  
 - 用空行分隔顶级函数和类定义
 
-[PEP 8 – Python代码风格指南](https://peps.python.org/pep-0008/)
+[PEP 8 – Python 代码风格指南](https://peps.python.org/pep-0008/)
 :::
 ## 条件判断
 
@@ -57,14 +57,14 @@ else:
 
 ```
 :::info
-三元表达式是一种简洁的条件赋值方式，相当于简化版的 if-else 语句。一行语句实现一个条件赋值。非常Pythonic。
+三元表达式是一种简洁的条件赋值方式，相当于简化版的 if-else 语句。一行语句实现一个条件赋值。非常 Pythonic。
 
 ```python showLineNumbers
 expression1 if condition else expression2
 ```
-其中`expression1`和`expression2`可以是任意表达式，`condition`是任意条件表达式。
+其中 `expression1` 和 `expression2` 可以是任意表达式，`condition` 是任意条件表达式。
 
-当`condition`为True时，返回`expression1`，否则返回`expression2`。
+当 `condition` 为 True 时，返回 `expression1`，否则返回 `expression2`。
 
 ```python showLineNumbers
 # 下面通过括号（可省）将同个表达式的部分标注了出来，更加可读。
@@ -88,9 +88,9 @@ print(grades)  # ['B', 'A', 'C', 'A', 'C']
 
 ### pass 语句
 
-`pass` 是一个空操作语句，它什么都不做。当语法上需要一个语句(判断、循环、函数、类等语句中)，但程序不需要任何操作时，可以使用 `pass`。
+`pass` 是一个空操作语句，它什么都不做。当语法上需要一个语句（判断、循环、函数、类等语句中），但程序不需要任何操作时，可以使用 `pass`。
 
-完全是为了满足Python的语法要求，在开发时临时填充代码结构，或者在某些控制流中明确表示"不执行任何操作"。
+完全是为了满足 Python 的语法要求，在开发时临时填充代码结构，或者在某些控制流中明确表示"不执行任何操作"。
 
 ```python showLineNumbers
 # 条件语句中的占位符
@@ -123,7 +123,7 @@ AssertionError: 0 不能作为分母
 
 :::info
 
-即便你从未学习过match, case 语句，你也可以轻松的看懂match, case 语句的用法。它是最具有可读性的条件判断语句。
+即便你从未学习过 match, case 语句，你也可以轻松的看懂 match, case 语句的用法。它是最具有可读性的条件判断语句。
 
 [PEP 636 – 结构匹配：教程](https://peps.python.org/pep-0636/)
 [PEP 635 - 结构匹配：动机和基本原理](https://peps.python.org/pep-0635/)
