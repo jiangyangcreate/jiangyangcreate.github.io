@@ -190,20 +190,6 @@ module.exports = {
     navbar: {
       hideOnScroll: false,
       items: [
-        // {
-        //   position: "left",
-        //   label: "文档",
-        //   items: [
-        //     {
-        //       label: "开发",
-        //       to: "/docs",
-        //     },
-        //     {
-        //       label: "书架",
-        //       to: "/read",
-        //     },
-        //   ],
-        // },
         {
           to: "/docs",
           position: "left",
