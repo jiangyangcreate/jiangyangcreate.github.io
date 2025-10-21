@@ -256,8 +256,16 @@ print(math.sqrt(16)) # 4.0
 
 我们可以通过升级至最新版本或安装指定的版本来解决：
 
-- 安装指定的版本示例：`pip install opencv-python==x.x.x`（x.x.x 为版本号）
-- 升级至最新版本示例：`pip install --upgrade opencv-python`
+```bash showLineNumbers
+# 安装最新版
+python -m pip install SomePackage            # latest version
+# 安装指定版本
+python -m pip install 'SomePackage==1.0.4'   # specific version
+# 安装最小版本
+python -m pip install 'SomePackage>=1.0.4'   # minimum version
+# 升级至最新版本
+python -m pip install --upgrade SomePackage
+```
 :::
 
 此外，有些包作者会仅在 GitHub 提供源码，需要我们自己编译安装。
