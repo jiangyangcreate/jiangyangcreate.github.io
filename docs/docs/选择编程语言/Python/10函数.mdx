@@ -15,9 +15,9 @@ API的行为在任何两个连续版本之间不得以不兼容的方式更改�
 
 ### def
 
-在 Python 中可以使用 def 关键字来定义函数，程序中函数的参数就相当于是数学上说的函数的自变量，可以通过 return 关键字来返回一个值，这相当于数学上说的函数的因变量。
+使用 def 关键字定义函数。参数为输入，return 返回输出。
 
-```python
+```python showLineNumbers
 def add(a, b):
     """
     add two nums
@@ -27,44 +27,40 @@ def add(a, b):
     """
     print(a + b)
 ```
-使用函数时，只需要将参数换成特定的值传给函数。
 
-```python
+调用函数时传入具体参数值。
+
+```python showLineNumbers
 # Python并没有限定参数的类型，因此可以使用不同的参数类型：
 print(add(2, 3))
 
 print(add('foo', 'bar'))  # foobar
 ```
 
-传入参数时，Python 提供了两种选项，
+参数传递方式：位置参数和关键字参数。
 
-第一种是上面使用的按照位置传入参数，
-
-另一种则是使用关键词模式，显式地指定参数的值：
-
-```python
+```python showLineNumbers
 add(a=2, b=3)
-```
 
-```python
 add(b='morning', a='good')
-```
 
-```python
 add(2, b=3)  # 5
 ```
 
 ### return
 
-return 语句用于从函数中返回值。如果函数没有 return 语句，则返回 None。
-
-当执行到 return，后续的逻辑代码不再执行，直接返回。
+return 语句返回值并终止函数执行。无 return 时返回 None。
 
 ```python showLineNumbers
 def add(a, b):
     return a + b
 
+def add_none(a, b):
+    a + b
+
+
 print(add(2, 3))  # 5
+print(add_none(2, 3))  # None
 ```
 
 ### yield
@@ -72,7 +68,7 @@ print(add(2, 3))  # 5
 :::info
 生成器让Python能够以内存高效的方式处理大量数据。它们实现了惰性求值，只在需要时计算值，体现了Python对性能和内存使用的关注。
 
-```python
+```python showLineNumbers
 def fibonacci():
     a, b = 0, 1
     while True:
@@ -83,11 +79,7 @@ def fibonacci():
 [PEP 255 – 简单生成器](https://peps.python.org/pep-0255/)
 :::
 
-yield 是暂停的意思(它有程序中起着类似红绿灯中等红灯的作用)
-
-使用了 yield 的函数被称为生成器函数（generator function），调用生成器函数会返回一个<Highlight>生成器（generator）对象</Highlight>。
-
-如果要返回的数据是通过 for 等循环生成的迭代器类型数据（如列表、元组），yeild 则可以在循环内部逐个元素返回。
+yield 暂停函数执行并返回值。使用 yield 的函数称为生成器函数，返回生成器对象。适用于逐个产生大量数据的场景。
 
 ```python showLineNumbers
 def fibonacci(n):
@@ -97,10 +89,9 @@ def fibonacci(n):
         a, b = b, a + b
 ```
 
-yiled from 还可以使一个生成器可以委派子生成器，建立双向通道
+yield from 委派子生成器，建立双向通道。
 
 ```python showLineNumbers
-
 def g1(x):
    yield range(x, 0, -1)
    yield range(x)
@@ -115,20 +106,15 @@ print(list(g2(5)))
 ```
 
 :::tip
-创建生成器对象的另一个方式是使用生成器表达式。
+生成器表达式：使用圆括号创建生成器对象，内存效率更高。
 
-
-生成器表达式与列表推导式类似，但使用圆括号，返回生成器对象而不是列表，具有内存效率优势。
-
-基本语法：
-
-```python
+```python showLineNumbers
 (expression for item in iterable)
 ```
 
 示例：
 
-```python
+```python showLineNumbers
 # 创建生成器
 squares_gen = (x**2 for x in range(10))
 print(type(squares_gen))  # <class 'generator'>
@@ -140,10 +126,9 @@ for square in squares_gen:
 
 :::
 
-
 ### lambda
 
-lambda 表达式用于创建匿名函数。
+lambda 创建匿名函数，语法简洁。
 
 ```python showLineNumbers
 def add(a, b):
@@ -158,18 +143,64 @@ print(add(2, 3))  # 5
 
 #### 位置参数与默认参数
 
-```python
+**位置参数**：按顺序传递，必须提供。
+
+**默认参数**：有默认值，调用时可省略。
+
+```python showLineNumbers
 def quad(x, a=1, b=0, c=0):
+    """
+    二次函数计算器
+    :param x: 自变量
+    :param a: 二次项系数，默认为1
+    :param b: 一次项系数，默认为0  
+    :param c: 常数项，默认为0
+    :return: 计算结果
+    """
     return a * x * x + b * x + c
 ```
 
-```python
-quad(2.0)
+**调用示例：**
+
+```python showLineNumbers
+# 只提供位置参数x，其他使用默认值
+quad(2.0)  # 结果: 4.0 (1*2*2 + 0*2 + 0)
+
+# 提供位置参数x和关键字参数b
+quad(2.0, b=3)  # 结果: 10.0 (1*2*2 + 3*2 + 0)
+
+# 提供位置参数x和a，其他使用默认值
+quad(2.0, 2)  # 结果: 8.0 (2*2*2 + 0*2 + 0)
+
+# 使用关键字参数，顺序可以改变
+quad(2.0, c=5, a=2)  # 结果: 13.0 (2*2*2 + 0*2 + 5)
 ```
 
-```python
-quad(2.0, b=3)
+:::tip 默认参数的重要陷阱
+**默认参数只计算一次！** 当默认值是可变对象（如列表、字典）时，所有函数调用会共享同一个对象，这通常不是我们想要的行为。
+
+```python showLineNumbers
+# ❌ 错误示例：默认参数使用可变对象
+def add_item(item, my_list=[]):
+    my_list.append(item)
+    return my_list
+
+print(add_item('a'))  # ['a']
+print(add_item('b'))  # ['a', 'b'] - 意外结果！
+
+# ✅ 正确做法：使用None作为默认值
+def add_item(item, my_list=None):
+    if my_list is None:
+        my_list = []
+    my_list.append(item)
+    return my_list
+
+print(add_item('a'))  # ['a']
+print(add_item('b'))  # ['b'] - 正确结果！
 ```
+
+**原因**：Python在定义函数时计算默认参数值，而不是在每次调用时计算。对于不可变对象（如数字、字符串），这不是问题；但对于可变对象，所有调用会共享同一个对象。
+:::
 
 #### 不定长参数
 
@@ -177,10 +208,9 @@ quad(2.0, b=3)
 
 表示参数数目不定，可以看成一个元组
 
-
 使用如下方法，可以使函数接受不定数目的参数,把第一个参数后面的参数当作元组中的元素。
 
-```python
+```python showLineNumbers
 def add(x, *args):
     total = x
     for arg in args:
@@ -195,7 +225,7 @@ print(add(1, 2))  # 3
 
 表示参数数目不定，可以看成一个字典
 
-```python
+```python showLineNumbers
 def add(x, **kwargs):
     total = x
     for arg, val in kwargs.items():
@@ -206,9 +236,9 @@ def add(x, **kwargs):
 add(1, a=2, b=3)  # 6
 ```
 
-混合使用
+混合使用 `*args` 和 `**kwargs`：
 
-```python
+```python showLineNumbers
 # 可以接收任意数目的位置参数和键值对参数：
 def fun1(*args, **kwargs):
     print(args, kwargs)
@@ -262,7 +292,7 @@ print(func3(1,  kwd_only=3))           # ✅ "1-3"
 
 类型注解是可选的，用于描述函数参数和返回值的类型。如果需要更加复杂的类型注解，可以使用 typing 模块。
 
-```python
+```python showLineNumbers
 # 声名 T 可以是 int 或 str
 def add[T: (int, str)](a: T, b: T) -> T:
     return a + b
@@ -271,45 +301,53 @@ print(add(1, 2))  # 3
 print(add('foo', 'bar'))  # foobar
 ```
 
+### 递归
+
+在函数中调用自身，称为递归。递归是一种解决问题的方法，它把一个问题分解为更小的子问题，直到子问题可以被直接解决。
+
+```python showLineNumbers
+def fact(n):
+    if n == 1:
+        return 1
+    return n * fact(n - 1)
+
+print(fact(5))  # 120
+```
+
 ## 内置函数
 
 ### map 函数
 
-map 函数
+map() 对序列每个元素应用函数，返回映射结果。
 
-map() 会根据提供的函数对指定序列做映射。
+map函数签名：`map(function, iterable, ...) -> map object`
 
-map(aFun, aSeq)
+参数说明：
+- `function`：要对每个元素执行的函数
+- `iterable`：要映射的可迭代对象
+- `...`：可以传入多个可迭代对象
 
-```python
+返回值：
+- 返回一个map对象（迭代器）
+
+```python showLineNumbers
 def sqr(x):
     return x ** 2
-```
 
-```python
 a = [2, 3, 4]
-result = map(sqr, a)  # [4,9,16]
-type(result)
-```
+result = map(sqr, a) 
+print(type(result))  # <class 'map'>
 
-```python
 # map返回的是个迭代器对象, 可以转化为list显示
-
-list(result)
+print(list(result)) # [4,9,16]
 ```
 
-事实上，根据函数参数的多少，map 可以接受多组序列，
-将其对应的元素作为参数传入函数：
+map() 支持多序列，对应元素作为函数参数：
 
-```python
+```python showLineNumbers
 def add(a, b):
     return a + b
 
-a = [2, 3, 4]
-list(map(sqr, a))  # [4,9,16]
-```
-
-```python
 a = (2, 3, 4)
 b = [10, 11, 15]
 list(map(add, a, b))  # [12, 14, 19]
@@ -317,7 +355,17 @@ list(map(add, a, b))  # [12, 14, 19]
 
 ### reduce 函数
 
-reduce() 函数会对参数序列中元素进行累积。
+reduce() 对序列元素进行累积运算。
+
+reduce函数签名：`reduce(function, iterable[, initializer]) -> value`
+
+参数说明：
+- `function`：累积函数，接受两个参数
+- `iterable`：要累积的可迭代对象
+- `initializer`：可选的初始值
+
+返回值：
+- 返回累积的结果
 
 ```python showLineNumbers
 from functools import reduce
@@ -328,38 +376,6 @@ sum1 = reduce(add, [1,2,3,4,5])   # 计算列表和：1+2+3+4+5
 sum2 = reduce(lambda x, y: x+y, [1,2,3,4,5])  # 使用 lambda 匿名函数
 print(sum1)
 print(sum2)
-```
-
-
-### 递归
-
-一般对于分治法，要用递归，不过在 python 中不怎么用，更高效的处理非波切利算法：
-
-```python
-def fib(n):
-    """Fib without recursion."""
-    a, b = 0, 1
-    for i in range(1, n + 1):
-        a, b = b, a + b
-    return b
-
-
-print([fib(i) for i in range(10)])
-
-```
-## 内置函数
-
-### map 函数
-
-map 函数用于将一个函数应用到序列的每个元素上，并返回一个迭代器对象。
-
-```python showLineNumbers
-def sqr(x):
-    return x ** 2
-
-a = [2, 3, 4]
-result = map(sqr, a)  # [4,9,16]
-type(result)
 ```
 
 ## 推荐库

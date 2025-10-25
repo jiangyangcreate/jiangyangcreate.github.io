@@ -1,0 +1,121 @@
+---
+sidebar_position: 7
+title: 检索增强
+---
+
+检索增强生成(RAG)是一种通过结合实时数据检索来增强大语言模型文本生成的技术。它允许模型在生成过程中搜索外部数据库，产生更准确和最新的响应。
+
+## 工作原理
+
+1. **检索**：根据查询从外部源获取相关数据
+2. **生成**：处理检索到的数据并生成响应
+
+传统的向量数据库的工作原理是：
+1. 将待检索的文档提前转换为向量，存储到向量数据库中
+2. 当用户提问时，大模型将用户的问题转换为向量，在向量数据库中检索最相似的向量
+3. 向量数据库返回最相似的向量对应的文档
+4. 大模型将文档内容与用户问题拼接，生成回答
+
+其中主要的调优手段是：
+1. chunking：将文档拆分为多个小块，基于段落、特定规则、字数等、每个chunk之间有重叠，避免关键词命中重叠部分。
+2. embedding：将文档转换为向量，使用相似度搜索，返回最相似的向量对应的文档。不同的embedding模型效果不同。
+
+
+向量相似度搜索基于语义相似性，但语义相似性不等于相关。为了解决传统数据库返回结果不准确的问题，我们引入了ranking重新排序机制。
+
+为了解决传统向量数据量不能关联较远知识的问题，我们引入了知识图谱型数据库。知识图谱型数据库的工作原理是利用现有的知识库，通过图数据库的查询语言，查询与用户问题相关的知识。生成较慢，但是效果有一定的提升。
+
+同时为了解决只能匹配文本的问题，我们引入了多模态数据库。embedding模型可以处理图片、音频、视频等多种模态的数据。
+
+知识图谱好但是慢、传统的向量数据库快但是不好，可以考虑使用混合检索。同时让他们返回搜索结果。这样知识图谱重新生成期间也可以提供服务。
+
+以上都是传统的解决方案，但是随着AI的发展，我们引入了Agent检索。Agent检索通过智能代理来优化检索过程：
+
+## Agent检索
+
+### 普通Agent检索
+
+普通Agent检索通过智能代理来优化检索过程：
+
+1. **查询理解**：Agent分析用户问题，提取关键信息和意图
+2. **检索策略选择**：根据问题类型选择最适合的检索方法（向量搜索、关键词搜索、混合搜索）
+3. **结果过滤**：Agent对检索结果进行初步筛选和排序
+4. **上下文整合**：将多个检索结果整合为连贯的上下文
+
+```python showLineNumbers
+# 普通Agent检索示例
+class RetrievalAgent:
+    def __init__(self):
+        self.vector_db = VectorDatabase()
+        self.knowledge_graph = KnowledgeGraph()
+    
+    def retrieve(self, query):
+        # 1. 查询理解
+        intent = self.analyze_intent(query)
+        
+        # 2. 选择检索策略
+        if intent == "factual":
+            results = self.knowledge_graph.search(query)
+        elif intent == "semantic":
+            results = self.vector_db.search(query)
+        else:
+            results = self.hybrid_search(query)
+        
+        # 3. 结果过滤和排序
+        filtered_results = self.filter_results(results, query)
+        return filtered_results
+```
+
+### 多Agent复合检索
+
+多Agent复合检索使用多个专业Agent协同工作，每个Agent负责不同的检索任务：
+
+1. **查询分解Agent**：将复杂问题分解为多个子问题
+2. **专业检索Agent**：针对不同领域进行专业检索
+   - 文本检索Agent
+   - 图像检索Agent
+   - 知识图谱检索Agent
+   - 实时数据检索Agent
+3. **结果融合Agent**：整合多个Agent的检索结果
+4. **质量评估Agent**：评估检索结果的质量和相关性
+
+```python showLineNumbers
+# 多Agent复合检索示例
+class MultiAgentRetrieval:
+    def __init__(self):
+        self.query_agent = QueryDecompositionAgent()
+        self.text_agent = TextRetrievalAgent()
+        self.image_agent = ImageRetrievalAgent()
+        self.graph_agent = GraphRetrievalAgent()
+        self.fusion_agent = ResultFusionAgent()
+        self.quality_agent = QualityAssessmentAgent()
+    
+    def retrieve(self, query):
+        # 1. 查询分解
+        sub_queries = self.query_agent.decompose(query)
+        
+        # 2. 并行检索
+        results = []
+        for sub_query in sub_queries:
+            text_results = self.text_agent.search(sub_query)
+            image_results = self.image_agent.search(sub_query)
+            graph_results = self.graph_agent.search(sub_query)
+            
+            results.extend([text_results, image_results, graph_results])
+        
+        # 3. 结果融合
+        fused_results = self.fusion_agent.merge(results)
+        
+        # 4. 质量评估
+        final_results = self.quality_agent.rank(fused_results, query)
+        
+        return final_results
+```
+
+### Agent检索的优势
+
+1. **智能决策**：Agent可以根据问题特点选择最佳检索策略
+2. **并行处理**：多Agent可以同时处理不同类型的检索任务
+3. **质量保证**：通过多轮验证和评估提高检索质量
+4. **自适应优化**：Agent可以学习用户偏好，持续优化检索效果
+5. **复杂查询处理**：能够处理需要多步骤推理的复杂查询
