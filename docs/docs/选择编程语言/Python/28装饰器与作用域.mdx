@@ -3,7 +3,6 @@ sidebar_position: 28
 title: 装饰器与作用域
 ---
 
-
 ## 装饰器
 
 ### callable函数
@@ -73,9 +72,35 @@ test(1) # 打印test 1
 
 ```
 
+:::info
+
+<Highlight>装饰器在被装饰函数定义时执行，而不是在被装饰函数调用时执行</Highlight>。
+
+可以利用这个特性来收集工具函数信息作为大模型的上下文。
+
+```python showLineNumbers
+def log(func):
+    print(func.__name__, func.__doc__)
+
+@log
+def test1():
+    """test1 function"""
+    pass
+
+@log
+def test2():
+    pass
+"""
+输出：
+test1 test1 function
+test2 None
+"""
+```
+:::
+
 装饰器的其他使用示例：记录函数运行时间、用于自动测试。
 
-```python
+```python showLineNumbers
 import time
 
 def log(func):
