@@ -180,6 +180,143 @@ if __name__ == '__main__':
 
 ```
 
+#### 工程化调用工具
+
+其实以上的调用方式都是换汤不换药，就是将可调用的工具（函数）作为提示词的一部分，传入给大模型。让大模型做选择填空，并返回特定格式。
+
+- 选择：是否调用以及调用哪些
+- 填空：调用函数的参数填什么
+
+<Highlight>Agent中的大模型，第一核心能力是指令遵循能力</Highlight>。
+
+```python showLineNumbers
+import json
+from dataclasses import dataclass
+from typing import Any, Callable
+
+@dataclass
+class Tool:
+    """极简工具对象，仅保留名称、描述和同步调用入口。"""
+
+    name: str
+    description: str
+    func: Callable[..., Any]
+
+    def invoke(self, **kwargs: Any) -> Any:
+        """同步调用底层函数。"""
+        return self.func(**kwargs)
+
+
+def tool(
+    func: Callable[..., Any] | None = None,
+    *,
+    name: str | None = None,
+    description: str = "",
+) -> Tool | Callable[[Callable[..., Any]], Tool]:
+    """把被装饰的同步函数封装成 `Tool`，支持可选参数。"""
+
+    def decorator(fn: Callable[..., Any]) -> Tool:
+        tool_name = name or fn.__name__
+        tool_description = (description or fn.__doc__ or "").strip()
+        """
+        装饰器可以收集工具函数信息作为大模型的上下文。其实这里也可以让大模型自己将工具的描述信息二次加工或者直接通过源代码生成，即让大模型自己生成工具的描述信息。
+        
+        import inspect
+        tool_description =  大模型推理("请根据以下函数源码，生成工具的描述信息："+inspect.getsource(func))
+        """
+        return Tool(name=tool_name, description=tool_description, func=fn)
+
+    if func is None:
+        return decorator
+    return decorator(func)
+
+
+@tool
+def get_weather(city: str) -> str:
+    """
+    描述：根据城市名称返回天气。
+
+    参数：
+    - city: 城市名称 str
+
+    返回：
+    - 天气信息 str
+
+    """
+    fake_db = {
+        "北京": "晴天，12℃",
+        "上海": "多云，15℃",
+        "深圳": "小雨，24℃",
+    }
+    return fake_db.get(city, "暂无天气数据")
+
+
+class FakeChatModel:
+    """模拟选择工具的 LLM，如果检测到“天气”则调用 weather 工具。"""
+
+    def __init__(self, tools: list[Tool] = None) -> None:
+        if tools is not None:
+            self.bind_tools(tools)
+
+    def bind_tools(self, tools: list[Tool]) -> None:
+        self.tools = {tool.name: tool for tool in tools}
+
+    def run(self, user_input: str) -> str:
+        """模拟 LLM 的推理、构造工具调用 JSON，再执行工具。"""
+        prompt_template = """
+        你是一个乐于助人的助手，根据用户输入的提示词，完成任务。
+
+        你也许有一些工具可以选择，如果需要使用工具，请选择一个工具，并填入工具的参数。
+
+        这是用户输入的提示词：
+
+        {user_input}
+
+        这是工具列表：
+
+        {tools}
+
+        如果你需要使用工具，请按照以下格式返回：
+        [
+            {{"Tool": "工具名称", "ToolArgs": {{"工具参数1": "参数值1", "工具参数2": "参数值2"}}}}
+        ]
+
+        如果你不需要使用工具，请直接返回：
+        [
+            {{"Message": "回答内容"}}
+        ]
+        """
+
+        prompt = prompt_template.format(user_input=user_input, tools=self.tools)
+        print(prompt)
+
+        # 大模型做 选择填空题，选择一个工具，并填入工具的参数(示例)
+        result = """[
+            {"Tool":"get_weather","ToolArgs":{"city":"上海"}}
+        ]"""
+        result_json = json.loads(result)
+        if result_json[0].get("Tool", None):
+            tool_name = result_json[0]["Tool"]
+            tool_args = result_json[0]["ToolArgs"]
+            tools_result = self.tools[tool_name].invoke(**tool_args)
+            # self.run(tools_result) 可以将工具的结果作为用户输入，继续推理
+            return [{"Message": tools_result}]
+        else:
+            return [{"Message": result_json[0]["Message"]}]
+
+
+if __name__ == "__main__":
+    tools = [get_weather]  # 装饰器已经把函数变成 Tool
+    model = FakeChatModel()
+    model.bind_tools(tools)
+
+    question = "上海 天气"
+    print(f"用户: {question}")
+    result = model.run(question)
+    print(f"模型: {result}")
+```
+
+
 #### Mcp
 
 一种专为大模型设计的API接口，简单易用，岗位要求基本与传统API开发一致，但需要对大模型特性有所了解。
@@ -233,15 +370,6 @@ A2A 是 Agent 到 Agent 的通信，是多智能体系统中的一种通信方�
 
 参考文章： https://www.aimodels.fyi/papers/arxiv/why-do-multi-agent-llm-systems-fail
 
-## 框架分析
-
-langchain
-
-langgraph、langgraph-swarm
-
-AutoGen
-
-MG
 
 ## 案例分析
 

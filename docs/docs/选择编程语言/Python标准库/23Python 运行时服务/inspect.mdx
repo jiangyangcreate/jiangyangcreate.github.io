@@ -1,0 +1,485 @@
+---
+sidebar_position: 23
+title: inspect
+---
+
+`inspect` 模块提供了一些有用的函数帮助获取对象的信息，例如模块、类、方法、函数、回溯、帧对象以及代码对象。例如它可以帮助你检查类的内容，获取某个方法的源代码，取得并格式化某个函数的参数列表，或者获取你需要显示的回溯的详细信息。
+
+该模块提供了4种主要的功能：类型检查、获取源代码、检查类与函数、检查解释器的调用堆栈。
+
+## 类型检查
+
+`getmembers()` 函数获取对象如类或模块的成员。名称以 "is" 打头的函数主要用于判断对象类型。
+
+### 基本类型判断
+
+```python showLineNumbers
+import inspect
+
+class MyClass:
+    def method(self):
+        pass
+
+def my_function():
+    pass
+
+# 判断对象类型
+print(inspect.isclass(MyClass))        # True
+print(inspect.ismethod(MyClass().method))  # True
+print(inspect.isfunction(my_function))  # True
+print(inspect.ismodule(inspect))        # True
+print(inspect.isbuiltin(print))         # True
+```
+
+### 获取对象成员
+
+```python showLineNumbers
+import inspect
+
+class Person:
+    """人员类"""
+
+    name = "张三"
+
+    def __init__(self, age):
+        self.age = age
+
+    @staticmethod
+    def a():
+        pass
+
+    @classmethod
+    def b(cls):
+        pass
+
+    def c(self):
+        pass
+
+# 获取类的所有成员（属性、方法）
+members = inspect.getmembers(Person)
+for name, value in members:
+    # 排除魔法方法
+    if not name.startswith('__'):
+        print(f"{name}: {value}")
+"""
+a: <function Person.a at 0x00000250F315B9C0>
+b: <bound method Person.b of <class '__main__.Person'>>
+c: <function Person.c at 0x00000250F315BA60>
+name: 张三
+"""
+
+# 只获取类方法
+methods = inspect.getmembers(Person, predicate=inspect.ismethod)
+print(methods)
+"""
+[('b', <bound method Person.b of <class '__main__.Person'>>)]
+"""
+
+# 只获取函数（包括未绑定的方法）
+functions = inspect.getmembers(Person, predicate=inspect.isfunction)
+print(functions)
+"""
+[('__init__', <function Person.__init__ at 0x000001976EF48D60>),
+ ('a', <function Person.a at 0x000001976F0BB9C0>), 
+ ('c', <function Person.c at 0x000001976F0BBA60>)
+]
+"""
+
+```
+
+### 常用类型检查函数
+
+```python showLineNumbers
+import inspect
+import types
+
+def example():
+    pass
+
+class Example:
+    def method(self):
+        pass
+
+# 检查是否为生成器
+def gen():
+    yield 1
+
+print(inspect.isgeneratorfunction(gen))  # True
+print(inspect.isgenerator(gen()))        # True
+
+# 检查是否为协程
+import asyncio
+async def coro():
+    await asyncio.sleep(1)
+
+print(inspect.iscoroutinefunction(coro))  # True
+print(inspect.iscoroutine(coro()))        # True
+
+# 检查是否为抽象基类
+import abc
+class Abstract(abc.ABC):
+    @abc.abstractmethod
+    def method(self):
+        pass
+
+print(inspect.isabstract(Abstract))  # True
+```
+
+## 获取源代码
+
+### 获取函数和类的源代码
+
+```python showLineNumbers
+import inspect
+
+
+def foo(x: int, y: int) -> int:
+    """计算两数之和"""
+    return x + y
+
+# 获取源代码
+print(inspect.getsource(foo))
+# 输出:
+# def foo(x: int, y: int) -> int:
+#     """计算两数之和"""
+#     return x + y
+
+# 获取源代码行号范围
+lines = inspect.getsourcelines(foo)
+print(f"行号: {lines[1]}, 总行数: {len(lines[0])}")
+# 行号: 4, 总行数: 3
+
+# 获取文件位置
+print(inspect.getfile(foo))  # 文件路径
+# d:\test\test.py
+print(inspect.getmodule(foo))  # 模块对象
+# <module '__main__' from 'd:\\test\\test.py'>
+```
+
+### 获取文档字符串
+
+```python showLineNumbers
+import inspect
+
+def documented_function():
+    """这是一个有文档的函数
+    
+    这是详细说明。
+    """
+    pass
+
+print(inspect.getdoc(documented_function))
+# 输出: 这是一个有文档的函数\n\n这是详细说明。
+```
+
+:::tip 获取源代码的限制
+`getsource()` 只能获取在 Python 源代码中定义的对象的源代码。对于：
+- C 扩展模块中的函数
+- 内置函数
+- 动态生成的代码
+
+将无法获取源代码，会抛出 `OSError`。
+:::
+
+### 使用 Signature 对象进行内省
+
+`Signature` 对象提供了函数签名的详细信息，包括参数名称、默认值、类型注解等。
+
+
+```python showLineNumbers
+import inspect
+
+def example(a: int, b: str = "default", *args, **kwargs) -> str:
+    """示例函数"""
+    return f"{a}-{b}"
+
+# 获取函数签名
+sig = inspect.signature(example)
+print(sig)
+# 输出: (a: int, b: str = 'default', *args, **kwargs) -> str
+
+# 获取参数信息
+for name, param in sig.parameters.items():
+    print(f"{name}: {param.annotation} = {param.default}")
+    print(f"  kind: {param.kind}")
+    print(f"  required: {param.default is inspect.Parameter.empty}")
+
+# 参数类型
+def example(pos, /, pos_or_kw, *, kw_only):
+    pass
+
+sig = inspect.signature(example)
+for name, param in sig.parameters.items():
+    kind = param.kind
+    if kind == inspect.Parameter.POSITIONAL_ONLY:
+        print(f"{name}: 仅位置参数")
+    elif kind == inspect.Parameter.POSITIONAL_OR_KEYWORD:
+        print(f"{name}: 位置或关键字参数")
+    elif kind == inspect.Parameter.VAR_POSITIONAL:
+        print(f"{name}: *args")
+    elif kind == inspect.Parameter.VAR_KEYWORD:
+        print(f"{name}: **kwargs")
+    elif kind == inspect.Parameter.KEYWORD_ONLY:
+        print(f"{name}: 仅关键字参数")
+
+# 绑定参数
+def func(a, b=10, *args, c=20, **kwargs):
+    return a, b, args, c, kwargs
+
+sig = inspect.signature(func)
+
+# 绑定参数
+bound = sig.bind(1, 2, 3, 4, c=30, d=40)
+print(bound.arguments)  # {'a': 1, 'b': 2, 'args': (3, 4), 'c': 30, 'kwargs': {'d': 40}}
+
+# 应用默认值
+bound.apply_defaults()
+print(bound.arguments)
+# {'a': 1, 'b': 2, 'args': (3, 4), 'c': 30, 'd': 40}
+```
+
+## 检查类与函数
+
+### 获取函数参数信息
+
+```python showLineNumbers
+import inspect
+
+def example(a, b=10, *args, c=20, **kwargs):
+    """示例函数"""
+    pass
+
+# 获取完整参数信息（推荐）
+full_args = inspect.getfullargspec(example)
+print(full_args)
+# FullArgSpec(args=['a', 'b'], varargs='args', varkw='kwargs', 
+#            defaults=(10,), kwonlyargs=['c'], kwonlydefaults={'c': 20}, 
+#            annotations={})
+
+# 获取参数名称
+print(full_args.args)  # ['a', 'b']
+print(full_args.varargs)  # 'args'
+print(full_args.varkw)  # 'kwargs'
+print(full_args.defaults)  # (10,)
+print(full_args.kwonlyargs)  # ['c']
+print(full_args.kwonlydefaults)  # {'c': 20}
+```
+
+:::warning 已弃用的函数
+`getargspec()` 在 Python 3.11 中已弃用，应使用 `getfullargspec()` 或 `signature()`。
+:::
+
+### 检查类层次结构
+
+```python showLineNumbers
+import inspect
+
+class A:
+    pass
+
+class B(A):
+    pass
+
+class C(B):
+    pass
+
+class D(A):
+    pass
+
+# 获取类层次结构
+tree = inspect.getclasstree([A, B, C, D])
+print(tree)
+# 输出: [(<class '__main__.A'>, ()), [(<class '__main__.B'>, (<class '__main__.A'>,)), 
+#       [(<class '__main__.C'>, (<class '__main__.B'>,))], 
+#       (<class '__main__.D'>, (<class '__main__.A'>,))]]
+
+# 获取方法解析顺序（MRO）
+print(C.__mro__)  # 或使用 inspect.getmro(C)
+```
+
+### 获取调用者信息
+
+```python showLineNumbers
+import inspect
+
+def caller_info():
+    """获取调用者信息"""
+    frame = inspect.currentframe()
+    caller_frame = frame.f_back
+    return {
+        'filename': caller_frame.f_code.co_filename,
+        'lineno': caller_frame.f_lineno,
+        'function': caller_frame.f_code.co_name
+    }
+
+def test():
+    info = caller_info()
+    print(f"在 {info['filename']} 的第 {info['lineno']} 行调用")
+
+test()
+```
+
+## 检查解释器的调用堆栈
+
+### 获取调用栈
+
+```python showLineNumbers
+import inspect
+
+def level3():
+    stack = inspect.stack()
+    print("调用栈:")
+    for frame_info in stack:
+        print(f"  {frame_info.function} in {frame_info.filename}:{frame_info.lineno}")
+
+def level2():
+    level3()
+
+def level1():
+    level2()
+
+level1()
+# 输出:
+# 调用栈:
+#   level3 in ...:5
+#   level2 in ...:11
+#   level1 in ...:14
+#   <module> in ...:17
+```
+
+### 获取当前帧信息
+
+```python showLineNumbers
+import inspect
+
+def example():
+    # 获取当前帧
+    frame = inspect.currentframe()
+    print(f"文件名: {frame.f_code.co_filename}")
+    print(f"函数名: {frame.f_code.co_name}")
+    print(f"行号: {frame.f_lineno}")
+    
+    # 获取局部变量
+    print(f"局部变量: {frame.f_locals}")
+
+def test(x=10):
+    y = 20
+    example()
+
+test(100)
+```
+
+### 获取回溯信息
+
+```python showLineNumbers
+import inspect
+import traceback
+
+def func1():
+    func2()
+
+def func2():
+    func3()
+
+def func3():
+    # 获取当前异常的回溯
+    try:
+        raise ValueError("测试异常")
+    except:
+        tb = inspect.trace()
+        print("回溯信息:")
+        for frame_info in tb:
+            print(f"  {frame_info.function} in {frame_info.filename}:{frame_info.lineno}")
+
+func1()
+```
+
+### 静态地获取属性
+
+`getattr_static()` 可以获取属性而不触发描述器协议或 `__getattr__()` 的执行。
+
+```python showLineNumbers
+import inspect
+
+class Descriptor:
+    def __get__(self, obj, objtype=None):
+        print("描述器被调用!")
+        return 42
+
+class MyClass:
+    attr = Descriptor()
+    normal_attr = "正常属性"
+
+obj = MyClass()
+
+# 使用 getattr() 会触发描述器
+value1 = getattr(obj, 'attr')
+# 输出: 描述器被调用!
+
+# 使用 getattr_static() 不会触发描述器
+value2 = inspect.getattr_static(obj, 'attr')
+print(type(value2))  # <class '__main__.Descriptor'>
+print(value2)  # <__main__.Descriptor object at ...>
+
+# 正常属性两者行为相同
+print(getattr(obj, 'normal_attr'))  # 正常属性
+print(inspect.getattr_static(obj, 'normal_attr'))  # 正常属性
+```
+
+:::info 使用场景
+`getattr_static()` 主要用于文档工具等需要静态内省的场景，避免触发动态属性查找。
+:::
+
+
+
+### 检查生成器状态
+
+```python showLineNumbers
+import inspect
+
+def generator():
+    yield 1
+    yield 2
+
+gen = generator()
+print(inspect.getgeneratorstate(gen))  # GEN_CREATED
+
+next(gen)
+print(inspect.getgeneratorstate(gen))  # GEN_SUSPENDED
+
+try:
+    next(gen)
+    next(gen)
+except StopIteration:
+    pass
+print(inspect.getgeneratorstate(gen))  # GEN_CLOSED
+
+# 获取生成器的局部变量
+def gen_with_locals():
+    x = 10
+    yield x
+    y = 20
+    yield y
+
+gen2 = gen_with_locals()
+next(gen2)
+print(inspect.getgeneratorlocals(gen2))  # {'x': 10}
+```
+
+### 检查协程状态
+
+```python showLineNumbers
+import inspect
+import asyncio
+
+async def coroutine():
+    await asyncio.sleep(0.1)
+    return "完成"
+
+coro = coroutine()
+print(inspect.getcoroutinestate(coro))  # CORO_CREATED
+
+# 运行协程
+asyncio.run(coro)
+print(inspect.getcoroutinestate(coro))  # CORO_CLOSED
+```
