@@ -110,45 +110,33 @@ print(d)  # [2, 3, 'hello', 2, 3, 'hello']
 ### 列表的内置方法
 
 ```python showLineNumbers
-print(a)  # [1, 2, 3]
+a = [1, 2, 3]
 a[0] = 100
 print(a)  # [100, 2, 3]
-```
 
-这种赋值也适用于分片，例如，将列表的第 2，3 两个元素换掉：
-
-```python showLineNumbers
+# 这种赋值也适用于分片，例如，将列表的第 2，3 两个元素换掉
 a[1:3] = [200, 300]
 print(a)  # [100, 200, 300]
-```
 
-事实上，对于连续的分片（即步长为 1 ），Python 采用的是整段替换的方法，两者的元素个数并不需要相同，
-
-```python showLineNumbers
+# 事实上，对于连续的分片（即步长为 1 ），Python 采用的是整段替换的方法，两者的元素个数并不需要相同，
 # 例如，将 [11,12] 替换为 [1,2,3,4]：
 a = [10, 11, 12, 13, 14]
 a[1:3] = [1, 2, 3, 4]
 print(a)  # [10, 1, 2, 3, 4, 13, 14]
-```
 
-用这种方法来删除列表中一个连续的分片：
-
-```python showLineNumbers
+# 用这种方法来删除列表中一个连续的分片：
 a = [10, 1, 2, 11, 12]
 print(a[1:3])  # [1, 2]
 a[1:3] = []
 print(a)  # [10, 11, 12]
-```
 
-对于不连续（间隔 step 不为 1）的片段进行修改时，两者的元素数目必须一致：
-
-```python showLineNumbers
+# 对于不连续（间隔 step 不为 1）的片段进行修改时，两者的元素数目必须一致：
 a = [10, 11, 12, 13, 14]
 a[::2] = [1, 2, 3]
 print(a)  # [1, 11, 2, 13, 3]
 ```
 
-Python 提供了删除列表中元素的方法 'del':
+Python 提供了删除列表中元素的方法 `del`:
 
 ```python showLineNumbers
 a = [100, 'a', 'b', 200]
@@ -264,13 +252,19 @@ a.reverse()
 print(a)  # [6, 5, 4, 3, 2, 1]
 ```
 
+:::tip
+
+如果不想改变原来列表中的值，可以使用切片语法。
+
 ```python showLineNumbers
-# 如果不想改变原来列表中的值，可以使用这样的方法：
 a = [1, 2, 3, 4, 5, 6]
 b = a[::-1]
 print(a)  # [1, 2, 3, 4, 5, 6]
 print(b)  # [6, 5, 4, 3, 2, 1]
+if a == b:
+    print('这是一个回文序列')
 ```
+:::
 
 #### clear方法、copy方法
 
@@ -439,7 +433,6 @@ averages = [{'name': student['name'], 'average': sum(student['scores'])/len(stud
 print(averages)
 # [{'name': 'Alice', 'average': 87.67}, {'name': 'Bob', 'average': 85.0}, {'name': 'Charlie', 'average': 91.67}]
 ```
-
 
 ## 字典
 
@@ -1409,6 +1402,48 @@ a = [1, 2, 3, 4, 5]
 b = slice(1, 3)
 print(a[b])  # [2, 3]
 ```
+
+#### 切片语法糖汇总
+
+`[a:b:c]` 获取从a到b的元素，步长为c。等价于 `slice(a, b, c)`。
+
+缺省则为None。所有有了以下语法糖汇总。
+
+| 语法 | 等价于 | 实例 | 典型用法 |
+| --- | --- | ---  | --- |
+| `[:]` | `slice(None, None, None)` | `a[:]` | 浅拷贝|
+| `[start:]` | `slice(start, None, None)` | `a[1:]` | 去掉前 start 个元素|
+| `[:-n]` | `slice(None, -n, None)` | `a[:-1]` | 去掉最后 n 个元素|
+| `[-n:]` | `slice(-n, None, None)` | `a[-1:]` | 获取最后 n 个元素|
+| `[:n]` | `slice(None, n, None)` | `a[:2]` | 获取前 n 个元素 |
+| `[::-1]` | `slice(None, None, -1)` | `a[::-1]` | 反转判断回文序列 |
+| `[::2]` | `slice(None, None, 2)` | `a[::2]` | 获取偶数索引,可以加 del 删除偶数索引元素|
+| `[1::2]` | `slice(1, None, 2)` | `a[1::2]` | 获取奇数索引,可以加 del 删除奇数索引元素|
+| `lst[:] = seq` | `lst[slice(None, None, None)] = seq` | `a[:] = []` | 原地清空或整体替换 |
+| `lst[n:m] = [1, 2, 3]` | `lst[slice(n, m, None)] = [1, 2, 3]` | `a[1:3] = [0, 0, 0]` | 替换列表中第 n 到 m 个元素（长度不需要一致） |
+| `lst[n:n] = [1, 2, 3]` | `lst[slice(n, n, None)] = [1, 2, 3]` | `a[2:2] = [7, 8]` | 在索引 n 处插入多个元素 |
+
+:::tip
+语法糖很方便，但是使用 `slice` 对象可以赋值给变量，有如下好处：
+- 提升代码可读性。
+- 可作为参数传递给函数。
+- 便于复用。
+```python showLineNumbers
+REVERSE_INDEX = slice(None, None, -1)
+a = [1, 2, 3, 4, 5]
+b = [6, 7, 8, 9, 10]
+
+print(a[REVERSE_INDEX])  # [5, 4, 3, 2, 1]
+print(b[REVERSE_INDEX])  # [10, 9, 8, 7, 6]
+
+def reverse_list(lst, index):
+    return lst[index]
+
+print(reverse_list(a, REVERSE_INDEX))  # [5, 4, 3, 2, 1]
+print(reverse_list(b, REVERSE_INDEX))  # [10, 9, 8, 7, 6]
+
+```
+:::
 
 ### sorted函数
 
