@@ -1,1 +1,618 @@
-socket是一个应用网络通信协议的库，可以设置不同参数用来实现不同的类型的网络通信。
+---
+sidebar_position: 1
+title: socket
+description: socket 低层级的网络接口库，提供 BSD 套接字的 Python 接口
+---
+
+`socket` 模块提供了访问 <HoverText text="BSD 套接字" explanation="Berkeley Software Distribution (伯克利软件套件)网络编程接口，是 Unix/Linux 系统中网络通信的标准 API。它提供了一套用于网络通信的系统调用接口，支持 TCP、UDP 等多种网络协议。"/> 的接口，是所有现代 Unix 系统、Windows、macOS 和其他一些平台上进行网络编程的基础。
+
+## 套接字协议族
+
+根据系统以及构建选项，此模块提供了各种套接字协议簇。常用的协议族包括：
+
+| 协议族 | 常量 | 地址格式 | 说明 |
+|--------|------|---------|------|
+| IPv4 | `AF_INET` | `(host, port)` 元组<br/>`host`: 主机名或 IPv4 地址字符串<br/>`port`: 整数端口号<br/>特殊值: `''` 表示所有接口，`'<broadcast>'` 表示广播地址 | 用于 IPv4 网络通信 |
+| IPv6 | `AF_INET6` | `(host, port, flowinfo, scope_id)` 四元组<br/>`host`: IPv6 地址字符串<br/>`port`: 整数端口号<br/>`flowinfo`: 流信息（通常为 0）<br/>`scope_id`: 作用域 ID（通常为 0）<br/>简化形式: `(host, port)` | 用于 IPv6 网络通信 |
+| Unix域 | `AF_UNIX` | 文件系统路径字符串<br/>例如: `'/tmp/mysocket.sock'` | 用于同一台机器上的进程间通信 |
+| 原始套接字 | `AF_PACKET` | 接口名称字符串<br/>例如: `'eth0'` | 用于底层网络包访问（Linux） |
+| 蓝牙 | `AF_BLUETOOTH` | 蓝牙地址元组，格式取决于协议 | 用于蓝牙通信 |
+
+
+### 地址格式示例
+
+```python
+import socket
+
+# AF_INET 地址示例
+address_v4_1 = ('www.example.com', 80)           # 使用主机名
+address_v4_2 = ('192.168.1.1', 8080)             # 使用 IPv4 地址
+address_v4_3 = ('', 8080)                        # 绑定到所有接口 (INADDR_ANY)
+address_v4_4 = ('<broadcast>', 8080)             # 广播地址 (INADDR_BROADCAST)
+
+# AF_INET6 地址示例
+address_v6_1 = ('2001:0db8::1', 8080, 0, 0)      # 完整形式
+address_v6_2 = ('2001:0db8::1', 8080)            # 简化形式（省略 flowinfo 和 scope_id）
+
+# AF_UNIX 地址示例
+address_unix = '/tmp/mysocket.sock'              # Unix 域套接字路径
+```
+
+## 套接字类型
+
+| 类型 | 常量 | 说明 |
+|------|------|------|
+| TCP流 | `SOCK_STREAM` | 面向连接的可靠传输，用于 TCP | 
+| UDP数据报 | `SOCK_DGRAM` | 无连接不可靠传输，用于 UDP | 
+| 原始套接字 | `SOCK_RAW` | <HoverText text="原始网络协议访问" explanation="允许应用程序直接访问网络层数据包，绕过传输层协议处理。可以自定义协议头，用于网络监控、安全工具、协议开发等场景。需要管理员权限。"/> |
+
+:::warning
+使用原始套接字需要管理员权限，且可以绕过操作系统的网络安全机制，可能被恶意软件利用。在生产环境中应谨慎使用。
+:::
+
+### 工作流程
+
+| 类型 | 工作流程 |
+|------|------|
+| TCP服务器 | `创建Socket` → `绑定地址(bind)` → `监听(listen)` → `接受连接(accept)` → `收发数据(send/recv)` → `关闭Socket(close)` |
+| TCP客户端 | `创建Socket` → `连接服务器(connect)` → `收发数据(send/recv)` → `关闭Socket(close)` |
+| UDP服务器 | `创建Socket` → `绑定地址(bind)` → `收发数据(recvfrom/sendto)` → `关闭Socket(close)` |
+| UDP客户端 | `创建Socket` → `(可选绑定)` → `收发数据(sendto/recvfrom)` → `关闭Socket(close)` |
+| 原始套接字 | `创建Socket` → `绑定地址(bind)` → `设置选项(setsockopt)` → `收发原始数据包` → `关闭Socket(close)` |
+
+:::tip
+TCP 和 UDP 都是全双工通信，可以同时发送和接收数据。
+
+- **TCP 的 `send/recv`**：建立连接后可以使用 `send()` 发送数据，使用 `recv()` 接收数据，两个操作可以交替或并发进行
+- **UDP 的 `recvfrom/sendto`**：使用 `recvfrom()` 接收数据（返回数据和发送方地址），使用 `sendto()` 发送数据（需要指定目标地址）。UDP 无连接，每次发送都需指定地址
+:::
+
+## 创建套接字
+
+### socket.socket()
+
+创建套接字对象的基本方法：
+
+```python
+import socket
+
+# 创建 TCP 套接字（IPv4）
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 创建 UDP 套接字（IPv4）
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+# 使用默认参数（默认是 AF_INET, SOCK_STREAM）
+sock = socket.socket()
+```
+
+:::tip
+大多数情况下，使用 `socket.socket()` 创建 TCP 套接字就足够了，默认参数会自动选择最常用的配置。
+:::
+
+
+## 套接字选项
+
+### setsockopt() 
+
+设置套接字选项：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 允许地址重用（避免 Address already in use 错误）
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+# 设置接收缓冲区大小
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 8192)
+
+# 设置发送缓冲区大小
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_SNDBUF, 8192)
+
+# 绑定地址前设置选项
+sock.bind(('localhost', 8080))
+```
+
+### getsockopt() 
+
+获取套接字选项的值：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 获取接收缓冲区大小
+rcvbuf = sock.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
+print(f'接收缓冲区大小: {rcvbuf}')
+
+# 检查 SO_REUSEADDR 选项
+reuse = sock.getsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR)
+print(f'地址重用: {bool(reuse)}')
+```
+
+### setblocking()
+
+设置套接字为阻塞或非阻塞模式：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 设置为非阻塞模式
+sock.setblocking(False)
+
+# 设置为阻塞模式（默认）
+sock.setblocking(True)
+```
+
+## 超时处理
+
+### settimeout() 
+
+设置套接字操作的超时时间（秒）：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 设置 5 秒超时
+sock.settimeout(5.0)
+
+try:
+    sock.connect(('www.example.com', 80))
+    data = sock.recv(1024)
+except socket.timeout:
+    print('操作超时')
+except OSError as e:
+    print(f'错误: {e}')
+```
+
+### gettimeout()
+
+获取当前超时设置：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 获取超时设置（None 表示无超时）
+timeout = sock.gettimeout()
+print(f'超时设置: {timeout}')
+```
+
+:::info
+超时设置影响以下操作：`connect()`, `recv()`, `send()`, `accept()`。如果设置为 `None`（默认），操作会无限期阻塞。
+:::
+
+## 地址解析函数
+
+`gethostname()` 获取本地主机的标准主机名。
+`gethostbyname()` 将主机名转换为 IPv4 地址。
+`gethostbyaddr()` 将 IP 地址转换为主机名（反向解析）。
+`getservbyname()` 根据服务名和协议获取端口号。
+`getservbyport()` 根据端口号和协议获取服务名。
+
+```python showLineNumbers
+import socket
+
+hostname = socket.gethostname()
+print(hostname) # Allen
+
+local_ip = socket.gethostbyname('localhost')
+print(f'本地 IP: {local_ip}') # 127.0.0.1
+
+# 解析主机名
+ip = socket.gethostbyname('www.baidu.com')
+print(f'IP 地址: {ip}') #183.2.172.177
+
+hostname, aliases, addresses = socket.gethostbyname_ex('www.baidu.com')
+print(f'主机名: {hostname}') # www.a.shifen.com
+print(f'别名: {aliases}') # ['www.baidu.com']
+print(f'IP 地址: {addresses}') #  ['183.2.172.177', '183.2.172.17']
+
+```
+
+
+### gethostbyaddr() 
+
+将 IP 地址转换为主机名（反向解析）：
+
+```python
+import socket
+
+try:
+    hostname, aliases, addresses = socket.gethostbyaddr('93.184.216.34')
+    print(f'主机名: {hostname}')
+    print(f'别名: {aliases}')
+    print(f'IP 地址: {addresses}')
+except socket.herror:
+    print('无法解析地址')
+```
+
+### getservbyname() 
+
+根据服务名和协议获取端口号：
+
+```python
+import socket
+
+# 获取 HTTP 服务的端口号
+http_port = socket.getservbyname('http', 'tcp')
+print(f'HTTP 端口: {http_port}')
+
+# 获取 FTP 服务的端口号
+ftp_port = socket.getservbyname('ftp', 'tcp')
+print(f'FTP 端口: {ftp_port}')
+
+# UDP 服务
+dns_port = socket.getservbyname('domain', 'udp')
+print(f'DNS 端口: {dns_port}')
+```
+
+
+
+## 服务器端操作
+
+### bind()
+
+将套接字绑定到特定的网络地址：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 绑定到本地地址和端口
+sock.bind(('localhost', 8080))
+
+# 绑定到所有网络接口
+sock.bind(('', 8080))
+
+# 绑定到 Unix 域套接字
+unix_sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+unix_sock.bind('/tmp/mysocket.sock')
+```
+
+:::warning
+如果端口已被占用，`bind()` 会抛出 `OSError: [Errno 98] Address already in use`。可以使用 `SO_REUSEADDR` 选项来避免这个问题。
+:::
+
+### listen()、accept()
+
+`listen()` 使套接字进入监听状态，接受连接请求。
+
+`accept()` 接受客户端连接，返回新的套接字对象和客户端地址。
+
+accept() 会阻塞，直到有客户端连接。
+
+```python showLineNumbers
+import socket
+
+sock = socket.socket()
+
+sock.bind(('localhost', 8080))
+sock.listen(5)
+
+client_sock, client_addr = sock.accept()
+print(f"""收到来自 {client_addr} 的连接""")
+
+message = client_sock.recv(1024).decode('utf-8') or "空消息"
+print(f"""消息为: {message}""")
+```
+
+## 客户端操作
+
+### connect()、connect_ex()
+
+`connect()` 建立与服务器的连接。
+
+`connect_ex()` 类似 `connect()`，但返回错误码而不是抛出异常。
+
+```python showLineNumbers
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try:
+    sock.connect(('localhost', 8080))
+    print('连接成功')
+except OSError as e:
+    print(f'连接失败，错误码: {e.errno}')
+
+err = sock.connect_ex(('localhost', 8080))
+if err == 0:
+    print('连接成功')
+else:
+    print(f'连接失败，错误码: {err}')
+```
+
+## 数据传输
+
+### send()、sendall()、sendto()
+
+`send()` 发送数据，返回发送的字节数。
+`sendall()` 发送所有数据，直到全部发送完成。
+`sendto()` 发送数据到指定地址。
+
+```python showLineNumbers
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(('localhost', 8080))
+
+# 发送数据（可能只发送部分数据）如果只发送了部分数据，需要继续发送剩余部分。
+sent = sock.send(b'Hello, Server')
+print(f'发送了 {sent} 字节')
+
+# 发送所有数据，直到全部发送完成。确保所有数据都被发送
+message = b'Hello, Server' * 100
+sock.sendall(message)
+print('所有数据已发送')
+
+# 发送 UDP 数据到指定地址
+sock.sendto(b'Hello, Server', ('localhost', 8080))
+```
+
+### recv()、recvfrom()
+
+`recv()` 接收数据，返回接收到的数据。
+
+`recvfrom()` 接收数据，返回接收到的数据和发送方地址。
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(('localhost', 8080))
+
+# 接收最多 1024 字节（1kb）
+data = sock.recv(1024)
+print(f'接收到 {len(data)} 字节: {data}')
+
+data, addr = sock.recvfrom(1024)
+print(f'从 {addr} 接收到: {data}')
+```
+
+**关于最多接收字节数：**
+
+- `recv(bufsize)` 中的 `bufsize` 参数指定**单次调用最多接收的字节数**
+- **理论上没有严格上限**，但实际使用受以下因素限制：
+  - 系统内存大小
+  - 套接字接收缓冲区大小（`SO_RCVBUF`，通常默认 64KB 或更大）
+  - 网络 MTU（最大传输单元，以太网通常为 1500 字节）
+- **实际接收的字节数可能少于 `bufsize`**，取决于当前可用的数据量
+- **常用值**：`1024` (1KB)、`2048` (2KB)、`4096` (4KB)、`8192` (8KB) 等（通常使用 2 的幂次）
+
+:::tip
+`recv()` 参数只是限制单次读取的最大字节数，不限制可以多次调用 `recv()` 接收的总数据量。如果需要接收固定大小的数据，需要在循环中多次调用直到接收完成。
+:::
+
+
+## 关闭套接字
+
+### close()
+
+关闭套接字，释放资源：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(('www.example.com', 80))
+
+# 关闭套接字
+sock.close()
+```
+
+### shutdown() 
+
+关闭连接的一部分或全部：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(('www.example.com', 80))
+
+# SHUT_RD: 关闭接收
+# SHUT_WR: 关闭发送
+# SHUT_RDWR: 关闭接收和发送
+sock.shutdown(socket.SHUT_RDWR)
+sock.close()
+```
+
+### getsockname()
+
+获取套接字自己的地址：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.bind(('localhost', 8080))
+
+# 获取绑定后的地址
+addr, port = sock.getsockname()
+print(f'本地地址: {addr}:{port}')
+```
+
+### getpeername()
+
+获取已连接套接字的远程地址：
+
+```python
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(('www.example.com', 80))
+
+# 获取远程地址
+addr, port = sock.getpeername()
+print(f'远程地址: {addr}:{port}')
+```
+
+## 示例：多线程TCP客户端和服务端
+
+使用标准库的 `threading` 模块实现TCP客户端和服务端，支持同时收发数据：
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="server" label="服务端" default>
+
+
+主线程负责监听客户端连接，每有一个客户端连接，就创建一个线程(handle_client)来处理该链接的收发数据。
+
+该线程(handle_client)又包含两个线程(send_data, recv_data)来处理该链接的收发数据。
+
+```python showLineNumbers title="tcp_server.py"
+import socket
+import threading
+
+def handle_client(client_sock, client_addr):
+    """处理客户端连接的线程函数"""
+    print(f'客户端 {client_addr} 已连接')
+    
+    # 创建发送数据的线程
+    def send_data():
+        try:
+            while True:
+                message = input(f'向 {client_addr} 发送: ')
+                if not message:
+                    break
+                client_sock.sendall(message.encode('utf-8'))
+        except (ConnectionResetError, BrokenPipeError):
+            print(f'客户端 {client_addr} 断开连接')
+    
+    # 创建接收数据的线程
+    def recv_data():
+        try:
+            while True:
+                data = client_sock.recv(1024)
+                if not data:
+                    break
+                print(f'收到来自 {client_addr} 的消息: {data.decode("utf-8")}')
+        except (ConnectionResetError, BrokenPipeError):
+            print(f'客户端 {client_addr} 断开连接')
+        finally:
+            client_sock.close()
+    
+    # 启动发送和接收线程
+    send_thread = threading.Thread(target=send_data, daemon=True)
+    recv_thread = threading.Thread(target=recv_data, daemon=True)
+    
+    send_thread.start()
+    recv_thread.start()
+    
+    # 等待接收线程结束（客户端断开连接）
+    recv_thread.join()
+    print(f'客户端 {client_addr} 连接已关闭')
+
+def main():
+    # 创建TCP套接字
+    server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    # 允许地址重用（避免 Address already in use 错误）
+    server_sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server_sock.bind(('localhost', 8888))
+    server_sock.listen(5)
+    
+    print('服务器启动，监听 0.0.0.0:8888')
+    print('等待客户端连接...')
+    
+    try:
+        while True:
+            # 接受客户端连接
+            client_sock, client_addr = server_sock.accept()
+            
+            # 为每个客户端创建新线程
+            client_thread = threading.Thread(
+                target=handle_client,
+                args=(client_sock, client_addr),
+                daemon=True
+            )
+            client_thread.start()
+    except KeyboardInterrupt:
+        print('\n服务器关闭')
+    finally:
+        server_sock.close()
+
+if __name__ == '__main__':
+    main()
+```
+
+  </TabItem>
+  <TabItem value="client" label="客户端">
+
+```python showLineNumbers title="tcp_client.py"
+import socket
+import threading
+
+def send_data(client_sock):
+    """发送数据的线程函数"""
+    try:
+        while True:
+            message = input('发送消息: ')
+            if not message:
+                break
+            client_sock.sendall(message.encode('utf-8'))
+    except (ConnectionResetError, BrokenPipeError):
+        print('服务器断开连接')
+    except Exception as e:
+        print(f'发送错误: {e}')
+
+def recv_data(client_sock):
+    """接收数据的线程函数"""
+    try:
+        while True:
+            data = client_sock.recv(1024)
+            if not data:
+                break
+            print(f'收到消息: {data.decode("utf-8")}')
+    except (ConnectionResetError, BrokenPipeError):
+        print('服务器断开连接')
+    except Exception as e:
+        print(f'接收错误: {e}')
+    finally:
+        client_sock.close()
+
+def main():
+    # 创建TCP套接字并连接服务器
+    client_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    
+    try:
+        client_sock.connect(('localhost', 8888))
+        print('已连接到服务器 localhost:8888')
+        print('可以开始发送和接收消息（输入空消息退出）')
+        
+        # 创建发送和接收线程
+        send_thread = threading.Thread(target=send_data, args=(client_sock,), daemon=True)
+        recv_thread = threading.Thread(target=recv_data, args=(client_sock,), daemon=True)
+        
+        # 启动线程
+        send_thread.start()
+        recv_thread.start()
+        
+        # 等待发送线程结束（用户输入空消息）
+        send_thread.join()
+        
+    except ConnectionRefusedError:
+        print('无法连接到服务器，请确保服务器已启动')
+    except Exception as e:
+        print(f'连接错误: {e}')
+    finally:
+        client_sock.close()
+        print('客户端已关闭')
+
+if __name__ == '__main__':
+    main()
+```
+
+  </TabItem>
+</Tabs>
+
