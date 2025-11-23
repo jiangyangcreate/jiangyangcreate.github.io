@@ -9,22 +9,55 @@ title: Transformer
 《Attention Is All You Need》截止2025年，谷歌学术总引用次数排名第2。
 :::
 
+关于大模型，我很早就了解了它的工作原理，但是和类与对象一样，很难在短时间内向他人讲述清楚。我认为抽象的内容最需要的是可视化的展示。
 
-在大模型的处理中，我们会把文本经过tokenizer转为token序列，通过嵌入层转为向量矩阵，经过一系列运算后得出新的向量矩阵，接着将这个新的矩阵最后一个向量与嵌入矩阵中的每个词计算相似度，返回最有相似的向量对应的token作为预测值，将token通过词表转化为文本。将新token追加到输入序列。
+[Transformer可视化](https://poloclub.github.io/transformer-explainer/)这个项目很好的展示了Transformer的工作原理。
 
-循环往复上述过程，直到遇到终止符，模型推理结束。
+以下是我配套的一些补充说明，目的是根据公式与原理逐步手写一个Transformer模型。
 
-## 构建词表
+以下是我的基础模型配置：
 
-词嵌入层（Embedding Layer）是编码器（Encoder）和解码器（Decoder）的组成部分，负责将输入Token映射为稠密向量。
+```python showLineNumbers
+dtype = 'bfloat16' # 数据类型：即每个数字占用16位（2字节），适当降低精度可以减少显存占用并轻度降智，精度低于int4时模型会断崖式降智。
+batch_size = 64    # 批次大小：越大训练速度越快，但占用显存越多。对模型智力影响偏小。
+block_size = 1024  # 上下文长度：越大，模型理解的上下文越多，智力越强，但占用显存越多。
+n_embd = 768       # 词嵌入维度：越大，模型学习能力越强，但占用显存指数级增加。对模型智力有较大影响。
+n_layer = 6      # Transformer层数：层数越多，模型表达能力越强，但训练和推理时间线性增加，显存占用也增加
+n_head = 6       # 注意力头数：多头注意力机制的头数，通常设为词嵌入维度的约数，用于并行学习不同的注意力模式
+# 以下和显存占用无关，和收敛速度有关
+dropout = 0.0     # Dropout比率：初期设为 0 加速训练，后期如果过拟合调成 0.1，用于防止过拟合
+learning_rate = 6e-4 # 学习率：控制模型参数更新的步长，过大可能导致训练不稳定，过小训练速度慢
+max_iters = 5000  # 最大训练迭代次数：训练的总轮数，需要根据数据集大小和训练效果调整
+lr_decay_iters = 5000 # 学习率衰减迭代次数：学习率开始衰减的迭代次数，通常与max_iters相同
+min_lr = 6e-5     # 最小学习率：学习率衰减的下限，防止学习率过小导致训练停滞
+# 基础配置
+device = 'cuda'   # 计算设备：'cuda'表示使用GPU加速，'cpu'表示使用CPU（速度较慢）
+compile = True    # 是否编译模型：True会使用PyTorch的torch.compile优化，可以提升训练和推理速度
+```
+{/* 
+这个配置预计显存占用：约 70GB+（使用 A100 GPU）。 且需要1-2周的训练时间，你才能拥有一个属于你自己的大模型（从随机权重开始预训练到基本连贯性）。
 
-不同的模型用了不同的语料，因此维度大小、Token划分都是不一样的（为了避免维度爆炸，我们一般指定维度大小，通过频次聚类压缩，使得维度不会太大）。即不同模型编码器与解码器不一样，如果混用则可能输出乱码，即发现乱码时需要查看 词嵌入向量 模块与模型是否出自同一家厂商。
+如果你的显存不够，刚好也可以通过文档中计算公式，调整模型配置，降低显存占用。这算是一个实践调参练习。
+
+## Embedding
+
+提前准备:训练好的词表
+
+- 文本 通过提前训练好的词表拆分为 Token（分词）
+- Token 通过提前训练好的词表转化为 Token ID（独热编码）
+- Token ID 通过提前训练好的词表转化为 Token Embedding（词嵌入）
+- 将位置信息 转化为 位置编码（位置编码）
+- 将 Token Embedding 和 位置编码 相加 得到 最终的输入向量
+
+### 分词
 
 训练大模型之前，一般先训练词嵌入向量库。训练前的词向量库会分配给每个token一个随机权重，如果不加训练也会输出乱码。训练后的词向量库每个token权重固定，相似词向量上体现一定的相似性。如果算力不够可以选择同时开源对应权重的【词嵌入向量库】
 
-获得词嵌入向量的步骤：
+不同的模型用了不同的语料，因此维度大小、Token划分都是不一样的（为了避免维度爆炸，我们一般指定维度大小，通过频次聚类压缩，使得维度不会太大）。即不同模型编码器与解码器不一样，如果混用则可能输出乱码，即发现乱码时需要查看 词嵌入向量 模块与模型是否出自同一家厂商。
 
 分词：首先需要使用某种分词器对输入文本进行分词处理，将其划分为一个个 token。这个过程中英文的单词有时需要下载一个分词表（通常为 tokenizer.json：分词器配置文件，用于文本的分词处理。），单词拆为本身和前缀与后缀，这个词表是人工标注的，这也是为什么英语是大模型首选语言。
+
+### 词嵌入
 
 构建词表：根据分词结果，统计所有 token 的出现频率，并依据设定的词表大小，选择保留的词汇。通常会保留高频率词汇，同时也会加入一些特殊符号（如垫零符 `<PAD>`、未知词 `<UNK>` 等）。通常为 tokenizer_config.json：分词器配置文件，定义了分词器的行为。分好后的词放在 vocab.json：词汇表文件，存储了模型所使用的词汇。
 
@@ -34,9 +67,7 @@ title: Transformer
 
 获取词嵌入向量：当模型训练完成后，对于任何一个给定的 token，都可以通过查找嵌入矩阵快速得到其对应的词嵌入向量。
 
-## 词嵌入
-
-词嵌入的过程是分割好的词从【嵌入矩阵】中获取自己向量的过程，假设【嵌入矩阵】如下：
+词嵌入的过程是分割好的词从【嵌入矩阵】中获取自己向量的过程，假设【嵌入矩阵】维度为4（GPT2选用768维）如下：
 
 | 词汇/Token | 维度1 | 维度2 | 维度3 | 维度4 |
 | ---------- | ----- | ----- | ----- | ----- |
@@ -47,7 +78,6 @@ title: Transformer
 | 学习       | 0.45  | 0.68  | 0.21  | 0.37  |
 | 爱         | 0.65  | 0.71  | 0.38  | -0.15 |
 
-
 当输入一个句子"我爱学习机器学习"时，会被分词为["我", "爱", "学习", "机器", "学习"]，然后每个词在嵌入矩阵中查找对应的向量，得到一系列向量表示：
 
 - "我" → [0.87, 0.42, -0.26, 0.35]
@@ -56,16 +86,15 @@ title: Transformer
 - "机器" → [0.32, 0.52, 0.75, 0.22]
 - "学习" → [0.45, 0.68, 0.21, 0.37]
 
-这样，原本的文本序列就被转换为向量序列，这个过程人可以通过肉眼直接看到，机器如何完成？你可以使用for循环加判断，但是有更简单快速的方式。
+这样，原本的文本序列就被转换为向量序列，这个过程人可以通过肉眼直接看到，机器如何完成？你可以使用for循环加判断，但是有更简单快速的方式：独热编码
 
-### 独热编码方式
-
-独热编码是将每个词表示为一个向量，该向量的长度等于词表大小，只有对应词的位置为1，其余位置为0：
+独热编码（One-Hot Encoding）是一种将每个词表示为一个向量，该向量的长度等于词表大小，只有对应词的位置为1，其余位置为0的编码方式：
 
 ```python
 import numpy as np
 
 # 假设我们有一个词表和嵌入矩阵
+# 词 ： token_id
 vocab = {"<PAD>": 0, 
          "<UNK>": 1, 
          "我": 2, 
@@ -90,7 +119,7 @@ def word_to_onehot(word, vocab_size):
     onehot = np.zeros(vocab_size)
     if word in vocab:
         onehot[vocab[word]] = 1 
-        # 以 “我”这个字为例，vocab[“我”] 为2，对应下标位置的值为1，其他为0. 
+        # 以 "我"这个字为例，vocab["我"] 为2，对应下标位置的值为1，其他为0. 
         # onehot[2] = 1 即[0,0,1,0,0,.....,0]
     else:
         onehot[vocab["<UNK>"]] = 1 # 即未知为1.其他为0 [0,1,0,0,0,.....,0]
@@ -107,7 +136,6 @@ embeddings = [get_embedding_via_onehot(token, vocab, embedding_matrix) for token
 # 形状为 5 行 N列，每行即是词对应的向量
 ```
 
-### 嵌入查找方式（更高效）
 
 实际应用中，我们通常直接使用词索引进行查找，避免独热编码的稀疏计算：
 
@@ -162,22 +190,865 @@ print(token_embeddings)
 
 词嵌入只考虑了词的语义信息，但在序列中，词的位置也很重要。Transformer通过位置编码（Positional Encoding）来捕捉序列中词的位置信息
 '''
-def get_positional_encoding(seq_len, d_model):
-    pe = np.zeros((seq_len, d_model))
-    for pos in range(seq_len):
-        for i in range(0, d_model, 2):
-            pe[pos, i] = np.sin(pos / (10000 ** (i / d_model)))
-            if i + 1 < d_model:
-                pe[pos, i + 1] = np.cos(pos / (10000 ** (i / d_model)))
-    return pe
-
-# 示例：生成长度为(根据输入的序列长度)，维度为4的位置编码
-seq_len = len(tokens)
-positional_encoding = get_positional_encoding(seq_len,embedding_dim)
-print(positional_encoding)
-
-# 将位置编码加到词嵌入上(不会改变形状)
-final_embeddings = token_embeddings + torch.tensor(positional_encoding, dtype=torch.float)
 ```
 
-位置编码和词嵌入相加后，就得到了包含语义和位置信息的完整表示，这将作为编码器的输入。
+### 位置编码
+
+这一步会将位置信息融入到词嵌入向量中。
+
+词嵌入层和位置编码层是两个独立的模块，它们在模型中是并行工作的。
+
+位置向量的维度与词嵌入向量维度**相同**。
+
+词嵌入向量维度通常很高,这里示例的都有768维(通常取不低于300维,768可以看作3个256维拼接)。
+
+我输入的词可能只有几个字,维度不够,如何转化为与词嵌入向量维度相同的向量?
+
+现在主流的大模型使用的是RoPE (Rotary Positional Embedding, 旋转位置编码)。
+
+假设你的词向量（Token Embedding）有 4 个维度（为了方便演示，用小数字），向量数值是：
+
+$$ \vec{x} = [x_1, x_2, x_3, x_4] $$
+
+RoPE 对 Q 和 K 向量进行旋转（不是独立的向量相加）。对每一对维度 (2i, 2i+1) 应用旋转矩阵（向量维度通常取2的整数倍或整数倍拼接，一定能两两配对上）。
+
+旋转角度 θ_i = base^{-2i / d_model} * m（m 是位置）
+
+例如，对于维度 2i 和 2i+1：
+
+$$
+\begin{align*}
+x'_{2i} &= x_{2i} \cos(\theta_i) - x_{2i+1} \sin(\theta_i) \\
+x'_{2i+1} &= x_{2i} \sin(\theta_i) + x_{2i+1} \cos(\theta_i)
+\end{align*}
+$$
+
+这直接修改 Q 和 K 向量，注入位置信息，而不增加额外参数。
+
+### 最终输入向量
+
+这个相加是向量相加(维度不变)，不是向量拼接。
+
+相加是一种节省算力的高效做法（比把两个向量首尾拼接省了一半的空间）
+
+以下是一个简单示例:
+
+```python showLineNumbers
+position = [0.1,0.2,0.3,0.4,0.5,0.6]
+embedding = [0.5,0.6,0.7,0.8,0.9,1.0]
+final_input = position + embedding
+print(final_input)
+# 输出: [0.6, 0.8, 1.0, 1.2, 1.4, 1.6]
+```
+
+很多人觉得应该把两个向量拼起来，增加维度。这是错误的，可以把它想象成给原来的语义向量**染色**。
+
+原本的向量表示"我是苹果"。加了位置向量后，它并没有改变维度，而是变成了"我是在这个位置的苹果"。模型在后续的运算中，有能力把这两层信息（语义+位置）从这个混合数值里解构出来。
+
+就像无线电信号：
+- 词向量 是载波（比如调频 FM 98.7） 
+- 位置向量 是调制在上面的信号。
+
+虽然它们在物理上混合成了一个波形，但接收端（大模型的后续层）有能力通过滤波器（权重矩阵）把它们区分开来。
+
+### 计算空间占用
+
+由于我们的 `batch_size` 设为 $64$，即并行 $64$ 组数据，每个单词被打成最长 $1024$ 个token，每个token会生成一个 $768$ 维的向量（词嵌入后融入 RoPE）。
+
+输入的部分参数量就是：$$64 \times 1024 \times 768 = 50,331,648 $$
+
+以上计算方式公式写作 $(B, T, C)$ 的形式，即 `batch_size` * `token_length` * `Channel /embedding_dim`。
+
+每个参数的精度是 `bfloat16`，即每个数字占用 $16$ 位（$2$ 字节），
+
+所以总空间占用为：$$50,331.648 \times 2 = 100,663,296 = 96 \text{ MB} $$
+
+所以，最终随着位置编码和词嵌入的创建和合并，总空间会先升高，再降低，最终占用是 $96 \text{ MB} \approx 100 \text{ MB}$。为了后续计算方便，我们取整为 $100 \text{ MB}$。
+
+:::info
+即每轮进入下一步的显存占用是：$100 \text{ MB}$。记住这个数字，后续会用到。
+
+这个空间占用代表了64组数据，每组数据有1024个token，每个向量有768个参数，每个参数占用16位（2字节）。
+:::
+
+## 注意力机制
+
+### 拆分QKV
+
+接下来,这个词向量拼接好了位置向量之后,会被拆为相同的3份(复制了3份,每一部分都可以看作是独立的一份)
+
+第一份 乘以一个可变权重矩阵 化作Q(Query)
+
+第二份 乘以一个可变权重矩阵 化作K(Key)
+
+第三份 乘以一个可变权重矩阵 化作V(Value)
+
+模型在训练过程中就是在疯狂调整这些矩阵里的数字。
+
+公式写作：$Q = W_q \times X$，$K = W_k \times X$，$V = W_v \times X$
+
+其中，$W_q$、$W_k$、$W_v$ 是可变权重矩阵，$X$ 是输入的词向量。
+
+
+### 多头分割
+
+为什么需要多头？想象你在看一幅画，如果只有一双眼睛，你只能从一个角度观察。但如果你有12双眼睛，每双眼睛关注不同的细节（颜色、形状、纹理、空间关系等），你就能更全面地理解这幅画。
+
+多头注意力（Multi-Head Attention）就是这个道理。我们把 $768$ 维的词嵌入向量分成 $12$ 个头（`n_head = 12`），每个头负责 $768 \div 12 = 64$ 维。
+
+```python showLineNumbers
+n_head = 12
+n_embd = 768
+head_dim = n_embd // n_head  # 64
+
+# 假设输入是 (batch_size, seq_len, n_embd) = (64, 1024, 768)
+# 我们需要把它分割成12个头，每个头是 (64, 1024, 64)
+
+# 在PyTorch中，通常使用view和transpose来实现
+# Q, K, V 的形状都是 (64, 1024, 768)
+# 分割后变成 (64, 12, 1024, 64)
+# 12个头，每个头处理64维
+```
+
+为什么要分割？因为不同的头可以学习不同的注意力模式：
+- 头1可能关注语法关系（主谓宾）
+- 头2可能关注语义关系（同义词、反义词）
+- 头3可能关注长距离依赖（句子开头和结尾的关系）
+- 头4可能关注局部关系（相邻词的关系）
+- ...等等
+
+这样，模型就能同时从多个角度理解文本，就像有12个专家同时分析同一段文字。
+
+:::info
+为什么是12个头？为什么不是更多或更少？
+
+- 头数太少（比如1-2个）：模型表达能力有限，无法同时关注多种关系
+- 头数太多（比如768个，每个头1维）：计算量爆炸，而且每个头的信息太少，学不到有用的模式
+- 12个头是一个经验值，在表达能力和计算效率之间取得了平衡
+
+通常头数设为词嵌入维度的约数，这样分割时不会有维度浪费。$768 \div 12 = 64$，正好整除。
+:::
+
+分割后的Q、K、V形状都是 $(B, H, T, d)$，其中：
+- $B$ = batch_size = 64
+- $H$ = n_head = 12
+- $T$ = block_size = 1024
+- $d$ = head_dim = 64
+
+### 掩饰的自我关注(Masked Self-Attention)
+
+为什么叫"自我关注"（Self-Attention）？因为每个token都在关注序列中的**所有token**（包括自己），通过Q、K、V都来自同一个输入序列。
+
+为什么叫"掩饰"（Masked）？在生成任务中，我们不应该让模型看到"未来"的信息。比如预测第5个词时，模型只能看前4个词，不能看第6、7、8...个词。
+
+想象你在考试时，如果能看到后面的答案，那就不叫考试了。掩码就是遮住"未来"的答案，让模型只能根据"过去"来预测。
+
+#### 点积
+
+怎么计算查询相似度？
+
+想象你在一个相亲大会上（这就是一个 Attention 过程）：
+
+- 你 (Token A): 你的 Q (Query) 就像是你的择偶标准："我喜欢爱运动、幽默的人。"
+- 嘉宾 (Token B): 他的 K (Key) 是他身上的标签："我是一个健身教练，我很幽默。"
+- 匹配过程: 你的 $Q$ 和他的 $K$ 进行计算（点积），发现非常匹配！
+
+点积（Dot Product）在数学几何上就是用来衡量两个向量**"方向是否一致"**的最佳工具。
+
+点积的公式是：$\vec{a} \cdot \vec{b} = \sum_{i=1}^{n} a_i \times b_i = a_1b_1 + a_2b_2 + ... + a_nb_n$
+
+如果两个向量方向一致（夹角接近0°），点积结果很大（正数且绝对值大）
+如果两个向量方向相反（夹角接近180°），点积结果很小（负数且绝对值大）
+如果两个向量垂直（夹角90°），点积结果为0
+
+在注意力机制中，我们计算每个token的Q与所有token的K的点积：
+
+$$\mathrm{Attention}(Q, K, V) = \mathrm{softmax}\left(\frac{QK^T} {\sqrt{d_k}}\right) \times V$$
+
+其中 $QK^T$ 就是点积操作。$Q$ 的形状是 $(B, H, T, d)$，$K$ 的形状也是 $(B, H, T, d)$，$K^T$ 表示转置，形状变成 $(B, H, d, T)$。
+
+所以 $QK^T$ 的形状是 $(B, H, T, d) \times (B, H, d, T) = (B, H, T, T)$
+
+这个 $(T, T)$ 的矩阵就是注意力分数矩阵，第 $i$ 行第 $j$ 列表示第 $i$ 个token对第 $j$ 个token的注意力分数。
+
+```python showLineNumbers
+import torch
+import torch.nn.functional as F
+
+# 假设我们有Q, K, V，形状都是 (batch_size, n_head, seq_len, head_dim)
+# 这里简化，只考虑一个batch和一个head
+batch_size = 1
+n_head = 1
+seq_len = 5  # 假设序列长度为5
+head_dim = 64
+
+Q = torch.randn(batch_size, n_head, seq_len, head_dim)
+K = torch.randn(batch_size, n_head, seq_len, head_dim)
+V = torch.randn(batch_size, n_head, seq_len, head_dim)
+
+# 计算注意力分数：Q @ K^T
+# Q: (1, 1, 5, 64), K: (1, 1, 5, 64)
+# K需要转置：K.transpose(-2, -1) -> (1, 1, 64, 5)
+scores = torch.matmul(Q, K.transpose(-2, -1))  # (1, 1, 5, 5)
+
+print(f"注意力分数矩阵形状: {scores.shape}")
+print(f"注意力分数矩阵:\n{scores[0, 0]}")
+# 输出一个5x5的矩阵，表示每个token对其他token的注意力分数
+```
+
+#### 缩放·掩码
+
+**为什么要缩放？**
+
+点积的结果可能会非常大，特别是当 $d_k$（head_dim）很大时。如果点积结果太大，经过softmax后，梯度会变得非常小（接近0），这会导致训练困难，模型学不到东西。
+
+想象你在用放大镜看东西，如果放大倍数太大，你反而看不清细节。缩放就是调整"放大倍数"，让注意力分数在一个合适的范围内。
+
+缩放公式：$\frac{QK^T}{\sqrt{d_k}}$
+
+其中 $d_k$ 是head_dim（在我们的例子中是64），$\sqrt{64} = 8$。
+
+```python showLineNumbers
+# 继续上面的代码
+d_k = head_dim  # 64
+scaled_scores = scores / (d_k ** 0.5)  # 除以根号d_k
+print(f"缩放后的注意力分数:\n{scaled_scores[0, 0]}")
+```
+
+**为什么要掩码？**
+
+在生成任务中（比如GPT），模型应该只能看到当前位置之前的信息，不能"偷看"未来的信息。
+
+掩码的作用就是把"未来"位置的注意力分数设为负无穷（在softmax后会变成0）。
+
+```python showLineNumbers
+# 创建掩码矩阵
+# 下三角矩阵：对角线及以下为False（不掩码），以上为True（掩码）
+mask = torch.triu(torch.ones(seq_len, seq_len), diagonal=1).bool()
+print(f"掩码矩阵:\n{mask}")
+# 输出：
+# [[False,  True,  True,  True,  True],
+#  [False, False,  True,  True,  True],
+#  [False, False, False,  True,  True],
+#  [False, False, False, False,  True],
+#  [False, False, False, False, False]]
+
+# 应用掩码：把True的位置设为负无穷
+masked_scores = scaled_scores.masked_fill(mask, float('-inf'))
+print(f"掩码后的注意力分数:\n{masked_scores[0, 0]}")
+# 被掩码的位置会变成-inf，经过softmax后变成0
+```
+
+:::tip
+为什么用负无穷而不是0？
+
+因为softmax函数：$\text{softmax}(x_i) = \frac{e^{x_i}}{\sum_{j} e^{x_j}}$
+
+如果某个位置的分数是0，softmax后可能还有很小的概率（比如0.001）。但如果某个位置的分数是负无穷，$e^{-\infty} = 0$，softmax后概率就是0，完全被屏蔽。
+:::
+
+#### Softmax · Dropout
+
+**Softmax：把分数变成概率**
+
+经过缩放和掩码后，我们得到了注意力分数矩阵。但这些分数可能是任意大小的正数或负数，我们需要把它们转换成概率分布（所有概率加起来等于1）。
+
+Softmax的作用就是把一组数字转换成概率分布：
+
+$$\text{softmax}(x_i) = \frac{e^{x_i}}{\sum_{j=1}^{n} e^{x_j}}$$
+
+```python showLineNumbers
+# 继续上面的代码
+# 对每一行应用softmax（对每个token的注意力分数归一化）
+attention_weights = F.softmax(masked_scores, dim=-1)  # dim=-1表示对最后一个维度（列）做softmax
+print(f"注意力权重（概率）:\n{attention_weights[0, 0]}")
+# 每一行的所有数字加起来等于1
+
+# 验证：每一行的和应该接近1
+print(f"每行和: {attention_weights[0, 0].sum(dim=-1)}")
+```
+
+**Dropout：防止过拟合**
+
+Dropout在训练时随机"关闭"一些神经元（设为0），让模型不要过度依赖某些特定的连接。这就像考试时，如果题目变化一点，过度依赖"死记硬背"的学生就会出错，而真正理解的学生仍然能答对。
+
+在我们的配置中，`dropout = 0.0`，所以训练初期不使用dropout（加速训练）。如果后期发现模型过拟合（在训练集上表现很好，但在测试集上表现差），可以调成0.1。
+
+```python showLineNumbers
+# 应用dropout（如果dropout > 0）
+dropout_rate = 0.0  # 初期设为0
+if dropout_rate > 0:
+    attention_weights = F.dropout(attention_weights, p=dropout_rate, training=True)
+
+# 最后，用注意力权重对V进行加权求和
+output = torch.matmul(attention_weights, V)  # (1, 1, 5, 64)
+print(f"输出形状: {output.shape}")
+```
+
+完整的注意力计算流程：
+
+```python showLineNumbers
+def scaled_dot_product_attention(Q, K, V, mask=None, dropout=0.0):
+    """
+    Q, K, V: (batch_size, n_head, seq_len, head_dim)
+    mask: (seq_len, seq_len) 或 None
+    """
+    d_k = Q.size(-1)  # head_dim
+    
+    # 1. 计算点积
+    scores = torch.matmul(Q, K.transpose(-2, -1))  # (B, H, T, T)
+    
+    # 2. 缩放
+    scores = scores / (d_k ** 0.5)
+    
+    # 3. 应用掩码（如果有）
+    if mask is not None:
+        scores = scores.masked_fill(mask, float('-inf'))
+    
+    # 4. Softmax
+    attention_weights = F.softmax(scores, dim=-1)
+    
+    # 5. Dropout
+    if dropout > 0:
+        attention_weights = F.dropout(attention_weights, p=dropout, training=True)
+    
+    # 6. 加权求和
+    output = torch.matmul(attention_weights, V)  # (B, H, T, d)
+    
+    return output, attention_weights
+```
+
+### 输出和连接
+
+经过多头注意力计算后，我们得到了12个头的输出，每个头的形状是 $(B, H, T, d)$。现在需要把这12个头"拼接"（concatenate）起来，恢复成原来的768维。
+
+```python showLineNumbers
+# 假设12个头的输出都在一个张量中，形状是 (B, 12, T, 64)
+# 需要拼接成 (B, T, 768)
+multi_head_output = output.view(batch_size, seq_len, n_head * head_dim)  # (B, T, 768)
+# 或者使用 transpose + contiguous + view
+# multi_head_output = output.transpose(1, 2).contiguous().view(batch_size, seq_len, n_embd)
+```
+
+拼接后，我们还需要乘以一个输出权重矩阵 $W_o$，形状是 $(768, 768)$，把拼接后的向量映射回768维（这一步可以理解为"融合"12个头的不同视角）。
+
+```python showLineNumbers
+# 输出投影层
+W_o = torch.nn.Linear(n_embd, n_embd)  # (768, 768)
+attention_output = W_o(multi_head_output)  # (B, T, 768)
+```
+
+**残差连接（Residual Connection）**
+
+为什么需要残差连接？想象你在学习新知识时，如果完全忘记旧知识，学习效率会很低。残差连接就是让模型"记住"输入，在输入的基础上做改进，而不是完全替换。
+
+残差连接的公式：$\text{output} = \text{LayerNorm}(x + \text{Attention}(x))$
+
+其中 $x$ 是输入，$\text{Attention}(x)$ 是注意力层的输出。
+
+```python showLineNumbers
+# 残差连接
+residual = input_embeddings  # 输入 (B, T, 768)
+attention_output = attention_output  # 注意力输出 (B, T, 768)
+residual_output = residual + attention_output  # 相加 (B, T, 768)
+```
+
+**层归一化（Layer Normalization）**
+
+为什么需要层归一化？在深度网络中，每一层的输出分布可能会"漂移"（变得很大或很小），导致训练不稳定。层归一化就是把每一层的输出"拉回"到一个稳定的分布（均值0，方差1）。
+
+层归一化的公式：
+
+$$\text{LayerNorm}(x) = \gamma \odot \frac{x - \mu}{\sqrt{\sigma^2 + \epsilon}} + \beta$$
+
+其中：
+- $\mu$ 是均值：$\mu = \frac{1}{d} \sum_{i=1}^{d} x_i$
+- $\sigma^2$ 是方差：$\sigma^2 = \frac{1}{d} \sum_{i=1}^{d} (x_i - \mu)^2$
+- $\gamma$ 和 $\beta$ 是可学习的缩放和偏移参数
+- $\epsilon$ 是一个很小的数（比如1e-5），防止除以0
+
+```python showLineNumbers
+# 层归一化
+layer_norm = torch.nn.LayerNorm(n_embd)  # 对768维做归一化
+normalized_output = layer_norm(residual_output)  # (B, T, 768)
+```
+
+:::info
+为什么是"层归一化"而不是"批归一化"（Batch Normalization）？
+
+- 批归一化：对batch维度做归一化，需要统计整个batch的均值和方差。但在序列任务中，不同序列长度不同，batch统计不稳定。
+- 层归一化：对特征维度做归一化，每个样本独立归一化，不依赖batch，更适合序列任务。
+
+层归一化是对每个token的768维向量独立归一化，不涉及batch和序列长度。
+:::
+
+完整的注意力块（Attention Block）结构：
+
+```python showLineNumbers
+class AttentionBlock(torch.nn.Module):
+    def __init__(self, n_embd, n_head, dropout=0.0):
+        super().__init__()
+        self.n_head = n_head
+        self.head_dim = n_embd // n_head
+        
+        # QKV投影
+        self.W_q = torch.nn.Linear(n_embd, n_embd)
+        self.W_k = torch.nn.Linear(n_embd, n_embd)
+        self.W_v = torch.nn.Linear(n_embd, n_embd)
+        
+        # 输出投影
+        self.W_o = torch.nn.Linear(n_embd, n_embd)
+        
+        # 层归一化
+        self.ln1 = torch.nn.LayerNorm(n_embd)
+        self.ln2 = torch.nn.LayerNorm(n_embd)
+        
+        self.dropout = dropout
+    
+    def forward(self, x, mask=None):
+        B, T, C = x.shape
+        
+        # 1. 残差连接的输入
+        residual = x
+        
+        # 2. 层归一化（Pre-LN结构，先归一化再计算）
+        x = self.ln1(x)
+        
+        # 3. 计算QKV
+        Q = self.W_q(x)  # (B, T, C)
+        K = self.W_k(x)
+        V = self.W_v(x)
+        
+        # 4. 分割成多头
+        Q = Q.view(B, T, self.n_head, self.head_dim).transpose(1, 2)  # (B, H, T, d)
+        K = K.view(B, T, self.n_head, self.head_dim).transpose(1, 2)
+        V = V.view(B, T, self.n_head, self.head_dim).transpose(1, 2)
+        
+        # 5. 注意力计算
+        attn_output, attn_weights = scaled_dot_product_attention(Q, K, V, mask, self.dropout)
+        
+        # 6. 拼接多头
+        attn_output = attn_output.transpose(1, 2).contiguous().view(B, T, C)
+        
+        # 7. 输出投影
+        attn_output = self.W_o(attn_output)
+        
+        # 8. 残差连接
+        x = residual + attn_output
+        
+        return x
+```
+
+### 计算空间占用
+
+输入的token要乘以一个权重矩阵，是词嵌入维度 的平方。即 768 * 768 个参数，拆为对等的3份：Q、K、V。一个参数占用2字节。
+
+所以总空间占用为：$$768 \times 768 \times 3 \times 2 \approx 3.5 \text{ MB}$$
+
+这里需要注意的是：权重矩阵只有1个，起初是随机的，我们希望通过训练调整它们，通过多个batch的训练，会加速这个过程。
+
+但是权重矩阵不会随着`batch_size`的增加而增加。
+
+:::info
+当然，你也可以说我每个`batch_size`都创建一个权重矩阵，然后一轮结束之后合并。
+
+这样会占用更多的显存。而且`batch_size`内的token的值不同，所以也不可能刚刚好同时算完。
+
+还不如谁先算好谁合并，始终只有1个权重矩阵。
+:::
+
+也不会随着上下文长度的增加而增加。如果你为 $1024$ 个位置分别创建 $1024$ 个权重矩阵，那么模型学到的规则就会变成：
+
+- 位置 1 的规则： 用 $W_1$ 来算 Query。
+- 位置 2 的规则： 用 $W_2$ 来算 Query。
+
+这样模型就没有通用性。它无法在位置 500 上识别它在位置 10 上学到的语法结构。
+
+我们使用同一个 $W$ 来处理所有位置的 Token。这样，模型学到的规则就是与位置无关的通用规则。
+
+它是如何用 1 个矩阵处理 1024 个 Token 的？
+
+对于GPU来说，输入的参数矩阵是（64，1024，768），可以看成（64*1024，768），然后乘以一个权重矩阵（768，768）
+
+:::tip
+补充：矩阵的乘法是：（m，n）*（n，p）=（m，p） 
+
+```python showLineNumbers
+import numpy as np
+
+a = np.array([[1, 2, 3], 
+              [4, 5, 6]]) # (2,3)
+print(a.shape)# (2,3)
+b = np.array([[7, 8],
+              [9, 10], 
+              [11, 12]])
+print(b.shape) # (3,2)
+c = np.dot(a, b) # 矩阵乘法
+print(c.shape)  # (2,2)
+
+# 输出: [[1*7 + 2*9 + 3*11, 1*8 + 2*10 + 3*12]
+#       [4*7 + 5*9 + 6*11, 4*8 + 5*10 + 6*12]]]
+```
+:::
+
+所以（64*1024，768）*（768，768）=（64*1024，768）。
+
+**注意力层的总显存占用：**
+
+1. **权重矩阵**：$W_q, W_k, W_v, W_o$ 各 $768 \times 768$，共 $4 \times 768 \times 768 \times 2 = 4.7 \text{ MB}$
+
+2. **中间计算结果**：
+   - Q, K, V：$(64, 1024, 768)$，每个 $100 \text{ MB}$，共 $300 \text{ MB}$
+   - 注意力分数矩阵：$(64, 12, 1024, 1024) \times 2B \approx 1.5 \text{ GB}$（这是最大的显存占用！）
+   - 注意力输出：$(64, 1024, 768)$，$100 \text{ MB}$
+
+3. **总显存占用**：约 $2 \text{ GB}$（主要是注意力分数矩阵）
+
+:::warning
+注意力分数矩阵的显存占用是 $B \times H \times T \times T$，当序列长度 $T$ 很大时，显存占用会**平方级增长**！
+
+这就是为什么GPT-3的最大上下文长度只有2048，而GPT-4通过优化（如稀疏注意力）才能支持更长的上下文。
+:::
+
+输入的token要乘以一个权重矩阵，是词嵌入维度 的平方。即 768 * 768 个参数，拆为对等的3份：Q、K、V。一个参数占用2字节。
+
+所以总空间占用为：$$768 \times 768 \times 3 \times 2 \approx 3.5 \text{ MB}$$
+
+这里需要注意的是：权重矩阵只有1个，起初是随机的，我们希望通过训练调整它们，通过多个batch的训练，会加速这个过程。
+
+但是权重矩阵不会随着`batch_size`的增加而增加。
+
+:::info
+当然，你也可以说我每个`batch_size`都创建一个权重矩阵，然后一轮结束之后合并。
+
+这样会占用更多的显存。而且`batch_size`内的token的值不同，所以也不可能刚刚好同时算完。
+
+还不如谁先算好谁合并，始终只有1个权重矩阵。
+:::
+
+也不会随着上下文长度的增加而增加。如果你为 $1024$ 个位置分别创建 $1024$ 个权重矩阵，那么模型学到的规则就会变成：
+
+- 位置 1 的规则： 用 $W_1$ 来算 Query。
+- 位置 2 的规则： 用 $W_2$ 来算 Query。
+
+这样模型就没有通用性。它无法在位置 500 上识别它在位置 10 上学到的语法结构。
+
+我们使用同一个 $W$ 来处理所有位置的 Token。这样，模型学到的规则就是与位置无关的通用规则。
+
+它是如何用 1 个矩阵处理 1024 个 Token 的？
+
+对于GPU来说，输入的参数矩阵是（64，1024，768），可以看成（64*1024，768），然后乘以一个权重矩阵（768，768）
+
+:::tip
+补充：矩阵的乘法是：（m，n）*（n，p）=（m，p） 
+
+```python showLineNumbers
+import numpy as np
+
+a = np.array([[1, 2, 3], 
+              [4, 5, 6]]) # (2,3)
+print(a.shape)# (2,3)
+b = np.array([[7, 8],
+              [9, 10], 
+              [11, 12]])
+print(b.shape) # (3,2)
+c = np.dot(a, b) # 矩阵乘法
+print(c.shape)  # (2,2)
+
+# 输出: [[1*7 + 2*9 + 3*11, 1*8 + 2*10 + 3*12]
+#       [4*7 + 5*9 + 6*11, 4*8 + 5*10 + 6*12]]]
+```
+:::
+
+所以（64*1024，768）*（768，768）=（64*1024，768）。
+
+
+## 多层感知器（MLP）
+
+经过注意力层后，我们得到了每个token的表示。但注意力机制主要是做"信息聚合"（把其他token的信息聚合过来），还需要一个"信息处理"的模块来进一步提取和转换特征。这就是多层感知器（MLP，也叫前馈神经网络，Feed-Forward Network）。
+
+**为什么需要MLP？**
+
+想象你在做阅读理解：
+- 注意力机制：找到文章中哪些句子与问题相关（信息聚合）
+- MLP：理解这些句子的深层含义，提取关键信息（信息处理）
+
+MLP的结构很简单：**扩展 → 激活 → 压缩**
+
+```python showLineNumbers
+class MLP(torch.nn.Module):
+    def __init__(self, n_embd, dropout=0.0):
+        super().__init__()
+        # 扩展层：768 -> 3072（通常扩展4倍）
+        self.fc1 = torch.nn.Linear(n_embd, 4 * n_embd)
+        # 激活函数：ReLU或GELU
+        self.activation = torch.nn.GELU()  # GPT-2使用GELU，比ReLU更平滑
+        # 压缩层：3072 -> 768
+        self.fc2 = torch.nn.Linear(4 * n_embd, n_embd)
+        self.dropout = torch.nn.Dropout(dropout)
+    
+    def forward(self, x):
+        # x: (B, T, 768)
+        x = self.fc1(x)  # (B, T, 3072)
+        x = self.activation(x)  # (B, T, 3072)
+        x = self.fc2(x)  # (B, T, 768)
+        x = self.dropout(x)
+        return x
+```
+
+**为什么扩展4倍？**
+
+扩展可以让模型有更多的"表达空间"来学习复杂的特征。如果只扩展2倍，可能不够；如果扩展8倍，显存占用太大。4倍是一个经验值，在表达能力和计算效率之间取得平衡。
+
+**为什么用GELU而不是ReLU？**
+
+ReLU函数：$f(x) = \max(0, x)$，在 $x < 0$ 时输出0，梯度也是0，可能导致"神经元死亡"。
+
+GELU函数：$f(x) = x \cdot \Phi(x)$，其中 $\Phi(x)$ 是标准正态分布的累积分布函数。GELU更平滑，对小负值也有小的输出，梯度不会完全消失。
+
+```python showLineNumbers
+import torch
+import matplotlib.pyplot as plt
+import numpy as np
+
+x = torch.linspace(-5, 5, 100)
+relu = torch.nn.ReLU()(x)
+gelu = torch.nn.GELU()(x)
+
+# 可视化对比（这里只是说明，实际代码中不需要画图）
+# ReLU: 负值直接截断为0
+# GELU: 负值有小的输出，更平滑
+```
+
+**完整的Transformer块（Transformer Block）**
+
+一个Transformer块 = 注意力层 + MLP层，每层都有残差连接和层归一化：
+
+```python showLineNumbers
+class TransformerBlock(torch.nn.Module):
+    def __init__(self, n_embd, n_head, dropout=0.0):
+        super().__init__()
+        # 注意力层
+        self.attention = AttentionBlock(n_embd, n_head, dropout)
+        # MLP层
+        self.mlp = MLP(n_embd, dropout)
+        # Pre-LN with RMSNorm
+        self.ln1 = torch.nn.RMSNorm(n_embd)
+        self.ln2 = torch.nn.RMSNorm(n_embd)
+    
+    def forward(self, x, mask=None):
+        # 并行 Attention + MLP（现代结构）
+        attn_out = self.attention(self.ln1(x), mask)
+        mlp_out = self.mlp(self.ln2(x))
+        x = x + attn_out + mlp_out  # 并行相加
+        return x
+```
+
+**计算空间占用**
+
+MLP的权重矩阵：
+- $W_1$（扩展层）：$768 \times 3072 = 2,359,296$ 个参数
+- $W_2$（压缩层）：$3072 \times 768 = 2,359,296$ 个参数
+- 总共：$4,718,592$ 个参数
+- 显存占用：$4,718,592 \times 2 = 9.4 \text{ MB}$
+
+中间计算结果：
+- 扩展层输出：$(64, 1024, 3072)$，约 $400 \text{ MB}$
+- MLP输出：$(64, 1024, 768)$，约 $100 \text{ MB}$
+
+**一个Transformer块的总显存占用：**
+- 注意力层：约 $2 \text{ GB}$
+- MLP层：约 $500 \text{ MB}$
+- **总计：约 $3-4 \text{ GB}$**
+
+我们有12层（`n_layer = 12`），所以所有Transformer块的显存占用约为 $40 \text{ GB}$。
+
+:::info
+为什么每层都要有残差连接？
+
+残差连接让梯度可以直接"跳过"某些层，避免梯度消失问题。在12层的深度网络中，如果没有残差连接，底层的梯度会变得非常小，导致训练困难。
+
+残差连接让模型可以学习"增量改进"：如果某一层学不到有用的东西，它至少不会让结果变差（因为可以"跳过"这一层）。
+:::
+
+## 输出概率
+
+经过12层Transformer块后，我们得到了每个token的最终表示，形状是 $(B, T, 768)$。现在需要把这个768维的向量转换成词表大小的概率分布，表示下一个token是词表中每个词的概率。
+
+**为什么需要概率分布？**
+
+模型需要"选择"下一个token。如果直接输出一个token ID，模型就没有"不确定性"的概念。概率分布让模型可以：
+1. 表示"这个token很可能是'的'，但也有可能是'地'"
+2. 支持采样策略（可以随机采样，也可以总是选概率最大的）
+
+**如何从向量转换成概率？**
+
+步骤1：线性投影到词表大小
+
+```python showLineNumbers
+vocab_size = 50000  # 假设词表大小是50000
+# 创建一个线性层：768 -> 50000
+output_projection = torch.nn.Linear(n_embd, vocab_size)
+
+# 假设最后一层的输出是 (64, 1024, 768)
+final_output = transformer_output  # (B, T, 768)
+
+# 投影到词表大小
+logits = output_projection(final_output)  # (B, T, 50000)
+```
+
+`logits` 是"原始分数"，可能是任意大小的正数或负数。
+
+步骤2：Softmax转换成概率
+
+```python showLineNumbers
+# 对最后一个维度（词表维度）做softmax
+probs = F.softmax(logits, dim=-1)  # (B, T, 50000)
+
+# 每一行的50000个数字加起来等于1，表示概率分布
+# 例如，第0个token的概率分布可能是：
+# [0.0001, 0.0002, 0.5, 0.0001, ..., 0.0003]
+# 表示第0个token的下一个token很可能是词表中的第2个词（概率0.5）
+```
+
+**如何选择下一个token？**
+
+有两种策略：
+
+1. **贪心策略（Greedy）**：总是选择概率最大的token
+```python showLineNumbers
+# 对每个位置，选择概率最大的token
+next_token_ids = torch.argmax(probs, dim=-1)  # (B, T)
+```
+
+2. **采样策略（Sampling）**：根据概率分布随机采样
+```python showLineNumbers
+# 根据概率分布采样
+next_token_ids = torch.multinomial(probs.view(-1, vocab_size), num_samples=1)
+next_token_ids = next_token_ids.view(B, T)
+```
+
+采样策略可以让模型生成更多样化的文本，而贪心策略会让模型总是生成"最安全"的选择，可能比较单调。
+
+**温度参数（Temperature）**
+
+在采样时，我们通常使用温度参数来控制采样的"随机性"：
+
+```python showLineNumbers
+temperature = 1.0  # 温度参数
+
+# 温度越高，分布越均匀（更随机）
+# 温度越低，分布越尖锐（更确定）
+scaled_logits = logits / temperature
+probs = F.softmax(scaled_logits, dim=-1)
+```
+
+- `temperature = 1.0`：正常采样
+- `temperature > 1.0`（如2.0）：更随机，生成更多样化
+- `temperature < 1.0`（如0.5）：更确定，生成更保守
+
+**计算空间占用**
+
+输出投影层的权重矩阵：
+- $W_{out}$：$768 \times 50000 = 38,400,000$ 个参数
+- 显存占用：$38,400,000 \times 2 = 76.8 \text{ MB}$
+
+输出logits和概率：
+- logits：$(64, 1024, 50000)$，约 $6.4 \text{ GB}$（这是非常大的显存占用！）
+- probs：$(64, 1024, 50000)$，约 $6.4 \text{ GB}$
+
+:::warning
+输出层的显存占用非常大！这是因为词表大小（50000）很大。
+
+在实际应用中，我们通常：
+1. 只计算最后一个位置的logits（不需要计算所有位置的）
+2. 使用更小的词表（如32000）
+3. 使用梯度检查点（gradient checkpointing）来节省显存
+:::
+
+**完整的Transformer模型**
+
+```python showLineNumbers
+class GPT(torch.nn.Module):
+    def __init__(self, vocab_size, n_embd, n_layer, n_head, block_size, dropout=0.0):
+        super().__init__()
+        self.block_size = block_size
+        
+        # 词嵌入层（无绝对位置嵌入）
+        self.token_embedding = torch.nn.Embedding(vocab_size, n_embd)
+        
+        # Transformer块（使用 Pre-LN 和 RMSNorm）
+        self.blocks = torch.nn.Sequential(*[
+            TransformerBlock(n_embd, n_head, dropout) 
+            for _ in range(n_layer)
+        ])
+        
+        # 输出层（weight tying）
+        self.ln_f = torch.nn.RMSNorm(n_embd)
+        self.head = torch.nn.Linear(n_embd, vocab_size)
+        self.head.weight = self.token_embedding.weight  # weight tying
+        
+        self.dropout = torch.nn.Dropout(dropout)
+    
+    def forward(self, idx, targets=None):
+        B, T = idx.shape
+        
+        # 1. 词嵌入（RoPE 在注意力层中应用）
+        x = self.token_embedding(idx)  # (B, T, n_embd)
+        x = self.dropout(x)
+        
+        # 2. Transformer块（RoPE 在 Attention 中）
+        x = self.blocks(x)
+        
+        # 3. 输出层
+        x = self.ln_f(x)
+        logits = self.head(x)  # (B, T, vocab_size)
+        
+        loss = None
+        if targets is not None:
+            # 计算交叉熵损失
+            loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
+        
+        return logits, loss
+```
+
+**总显存占用估算**
+
+1. Embedding层：约 $100 \text{ MB}$
+2. 12个Transformer块：约 $40 \text{ GB}$
+3. 输出层：约 $6.4 \text{ GB}$
+4. **总计：约 $50 \text{ GB}$**
+
+但实际训练时，还需要存储：
+- 梯度（与参数大小相同）：$50 \text{ GB}$
+- 优化器状态（如Adam需要存储动量和方差）：$100 \text{ GB}$
+- 激活值（中间计算结果）：$20-40 \text{ GB}$
+
+**总显存需求：约 $80-100 \text{ GB}$**
+
+:::info
+这就是为什么训练大模型需要很多GPU！我们的配置（70GB+）是经过优化的，使用了：
+- 混合精度训练（bfloat16）
+- 梯度累积（把batch_size分成多份）
+- 梯度检查点（不存储所有激活值）
+- 模型并行（把模型分到多个GPU上）
+
+如果显存不够，可以：
+1. 减小batch_size（如64 -> 32）
+2. 减小block_size（如1024 -> 512）
+3. 减小n_embd（如768 -> 512）
+4. 减小n_layer（如12 -> 6）
+::: */}
+
+
+## 代码
+
+开源仓库地址：
+
+https://github.com/jingyaogong/minimind-v
+
+https://github.com/jingyaogong/minimind
+
+
+李沐的[动手学深度学习](https://github.com/d2l-ai/d2l-zh)
+
