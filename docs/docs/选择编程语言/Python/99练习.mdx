@@ -891,3 +891,318 @@ def fun(num, list=None):
 x = 9*5
 print(fun(x))# [3, 3, 5]
 ```
+
+### 最少换乘
+
+#### 描述
+
+假设你要从起点去往终点，路上有多个**单向**站点，怎么设计一个算法，找到最少换乘的路线？
+
+这是一个经典的图论问题，可以用广度优先搜索（BFS）来解决。每条路线可以看作是一条边，换乘次数就是路径的边数。
+
+#### 思路
+
+1. 找到起点能去的所有节点
+2. 检查可去节点是否包含终点
+3. 如果不包含则继续前往这些节点的可去节点
+4. 使用广度优先搜索（BFS）确保找到的是最少换乘路线
+5. 使用队列记录当前层级的节点，逐层扩展直到找到终点
+
+#### 题解
+
+```python showLineNumbers
+
+def min_transfers(edges, start, end):
+    """
+    找到从起点到终点的最少换乘路线
+    
+    :param edges: 图的邻接表表示，edges[u] = [v1, v2, ...] 表示从u可以到达的站点
+    :param start: 起点
+    :param end: 终点
+    :return: 最少换乘次数和路径，如果无法到达返回-1和None
+    """
+    if start == end:
+        return 0, [start]
+    
+    # BFS队列，存储(当前站点, 换乘次数, 路径)
+    queue = [(start, 0, [start])]
+    visited = {start}  # 已访问的站点
+    
+    # 只要队列不为空，就继续遍历
+    while queue:
+        # 获取队列中最左侧（最左边是第一个进入队列的元素）元素，并从队列中删除
+        # 当前站点, 换乘次数, 路径
+        current, transfers, path = queue.pop(0)
+        
+        # 遍历所有可达的下一个站点(即当前站点可去的站点)
+        # 如果当前站点没有下一个站点，则跳过
+        # 如果当前站点有下一个站点，则将下一个站点加入队列
+        for next_station in edges.get(current, []):
+            if next_station == end:
+                # 找到终点
+                return transfers + 1, path + [end]
+            # 如果下一个站点没有被访问过，则将下一个站点加入已访问集合，并加入队列
+            # 这一步可以避免重复访问同一个站点，提升算法效率
+            if next_station not in visited:
+                # 将下一个站点加入已访问集合
+                visited.add(next_station)
+                # 将下一个站点加入队列
+                # 换乘次数加1，路径加上下一个站点
+                queue.append((next_station, transfers + 1, path + [next_station]))
+    
+    # 无法到达终点
+    return -1, None
+
+# 测试数据
+if __name__ == '__main__':
+    # 示例：站点A->B->D, A->C->D, A->D
+    edges = {
+        'A': ['B', 'C'],
+        'B': ['C'],
+        'C': ['X'],
+        'X': [],
+        'D': []
+    }
+    
+    transfers, path = min_transfers(edges, 'A', 'D')
+    print(f"最少换乘次数: {transfers}")
+    print(path)  # 最少换乘次数: 1, 路径: A -> D
+```
+
+### 最少价格路径
+
+#### 描述
+
+给定一个带权有向图，每条边都有一个价格（权重），请找到从起点到终点的**价格总和最小**的路径。
+
+这是一个典型的**单源最短路径**问题，可以使用Dijkstra算法来解决（假设所有边权非负）。
+
+#### 思路
+
+1. 初始化起点的距离为0，其他所有节点距离为无穷大
+2. 找到起点能去的所有节点，计算到达这些节点的价格
+3. 选择价格最小的节点作为下一个访问节点
+4. 检查该节点的可去节点，更新到达这些节点的最少价格
+5. 重复步骤3-4，直到访问到终点或所有可达节点都访问完毕
+6. 使用优先队列（堆）来快速找到价格最小的节点
+
+#### 题解
+
+```python showLineNumbers
+def dijkstra(graph, start, end):
+    """
+    使用Dijkstra算法找到从起点到终点的最少价格路径
+    
+    :param graph: 图的邻接表表示，graph[u] = [(v1, weight1), (v2, weight2), ...]
+    :param start: 起点
+    :param end: 终点
+    :return: 最少价格和路径，如果无法到达返回-1和None
+    """
+    # 初始化节点信息字典：每个节点包含价格、前驱节点等信息
+    nodes = {}
+    processed = set()  # 已处理的节点集合
+    
+    # 获取所有节点
+    # 1. 获取所有节点放入 集合，集合具有去重的特点
+    all_nodes = set(graph.keys())
+    # 2. 获取所有邻居节点
+    for neighbors in graph.values():
+        for neighbor, _ in neighbors:
+            all_nodes.add(neighbor) # 将邻居节点加入所有节点集合
+    
+    # 步骤1：初始化起点的距离为0，其他所有节点距离为无穷大
+    for node in all_nodes:
+        nodes[node] = {
+            'price': 0 if node == start else float('inf'),
+            'previous': None # 前一个节点
+        }
+    """
+    all_nodes = {'A', 'B', 'C', 'D'}
+
+    nodes = {'A': {'price': 0, 'previous': None},
+     'D': {'price': inf, 'previous': None}, 
+     'C': {'price': inf, 'previous': None}, 
+     'B': {'price': inf, 'previous': None}}
+    """
+    
+    def find_lowest_price_node():
+        """在所有未处理的节点中，找到价格最小的节点"""
+        lowest_price = float('inf')
+        lowest_price_node = None
+        for node_name, node_info in nodes.items():
+            # 依次取出每个节点，并检查其价格是否小于最低价格
+            # 初始选择中，除了起点是0，其他都是无穷大，所以一定会选择起点
+            if node_name not in processed:  # 只从未处理的节点中查找
+                cost = node_info['price']
+                if cost < lowest_price:
+                    lowest_price = cost
+                    lowest_price_node = node_name
+        return lowest_price_node
+    
+    # 步骤3-5：重复选择价格最小的节点，更新其邻居节点的价格
+    node = find_lowest_price_node()  # 在所有未处理的节点中，找到价格最小的节点
+    
+    while node is not None:  # 只要存在未处理的节点，就继续循环
+
+        # 如果到达终点，可以提前结束（可选优化）
+        if node == end:
+            break
+            
+        price = nodes[node]['price']  # 当前节点的价格
+        
+        # 步骤2和4：找到当前节点能去的所有节点，计算到达这些节点的价格
+        neighbors = graph.get(node, [])  # 当前节点的邻居（从图的邻接表中获取）
+        for neighbor_name, edge_weight in neighbors:  # 遍历当前节点的邻居
+            # 计算到达邻居的价格 = 当前节点价格 + 边权重
+            new_price = price + edge_weight
+            # 如果到达邻居的价格比当前价格更小，则更新邻居的价格
+            if new_price < nodes[neighbor_name]['price']:
+                nodes[neighbor_name]['price'] = new_price  # 更新邻居的价格
+                nodes[neighbor_name]['previous'] = node  # 更新邻居的前一个节点
+        
+        processed.add(node)  # 将当前节点标记为已处理
+        node = find_lowest_price_node()  # 在所有未处理的节点中，找到价格最小的节点
+    
+    # 检查是否能到达终点
+    if nodes[end]['price'] == float('inf'):
+        return -1, None
+    
+    # 重建路径
+    def get_path(node_name):
+        """根据前驱节点重建路径"""
+        path = []
+        current = node_name
+        while current is not None:
+            path.append(current)
+            current = nodes[current]['previous']
+        path.reverse()
+        return path if path else None
+    
+    path = get_path(end)
+    return nodes[end]['price'], path
+
+
+# 测试数据
+if __name__ == '__main__':
+    # 示例图：A->B(1), B->C(2),
+    #                 B->D(5),
+    #       A->C(4),  C->D(1)
+    graph = {
+        'A': [('B', 1), ('C', 4)],
+        'B': [('C', 2), ('D', 5)],
+        'C': [('D', 1)],
+        'D': []
+    }
+    
+    price, path = dijkstra(graph, 'A', 'D')
+    print(f"最少价格: {price}")
+    print(f"路径: {' -> '.join(path)}")  # 最少价格: 4, 路径: A -> B -> C -> D
+```
+
+### 最少交换价格
+
+#### 描述
+
+给定一个带权有向图，每条边都有一个价格（权重），**考虑负权边**的情况，请找到从起点到所有其他顶点的最少价格路径。
+
+当图中存在负权边时，Dijkstra算法不再适用（因为可能出现负环），需要使用**Bellman-Ford算法**或**SPFA算法**。Bellman-Ford算法可以检测负权环，并找到最短路径。
+
+#### 思路
+
+1. 初始化起点的距离为0，其他所有节点距离为无穷大
+2. 对所有边进行V-1次松弛操作（V为顶点数），每次检查所有边是否能更新最短距离
+3. 对于每条边(u, v, w)，如果dist[u] + w < dist[v]，则更新dist[v] = dist[u] + w
+4. 经过V-1次松弛后，如果没有负权环，所有最短路径应该已经找到
+5. 再进行一次松弛操作，如果还能更新距离，说明存在负权环
+6. 使用前驱数组记录路径，便于重建最短路径
+
+#### 题解
+
+```python showLineNumbers
+def bellman_ford(graph, start):
+    """
+    使用Bellman-Ford算法找到从起点到所有顶点的最少价格路径
+    可以处理负权边，并检测负权环
+    
+    :param graph: 图的边列表表示，[(u, v, weight), ...]
+    :param start: 起点
+    :return: (距离字典, 前驱字典, 是否存在负权环)
+    """
+    # 获取所有顶点
+    vertices = set()
+    for u, v, w in graph:
+        vertices.add(u)
+        vertices.add(v)
+    vertices = list(vertices)
+    
+    # 初始化距离和前驱
+    distances = {v: float('inf') for v in vertices}
+    predecessors = {v: None for v in vertices}
+    distances[start] = 0
+    
+    # 松弛操作：进行V-1次（V为顶点数）
+    for _ in range(len(vertices) - 1):
+        updated = False
+        for u, v, weight in graph:
+            if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+                distances[v] = distances[u] + weight
+                predecessors[v] = u
+                updated = True
+        if not updated:
+            break  # 提前退出优化
+    
+    # 检测负权环：再进行一次松弛，如果还能更新，说明存在负权环
+    has_negative_cycle = False
+    for u, v, weight in graph:
+        if distances[u] != float('inf') and distances[u] + weight < distances[v]:
+            has_negative_cycle = True
+            break
+    
+    return distances, predecessors, has_negative_cycle
+
+def get_path(predecessors, start, end):
+    """
+    根据前驱字典重建路径
+    """
+    if end not in predecessors or predecessors[end] is None:
+        return None
+    
+    path = []
+    current = end
+    while current is not None:
+        path.append(current)
+        current = predecessors[current]
+        if current == start:
+            path.append(start)
+            break
+    
+    path.reverse()
+    return path if path[0] == start else None
+
+# 测试数据
+if __name__ == '__main__':
+    # 示例图：A->B(-1), A->C(4), B->C(3), B->D(2), B->E(2), D->B(1), D->C(5), E->D(-3)
+    graph = [
+        ('A', 'B', -1),
+        ('A', 'C', 4),
+        ('B', 'C', 3),
+        ('B', 'D', 2),
+        ('B', 'E', 2),
+        ('D', 'B', 1),
+        ('D', 'C', 5),
+        ('E', 'D', -3)
+    ]
+    
+    distances, predecessors, has_cycle = bellman_ford(graph, 'A')
+    
+    if has_cycle:
+        print("警告：图中存在负权环！")
+    else:
+        print("从A到各顶点的最少价格：")
+        for vertex, dist in distances.items():
+            if dist != float('inf'):
+                path = get_path(predecessors, 'A', vertex)
+                print(f"A -> {vertex}: {dist}, 路径: {' -> '.join(path)}")
+            else:
+                print(f"A -> {vertex}: 无法到达")
+```
