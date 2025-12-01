@@ -307,6 +307,59 @@ print('{:%Y-%m-%d %H:%M:%S}'.format(d)) # 2008-12-03 12:15:58
 # # 2008-12-03 是Python3.0.0的发布日期。
 ```
 
+#### 双花括号转义
+
+在字符串格式化中，双花括号 `{{` 和 `}}` 用于转义，表示字面上的花括号字符。这在定义模板字符串时非常有用，特别是大模型提示词等场景，可以先定义模板，稍后再插入参数。
+
+```python showLineNumbers
+# 定义模板字符串，使用双花括号表示字面上的花括号
+template = "你是一个{{role}}助手，请用{{tone}}的语气回答：{{question}}"
+
+# 稍后通过 format() 方法插入参数
+prompt = template.format(role="专业", tone="友好", question="什么是Python？")
+print(prompt)
+# 输出：你是一个专业助手，请用友好的语气回答：什么是Python？
+
+# 也可以使用关键字参数
+prompt2 = template.format(
+    role="教学",
+    tone="耐心",
+    question="如何学习编程？"
+)
+print(prompt2)
+# 输出：你是一个教学助手，请用耐心的语气回答：如何学习编程？
+
+# 如果模板中需要包含字面上的花括号，使用双花括号转义
+template_with_braces = "变量名：{{name}}，值：{{{{value}}}}"
+result = template_with_braces.format(name="x", value=42)
+print(result)
+# 输出：变量名：x，值：{value}
+```
+:::tip
+f-string 也支持双花括号转义，但需要注意：**f-string 是立即求值的**，在定义时就会执行表达式。如果需要在模板中保留花括号供后续格式化，应该使用普通字符串配合 `.format()` 方法。
+
+```python showLineNumbers
+# f-string 中使用双花括号转义
+name = "Python"
+# 在 f-string 中，双花括号会被转义为单个花括号
+text = f"语言名称：{{name}}"
+print(text)
+# 输出：语言名称：{name}
+
+# 注意：f-string 会立即求值，所以这样写会直接替换变量
+text2 = f"语言名称：{name}"
+print(text2)
+# 输出：语言名称：Python
+
+# 如果需要延迟格式化，使用普通字符串模板
+template = "语言名称：{{name}}"
+# 稍后再格式化
+result = template.format(name="Python")
+print(result)
+# 输出：语言名称：Python
+```
+:::
+
 ### Unicode 和转义字符
 
 Python3 的字符就是`Unicode`字符。

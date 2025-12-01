@@ -784,6 +784,203 @@ print(nike_clothes.__class__)           # <class '__main__.NikeClothes'>
 print(nike_clothes.__class__.__bases__)  # (<class '__main__.Clothes'>,)
 ```
 
+### \_\_dict\_\_和\_\_slots\_\_
+
+默认情况下，Python把各个实例的属性存储在一个名为`__dict__`的字典中。这个字典的键是属性名，值是属性值。
+
+每当属性被增加或删除时，`__dict__`都会被更新。
+
+```python showLineNumbers
+class Clothes(object):
+    def __init__(self, color="green"):
+        self.color = color
+
+# 标准方式增加属性
+my_clothes = Clothes()
+print(my_clothes.__dict__) # {'color': 'green'}
+
+# 动态增加属性
+my_clothes.size = "L"
+print(my_clothes.__dict__) # {'color': 'green', 'size': 'L'}
+
+# 删除属性
+del my_clothes.color
+print(my_clothes.__dict__) # {'size': 'L'}
+```
+
+不过字典占用的空间较大，如果实例的属性较多，可能会占用较多的内存。
+
+如果定义一个名为`__slots__`的类属性，以序列的形式存储属性名称，那么Python将使用`__slots__`指定的数据模型存储实例属性，而不会使用`__dict__`。此时你虽然可以继续定义`__dict__ = {}`，但是它已经不会再动态的添加属性了。
+
+`__slots__`空间占用更小的代价是失去了动态添加属性和弱引用的能力。下面的例子中，你不能添加 `x` 和 `y` 之外的属性。
+
+:::note
+普通引用会增加对象的引用计数，导致对象无法被垃圾回收。
+
+弱引用（weak reference）是一种不增加对象引用计数的引用方式。当对象的所有强引用都被删除后，即使存在弱引用，对象也会被垃圾回收。
+
+弱引用不会阻止对象的销毁，但可以在对象被销毁前访问它。
+:::
+
+`__slots__`必须在定义类时声明，之后再添加或修改均无效。属性名称可以存储在一个元组或列表中，不过我喜欢使用元组，因为这可以明确表明`__slots__`无法修改。
+
+```python showLineNumbers
+# 继承自object，所以默认有__weakref__属性、__dict__属性
+class P1:
+    pass
+
+# 定义了__slots__，所以没有__weakref__属性、__dict__属性
+# 但是多了__slots__属性和'x', 'y'两个定义的属性
+class P2:
+    __slots__ = ('x', 'y')
+print(set(dir(P1())) - set(dir(P2())))
+# {'__dict__', '__weakref__'}
+print(set(dir(P2())) - set(dir(P1())))
+# {'__slots__', 'y', 'x'}
+
+p = P2()
+
+p.x = 10 
+p.y = 20
+print(p.__slots__) # ('x', 'y')
+
+# p.size = 'L' 
+# AttributeError: 'P2' object has no attribute 'size' and no __dict__ for setting new attributes
+```
+
+:::tip
+想把该类的实例作为弱引用的目标，则必须把`'__weakref__'`添加到`__slots__`中。
+
+想把该类的实例继续动态添加属性，则必须把`'__dict__'`添加到`__slots__`中。该实例的非`__slots__`中的属性会存储在`__dict__`中，而不是`__slots__`中。但是这样会导致`__slots__`失去意义。
+
+```python showLineNumbers
+# 定义了__slots__，所以必须把__weakref__添加到__slots__中
+class Pixel2:
+    __slots__ = ('x', 'y','__weakref__')
+
+# 没有定义__slots__，所以默认就有__weakref__属性
+class Pixel3:
+    pass
+
+p = Pixel()
+print("__weakref__" in dir(p)) # False
+p2 = Pixel2()
+print("__weakref__" in dir(p2)) # True
+p3= Pixel3()
+print("__weakref__" in dir(p3)) # True
+
+class Parent:
+    __slots__ = ('x', 'y',"__dict__")
+
+p = Parent()
+p.xx = 1 # 非__slots__中的属性会存储在__dict__中
+p.x = 1 # __slots__中的属性会存储在__slots__中
+print(p.__dict__) # {'xx': 1}
+print(p.__slots__) # ('x', 'y', '__dict__')
+```
+:::
+
+当子类继承父类时，子类会继承父类的`__slots__`，但是会有一些奇特的表现。
+
+```python showLineNumbers
+class P:
+    __slots__ = ("x")
+
+class C(P):
+    pass
+
+class X:
+    pass
+
+# 子类和标准类X，取对称差集发现，子类C本该失去的'__weakref__'和'__dict__'又回来了
+# 同时依然继承了父类的'__slots__'属性和创建的'x'属性
+print(set(dir(C)) ^ set(dir(X)))
+# {'__slots__', 'x'}
+c = C()
+
+c.x = 1
+c.y = 2
+# 这个表现等价于在 __slots__  中添加了 '__weakref__'和'__dict__'
+print(c.__dict__) # {'y': 2}
+
+"""
+为了确保子类的实例也没有`__dict__`属性，必须在子类中再次声明`__slots__`属性。
+
+如果在子类中声明`__slots__= ()`（一个空元组）​，则子类的实例将没有`__dict__`属性，而且只接受基类的`__slots__`属性列出的属性名称。如果子类需要额外属性，则在子类的__slots__属性中列出来。
+"""
+class C2(P):
+    __slots__= ()
+
+class C3(P):
+    __slots__= ("y",)
+```
+
+:::tip
+如果使用得当，则类属性`__slots__`能显著节省内存(60%左右)，不过有几个问题需要注意。
+
+- 每个子类都要重新声明`__slots__`属性，以防止子类的实例有`__dict__`属性。
+- 实例只能拥有`__slots__`列出的属性，除非把`'__dict__'`加入`__slots__`中（但是这样做就失去了节省内存的功效）​。
+- 有`__slots__`的类不能使用`@cached_property`装饰器，除非把`'__dict__'`加入`__slots__`中。
+- 如果不把`'__weakref__'`加入`__slots__`中，那么实例就不能作为弱引用的目标。
+:::
+
+### \_\_match_args\_\_
+
+`__match_args__` 是 Python 3.10+ 引入的类属性，用于在模式匹配（match-case）中定义位置参数的顺序。它允许类指定在类模式匹配时，如何将位置参数映射到类的属性。
+
+在模式匹配中，可以使用位置参数或关键字参数来匹配类的属性：
+
+```python showLineNumbers
+class Point:
+    __match_args__ = ('x', 'y')  # 定义位置参数的顺序
+
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+def process_point(p):
+    match p:
+        # 没有定义__match_args__，只能使用关键字参数匹配
+        # 不能使用位置参数匹配
+        case Point(x=0, y=_):
+            return "y轴上的点"
+        # 定义之后可以使用位置参数匹配，更简洁
+        case Point(_,0):
+            return "x轴上的点"
+        case _:
+            return f"点({p.x}, {p.y})"
+
+print(process_point(Point(0, 5))) # y轴上的点
+print(process_point(Point(3, 0))) # x轴上的点
+print(process_point(Point(2, 3))) # 点(2, 3)
+```
+`__match_args__` 用于定义在模式匹配中使用位置参数时的顺序，关键字参数匹配总是可用，无需 `__match_kwargs__`。
+
+可以自定义 `__match_args__` 来控制哪些属性可以通过位置参数匹配。`@dataclass` 会自动生成 `__match_args__`，除非使用 `kw_only=True`
+
+```python showLineNumbers
+class Point:
+    __match_args__ = ('flag',)  # 定义位置参数的顺序,注意，位置参数必须在默认参数之前。
+
+    def __init__(self, flag, x, y):
+        self.x = x
+        self.y = y
+        self.flag = flag
+
+# 使用关键字参数匹配（总是可用）
+def process_point(p):
+    match p:
+        # 定义__match_args__，只有__match_args__设置的关键字才能使用位置参数匹配
+        case Point(99,x=0, y=0):
+            return "彩蛋"
+        # 异常,因为我们只设置了1个参数可以位置参数匹配，这里传入了3个位置参数，所以报错
+        case Point(100, 0, 0):
+            return "异常"
+print(process_point(Point(99,x = 0, y = 0))) # 彩蛋
+print(process_point(Point(99, 0, 0))) # 彩蛋
+
+print(process_point(Point(100, 0, 0))) # TypeError: Point() accepts 1 positional sub-pattern (3 given)
+```
 
 ## 重载类型转换
 
