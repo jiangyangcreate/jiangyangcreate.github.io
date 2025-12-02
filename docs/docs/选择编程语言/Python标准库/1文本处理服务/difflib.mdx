@@ -1,0 +1,173 @@
+---
+sidebar_position: 2
+title: difflib
+---
+
+`difflib` 是 Python 标准库中用于比较序列差异的模块，核心算法基于 1986 年的 Ratcliff/Obershelp 算法（又称 gestalt pattern matching），至今仍是工业界最常用的文本相似度与 diff 生成工具。
+
+:::info
+不要与 `filecmp` 混淆。  
+`filecmp.cmp(..., shallow=False)` 仅判断文件是否完全相同，且性能远不如直接计算 blake3/xxh3 hash。  
+`filecmp` 唯一仍有价值的场景是 `dircmp` 的目录报告和 `shall=True` 快速过滤。
+:::
+
+## SequenceMatcher
+
+`SequenceMatcher` 是 `difflib` 的底层实现，可比较任意序列（最常用的是字符串），支持计算相似度、提取匹配块等操作。
+
+### ratio()、quick_ratio()、real_quick_ratio()
+
+```python showLineNumbers
+from difflib import SequenceMatcher
+
+def similarity(a: str, b: str) -> float:
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+
+# 示例
+print(similarity("Python is good", "python is good!"))     # 0.9032258064516129
+print(similarity("今天天气很好", "今天天气非常好"))         # 0.8571428571428571
+```
+
+| 方法                  | 精度 | 速度   | 推荐场景                     |
+|-----------------------|------|--------|------------------------------|
+| `ratio()`             | 高   | 中等   | 最终相似度判定（最常用）     |
+| `quick_ratio()`       | 中   | 快     | 海量数据初筛                 |
+| `real_quick_ratio()`  | 低   | 极快   | 亿级文本粗筛                 |
+
+:::info
+`ratio()` 是 `SequenceMatcher` 的核心方法，用于计算两个序列的相似度。它返回一个介于 0.0 和 1.0 之间的浮点数，表示两个序列的相似程度。
+
+推荐用于答案完全一致性判断，例如大模型生成代码与标准答案的完全一致性判断。
+:::
+
+### get_matching_blocks()
+
+返回一个 `Match(a, b, size)` 三元组列表，表示在序列 a 的位置 a 开始、在 b 的位置 b 开始的连续匹配长度为 size。
+
+```python showLineNumbers
+from difflib import SequenceMatcher
+
+s1 = "ABCDEFFF123GGGHIJK"
+s2 = "ABCDXXXFFF456GGGHIJKMNOP"
+
+matcher = SequenceMatcher(None, s1, s2)
+blocks = matcher.get_matching_blocks()
+
+for block in blocks:
+    if block.size > 0:
+        print(f"匹配: '{s1[block.a:block.a+block.size]}' (长度 {block.size})")
+# 匹配: 'ABCDE' (长度 5)
+# 匹配: 'FFF123GGG' (长度 9)   ← 注意：这里是 9，不是 10（因中间数字不同）
+# 匹配: 'HIJK' (长度 4)
+```
+:::tip
+一行代码提取最长公共子串（全局最优）
+
+```python showLineNumbers
+def longest_common_substring(s1: str, s2: str) -> str:
+    matcher = SequenceMatcher(None, s1, s2)
+    match = max(matcher.get_matching_blocks(), key=lambda m: m.size)
+    return s1[match.a:match.a + match.size]
+
+print(longest_common_substring(
+    "ABCDEFFF123GGGHIJK",
+    "ABCDXXXFFF456GGGHIJKMNOP"
+))
+# 输出：FFF123GGG （长度 9，当前全局最长连续公共子串）
+```
+:::
+
+## get_close_matches
+
+从候选列表中返回与目标最相似的 n 个选项。
+
+```python showLineNumbers
+from difflib import get_close_matches
+
+print(get_close_matches("appel", ["apple", "apply", "ape", "banana"], n=3, cutoff=0.6))
+# ['apple', 'apply', 'ape']
+
+print(get_close_matches("grok", ["groq", "gork", "glok"], n=1, cutoff=0.8))
+# ['grok'] 或 []（如果都不达标）
+```
+
+| 参数     | 说明                     | 推荐值         |
+|----------|--------------------------|----------------|
+| `n`      | 返回最多数量             | 1~5            |
+| `cutoff` | 相似度阈值（0~1）        | 0.6~0.8（常用）|
+
+典型应用：命令行参数纠错、配置项拼写提示。
+
+## Differ
+
+```python showLineNumbers
+from difflib import Differ
+
+old = ["第一行", "第二行", "第三行"]
+new = ["第一行", "第二行已修改", "第三行"]
+
+d = Differ()
+diff = list(d.compare(old, new))
+
+print("\n".join(diff))
+#   第一行
+# - 第二行
+# + 第二行已修改
+# ?       ++++++
+#   第三行
+```
+
+前缀含义：
+- `'  '`：两边相同
+- `'- '`：仅在旧文本
+- `'+ '`：仅在新文本
+- `'?'`：指示字符级差异位置
+
+## unified_diff
+
+```python showLineNumbers
+from difflib import unified_diff
+
+old = ["line1\n", "line2\n", "line3\n"]
+new = ["line1\n", "line2 modified\n", "line3\n"]
+
+diff = unified_diff(
+    old, new,
+    fromfile="old.txt",
+    tofile="new.txt",
+    lineterm=""
+)
+
+print("\n".join(diff))
+# --- old.txt
+# +++ new.txt
+# @@ -1,3 +1,3 @@
+#  line1
+# -line2
+# +line2 modified
+#  line3
+```
+
+推荐用于：生成 patch、代码审查、配置变更记录。
+
+## HtmlDiff
+
+```python showLineNumbers
+from difflib import HtmlDiff
+
+old = ["第一行", "第二行", "第三行"]
+new = ["第一行", "第二行已修改", "第三行"]
+
+html = HtmlDiff().make_file(
+    old, new,
+    fromdesc="旧版本",
+    todesc="新版本",
+    context=True,    # 只显示差异附近行
+    numlines=3
+)
+
+with open("diff.html", "w", encoding="utf-8") as f:
+    f.write(html)
+```
+
+生成的 HTML 文件支持行内字符高亮，适合内网配置对比、日志审查页面。

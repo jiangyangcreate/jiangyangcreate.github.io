@@ -1,0 +1,235 @@
+---
+sidebar_position: 4
+title: datetime、zoneinfo、calendar
+---
+
+Python 标准库提供了完整的时间处理工具链，推荐按以下优先级使用：
+
+1. 日常开发：`datetime` + `zoneinfo`  
+2. 仅需简单格式化或判断：直接用 `datetime`  
+3. 输出日历、判断闰年等：`calendar`
+
+## datetime
+
+`datetime` 模块提供对日期和时间的操作，是最核心的时间处理模块。所有类型都是 **immutable** 和 **hashable**，可作为字典键。
+
+### datetime.date：年月日
+
+```python showLineNumbers
+from datetime import date
+
+# 创建
+d = date(2025, 12, 25)
+print(d)                    # 2025-12-25
+print(d.year, d.month, d.day)  # 2025 12 25
+
+# 今天
+today = date.today()
+print(today)                # 2025-12-01（当前日期）
+
+# 常用属性与方法
+print(today.weekday())      # 0=Monday ... 6=Sunday
+print(today.isoweekday())   # 1=Monday ... 7=Sunday
+print(today.isoformat())    # 2025-12-01
+print(today.strftime("%Y年%m月%d日"))  # 2025年12月01日
+```
+
+### datetime.time：时分秒及微秒
+
+```python showLineNumbers
+from datetime import time
+
+t = time(13, 45, 30, 123456)
+print(t)                    # 13:45:30.123456
+print(t.hour, t.minute, t.second, t.microsecond)
+```
+
+### datetime.datetime：完整日期时间（最常用）
+
+```python showLineNumbers
+from datetime import datetime
+
+# 创建
+dt = datetime(2025, 12, 25, 13, 45, 30)
+print(dt)                   # 2025-12-25 13:45:30
+
+# 现在（带时区信息推荐用 zoneinfo）
+now = datetime.now()
+print(now)
+
+# 带时区（Python 3.9+ 推荐写法）
+from zoneinfo import ZoneInfo
+shanghai = ZoneInfo("Asia/Shanghai")
+now_sh = datetime.now(shanghai)
+print(now_sh)               # 2025-12-01 08:xx:xx+08:00
+print(now_sh.tzname())      # CST
+```
+
+### datetime.timedelta：时间差计算
+
+```python showLineNumbers
+from datetime import datetime, timedelta
+
+now = datetime.now()
+one_day = timedelta(days=1)
+tomorrow = now + one_day
+yesterday = now - one_day
+
+print(tomorrow)
+print(yesterday)
+
+# 常用构造
+print(now + timedelta(hours=3, minutes=30))
+print(now + timedelta(weeks=2))
+```
+
+### datetime.timezone：固定偏移时区（简单场景）
+
+```python showLineNumbers
+from datetime import timezone, timedelta
+
+UTC = timezone.utc
+UTC8 = timezone(timedelta(hours=8), "UTC+8")
+
+dt = datetime(2025, 1, 1, 12, 0, tzinfo=UTC8)
+print(dt)                   # 2025-01-01 12:00:00+08:00
+```
+
+### 字符串 ↔ datetime 互转（推荐格式）
+
+```python showLineNumbers
+from datetime import datetime
+
+# 字符串 → datetime
+dt = datetime.strptime("2025-12-25 13:45", "%Y-%m-%d %H:%M")
+print(dt)
+
+# datetime → 字符串
+print(dt.strftime("%Y年%m月%d日 %H:%M"))   # 2025年12月25日 13:45
+print(dt.isoformat())                     # 2025-12-25T13:45:00
+```
+
+## zoneinfo
+
+Python 3.9+ 引入，基于 IANA 时区数据库（tz database），完全替代旧的 `pytz`。
+
+### ZoneInfo：获取时区对象
+
+```python showLineNumbers
+from zoneinfo import ZoneInfo
+from datetime import datetime
+
+sh = ZoneInfo("Asia/Shanghai")
+ny = ZoneInfo("America/New_York")
+tk = ZoneInfo("Asia/Tokyo")
+
+now_sh = datetime.now(sh)
+print(now_sh)               # 2025-12-01 08:xx:xx+08:00
+print(now_sh.tzname())      # CST
+print(now_sh.utcoffset())   # 8:00:00
+```
+
+### 常用时区别名
+
+| 时区名称                   | 说明               |
+|----------------------------|--------------------|
+| `"Asia/Shanghai"`          | 中国大陆           |
+| `"Asia/Hong_Kong"`         | 香港               |
+| `"Asia/Tokyo"`             | 日本               |
+| `"America/New_York"`       | 美东               |
+| `"Europe/London"`          | 伦敦（含夏令时）   |
+| `"UTC"`                    | 协调世界时         |
+
+### 时区转换
+
+```python showLineNumbers
+from zoneinfo import ZoneInfo
+from datetime import datetime
+
+sh = ZoneInfo("Asia/Shanghai")
+ny = ZoneInfo("America/New_York")
+
+now_sh = datetime.now(sh)
+now_ny = now_sh.astimezone(ny)
+
+print(f"上海时间: {now_sh}")
+print(f"纽约时间: {now_ny}")
+```
+
+:::tip
+`zoneinfo` 自动处理夏令时，**不要再用 `pytz`**。  
+系统没有 IANA 数据库时会抛 `ZoneInfoNotFoundError`，可通过 `tzdata` 包解决（pip install tzdata）。
+:::
+
+## calendar
+
+提供日历相关的计算函数，所有功能均为纯计算，不涉及时区。
+
+### 判断闰年
+
+```python showLineNumbers
+import calendar
+
+print(calendar.isleap(2024))   # True
+print(calendar.isleap(2025))   # False
+```
+
+### 获取某月天数及星期几
+
+```python showLineNumbers
+import calendar
+
+# 返回 (星期几开始, 当月天数)
+print(calendar.monthrange(2025, 2))   # (5, 28) → 2025年2月1日是星期六，有28天
+
+# 月历矩阵（周一作为一周开始）
+print(calendar.monthcalendar(2025, 12))
+# [[1, 2, 3, 4, 5, 6, 7],
+#  [8, 9, 10, 11, 12, 13, 14], ...]
+```
+
+### 打印月历
+
+```python showLineNumbers
+import calendar
+
+print(calendar.month(2025, 12))
+#     December 2025
+# Mo Tu We Th Fr Sa Su
+#  1  2  3  4  5  6  7
+#  8  9 10 11 12 13 14
+# ...
+```
+
+### TextCalendar / HTMLCalendar
+
+```python showLineNumbers
+import calendar
+
+# 文本日历（周一为一周开始）
+cal = calendar.TextCalendar(calendar.MONDAY)
+print(cal.formatmonth(2025, 12))
+
+# 生成 HTML 日历
+html_cal = calendar.HTMLCalendar(calendar.MONDAY)
+print(html_cal.formatmonth(2025, 12)[:200] + "...")
+```
+
+### 实用常量
+
+```python showLineNumbers
+import calendar
+
+print(calendar.MONDAY)      # 0
+print(calendar.SUNDAY)      # 6
+print(calendar.day_name[0]) # 'Monday'
+print(calendar.month_name[12])  # 'December'
+```
+
+**结论：**
+
+- 日常开发 99% 的场景：`datetime` + `zoneinfo` 足够  
+- 需要输出日历或判断闰年：用 `calendar`  
+- 再也不需要第三方库 `arrow`、`pendulum`、`pytz` 了（除非极特殊需求）
+```
+
