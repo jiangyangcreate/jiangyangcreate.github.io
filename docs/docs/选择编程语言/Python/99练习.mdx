@@ -7,6 +7,424 @@ title: 练习
 
 ## 程序题
 
+### 折纸问题
+
+一张厚度为N层的纸，每次对折都会使厚度变为原来的2倍，问第多少次对折后，其高度超过珠穆朗玛峰的高度(8848.86米)
+
+#### 题解
+
+```python showLineNumbers
+def fold_paper(thickness, height):
+    count = 0
+    while thickness < height:
+        thickness *= 2
+        count += 1
+    return count
+
+print(fold_paper(0.0001, 8848.86))
+```
+
+### 打印时间
+
+#### 描述
+
+请从00:00依次打印出一天的时间
+示例：
+
+- 23 : 52
+- 23 : 53
+- 23 : 54
+
+#### 题解
+
+```python showLineNumbers 
+
+for 时钟 in range(24):
+    for 分钟 in range(60):
+        print(时钟, ':', 分钟)
+
+```
+
+
+
+### 九九乘法表
+
+#### 描述
+
+要求使用循环代码打印一个九九乘法表出来.如下
+
+```bash
+1*1=1 
+
+1*2=2 2*2=4 
+
+1*3=3 2*3=6 3*3=9 
+
+1*4=4 2*4=8 3*4=12 4*4=16 
+
+1*5=5 2*5=10 3*5=15 4*5=20 5*5=25 
+
+1*6=6 2*6=12 3*6=18 4*6=24 5*6=30 6*6=36 
+
+1*7=7 2*7=14 3*7=21 4*7=28 5*7=35 6*7=42 7*7=49 
+
+1*8=8 2*8=16 3*8=24 4*8=32 5*8=40 6*8=48 7*8=56 8*8=64      
+
+1*9=9 2*9=18 3*9=27 4*9=36 5*9=45 6*9=54 7*9=63 8*9=72 9*9=81 
+```
+
+#### 题解
+
+```python showLineNumbers 
+#方法一
+for i in range(1,10):
+    print()
+    for j in range(1,i+1):
+        print('%d*%d=%d' % (j,i,i*j),end=' ')
+
+#方法二
+i=1
+while i<10: #控制行，1到9
+    j=1
+    while j <= i: #控制每行显示的数量，1到9
+        print("%d*%d=%d"%(j,i,i*j),end=' ') #输出
+        j+=1 #每行显示的数量加1
+    print("\n") #每一行结束换行
+    i+=1 #行数加1
+
+```
+
+
+### 复利的力量
+
+小明从2026年1月1日每日定投100元，年化收益率为10%，考虑到交易日，问小明在第几年可以实现100万的目标？
+
+#### 题解
+
+```python showLineNumbers
+# 小明从2026年1月1日每日定投300元，年化收益率为10%，考虑到交易日（周一到周五），问小明在第几年可以实现100万的目标？
+
+from datetime import datetime, timedelta
+import calendar
+
+# 计算参数
+daily_investment = 100  # 每日定投金额（元）
+annual_return_rate = 0.10  # 年化收益率 10%
+target_amount = 1000000  # 目标金额 100万元
+
+# 起始日期：2026年1月1日
+start_date = datetime(2026, 1, 1)
+current_date = start_date
+
+# 计算每日收益率（假设每年约250个交易日）
+# 先估算，后面会根据实际交易日数调整
+estimated_trading_days = 250
+daily_return_rate = (1 + annual_return_rate) ** (1 / estimated_trading_days) - 1
+
+print("=" * 60)
+print("定投计算（实际交易日：周一到周五）")
+print("=" * 60)
+print(f"起始日期: {start_date.strftime('%Y年%m月%d日')}")
+print(f"每日收益率: {daily_return_rate * 100:.6f}%")
+print(f"每日定投: {daily_investment} 元")
+print(f"目标金额: {target_amount:,} 元")
+print("-" * 60)
+
+# 模拟每日定投
+total_amount = 0  # 当前总金额
+trading_day_count = 0  # 交易日计数
+current_year = start_date.year
+trading_days_this_year = 0  # 当前年度的交易日数
+last_year_end_amount = 0  # 上一年结束时的金额
+last_year_trading_days = 0  # 上一年的交易日数
+
+while total_amount < target_amount:
+    # 检查是否是工作日（周一到周五，weekday()返回0-6，0是周一，6是周日）
+    weekday = current_date.weekday()  # 0=周一, 1=周二, ..., 4=周五, 5=周六, 6=周日
+    
+    # 检查是否跨年（在处理交易日之前）
+    if current_date.year > current_year:
+        year_num = current_year - start_date.year + 1
+        print(f"第 {year_num} 年（{current_year} 年）结束时，总金额: {last_year_end_amount:,.2f} 元，交易日数: {last_year_trading_days} 天")
+        current_year = current_date.year
+        trading_days_this_year = 0
+        last_year_end_amount = total_amount
+        last_year_trading_days = 0
+    
+    if weekday < 5:  # 周一到周五（0-4）是交易日
+        trading_day_count += 1
+        trading_days_this_year += 1
+        last_year_trading_days = trading_days_this_year
+        
+        # 先计算昨日收益（复利）
+        total_amount = total_amount * (1 + daily_return_rate)
+        
+        # 然后投入今日的定投金额
+        total_amount += daily_investment
+        last_year_end_amount = total_amount
+        
+        # 检查是否达到目标（在交易日达到目标）
+        if total_amount >= target_amount:
+            break
+    
+    # 移动到下一天
+    current_date += timedelta(days=1)
+
+# 打印最后一年（如果还没打印）
+if trading_days_this_year > 0:
+    year_num = current_year - start_date.year + 1
+    print(f"第 {year_num} 年（{current_year} 年）结束时，总金额: {last_year_end_amount:,.2f} 元，交易日数: {trading_days_this_year} 天")
+
+# 计算达到目标的实际日期
+# 由于在交易日达到目标后立即break，current_date就是达到目标的日期
+actual_date = current_date
+year_num = actual_date.year - start_date.year + 1
+
+print("-" * 60)
+print("\n最终结果：")
+print("=" * 60)
+print(f"达到目标日期: {actual_date.strftime('%Y年%m月%d日')} ({calendar.day_name[actual_date.weekday()]})")
+print(f"达到目标时间: 第 {year_num} 年（{actual_date.year} 年）的第 {trading_days_this_year} 个交易日")
+print(f"总金额: {total_amount:,.2f} 元")
+print(f"累计交易日数: {trading_day_count} 天")
+print(f"累计投资本金: {trading_day_count * daily_investment:,.2f} 元")
+print(f"累计收益: {total_amount - trading_day_count * daily_investment:,.2f} 元")
+print(f"收益率: {(total_amount - trading_day_count * daily_investment) / (trading_day_count * daily_investment) * 100:.2f}%")
+print(f"实际经过天数: {(actual_date - start_date).days + 1} 天")
+print("=" * 60)
+```
+
+### 字典排序
+
+#### 描述
+
+将字典数组按字典的某个key排序
+
+#### 题解
+
+```python showLineNumbers 
+# 方法1：
+sorted(d.cop(),key = lambda i:i[k])
+
+# 方法2：
+heappush(h,(i[k],i)) for i in d
+```
+
+### 单例模式
+
+单例模式目的：让类创建的对象，在系统中只有 **唯一的一个实例**
+
+特点：每一次执行 `类名()` 返回的对象，内存地址是相同的
+
+#### 方法一：使用 `__new__` 方法
+
+##### 基本实现
+
+```python showLineNumbers   title="单例模式基础实现"
+class MusicPlayer(object):
+    # 记录第一个被创建对象的引用
+    instance = None
+    
+    def __new__(cls, *args, **kwargs):
+        # 1. 判断类属性是否为空对象
+        if cls.instance is None:
+            # 调用父类方法为第一个对象分配空间
+            cls.instance = super().__new__(cls)
+        
+        # 2. 返回类属性保存的对象引用
+        return cls.instance
+
+# 测试单例效果
+player1 = MusicPlayer()
+player2 = MusicPlayer()
+
+print(f"player1: {player1}")
+print(f"player2: {player2}")
+print(f"是否为同一对象: {player1 is player2}")  # True
+```
+
+##### 优化：只初始化一次
+
+
+上述实现中，虽然返回的是同一个对象，但 `__init__` 方法会被多次调用
+
+
+```python showLineNumbers  title="确保初始化只执行一次" {16-23}
+class MusicPlayer(object):
+    # 记录第一个被创建对象的引用
+    instance = None
+    # 记录初始化执行状态
+    init_flag = False
+
+    def __new__(cls, *args, **kwargs):
+        if cls.instance is None:
+            cls.instance = super().__new__(cls)
+        return cls.instance
+
+    def __init__(self):
+        # 1. 判断是否执行过初始化动作
+        if MusicPlayer.init_flag:
+            return
+        
+        # 2. 如果没有执行过就执行初始化动作
+        print("播放器初始化")
+        
+        # 3. 修改初始化状态
+        MusicPlayer.init_flag = True
+
+
+# 测试
+player1 = MusicPlayer()  # 输出: 播放器初始化
+player2 = MusicPlayer()  # 不会再次初始化
+```
+
+#### 方法二：使用装饰器 
+
+```python showLineNumbers  title="装饰器实现单例"
+def singleton(cls):
+    """单例装饰器"""
+    instances = {}
+    
+    def get_instance(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+    
+    return get_instance
+
+@singleton
+class MySingleton:
+    def __init__(self, param):
+        self.param = param
+        print(f"初始化参数: {param}")
+
+# 使用示例
+if __name__ == '__main__':
+    a = MySingleton(10)  # 输出: 初始化参数: 10
+    b = MySingleton(20)  # 不会再次初始化
+    
+    print(f"a.param: {a.param}")  # 10
+    print(f"b.param: {b.param}")  # 10
+    print(f"是否为同一对象: {a is b}")  # True
+```
+
+:::tip 装饰器优势
+- 代码简洁优雅
+- 可重用性强
+- 不需要修改原类的内部结构
+:::
+
+#### 方法三：使用类方法 
+
+```python showLineNumbers  title="类方法实现单例"
+class Singleton(object):
+    def __init__(self, name):
+        self.name = name
+
+    @classmethod
+    def instance(cls, *args, **kwargs):
+        if not hasattr(cls, "_instance"):
+            cls._instance = cls(*args, **kwargs)
+        return cls._instance
+
+# 使用示例
+single_1 = Singleton.instance('第1次创建')
+single_2 = Singleton.instance('第2次创建')
+
+print(f"single_1.name: {single_1.name}")  # 第1次创建
+print(f"single_2.name: {single_2.name}")  # 第1次创建
+print(f"是否为同一对象: {single_1 is single_2}")  # True
+```
+
+##### 线程安全版本
+
+:::warning 多线程问题
+上述实现在多线程环境下不安全，需要加锁保护
+:::
+
+```python showLineNumbers  title="线程安全的类方法单例"
+from threading import RLock
+
+class Singleton(object):
+    _lock = RLock()  # 可重入锁
+
+    def __init__(self, name):
+        self.name = name
+
+    @classmethod
+    def instance(cls, *args, **kwargs):
+        # 使用锁确保线程安全
+        with cls._lock:
+            if not hasattr(cls, "_instance"):
+                cls._instance = cls(*args, **kwargs)
+        return cls._instance
+```
+
+#### 方法四：使用元类
+
+```python showLineNumbers  title="元类实现单例"
+class SingletonType(type):
+    def __call__(cls, *args, **kwargs):
+        # 创建 cls 的对象时调用
+        if not hasattr(cls, "_instance"):
+            # 创建 cls 的对象
+            cls._instance = super(SingletonType, cls).__call__(*args, **kwargs)
+        return cls._instance
+
+class Singleton(metaclass=SingletonType):
+    def __init__(self, name):
+        self.name = name
+
+# 使用示例
+single_1 = Singleton('第1次创建')
+single_2 = Singleton('第2次创建')
+
+print(f"single_1.name: {single_1.name}")  # 第1次创建
+print(f"single_2.name: {single_2.name}")  # 第1次创建
+print(f"是否为同一对象: {single_1 is single_2}")  # True
+```
+
+:::info 元类原理
+- `Singleton` 是元类 `SingletonType` 的实例
+- `Singleton('参数')` 实际上是调用元类的 `__call__` 方法
+- 使用 `super()` 避免递归调用
+:::
+
+#### 方法五：使用模块
+
+:::tip 官方推荐
+这是 Python 官方推荐的单例实现方式，简单且天然线程安全
+:::
+
+```python showLineNumbers  title="my_singleton.py - 模块单例"
+class Singleton:
+    def __init__(self, name):
+        self.name = name
+
+    def do_something(self):
+        print(f"{self.name} 正在工作...")
+
+# 创建单例实例
+singleton = Singleton('模块单例')
+```
+
+```python showLineNumbers  title="使用模块单例"
+# file1.py
+from my_singleton import singleton
+print(f"file1 中的 singleton: {singleton}")
+
+# file2.py  
+from my_singleton import singleton
+print(f"file2 中的 singleton: {singleton}")
+
+# 测试文件
+import file1
+import file2
+
+print(f"是否为同一对象: {file1.singleton is file2.singleton}")  # True
+```
+
+
 ### 进度条打印
 
 #### 描述
@@ -127,74 +545,6 @@ while True:
     if 找到了吗 != 0 : # 不等于 0 就代表它找到了
         break
     print('【查无此人】') # 1号位
-```
-
-### 打印时间
-
-#### 描述
-
-请从00:00依次打印出一天的时间
-示例：
-
-- 23 : 52
-- 23 : 53
-- 23 : 54
-
-#### 题解
-
-```python showLineNumbers 
-
-for 时钟 in range(24):
-    for 分钟 in range(60):
-        print(时钟, ':', 分钟)
-
-```
-
-### 九九乘法表
-
-#### 描述
-
-要求使用循环代码打印一个九九乘法表出来.如下
-
-```bash
-1*1=1 
-
-1*2=2 2*2=4 
-
-1*3=3 2*3=6 3*3=9 
-
-1*4=4 2*4=8 3*4=12 4*4=16 
-
-1*5=5 2*5=10 3*5=15 4*5=20 5*5=25 
-
-1*6=6 2*6=12 3*6=18 4*6=24 5*6=30 6*6=36 
-
-1*7=7 2*7=14 3*7=21 4*7=28 5*7=35 6*7=42 7*7=49 
-
-1*8=8 2*8=16 3*8=24 4*8=32 5*8=40 6*8=48 7*8=56 8*8=64      
-
-1*9=9 2*9=18 3*9=27 4*9=36 5*9=45 6*9=54 7*9=63 8*9=72 9*9=81 
-```
-
-#### 题解
-
-```python showLineNumbers 
-#方法一
-for i in range(1,10):
-    print()
-    for j in range(1,i+1):
-        print('%d*%d=%d' % (j,i,i*j),end=' ')
-
-#方法二
-i=1
-while i<10: #控制行，1到9
-    j=1
-    while j <= i: #控制每行显示的数量，1到9
-        print("%d*%d=%d"%(j,i,i*j),end=' ') #输出
-        j+=1 #每行显示的数量加1
-    print("\n") #每一行结束换行
-    i+=1 #行数加1
-
 ```
 
 
@@ -484,257 +834,7 @@ p.color_percent()
 # 黑色 占比百分之 100
 ```
 
-
-### 字典排序
-
-#### 描述
-
-将字典数组按字典的某个key排序
-
-#### 题解
-
-```python showLineNumbers 
-# 方法1：
-sorted(d.cop(),key = lambda i:i[k])
-
-# 方法2：
-heappush(h,(i[k],i)) for i in d
-```
-
-### 单例模式
-
-单例模式目的：让类创建的对象，在系统中只有 **唯一的一个实例**
-
-特点：每一次执行 `类名()` 返回的对象，内存地址是相同的
-
-#### 方法一：使用 `__new__` 方法
-
-##### 基本实现
-
-```python showLineNumbers   title="单例模式基础实现"
-class MusicPlayer(object):
-    # 记录第一个被创建对象的引用
-    instance = None
-    
-    def __new__(cls, *args, **kwargs):
-        # 1. 判断类属性是否为空对象
-        if cls.instance is None:
-            # 调用父类方法为第一个对象分配空间
-            cls.instance = super().__new__(cls)
-        
-        # 2. 返回类属性保存的对象引用
-        return cls.instance
-
-# 测试单例效果
-player1 = MusicPlayer()
-player2 = MusicPlayer()
-
-print(f"player1: {player1}")
-print(f"player2: {player2}")
-print(f"是否为同一对象: {player1 is player2}")  # True
-```
-
-##### 优化：只初始化一次
-
-
-上述实现中，虽然返回的是同一个对象，但 `__init__` 方法会被多次调用
-
-
-```python showLineNumbers  title="确保初始化只执行一次" {16-23}
-class MusicPlayer(object):
-    # 记录第一个被创建对象的引用
-    instance = None
-    # 记录初始化执行状态
-    init_flag = False
-
-    def __new__(cls, *args, **kwargs):
-        if cls.instance is None:
-            cls.instance = super().__new__(cls)
-        return cls.instance
-
-    def __init__(self):
-        # 1. 判断是否执行过初始化动作
-        if MusicPlayer.init_flag:
-            return
-        
-        # 2. 如果没有执行过就执行初始化动作
-        print("播放器初始化")
-        
-        # 3. 修改初始化状态
-        MusicPlayer.init_flag = True
-
-
-# 测试
-player1 = MusicPlayer()  # 输出: 播放器初始化
-player2 = MusicPlayer()  # 不会再次初始化
-```
-
-#### 方法二：使用装饰器 
-
-```python showLineNumbers  title="装饰器实现单例"
-def singleton(cls):
-    """单例装饰器"""
-    instances = {}
-    
-    def get_instance(*args, **kwargs):
-        if cls not in instances:
-            instances[cls] = cls(*args, **kwargs)
-        return instances[cls]
-    
-    return get_instance
-
-@singleton
-class MySingleton:
-    def __init__(self, param):
-        self.param = param
-        print(f"初始化参数: {param}")
-
-# 使用示例
-if __name__ == '__main__':
-    a = MySingleton(10)  # 输出: 初始化参数: 10
-    b = MySingleton(20)  # 不会再次初始化
-    
-    print(f"a.param: {a.param}")  # 10
-    print(f"b.param: {b.param}")  # 10
-    print(f"是否为同一对象: {a is b}")  # True
-```
-
-:::tip 装饰器优势
-- 代码简洁优雅
-- 可重用性强
-- 不需要修改原类的内部结构
-:::
-
-#### 方法三：使用类方法 
-
-```python showLineNumbers  title="类方法实现单例"
-class Singleton(object):
-    def __init__(self, name):
-        self.name = name
-
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        if not hasattr(cls, "_instance"):
-            cls._instance = cls(*args, **kwargs)
-        return cls._instance
-
-# 使用示例
-single_1 = Singleton.instance('第1次创建')
-single_2 = Singleton.instance('第2次创建')
-
-print(f"single_1.name: {single_1.name}")  # 第1次创建
-print(f"single_2.name: {single_2.name}")  # 第1次创建
-print(f"是否为同一对象: {single_1 is single_2}")  # True
-```
-
-##### 线程安全版本
-
-:::warning 多线程问题
-上述实现在多线程环境下不安全，需要加锁保护
-:::
-
-```python showLineNumbers  title="线程安全的类方法单例"
-from threading import RLock
-
-class Singleton(object):
-    _lock = RLock()  # 可重入锁
-
-    def __init__(self, name):
-        self.name = name
-
-    @classmethod
-    def instance(cls, *args, **kwargs):
-        # 使用锁确保线程安全
-        with cls._lock:
-            if not hasattr(cls, "_instance"):
-                cls._instance = cls(*args, **kwargs)
-        return cls._instance
-```
-
-#### 方法四：使用元类
-
-```python showLineNumbers  title="元类实现单例"
-class SingletonType(type):
-    def __call__(cls, *args, **kwargs):
-        # 创建 cls 的对象时调用
-        if not hasattr(cls, "_instance"):
-            # 创建 cls 的对象
-            cls._instance = super(SingletonType, cls).__call__(*args, **kwargs)
-        return cls._instance
-
-class Singleton(metaclass=SingletonType):
-    def __init__(self, name):
-        self.name = name
-
-# 使用示例
-single_1 = Singleton('第1次创建')
-single_2 = Singleton('第2次创建')
-
-print(f"single_1.name: {single_1.name}")  # 第1次创建
-print(f"single_2.name: {single_2.name}")  # 第1次创建
-print(f"是否为同一对象: {single_1 is single_2}")  # True
-```
-
-:::info 元类原理
-- `Singleton` 是元类 `SingletonType` 的实例
-- `Singleton('参数')` 实际上是调用元类的 `__call__` 方法
-- 使用 `super()` 避免递归调用
-:::
-
-#### 方法五：使用模块
-
-:::tip 官方推荐
-这是 Python 官方推荐的单例实现方式，简单且天然线程安全
-:::
-
-```python showLineNumbers  title="my_singleton.py - 模块单例"
-class Singleton:
-    def __init__(self, name):
-        self.name = name
-
-    def do_something(self):
-        print(f"{self.name} 正在工作...")
-
-# 创建单例实例
-singleton = Singleton('模块单例')
-```
-
-```python showLineNumbers  title="使用模块单例"
-# file1.py
-from my_singleton import singleton
-print(f"file1 中的 singleton: {singleton}")
-
-# file2.py  
-from my_singleton import singleton
-print(f"file2 中的 singleton: {singleton}")
-
-# 测试文件
-import file1
-import file2
-
-print(f"是否为同一对象: {file1.singleton is file2.singleton}")  # True
-```
-
 ## 算法题
-
-### 冒泡排序
-
-#### 描述
-
-给定一个列表，请你对列表的元素进行排序
-
-#### 题解
-
-```python showLineNumbers  
-list1 = [13, 22, 6, 99, 11, 0]
-
-for a in range(len(list1)):
-    for b in range(a,len(list1)):
-        if list1[a] < list1[b]:  #如果m大于了n
-           list1[a] ,list1[b] =  list1[b],list1[a]#交换位置
-print(list1)
-```
-
 
 ### 二分查找
 
@@ -761,6 +861,76 @@ print(binary_search([1, 2, 6, 7, 8, 9, 10], 0))# -1
 print(binary_search([1, 2, 6, 7, 8, 9, 10], 6))# 2
 ```
 
+
+### 冒泡排序
+
+#### 描述
+
+给定一个列表，请你对列表的元素进行排序
+
+#### 题解
+
+```python showLineNumbers  
+list1 = [13, 22, 6, 99, 11, 0]
+
+for a in range(len(list1)):
+    for b in range(a,len(list1)):
+        if list1[a] < list1[b]:  #如果m大于了n
+           list1[a] ,list1[b] =  list1[b],list1[a]#交换位置
+print(list1)
+```
+
+
+### 快速排序
+
+#### 描述
+
+快速排序（Quicksort）是对冒泡排序的一种改进算法。
+
+该算法的实现基本可分为以下几步：
+
+在数组中选一个基准数（通常为数组第一个）。
+将数组中小于基准数的数据移到基准数左边，大于基准数的移到右边
+对于基准数左、右两边的数组，不断重复以上两个过程，直到每个子集只有一个元素，即为全部有序。
+
+请你编写它的实现代码。
+
+#### 题解
+
+```python showLineNumbers  
+def quick_sort(arr):
+    """
+    快速排序
+    :param arr: 待排序的List
+    :return: 排序后的List
+    """
+    # 递归结束条件：如果列表长度小于等于1，直接返回
+    if len(arr) <= 1:
+        return arr
+    
+    # 创建左右2个空列表
+    left = []
+    right = []
+    
+    # 选择一个选中值（pivot），选择第一个元素
+    pivot = arr[0]
+    
+    # 将元素分配到左右列表
+    for i in range(1, len(arr)):
+        if arr[i] <= pivot:  # 小于等于pivot的元素放入左列表
+            left.append(arr[i])
+        else:  # 大于pivot的元素放入右列表
+            right.append(arr[i])
+    
+    # 递归排序左右两部分，并合并结果
+    return quick_sort(left) + [pivot] + quick_sort(right)
+
+# 测试数据
+if __name__ == '__main__':
+    arr = [17, 56, 71, 38, 61, 62, 48, 28, 57, 42, 10, 21, 12, 90]  # 长度为14
+    sorted_arr = quick_sort(arr)
+    print("快速排序结果：", sorted_arr)
+```
 
 ### 密码组合
 
@@ -818,57 +988,6 @@ def generate_parenthesis(n):
 print(generate_parenthesis(3))# ['((()))', '(()())', '(())()', '()(())', '()()()']  
 ```
 
-### 快速排序
-
-#### 描述
-
-快速排序（Quicksort）是对冒泡排序的一种改进算法。
-
-该算法的实现基本可分为以下几步：
-
-在数组中选一个基准数（通常为数组第一个）。
-将数组中小于基准数的数据移到基准数左边，大于基准数的移到右边
-对于基准数左、右两边的数组，不断重复以上两个过程，直到每个子集只有一个元素，即为全部有序。
-
-请你编写它的实现代码。
-
-#### 题解
-
-```python showLineNumbers  
-def quick_sort(arr):
-    """
-    快速排序
-    :param arr: 待排序的List
-    :return: 排序后的List
-    """
-    # 递归结束条件：如果列表长度小于等于1，直接返回
-    if len(arr) <= 1:
-        return arr
-    
-    # 创建左右2个空列表
-    left = []
-    right = []
-    
-    # 选择一个选中值（pivot），选择第一个元素
-    pivot = arr[0]
-    
-    # 将元素分配到左右列表
-    for i in range(1, len(arr)):
-        if arr[i] <= pivot:  # 小于等于pivot的元素放入左列表
-            left.append(arr[i])
-        else:  # 大于pivot的元素放入右列表
-            right.append(arr[i])
-    
-    # 递归排序左右两部分，并合并结果
-    return quick_sort(left) + [pivot] + quick_sort(right)
-
-# 测试数据
-if __name__ == '__main__':
-    arr = [17, 56, 71, 38, 61, 62, 48, 28, 57, 42, 10, 21, 12, 90]  # 长度为14
-    sorted_arr = quick_sort(arr)
-    print("快速排序结果：", sorted_arr)
-```
-
 ### 质数分解
 
 #### 描述
@@ -899,6 +1018,31 @@ print(fun(x))# [3, 3, 5]
 假设你要从起点去往终点，路上有多个**单向**站点，怎么设计一个算法，找到最少换乘的路线？
 
 这是一个经典的图论问题，可以用广度优先搜索（BFS）来解决。每条路线可以看作是一条边，换乘次数就是路径的边数。
+
+
+图数据结构定义：
+
+```python
+edges = {
+    'A': ['B', 'C'],
+    'B': ['C'],
+    'C': ['D'],
+    'D': [],
+}
+```
+
+如下图所示：
+
+```mermaid
+graph LR
+    A[A] --> B[B]
+    A --> C[C]
+    B --> C
+    C --> D[D]
+    classDef nodeStyle fill:#9f6,stroke:#333,stroke-width:2px
+    class A,B,C,D nodeStyle
+```
+
 
 #### 思路
 
@@ -959,14 +1103,13 @@ if __name__ == '__main__':
     edges = {
         'A': ['B', 'C'],
         'B': ['C'],
-        'C': ['X'],
-        'X': [],
+        'C': ['D'],
         'D': []
     }
     
     transfers, path = min_transfers(edges, 'A', 'D')
     print(f"最少换乘次数: {transfers}")
-    print(path)  # 最少换乘次数: 1, 路径: A -> D
+    print(path)  
 ```
 
 ### 最少价格路径
@@ -976,6 +1119,34 @@ if __name__ == '__main__':
 给定一个带权有向图，每条边都有一个价格（权重），请找到从起点到终点的**价格总和最小**的路径。
 
 这是一个典型的**单源最短路径**问题，可以使用Dijkstra算法来解决（假设所有边权非负）。
+
+图数据结构定义：
+
+```python
+graph = {
+    'A': [('B', 1), ('C', 4)],
+    'B': [('C', 2), ('D', 5)],
+    'C': [('D', 1)],
+    'D': []
+}
+```
+
+如下图所示：
+
+```mermaid
+graph LR
+    A[A] -->|1| B[B]
+    B -->|2| C
+    A -->|4| C[C]
+    B -->|5| D[D]
+    C -->|1| D
+    classDef nodeStyle fill:#9f6,stroke:#333,stroke-width:2px
+    class A,B,C,D nodeStyle
+```
+
+虽然`A` -> `B` -> `D` 或 `A` -> `C` -> `D` 的路径最短，但价格较高。
+
+其中沿着`A` -> `B` -> `C` -> `D` 的路径，价格总和最小，为`1 + 2 + 1 = 4`。
 
 #### 思路
 
@@ -1206,3 +1377,124 @@ if __name__ == '__main__':
             else:
                 print(f"A -> {vertex}: 无法到达")
 ```
+
+### 树
+
+树是一种特殊的图，没有环路。其中更特殊的是二叉树。二叉树是一种每个节点最多有两个子节点的树。
+
+其中左子节点及其所有子节点称为左子树，右子节点及其所有子节点称为右子树。
+
+树兼顾了数组与链表的优点，即可以快速访问任意元素，又可以快速插入和删除元素。
+
+BST树满足普通二叉树的条件，同时：左子节点与左子树总是比父节点要小，右子节点与右子树总是比父节点要大。
+
+假设其根节点为：10 ，左节点为5，右节点为20 则表示为：`[10, 5, 20]`
+
+如果5有左节点为2，右节点为7。20没有左节点，有右节点为25。则表示为：`[10, 5, 20, 2, 7, None,25]`
+
+如下图所示：
+
+```mermaid
+graph TD;
+    classDef nodeStyle fill:#9f6,stroke:#333,stroke-width:2px;
+    classDef nullStyle fill:#ddd,stroke:#999,stroke-width:1px,stroke-dasharray: 5 5;
+    10[10]-->5[5];
+    10[10]-->20[20];
+    5[5]-->2[2];
+    5[5]-->7[7];
+    20[20]-->None[None];
+    20[20]-->25[25];
+    class 10,5,20,2,7,25 nodeStyle;
+    class None nullStyle;
+```
+
+这棵树从根节点出发，到任意子节点，最多只有两条边。所以树的高度为2。
+
+同样的这组数据，也可绘制以25为根节点的树，所有比25小的都在左侧，但是这样树会很高（去往左侧节点需要走很多步）。
+
+如下图所示：
+
+```mermaid
+graph TD;
+    classDef nodeStyle fill:#f96,stroke:#333,stroke-width:2px;
+    classDef nullStyle fill:#ddd,stroke:#999,stroke-width:1px,stroke-dasharray: 5 5;
+    25[25]-->None1[None];
+    25-->20[20];
+    20-->10[10];
+    20-->None2[None];
+    10-->7[7];
+    10-->None3[None];
+    7-->5[5];
+    7-->None4[None];
+    5-->2[2];
+    5-->None5[None];
+    class 25,20,10,7,5,2 nodeStyle;
+    class None1 nullStyle;
+    class None2,None3,None4,None5,None6 nullStyle;
+```
+
+这棵树高度为5，所有节点都形成了一条链，访问最左侧的节点2需要经过5步，效率很低。
+
+AVL树是一种平衡二叉树，它保证树的左右节点尽量平衡，即左右子树的高度差不超过1。
+
+在上面不平衡的树中，你可以把位于中间的节点`10`或者节点`7`，这样可以把树大致对折。持续对折所有节点，直到所有节点都高度差不超过1为止。
+:::info
+在AVL树中，每个节点存储一个平衡因子，如果仅有左子树或仅有右子树，则平衡因子为1或-1。如果左右子树都有，则平衡因子和为0。
+
+如果左子树还有左子树，没有右子树，则总平衡因子为2，其绝对值大于1。此时需要进行左旋转。
+
+如果右子树还有右子树，没有左子树，则总平衡因子为-2，其绝对值大于1。此时需要进行右旋转。
+
+叶子节点由于没有子节点，所以平衡因子为0。
+:::
+
+每当数据被插入，其可以通过O(logn)时间复杂度找到插入位置。
+
+然后对每个父节点更新其平衡因子（父节点数量小于logn）。如果发生不平衡，则最多进行1次旋转操作，即可恢复平衡（常量操作）。
+
+所以插入操作的时间复杂度为：
+
+O(logn) + O(logn) + O(1) = 2O(logn)
+
+大O表示法中，常量可以忽略不计，所以插入操作的时间复杂度为：O(logn)。
+
+:::tip
+另一种是伸展树，其访问性能很高，每次访问后，会将访问节点移动到根节点，从而提高后续访问性能。
+
+其工作原理是：你在伸展树中查找过一次节点后，会将该节点移动到根节点，后续再次访问该节点时，可以一瞬间找到该节点。
+
+所有经常访问的节点，都可以会聚集在根节点附近，从而提高访问性能。代价是无法保持自平衡，偶尔访问很偏远的节点，需要更多的时间。
+
+但在大部分情况下，伸展树的访问性能很高，可以接受。
+:::
+
+B树是一种广义的二叉树，其每个节点可以有多个子节点，每个节点可以有多个键值。主要用于数据库索引。
+
+在计算机真实进行数据库检索时，需要移动物理部件到指定位置，这称为**寻道**。
+
+寻道时间非常长，好比你去超市买东西，假设你从家走到超市买了一个面包，然后从超市走到家，发现也许应该再买一瓶水。往返很耗时。
+
+B树的理念是：既然都去超市了，不如把这个超市的东西都加载到内存里。免得反复**寻道**。所以B树的子节点更多。
+
+B+树是B树的一种变种和改进，在数据库系统中应用更加广泛。B+树与B树的主要区别在于：
+
+1. **数据存储位置**：
+   - B树：内部节点既存储键值，也存储实际数据
+   - B+树：只有叶子节点存储实际数据，内部节点只存储键值和指向子节点的指针
+
+2. **叶子节点结构**：
+   - B+树的叶子节点通过指针相互连接，形成有序链表
+   - 这使得范围查询和顺序访问非常高效
+
+3. **树的高度**：
+   - 由于B+树内部节点不存储数据，在相同数据量下，B+树通常比B树更矮
+   - 更少的层级意味着更少的磁盘I/O操作
+
+4. **查询性能**：
+   - 对于精确查询，B树和B+树性能相近
+   - 对于范围查询，B+树性能明显优于B树，因为可以通过叶子节点的链表顺序访问
+
+继续用超市的比喻：B+树就像是在超市门口放了一个**目录架**，目录架上只写了商品类别和对应的货架编号（内部节点存储键值），而实际的商品（数据）都放在货架上（叶子节点）。当你想找某个商品时，先看目录找到货架位置，然后直接去货架拿商品。如果你要买多个同类商品，可以在同一个货架上依次拿取，非常方便。
+
+由于B+树这些优势，大多数现代数据库系统（如MySQL的InnoDB引擎、PostgreSQL等）都采用B+树作为索引结构，特别适合处理大量的范围查询和排序操作。
+
