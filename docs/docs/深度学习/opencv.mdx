@@ -3,6 +3,9 @@ sidebar_position: 3
 title: OpenCV
 ---
 
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
 早期计算机处理的数据有2种：文本数据、图像数据。其中文本数据又称为序列数据，图像数据又称为网格数据。
 
 计算机视觉（Computer Vision）是人工智能的一个重要分支，它研究如何让计算机“看”和“理解”图像和视频。也叫机器视觉（Machine Vision）。
@@ -11,7 +14,7 @@ title: OpenCV
 
 它向前承接传统以数组为单位的图像处理，向后允许你加载一些现成的算法、模型，是传统图像处理与深度学习之间重要的桥梁。
 
-目前OpenCV主要用于<Highlight color="g">图像的预处理作为深度学习模型的输入</Highlight>、或者<Highlight color="g">用较低的资源运行深度学习模型</Highlight>。
+目前OpenCV主要用于<Highlight color="g">图像的预处理作为深度学习模型的输入</Highlight>。
 
 ## 安装
 
@@ -1803,6 +1806,194 @@ if __name__ == "__main__":
 
 如果你不想从头写模型，直接使用 Ultralytics YOLO（v11）是目前最推荐的工业级方案。
 
-训练好的 PyTorch / YOLO 模型都可以非常方便地导出为 ONNX 格式，并用 OpenCV DNN 模块加载推理。
+:::tip
+训练好的 PyTorch / YOLO 模型都可以导出为 ONNX 格式，并用 OpenCV DNN 模块加载推理。
 
-使用 OpenCV 依赖极轻、CPU 性能尚可，适合资源受限的边缘设备。
+经过测试：opencv加载YOLOv11模型，与原生yolo的FPS一致、内存占用一致。Opencv的CPU占用率更高。
+
+所以使用OpenCV的唯一原因是可以用`C++`版本的代码，在无python依赖的设备上运行，适合资源受限的边缘设备。
+:::
+
+### 导出模型
+
+```python showLineNumbers
+from ultralytics import YOLO
+import os
+import shutil
+
+def export_yolo_to_onnx(model_path, output_path, imgsz=640, batch_size=1):
+    model = YOLO(model_path)
+    model.export(
+        format='onnx',
+        imgsz=imgsz,
+        batch=batch_size,
+        simplify=True,
+        opset=11,
+        dynamic=False,
+        half=False
+    )
+    
+    # 重命名到指定路径
+    base_name = os.path.splitext(model_path)[0]
+    auto_path = base_name + '.onnx'
+    if os.path.exists(auto_path) and auto_path != output_path:
+        shutil.move(auto_path, output_path)
+    
+    print(f"导出完成: {output_path}")
+
+
+if __name__ == "__main__":
+    # 导出yolo11n.pt模型（官方模板）为onnx格式
+    export_yolo_to_onnx("yolo11n.pt", "yolo11n.onnx", imgsz=640, batch_size=1)
+```
+
+### 使用模型
+
+<Tabs>
+  <TabItem value="ultralytics" label="Ultralytics" default>
+
+```python showLineNumbers
+from ultralytics import YOLO
+import cv2
+import time
+
+# 加载YOLO模型（使用.pt文件，原生格式）
+model = YOLO("yolo11n.pt")  # 或者使用 "yolo11n.onnx" 也可以
+
+# 打开摄像头
+cap = cv2.VideoCapture(0)
+
+if not cap.isOpened():
+    print("无法打开摄像头！")
+    exit()
+
+print("摄像头已打开，按 'q' 键退出")
+
+# 实时检测循环
+pTime = 0
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        print("无法读取摄像头画面")
+        break
+    
+    # 记录开始时间（计算整个循环的FPS，包括所有操作）
+    loop_start = time.time()
+    
+    # YOLO原生推理（自动处理预处理和后处理）
+    results = model(frame, verbose=False)
+    
+    # 绘制检测结果
+    annotated_frame = results[0].plot()
+    
+    # 计算整个循环的FPS（公平比较）
+    cTime = time.time()
+    fps = 1.0 / (cTime - pTime) if (cTime - pTime) > 0 else 0
+    pTime = cTime
+    
+    # 显示FPS和推理时间（可选）
+    inference_time = results[0].speed['inference']  # ms
+    cv2.putText(annotated_frame, f"FPS: {fps:.1f} (Loop)", (10, 30), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
+    cv2.putText(annotated_frame, f"Inference: {inference_time:.1f}ms", (10, 60), 
+                cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+    
+    # 显示画面
+    cv2.imshow("YOLO 实时检测", annotated_frame)
+    
+    # 按 'q' 键退出
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
+
+# 释放资源
+cap.release()
+cv2.destroyAllWindows()
+print("已关闭摄像头")
+```
+
+  </TabItem>
+  <TabItem value="opencv" label="OpenCV" default>
+```python showLineNumbers
+import cv2
+import numpy as np
+import time
+
+# 配置
+ONNX_PATH = "yolo11n.onnx"
+CONF_THRESHOLD = 0.45
+INPUT_SIZE = 640
+USE_CUDA = True
+
+# COCO类名
+COCO_CLASSES = ['person', 'bicycle', 'car', 'motorcycle', 'airplane', 'bus', 'train', 'truck', 'boat', 'traffic light',
+    'fire hydrant', 'stop sign', 'parking meter', 'bench', 'bird', 'cat', 'dog', 'horse', 'sheep', 'cow',
+    'elephant', 'bear', 'zebra', 'giraffe', 'backpack', 'umbrella', 'handbag', 'tie', 'suitcase', 'frisbee',
+    'skis', 'snowboard', 'sports ball', 'kite', 'baseball bat', 'baseball glove', 'skateboard', 'surfboard',
+    'tennis racket', 'bottle', 'wine glass', 'cup', 'fork', 'knife', 'spoon', 'bowl', 'banana', 'apple',
+    'sandwich', 'orange', 'broccoli', 'carrot', 'hot dog', 'pizza', 'donut', 'cake', 'chair', 'couch',
+    'potted plant', 'bed', 'dining table', 'toilet', 'tv', 'laptop', 'mouse', 'remote', 'keyboard', 'cell phone',
+    'microwave', 'oven', 'toaster', 'sink', 'refrigerator', 'book', 'clock', 'vase', 'scissors', 'teddy bear',
+    'hair drier', 'toothbrush']
+
+# 加载模型
+net = cv2.dnn.readNetFromONNX(ONNX_PATH)
+if USE_CUDA and cv2.cuda.getCudaEnabledDeviceCount() > 0:
+    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
+
+# 打开摄像头
+cap = cv2.VideoCapture(0)
+pTime = 0
+
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        break
+    
+    # 推理
+    t0 = time.time()
+    blob = cv2.dnn.blobFromImage(frame, 1/255.0, (INPUT_SIZE, INPUT_SIZE), swapRB=True)
+    net.setInput(blob)
+    output = np.squeeze(net.forward()).T
+    
+    # 后处理
+    boxes, scores = output[:, :4], output[:, 4:84]
+    max_scores = np.max(scores, axis=1)
+    class_ids = np.argmax(scores, axis=1)
+    mask = max_scores > CONF_THRESHOLD
+    
+    # 坐标转换
+    h, w = frame.shape[:2]
+    scale_x, scale_y = w / INPUT_SIZE, h / INPUT_SIZE
+    boxes_masked = boxes[mask]
+    final_boxes = [[int((cx - bw/2) * scale_x), int((cy - bh/2) * scale_y), 
+                    int(bw * scale_x), int(bh * scale_y)] 
+                   for cx, cy, bw, bh in boxes_masked]
+    
+    # NMS并绘制
+    scores_masked = max_scores[mask]
+    class_ids_masked = class_ids[mask]
+    indices = cv2.dnn.NMSBoxes(final_boxes, scores_masked.tolist(), CONF_THRESHOLD, 0.5)
+    if len(indices) > 0:
+        for i in indices.flatten():
+            x, y, bw, bh = final_boxes[i]
+            label = f"{COCO_CLASSES[class_ids_masked[i]]} {scores_masked[i]:.2f}"
+            cv2.rectangle(frame, (x, y), (x+bw, y+bh), (0, 255, 0), 2)
+            cv2.putText(frame, label, (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+    
+    # FPS
+    cTime = time.time()
+    fps = 1 / (cTime - pTime) if (cTime - pTime) > 0 else 0
+    pTime = cTime
+    cv2.putText(frame, f"FPS: {fps:.1f}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+    cv2.putText(frame, f"Inference: {(time.time()-t0)*1000:.1f}ms", (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 0), 2)
+    
+    cv2.imshow("YOLO Webcam", frame)
+    if cv2.waitKey(1) == 27:
+        break
+
+cap.release()
+cv2.destroyAllWindows()
+```
+  </TabItem>
+</Tabs>
