@@ -1,11 +1,13 @@
 ---
-sidebar_position: 1
-title: LeNet-5
+sidebar_position: 5
+title: 经典论文
 ---
+
+## LeNet-5
 
 LeNet-5被认为是卷积神经网络（CNN）的开山之作，主要用于手写数字识别。它包含了卷积层、池化层和全连接层，是现代CNN的雏形。
 
-## 卷积
+### 卷积
 
 
 卷积神经网络(convolutional neural network)简称CNN。卷积神经网络的核心是卷积核，卷积核在图像处理领域可以用来提取图像的纵向和横向特征。
@@ -150,7 +152,7 @@ $$
 
 通过这个例子，可以清晰地看到卷积核是如何对矩阵进行操作并生成输出的。
 
-### 常见卷积核
+#### 常见卷积核
 
 
 1. **水平边缘检测**：
@@ -340,7 +342,7 @@ plt.show()
 
 ```
 
-## 池化
+### 池化
 
 
 池化（Pooling）是一种用于减少卷积神经网络（CNN）中特征图大小的操作。它通过将特征图上的局部区域进行聚合，得到一个更小的特征图。
@@ -510,7 +512,7 @@ print(out_put)
 ```
 
 
-## 步幅
+### 步幅
 
 步幅表示卷积核移动的步长，步幅越大，卷积核每次跳跃的距离就越多，卷积核的感受野越小。
 :::tip
@@ -610,7 +612,7 @@ if __name__ == "__main__":
 ```
 
 
-## 手写数字识别
+### 手写数字识别
 
 
 import Tabs from '@theme/Tabs';
@@ -1005,3 +1007,69 @@ for ep in range(epochs):
   </TabItem>
 
 </Tabs>
+
+
+## AlexNet
+
+在2012年ImageNet图像识别挑战赛中取得了巨大突破，是深度学习在计算机视觉领域爆发的标志。它比LeNet-5更深、更宽，使用了ReLU激活函数、Dropout等技术。
+
+证明了GPU可以大幅提升神经网络的训练速度,证明了深度学习在计算机视觉领域的有效性。
+
+:::info
+《ImageNet Classification with Deep Convolutional Neural Networks》截止2025年，谷歌学术总引用次数排名第3。
+:::
+
+### ReLU激活函数
+
+### Dropout
+
+## ResNet
+
+ResNet引入了“残差连接”（Residual Connection），解决了深度神经网络中梯度消失和网络退化的问题，使得可以训练非常深的网络（例如152层）。
+
+是深度学习领域最重要的突破之一，使得训练超深网络成为可能，极大地提升了图像识别的准确率。
+
+:::info
+《Deep Residual Learning for Image Recognition》截止2025年，机器视觉标签下，谷歌学术总引用次数排名第1。
+:::
+
+### 残差连接
+
+## Adam
+
+提出了一种高效且自适应的随机优化算法，通过结合一阶矩（动量）和二阶矩（自适应学习率）的估计，为每个模型参数独立调整学习率。
+
+大幅简化了深度学习模型的训练过程，减少了手动调整学习率的需要，并保证了在稀疏梯度（尤其是在 NLP 中）下的稳定收敛。
+
+成为深度学习，特别是自然语言处理（NLP）和 Transformer 架构的默认优化器之一。
+
+:::info
+《Adam: A Method for Stochastic Optimization》截止2025年，谷歌学术总引用次数排名第6。
+:::
+
+## Batch Normalizations
+
+提出了一种规范化网络层输入的方法，解决了训练深度网络时“内部协变量偏移”（Internal Covariate Shift）的问题，即中间层输入的分布在训练过程中不断变化的现象。
+
+使得研究人员能够使用更高的学习率和更深的（更复杂的）网络架构进行训练，同时极大地加速了模型的收敛速度。
+
+有效充当正则化器，减少了对 Dropout 等其他正则化技术的依赖。
+
+:::info
+《Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariate Shift》截止2025年，谷歌学术总引用次数排名第8。
+:::
+
+## LSTM
+
+:::info
+LSTM（长短期记忆网络）是深度学习中最重要的架构之一。1997 年由 Hochreiter 和 Schmidhuber 提出，专门设计用于解决传统 RNN 的梯度消失问题，能够学习长期依赖关系。
+
+**LSTM 的核心创新：**
+- **门控机制**：通过遗忘门、输入门、输出门控制信息流动
+- **细胞状态**：信息高速公路，让梯度能够长距离传播
+- **长期记忆**：有效捕获序列中的长期依赖关系
+
+《Long Short-Term Memory》论文截止 2025 年，谷歌学术总引用次数排名第 5，是深度学习领域最具影响力的论文之一。
+
+[原始论文：Long Short-Term Memory (1997)](https://www.bioinf.jku.at/publications/older/2604.pdf)
+:::

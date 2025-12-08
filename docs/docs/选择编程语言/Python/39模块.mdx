@@ -261,14 +261,29 @@ print(math.sqrt(16)) # 4.0
 ```bash showLineNumbers
 # 安装最新版
 python -m pip install SomePackage            # latest version
+
 # 安装指定版本
 python -m pip install 'SomePackage==1.0.4'   # specific version
+
 # 安装最小版本
 python -m pip install 'SomePackage>=1.0.4'   # minimum version
+
+# 交叉条件，安装版本不为2.4.0且最小版本为1.8.0
+python -m pip install 'SomePackage!=2.4.0,>=1.8.0'
+
+# 交叉条件，安装版本不为1.4且最小版本为1.1.0
+python -m pip install 'SomePackage<1.4,>=1.1.0'
+
 # 升级至最新版本
 python -m pip install --upgrade SomePackage
 ```
 :::
+:::warning
+当你的版本条件里出现了 `<`、`>`、`<=`、`>=`、`!=` 这些特殊符号时必须加引号。
+
+因为在命令行中他们会被解释为重定向符号，所以必须加引号。
+:::
+
 
 此外，有些包作者会仅在 GitHub 提供源码，需要我们自己编译安装。
 
