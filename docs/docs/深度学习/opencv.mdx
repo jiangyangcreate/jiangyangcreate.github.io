@@ -344,6 +344,37 @@ cv2.waitKey(1000)
 # 关闭所有窗口
 cv2.destroyAllWindows()
 ```
+### 绘制箭头
+
+函数签名：`cv2.arrowedLine(img, start_point, end_point, color, thickness, tipLength) -> img`
+
+参数说明：
+
+- `img`：图像对象
+- `start_point`：起点坐标
+- `end_point`：终点坐标
+- `color`：颜色
+- `thickness`：线宽
+- `tipLength`：箭头占比
+
+```python showLineNumbers
+import cv2
+img = cv2.imread("top.png")
+
+# 假设 Agent 决定点击 (800, 450)
+start_point = (0, 0)   # 从下往上画一支箭，更像人伸手
+end_point   = (100, 250)   # 指向目标按钮
+
+img_with_arrow = cv2.arrowedLine(
+    img, start_point, end_point,
+    color=(0, 255, 255),      # 黄箭头
+    thickness=8,              # 粗箭头，摄像头里都看得清
+    tipLength=0.3             # 箭头占比，越大越明显
+)
+
+cv2.imwrite("agent_intent.jpg", img_with_arrow)
+```
+
 
 ### PIL库绘制中文
 
@@ -442,6 +473,74 @@ img3 = cv2.addWeighted(img1, 1, img2, 1,0)
 cv2.imshow("img4", img3)
 cv2.waitKey(0)
 ```
+:::
+
+### 图像横向与纵向拼接
+
+图像拼接的前提是两张图片在拼接方向上的尺寸相同（横向拼接要求高度相同，纵向拼接要求宽度相同）。
+
+横向拼接函数签名：`cv2.hconcat(src, dst) -> dst` 或 `np.hstack((img1, img2, ...)) -> dst`
+
+纵向拼接函数签名：`cv2.vconcat(src, dst) -> dst` 或 `np.vstack((img1, img2, ...)) -> dst`
+
+参数说明：
+
+- `src`：图像列表或元组
+- `dst`：输出图像
+
+```python showLineNumbers
+import cv2
+import numpy as np
+
+# 读取两张图片
+img1 = cv2.imread("img1.jpg")
+img2 = cv2.imread("img2.jpg")
+
+# 确保两张图片高度相同（横向拼接）
+h1, w1 = img1.shape[:2]
+h2, w2 = img2.shape[:2]
+if h1 != h2:
+    # 将高度较小的图片调整到与高度较大的图片相同
+    if h1 < h2:
+        img1 = cv2.resize(img1, (w1, h2))
+    else:
+        img2 = cv2.resize(img2, (w2, h1))
+
+# 方法1：使用 cv2.hconcat 横向拼接
+img_horizontal = cv2.hconcat([img1, img2])
+
+# 方法2：使用 np.hstack 横向拼接（效果相同）
+# img_horizontal = np.hstack((img1, img2))
+
+# 确保两张图片宽度相同（纵向拼接）
+h1, w1 = img1.shape[:2]
+h2, w2 = img2.shape[:2]
+if w1 != w2:
+    # 将宽度较小的图片调整到与宽度较大的图片相同
+    if w1 < w2:
+        img1 = cv2.resize(img1, (w2, h1))
+    else:
+        img2 = cv2.resize(img2, (w1, h2))
+
+# 方法1：使用 cv2.vconcat 纵向拼接
+img_vertical = cv2.vconcat([img1, img2])
+
+# 方法2：使用 np.vstack 纵向拼接（效果相同）
+# img_vertical = np.vstack((img1, img2))
+
+# 显示结果
+cv2.imshow("Horizontal", img_horizontal)
+cv2.imshow("Vertical", img_vertical)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+# 保存结果
+cv2.imwrite("horizontal.jpg", img_horizontal)
+cv2.imwrite("vertical.jpg", img_vertical)
+```
+
+:::tip
+如果图片尺寸不一致，需要先使用 `cv2.resize()` 调整尺寸，确保在拼接方向上尺寸相同。
 :::
 
 ## 基础图像操作
@@ -813,8 +912,8 @@ HSV：相比RGB相比，HSV能更好的表示同个颜色的不同值（饱和�
 
 ### 灰度图
 
-灰度图
-适用于图像处理，如边缘检测及其应用：图像分割、轮廓检测
+灰度图适用于图像处理，如边缘检测及其应用：图像分割、轮廓检测
+
 只有1个通道，取值范围是0-255，表示颜色的亮度
 
 ```python showLineNumbers
@@ -842,10 +941,7 @@ cv2.destroyAllWindows()
 
 ### 二值化图
 
-二值化图
-适用于图像压缩
-只有1个通道，取值范围是0或1
-
+二值化图，适用于图像压缩。只有1个通道，取值范围是0或1
 
 | 方法 | 核心思想 | 如何工作？ | 优点 | 缺点 | 适用场景 |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -873,6 +969,28 @@ cv2.destroyAllWindows()
 归一化的目的是消除数据量纲和尺度的影响，使得不同尺度或单位的数据可以在同一水平上进行比较或处理。
 :::
 
+函数签名：`cv2.threshold(img, thresh, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU) -> retval, dst`
+
+参数说明：
+
+- `img`：输入灰度图像
+- `thresh`：阈值（Otsu方法中通常设为0，会自动计算最佳阈值）
+- `255`：当像素值超过阈值时赋予的新值（maxValue）
+- `cv2.THRESH_BINARY + cv2.THRESH_OTSU`：二值化类型，OTSU会自动计算最佳阈值
+
+主要用于缺陷检测
+
+函数签名：`cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2) -> dst`
+
+参数说明：
+
+- `img`：输入灰度图像
+- `255`：当像素值超过阈值时赋予的新值（maxValue）
+- `cv2.ADAPTIVE_THRESH_GAUSSIAN_C`：自适应方法，使用高斯加权
+- `11`：用于计算阈值的邻域大小（blockSize，必须为奇数）
+- `2`：从平均值或加权和中减去的常数（C）
+
+主要用于光照不均匀的场景
 
 ```python showLineNumbers
 import cv2
@@ -935,11 +1053,11 @@ def get_binary_image(img, method, *args, **kwargs):
         # 全局平均值法
         _, binary = cv2.threshold(img, img.mean(), 255, cv2.THRESH_BINARY)
     elif method == 'adaptive_mean':
-        # 自适应均值阈值法
+        # 自适应均值阈值法（光照不均匀时效果更好）
         binary = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
                                        cv2.THRESH_BINARY, 11, 2)
     elif method == 'adaptive_gaussian':
-        # 自适应高斯阈值法
+        # 自适应高斯阈值法（光照不均匀时效果更好）
         binary = cv2.adaptiveThreshold(img, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, 
                                        cv2.THRESH_BINARY, 11, 2)
     elif method == 'otsu':
@@ -1027,6 +1145,41 @@ cv2.destroyAllWindows()
 - 顶帽: 原图 - 开运算，用于提取图像中的小噪声
 - 黑帽: 闭运算 - 原图，用于填充图像中的小孔洞
 :::
+
+### 开运算和闭运算
+
+开运算和闭运算主要用于去除图像中的小噪声和小孔洞、粘连断裂。
+
+开运算函数签名：`cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel) -> dst`
+
+闭运算函数签名：`cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel) -> dst`
+
+参数说明：
+
+- `img`：输入图像
+- `cv2.MORPH_OPEN`：开运算操作类型（先腐蚀后膨胀）
+- `cv2.MORPH_CLOSE`：闭运算操作类型（先膨胀后腐蚀）
+- `kernel`：形态学操作的核
+
+```python showLineNumbers
+import cv2
+import numpy as np
+
+img = cv2.imread("dt2.png")
+kernel = np.ones((3, 3), np.uint8)
+
+# 开运算：先腐蚀后膨胀，用于去除图像中的小噪声
+opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
+
+# 闭运算：先膨胀后腐蚀，用于填充图像中的小孔洞
+closing = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+
+cv2.imshow("Original", img)
+cv2.imshow("Opening", opening)
+cv2.imshow("Closing", closing)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+```
 
 
 ### 模糊
@@ -1159,7 +1312,7 @@ cv2.destroyAllWindows()
 
 ## 算法指路
 
-下面是Opencv常用的算法，每个算法都比较复杂且可能随时间变化出现新的算法，因此随用随学即可。
+下面是Opencv常用的算法，每个算法都比较复杂且可能随时间变化出现新的算法，因此随用随学即可。另外，大部分算法也有深度学习的版本，效果更好。
 
 想获得认证可以参与[OpenCV Bootcamp](https://courses.opencv.org/courses/course-v1:OpenCV+Bootcamp+CV0/course/)
 
@@ -1649,9 +1802,7 @@ video_out.release()
 
 ```
 
-### 人体相关
-
-#### 人脸检测
+### 人脸检测
 
 人脸检测算法广泛应用于身份验证、考勤系统、社交媒体标记、美颜相机和安防监控中。
 
@@ -1784,17 +1935,6 @@ if __name__ == "__main__":
     recognizer()
 ```
 
-#### 其他
-
-人体检测算法广泛应用于智能安防、客流统计、健身应用、体感游戏和自动驾驶系统中。
-
-人体姿态估计主要用于健身指导、医疗康复、运动分析、动作捕捉和人机交互界面。
-
-手势识别技术应用于智能家居控制、手语翻译、VR/AR交互、游戏控制和辅助残障人士交流。
-
-动作识别算法用于视频内容理解、体育比赛分析、异常行为检测、健身应用和人机交互。
-
-行为识别技术主要应用于安防监控、智慧城市、客户行为分析、老人看护和异常事件预警。
 
 ## YOLO
 
@@ -1811,7 +1951,7 @@ if __name__ == "__main__":
 
 经过测试：opencv加载YOLOv11模型，与原生yolo的FPS一致、内存占用一致。Opencv的CPU占用率更高。
 
-所以使用OpenCV的唯一原因是可以用`C++`版本的代码，在无python依赖的设备上运行，适合资源受限的边缘设备。
+所以使用OpenCV的唯一原因是打包为可执行文件后体积更小。
 :::
 
 ### 导出模型
