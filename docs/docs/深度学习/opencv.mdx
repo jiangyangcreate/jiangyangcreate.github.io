@@ -412,38 +412,6 @@ img.show()
 
 ## 图像运算
 
-### 图像截取
-
-图像的本质是数组，所以图像的截取就是数组的截取。
-
-```python showLineNumbers
-img = cv2.imread("demo.jpg")
-
-# 1. 知道左上角 + 宽高（最常用）
-x, y, w, h = 100, 200, 300, 400
-cropped = img[y:y+h, x:x+w]
-
-# 2. 知道左上角和右下角坐标
-x1, y1 = 100, 200
-x2, y2 = 400, 600
-cropped = img[y1:y2, x1:x2]
-
-# 3. 知道中心点 + 宽高（比如 YOLO 检测框）
-center_x, center_y = 320, 240
-w, h = 200, 300
-x = int(center_x - w/2)
-y = int(center_y - h/2)
-cropped = img[y:y+h, x:x+w]
-
-# 4. 防止越界（生产必加，防止 crash）
-h_img, w_img = img.shape[:2]
-x = max(0, x)
-y = max(0, y)
-w = min(w, w_img - x)
-h = min(h, h_img - y)
-cropped = img[y:y+h, x:x+w]   
-```
-
 加减法的前提是两张图片的尺寸相同。
 
 ### 图像加法、图像减法
@@ -694,22 +662,37 @@ img = cv2.imread("xxx.png")
 # 获取图像尺寸
 height, width = img.shape[:2]
 
-# 裁剪中心区域（从坐标(100,100)到(300,300)）
-cropped_img = img[100:300, 100:300]
-
 # 裁剪图像上半部分
 top_half = img[0:height//2, 0:width]
 
 # 裁剪图像右下角四分之一
 bottom_right = img[height//2:height, width//2:width]
 
-cv2.imshow("Original", img)
-cv2.imshow("Cropped", cropped_img)
-cv2.imshow("Top Half", top_half)
-cv2.imshow("Bottom Right", bottom_right)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# 知道左上角 + 宽高
+x, y, w, h = 100, 200, 300, 400
+cropped = img[y:y+h, x:x+w]
+
+# 知道左上角和右下角坐标
+x1, y1 = 100, 200
+x2, y2 = 400, 600
+cropped = img[y1:y2, x1:x2]
+
+# 知道中心点 + 宽高（比如 YOLO 检测框）
+center_x, center_y = 320, 240
+w, h = 200, 300
+x = int(center_x - w/2)
+y = int(center_y - h/2)
+cropped = img[y:y+h, x:x+w]
+
+# 防止越界（生产必加，防止 crash）
+h_img, w_img = img.shape[:2]
+x = max(0, x)
+y = max(0, y)
+w = min(w, w_img - x)
+h = min(h, h_img - y)
+cropped = img[y:y+h, x:x+w]   
 ```
+
 
 ### 图像平移
 
