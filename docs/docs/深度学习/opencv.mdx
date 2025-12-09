@@ -344,6 +344,7 @@ cv2.waitKey(1000)
 # 关闭所有窗口
 cv2.destroyAllWindows()
 ```
+
 ### 绘制箭头
 
 函数签名：`cv2.arrowedLine(img, start_point, end_point, color, thickness, tipLength) -> img`
@@ -410,6 +411,38 @@ img.show()
 ```
 
 ## 图像运算
+
+### 图像截取
+
+图像的本质是数组，所以图像的截取就是数组的截取。
+
+```python showLineNumbers
+img = cv2.imread("demo.jpg")
+
+# 1. 知道左上角 + 宽高（最常用）
+x, y, w, h = 100, 200, 300, 400
+cropped = img[y:y+h, x:x+w]
+
+# 2. 知道左上角和右下角坐标
+x1, y1 = 100, 200
+x2, y2 = 400, 600
+cropped = img[y1:y2, x1:x2]
+
+# 3. 知道中心点 + 宽高（比如 YOLO 检测框）
+center_x, center_y = 320, 240
+w, h = 200, 300
+x = int(center_x - w/2)
+y = int(center_y - h/2)
+cropped = img[y:y+h, x:x+w]
+
+# 4. 防止越界（生产必加，防止 crash）
+h_img, w_img = img.shape[:2]
+x = max(0, x)
+y = max(0, y)
+w = min(w, w_img - x)
+h = min(h, h_img - y)
+cropped = img[y:y+h, x:x+w]   
+```
 
 加减法的前提是两张图片的尺寸相同。
 
@@ -1315,6 +1348,109 @@ cv2.destroyAllWindows()
 下面是Opencv常用的算法，每个算法都比较复杂且可能随时间变化出现新的算法，因此随用随学即可。另外，大部分算法也有深度学习的版本，效果更好。
 
 想获得认证可以参与[OpenCV Bootcamp](https://courses.opencv.org/courses/course-v1:OpenCV+Bootcamp+CV0/course/)
+
+### 模板匹配
+
+模板匹配（Template Matching）是一种在图像中寻找指定模板位置的技术。它通过在目标图像中滑动模板图像，计算相似度来找到最佳匹配位置。
+
+**应用场景**：
+- 目标检测：在图像或视频中查找特定对象
+- 图像识别：识别图像中的图标、按钮等
+- 自动化测试：UI自动化中的元素定位
+- 文档处理：在扫描文档中查找特定区域
+
+**函数签名**：`cv2.matchTemplate(image, templ, method[, result[, mask]]) -> result`
+
+**参数说明**：
+- `image`：目标图像（待搜索的图像），必须是单通道或三通道图像
+- `templ`：模板图像（要查找的小图像），尺寸必须小于等于目标图像
+- `method`：匹配方法，使用归一化的方法效果通常更好，常用的有：
+  - `cv2.TM_CCOEFF_NORMED`：归一化相关系数匹配，返回0-1之间的值，值越大越匹配
+  - `cv2.TM_CCORR_NORMED`：归一化相关匹配
+  - `cv2.TM_SQDIFF_NORMED`：归一化平方差匹配，值越小越匹配
+- `result`：可选，输出结果图像
+- `mask`：可选，掩码图像
+
+**返回值**：
+- `result`：匹配结果图像，尺寸为 `(W-w+1, H-h+1)`，其中 `(W, H)` 是目标图像尺寸，`(w, h)` 是模板图像尺寸
+
+**获取最佳匹配位置**：使用 `cv2.minMaxLoc()` 函数获取匹配结果中的最值及其位置
+
+**函数签名**：`cv2.minMaxLoc(src[, mask]) -> minVal, maxVal, minLoc, maxLoc`
+
+**返回值**：
+- `minVal`：最小值
+- `maxVal`：最大值
+- `minLoc`：最小值位置 `(x, y)`
+- `maxLoc`：最大值位置 `(x, y)`
+
+**注意**：
+- 对于 `TM_SQDIFF` 和 `TM_SQDIFF_NORMED` 方法，最小值位置是最佳匹配
+- 对于其他方法，最大值位置是最佳匹配
+
+```python showLineNumbers
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 读取目标图像和模板图像
+image = cv2.imread('target.jpg')  # 目标图像（大图）
+template = cv2.imread('template.jpg')  # 模板图像（小图）
+
+# 将图像转换为灰度图（模板匹配通常在灰度图上进行）
+image_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+template_gray = cv2.cvtColor(template, cv2.COLOR_BGR2GRAY)
+
+# 执行模板匹配
+# 使用归一化相关系数匹配方法
+result = cv2.matchTemplate(image_gray, template_gray, cv2.TM_CCOEFF_NORMED)
+
+# 获取最佳匹配位置
+min_val, max_val, min_loc, max_loc = cv2.minMaxLoc(result)
+
+# 由于使用 TM_CCOEFF_NORMED，最大值位置是最佳匹配
+top_left = max_loc
+h, w = template_gray.shape
+bottom_right = (top_left[0] + w, top_left[1] + h)
+
+# 在原图上绘制匹配区域
+image_copy = image.copy()
+cv2.rectangle(image_copy, top_left, bottom_right, (0, 255, 0), 2)
+cv2.putText(image_copy, f'Match: {max_val:.3f}', 
+            (top_left[0], top_left[1] - 10),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.9, (0, 255, 0), 2)
+
+# 显示结果
+plt.figure(figsize=(15, 5))
+
+plt.subplot(1, 3, 1)
+plt.imshow(cv2.cvtColor(template, cv2.COLOR_BGR2RGB))
+plt.title('Template')
+plt.axis('off')
+
+plt.subplot(1, 3, 2)
+plt.imshow(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
+plt.title('Target Image')
+plt.axis('off')
+
+plt.subplot(1, 3, 3)
+plt.imshow(cv2.cvtColor(image_copy, cv2.COLOR_BGR2RGB))
+plt.title(f'Match Result (Score: {max_val:.3f})')
+plt.axis('off')
+
+plt.tight_layout()
+plt.show()
+
+# 如果需要找到所有匹配位置（设置阈值）
+threshold = 0.8  # 匹配阈值
+locations = np.where(result >= threshold)
+locations = list(zip(*locations[::-1]))  # 转换为 (x, y) 格式
+
+print(f'Found {len(locations)} matches above threshold {threshold}')
+for loc in locations:
+    cv2.rectangle(image_copy, loc, (loc[0] + w, loc[1] + h), (255, 0, 0), 2)
+```
+
 
 ### 特征点校准
 
