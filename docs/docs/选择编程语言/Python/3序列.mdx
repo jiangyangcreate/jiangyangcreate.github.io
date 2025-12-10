@@ -1211,6 +1211,11 @@ def func(a, b, c):
 
 args = (1, 2, 3)
 result = func(*args)  # 等同于 func(1, 2, 3)
+
+
+# 字典同样可以解包
+kwargs = {'a': 1, 'b': 2, 'c': 3}
+result = func(**kwargs)  # 等同于 func(a=1, b=2, c=3)
 ```
 
 [PEP 3132 – 扩展可迭代对象解包](https://peps.python.org/pep-3132/)
