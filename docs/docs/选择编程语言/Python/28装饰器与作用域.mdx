@@ -319,19 +319,6 @@ print("函数外的z",z)
 # 函数外的z 30
 ```
 
-### locals
-
-locals 函数返回当前作用域的局部变量的字典。
-
-```python showLineNumbers
-def test():
-    x = 1
-    print(locals())
-test()
-# {'x': 1}
-```
-
-
 ### nonlocal
 
 当一个函数或类的定义嵌套（被包围）在其他函数的定义中时，其非局部作用域就是<Highlight>包围它的函数的局部作用域</Highlight> 。
@@ -417,3 +404,56 @@ print(func()()) # 2
 """
 
 ```
+
+## 内置函数
+
+### locals函数、globals函数
+
+`locals()` 和 `globals()` 都是用来**查看当前命名空间中的变量**的内置函数，本质上都是**返回一个字典对象**。
+
+- **locals()**：返回当前局部作用域中的变量字典
+- **globals()**：返回当前全局作用域（模块级别）中的变量字典
+
+两者都**不需要参数**：
+
+- 函数签名：`locals() -> dict`
+- 函数签名：`globals() -> dict`
+
+```python showLineNumbers
+x = 10
+
+def func(y):
+    z = 20
+    print("函数内部 locals():")
+    print(locals())      # {'y': 5, 'z': 20}
+    print("函数内部 globals() 是否包含 x? ->", "x" in globals())  # True
+
+func(5)
+
+print("模块级别 globals() 中的部分键：")
+print(list(globals().keys())[:8])  # 只看前几个键
+```
+
+> 一般来说：
+>
+> - 在**函数内部**：`locals()` 反映的是当前函数的局部变量，`globals()` 反映的是整个模块的全局变量；
+> - 在**模块顶层**（不在函数里）：`locals()` 和 `globals()` 返回的其实是同一个字典（都是全局命名空间）。
+
+`locals()` 返回的字典在函数内部通常是**只读视图**，直接修改其返回值，不一定会真正改变局部变量；而通过 `globals()` 返回的字典修改全局变量，一般是有效的：
+
+```python showLineNumbers
+a = 1
+
+def demo():
+    b = 2
+    # 尝试修改局部变量
+    locals()["b"] = 100
+    print("b =", b)  # 仍然是 2，大多数实现中修改无效
+
+demo()
+
+# 通过 globals() 修改全局变量
+globals()["a"] = 99
+print("a =", a)  # 99
+```
+
