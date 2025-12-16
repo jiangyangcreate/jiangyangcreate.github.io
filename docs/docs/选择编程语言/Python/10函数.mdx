@@ -356,7 +356,7 @@ list(map(add, a, b))  # [12, 14, 19]
 ## 标准库推荐
 
 - functools: 提供高阶函数和装饰器工具，例如 `wraps`、`lru_cache` 等。
-- contextlib: 提供上下文管理器相关工具，如 `contextmanager`、`nullcontext`。
 - itertools: 提供迭代器工具（排列组合、无限迭代器等）。
 - operator: 提供将运算符函数化的工具，便于与高阶函数搭配使用。
 - typing: 提供类型提示支持，让函数签名更清晰。
+- doctest: 支持在文档字符串中编写示例代码，并自动执行这些示例以验证函数行为，非常适合为函数写“可执行文档”和简单测试。 

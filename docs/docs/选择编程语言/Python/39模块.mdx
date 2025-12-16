@@ -640,7 +640,7 @@ jobs:
         version: "latest"
     
     - name: Set up Python
-      run: uv python install 3.11
+      run: uv python install 3.12
     
     - name: Install dependencies
       run: |
@@ -786,7 +786,9 @@ pyinstaller -F -i app.ico app.py --add-data="C:\mediapipe\modules;mediapipe/modu
 
 ## 标准库推荐
 
-- ctypes: 调用 C 语言动态库，桥接底层系统能力。
+- ensurepip: 确保 pip 安装器可用，在 Python 安装时自动安装 pip。
+- venv: 创建和管理虚拟环境，隔离项目依赖，避免包冲突。
+- importlib: 提供动态导入模块的接口，支持以编程方式加载、重载模块。
 - argparse: 构建命令行接口的标准解决方案。
-- datetime / zoneinfo / calendar: 处理日期、时间与时区。
-- locale: 处理本地化、区域设置相关的格式与文本。
+- getpass: 安全获取用户密码输入，输入时不回显到终端。
+- locale: 提供本地化/国际化支持，处理不同语言、地区的数字、日期、货币格式。

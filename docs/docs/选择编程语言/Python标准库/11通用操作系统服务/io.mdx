@@ -1,0 +1,25 @@
+
+
+:::info
+假设你有一个函数，它要求传入一个文件对象作为参数，但你并不想真的在磁盘上创建一个文件。这时，你可以用 io.StringIO 创建一个内存中的“假文件”。
+
+```python showLineNumbers
+import io
+
+def process_file(file_object):
+    """一个需要文件对象作为参数的函数"""
+    content = file_object.read()
+    # 假设这里对文件内容进行了一些处理
+    return content.upper()
+
+# 使用 io.StringIO 创建一个内存中的文件
+text_data = "hello world from memory"
+string_file = io.StringIO(text_data)
+
+# 将内存中的文件对象传递给函数
+result = process_file(string_file)
+
+print(result)
+# 输出：HELLO WORLD FROM MEMORY
+```
+:::

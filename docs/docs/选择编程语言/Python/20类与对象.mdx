@@ -587,7 +587,28 @@ graph TD
 | **对象** | ✖️ | ✔️ |
 | **可迭代对象** | ✔️ | ✖️ |
 | 是**可迭代对象**也是**迭代器** | ✔️ | ✔️ |
+
+迭代器协议是 Python 中的核心概念之一。它定义了对象如何支持迭代操作，使得 for 循环、列表推导式等语法成为可能。迭代器提供了一种惰性求值的方式，节省内存并提高效率。
+
+```python showLineNumbers
+# 迭代器使得这些操作成为可能
+for item in [1, 2, 3]:
+    print(item)
+
+# 列表推导式也依赖于迭代器
+squares = [x**2 for x in range(10)]
+```
+
+[PEP 234 – 迭代器](https://peps.python.org/pep-0234/)
 :::
+
+迭代器是一个可以记住遍历位置的对象。迭代器对象从集合的第一个元素开始访问，直到所有元素被访问完结束。
+
+**迭代器的特点：**
+- **单向性**：只能往前不会后退
+- **惰性求值**：按需生成数据，节省内存
+- **一次性**：耗尽后不能重用，需要重新创建
+- **协议支持**：实现了 `__iter__()` 和 `__next__()` 方法
 
 ```python showLineNumbers
 class MyRange:
@@ -625,6 +646,45 @@ __next__
 __next__
 """
 ```
+
+```python showLineNumbers
+# 字符串、列表、元组都是可迭代对象，可用于创建迭代器
+lists = [1, 2, 3, 4]
+it = iter(lists)    # 创建迭代器对象
+
+print(next(it))  # 1 - 输出迭代器的下一个元素
+print(next(it))  # 2 - 再输出下一个元素
+print(next(it))  # 3
+print(next(it))  # 4
+
+# 耗尽后会抛出 StopIteration 异常
+try:
+    print(next(it))
+except StopIteration:
+    print("迭代器已耗尽")
+```
+
+:::tip
+for 循环会自动处理 StopIteration 异常，所以我们不需要手动捕获：
+```python
+lists = [1, 2, 3]
+for item in lists:  # for 循环内部调用 iter() 和 next()
+    print(item)
+```
+:::
+
+:::tip
+实际开发中，生成器（generator）通常比自定义迭代器类更简洁。生成器使用 `yield` 关键字。
+```python
+def countdown(start):
+    while start > 0:
+        yield start
+        start -= 1
+
+for num in countdown(5):
+    print(num)  # 5, 4, 3, 2, 1
+```
+:::
 
 
 ###  \_\_enter\_\_和\_\_exit\_\_ 与 with 语句
@@ -1493,10 +1553,55 @@ test_vars()
 print("Global vars keys:", list(vars().keys()))  # 显示全局变量的键
 ```
 
+### iter函数
 
-## 元类编程
+`iter()` 函数用于从可迭代对象创建迭代器，或创建一个调用函数直到返回哨兵值的迭代器。调用的是类的`__iter__()`方法。
 
-### object
+**函数签名：**
+1. `iter(iterable) -> iterator`
+2. `iter(callable, sentinel) -> iterator`
+
+```python showLineNumbers
+# 基本用法：从可迭代对象创建迭代器
+numbers = [1, 2, 3, 4, 5]
+it = iter(numbers)
+print(next(it))  # 1
+print(next(it))  # 2
+
+# 高级用法：使用哨兵值
+# 读取文件直到空行
+with open('data.txt') as f:
+    for line in iter(f.readline, '\n'):
+        print(line.strip())
+```
+
+### next函数
+
+`next()` 函数用于从迭代器获取下一个元素。调用的是类的`__next__()`方法。
+
+**函数签名：** `next(iterator, default=None) -> value`
+
+```python showLineNumbers
+# 基本用法
+numbers = iter([1, 2, 3])
+print(next(numbers))  # 1
+print(next(numbers))  # 2
+print(next(numbers))  # 3
+
+# 使用默认值避免 StopIteration 异常
+print(next(numbers, 'No more items'))  # No more items
+
+# 不使用默认值会抛出异常
+try:
+    numbers2 = iter([1, 2])
+    next(numbers2)
+    next(numbers2)
+    next(numbers2)  # 抛出 StopIteration
+except StopIteration:
+    print("迭代器已耗尽")
+```
+
+### object函数
 
 `object` 是 Python 中所有类的最终基类。在 Python 3 中，即使没有显式继承，所有类都会自动继承自 `object`。<Highlight>object 自己没有基类，它是根基类。</Highlight>
 
@@ -1549,5 +1654,6 @@ print(MyMetaClass.class_id)  # MyMetaClass_ID
 
 ## 标准库推荐
 
-- dataclasses: 通过装饰器自动生成 `__init__`、`__repr__` 等方法，简化数据类定义。
 - abc: 提供抽象基类支持，用于定义接口与抽象方法。
+- dataclasses: 通过装饰器自动生成 `__init__`、`__repr__` 等方法，简化数据类定义。
+- contextlib: 提供上下文管理器相关工具，如 `contextmanager`、`nullcontext`。

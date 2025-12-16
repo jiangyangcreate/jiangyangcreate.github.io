@@ -309,11 +309,12 @@ asyncio.run(process_stream())
 
 ## 标准库推荐
 
+- webbrowser: 使用系统默认浏览器打开 URL。
+- urllib: URL处理、打开、解析等。
 - asyncio: 核心异步 IO 框架，提供事件循环、协程调度等能力。
+- socket: 低层网络编程接口，也是许多高层网络库的基础。
 - threading: 基于线程的并发模型，适合与异步 IO 结合处理少量 CPU 密集任务。
 - multiprocessing: 使用多进程绕过 GIL，适合 CPU 密集型任务的并行计算。
 - concurrent.futures: 提供统一的线程池/进程池接口（`ThreadPoolExecutor` / `ProcessPoolExecutor`）。
 - queue: 线程安全的队列，用于在线程/协程间传递任务与数据。
 - subprocess: 启动子进程并与之通信，常用于异步地调用外部命令。
-- socket: 低层网络编程接口，也是许多高层网络库的基础。
-- webbrowser: 使用系统默认浏览器打开 URL。
