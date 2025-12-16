@@ -1546,3 +1546,8 @@ class MyMetaClass(metaclass=Meta):
 print(type(MyMetaClass))     # <class '__main__.Meta'>
 print(MyMetaClass.class_id)  # MyMetaClass_ID
 ```
+
+## 标准库推荐
+
+- dataclasses: 通过装饰器自动生成 `__init__`、`__repr__` 等方法，简化数据类定义。
+- abc: 提供抽象基类支持，用于定义接口与抽象方法。

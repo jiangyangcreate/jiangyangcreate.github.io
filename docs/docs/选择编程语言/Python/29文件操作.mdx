@@ -219,3 +219,21 @@ with open("data.bin", "rb") as f:
     #     record_id, value = modified_structured_mv[i]
     #     print(f"Modified Record {i}: ID={record_id}, Value={value}")
 ```
+
+## 标准库推荐
+
+- os: 提供与操作系统交互的 API，如文件路径、权限与进程相关操作。
+- pathlib: 面向对象的路径操作库，比传统字符串路径更易读、更安全。
+- glob: 使用通配符匹配文件路径，方便批量处理一组文件。
+- tempfile: 创建临时文件和临时目录，适合中间数据与测试场景。
+- io: 提供更底层、灵活的流接口（文本流、二进制流等）。
+- xml: 处理 XML 结构化标记数据。
+- html: 生成或解析 HTML 文本。
+- csv: 读写 CSV 文本文件的标准库。
+- json: 处理 JSON 文本与 Python 对象之间的序列化/反序列化。
+- zipfile: 读写 ZIP 压缩文件。
+- tarfile: 读写 TAR 归档文件。
+- compressio: 处理多种压缩格式的工具集合。
+- pickle: 将 Python 对象序列化到文件/字节流，或从中恢复。
+- sqlite3: 内置轻量级关系型数据库，常用于本地持久化存储。
+- struct: 在字节串与 C 结构体之间进行打包和解包，适合处理二进制文件格式。

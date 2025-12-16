@@ -783,3 +783,10 @@ pyinstaller -F -i app.ico app.py --noconsole
 pyinstaller -F -i app.ico app.py --add-data="C:\mediapipe\modules;mediapipe/modules" --noconsole
 ```
 :::
+
+## 标准库推荐
+
+- ctypes: 调用 C 语言动态库，桥接底层系统能力。
+- argparse: 构建命令行接口的标准解决方案。
+- datetime / zoneinfo / calendar: 处理日期、时间与时区。
+- locale: 处理本地化、区域设置相关的格式与文本。

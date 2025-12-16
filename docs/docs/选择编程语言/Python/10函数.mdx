@@ -353,9 +353,10 @@ b = [10, 11, 15]
 list(map(add, a, b))  # [12, 14, 19]
 ```
 
-## 推荐库
+## 标准库推荐
 
-- functools: 提供高阶函数和装饰器
-- itertools: 提供迭代器工具
-- operator: 提供操作符函数
-- typing: 提供类型提示
+- functools: 提供高阶函数和装饰器工具，例如 `wraps`、`lru_cache` 等。
+- contextlib: 提供上下文管理器相关工具，如 `contextmanager`、`nullcontext`。
+- itertools: 提供迭代器工具（排列组合、无限迭代器等）。
+- operator: 提供将运算符函数化的工具，便于与高阶函数搭配使用。
+- typing: 提供类型提示支持，让函数签名更清晰。
