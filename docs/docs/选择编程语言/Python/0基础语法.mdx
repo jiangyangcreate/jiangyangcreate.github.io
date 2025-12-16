@@ -147,12 +147,13 @@ print(keyword.kwlist)
 
 ## 关键字
 
-### 数据类型和值
+### 基础语法
 - False, None, True: 基本的常量值
-
-### 逻辑运算
 - and, or, not: 逻辑运算符
 - is, in: 身份和成员运算符
+
+### 变量
+- del: 删除对象
 
 ### 控制流
 - if, elif, else: 条件判断
@@ -169,25 +170,24 @@ print(keyword.kwlist)
 - return: 函数返回
 - yield: 生成器
 - lambda: 匿名函数
+
+### 类与对象
+- class: 定义类
+- type: 泛型声明（软关键字）
+
+### 装饰器和作用域
 - global: 全局变量声明
 - nonlocal: 非局部变量声明
 
-### 类
-- class: 定义类
-
-### 泛型
-- type: 泛型声明（软关键字）
-
-### 模块和导入
-- import, from: 模块导入
-- as: 别名
+### 文件操作
+- with: 上下文管理器
 
 ### 异步编程
 - async, await: 异步编程关键字
 
-### 其他
-- del: 删除对象
-- with: 上下文管理器
+### 模块
+- import, from: 模块导入
+- as: 别名
 
 `} />
 
@@ -437,7 +437,7 @@ print(keyword.kwlist)
 - ascii(): ASCII表示
 - repr(): 对象表示
 
-### 序列操作与控制流
+### 序列操作
 - list(): 列表
 - dict(): 字典
 - tuple(): 元组
@@ -448,16 +448,18 @@ print(keyword.kwlist)
 - sorted(): 排序
 - reversed(): 反向生成迭代器
 - filter(): 过滤序列返回迭代器
+
+### 控制流
 - all(): 所有元素为真
 - any(): 任一元素为真
 - range(): 数字序列
-- zip(): 并行迭代
 - enumerate(): 枚举索引和值
+- zip(): 并行迭代
 
 ### 函数
 - map(): 映射
 
-### 面向对象编程
+### 类与对象
 - object(): 基础对象
 - super(): 父类引用
 - delattr(): 删除属性
@@ -469,15 +471,15 @@ print(keyword.kwlist)
 - type(): 对象类型
 - isinstance(): 类型检查
 - issubclass(): 子类检查
+- property(): 属性装饰器
+- classmethod(): 类方法装饰器
+- staticmethod(): 静态方法装饰器
 
-### 生成器与迭代器
+### 迭代器
 - iter(): 创建迭代器
 - next(): 获取下一个元素
 
 ### 装饰器与作用域
-- property(): 属性装饰器
-- classmethod(): 类方法装饰器
-- staticmethod(): 静态方法装饰器
 - callable(): 是否可调用
 - globals(): 全局变量字典
 - locals(): 局部变量字典
@@ -490,14 +492,17 @@ print(keyword.kwlist)
 - aiter(): 异步迭代器
 - anext(): 异步next
 
-### 模块操作
-- __ import __(): 动态导入模块
-
-### 其他
+### 代码执行与调试
 - breakpoint(): 调试断点
 - compile(): 编译代码
 - eval(): 执行表达式
 - exec(): 执行代码
+
+
+### 模块操作
+- __ import __(): 动态导入模块
+
+### 其他
 - help(): 显示帮助信息
 
 `} />

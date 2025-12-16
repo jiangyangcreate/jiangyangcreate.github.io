@@ -1,0 +1,24 @@
+### reduce 函数
+
+reduce() 对序列元素进行累积运算。
+
+reduce函数签名：`reduce(function, iterable[, initializer]) -> value`
+
+参数说明：
+- `function`：累积函数，接受两个参数
+- `iterable`：要累积的可迭代对象
+- `initializer`：可选的初始值
+
+返回值：
+- 返回累积的结果
+
+```python showLineNumbers
+from functools import reduce
+
+def add(x, y) :            # 两数相加
+    return x + y
+sum1 = reduce(add, [1,2,3,4,5])   # 计算列表和：1+2+3+4+5
+sum2 = reduce(lambda x, y: x+y, [1,2,3,4,5])  # 使用 lambda 匿名函数
+print(sum1)
+print(sum2)
+```

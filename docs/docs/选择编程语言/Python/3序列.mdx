@@ -1474,7 +1474,19 @@ print(sorted(dicts.items(), key=lambda x: x[1], reverse=True))
 """
 [('b', 5), ('d', 4), ('c', 3), ('e', 2), ('a', 1)]
 """
+
+# 如果你想要同时对字典的键和值排序, 可以试试下面的方法
+dicts = {'a': 1, 'b': 1, 'c': 3, 'd': 1, 'e': 3}
+print(sorted(dicts.items(), key=lambda x: (x[1],x[0]), reverse=False))
 ```
+
+:::tip
+当 Python 比较元组时，首先比较每个元组的第一个元素，并确定哪个元素较小。如果第一个元素小于另一个元组中匹配的第一个元素，则整个元组被视为小于另一个元组。
+
+但如果出现平局，Python 会查看每个元组中的第二个元素。
+
+字符串比较时，会逐字符比较其 Unicode 码点值。
+:::
 
 ### reversed函数
 

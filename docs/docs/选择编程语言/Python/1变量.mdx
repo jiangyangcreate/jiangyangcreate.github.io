@@ -357,22 +357,35 @@ for i in range(10):
 
 ### id函数、hash函数
 
-id函数用于获取对象的内存地址。id函数返回的值是对象的内存地址的整数表示，用于快速查找和比较对象。
+id函数用于获取对象的内存地址。id函数返回的值是对象的<Highlight color="g">内存地址的整数表示</Highlight>，用于快速查找和比较对象。所有对象都可以用id函数来获取其内存地址。
+
+id保证在对象存活期间进程内唯一。标识“这是哪一个对象实例”。
 
 函数签名：`id(object) -> int`
 
-hash函数用于获取对象的哈希值。哈希值是对象的唯一标识，只有不可变对象才有哈希值，同id函数一样用于快速查找和比较对象。
+hash函数用于获取对象的哈希值。<Highlight color="g">只有不可变对象才有哈希值</Highlight>，同id函数一样用于快速查找和比较对象。 
+
+用于标识“这个对象的内容（或值）是什么”。在相同进程下，等价对象应该有相同的 hash。
 
 函数签名：`hash(object) -> int`
 
-```python
-a = (1,2,3)
-print(id(a))
-print(hash(a))
+```python showLineNumbers
+a = tuple([1,2,3])
+
+b = tuple([1,2,3])
+
+print(id(a),id(b))
+# id 不同说明不是一个对象
+# 2667887440704 2667887219328
+
+print(hash(a),hash(b))
+# hash结果相同，说明值相同
+# 529344067295497451 529344067295497451
 ```
 
 ## 相关库推荐
 
+- hashlib: 更加丰富的hash方法。
 - <Highlight color="g">typing: 对类型提示的支持</Highlight>
 - <Highlight color="g">pydantic: **第三方**数据验证模块</Highlight>
 - pydoc: 文档生成器和在线帮助系统

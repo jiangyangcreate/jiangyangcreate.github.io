@@ -497,6 +497,34 @@ print(abs(10.5))    # 10.5
 print(abs(3+4j))    # 5.0 - 复数的模长，即sqrt(3²+4²)
 ```
 
+
+### divmod函数
+
+以两个（非复数）数字为参数，在作整数除法时，返回商和余数。
+
+若操作数为混合类型，则适用二进制算术运算符的规则。
+
+函数签名：`divmod(a, b) -> tuple`
+
+参数说明：
+- `a`：被除数
+- `b`：除数
+
+返回值：
+- 返回一个包含商和余数的元组
+
+```python showLineNumbers
+print(divmod(7, 3)) # (2, 1)
+
+print(divmod(6, 3)) # (2, 0)
+
+print(divmod(6.0, 3.0)) # (2.0, 0.0)
+
+print(divmod(-6, 3)) # (-2, 0)
+
+print(divmod(6.5, 3)) # (2.0, 0.5)
+```
+
 ### max函数、min函数
 
 二者语法一致、参数一致，只是行为相反。
@@ -528,21 +556,6 @@ def _sort(value):
 print(max(lists,key=_sort)) # -2
 ```
 
-### sum函数
-
-返回可迭代对象中所有元素的和。
-
-函数签名：`sum(iterable, /, start=0)`
-
-参数说明：
-- `iterable`：要计算和的可迭代对象
-- `start`：要添加到和的初始值，默认为0
-
-```python showLineNumbers
-print(sum((1, 2, 3))) # 6
-
-print(sum([1,2,3],10)) # 16
-```
 
 ### round函数
 
@@ -571,34 +584,6 @@ print(round(123.555,2)) # 123.56
 这不算是程序错误：这一结果是由于大多数十进制小数实际上都不能以浮点数精确地表示。
 :::
 
-
-### divmod函数
-
-以两个（非复数）数字为参数，在作整数除法时，返回商和余数。
-
-若操作数为混合类型，则适用二进制算术运算符的规则。
-
-函数签名：`divmod(a, b) -> tuple`
-
-参数说明：
-- `a`：被除数
-- `b`：除数
-
-返回值：
-- 返回一个包含商和余数的元组
-
-```python showLineNumbers
-print(divmod(7, 3)) # (2, 1)
-
-print(divmod(6, 3)) # (2, 0)
-
-print(divmod(6.0, 3.0)) # (2.0, 0.0)
-
-print(divmod(-6, 3)) # (-2, 0)
-
-print(divmod(6.5, 3)) # (2.0, 0.5)
-```
-
 ### pow函数
 
 函数签名：`pow(base, exp, mod=None)`
@@ -621,6 +606,22 @@ print(2**3) # 8
 print(pow(2, 3, 5)) # 3
 # 等价于
 print((2**3) % 5) # 3
+```
+
+### sum函数
+
+返回可迭代对象中所有元素的和。
+
+函数签名：`sum(iterable, /, start=0)`
+
+参数说明：
+- `iterable`：要计算和的可迭代对象
+- `start`：要添加到和的初始值，默认为0
+
+```python showLineNumbers
+print(sum((1, 2, 3))) # 6
+
+print(sum([1,2,3],10)) # 16
 ```
 
 
