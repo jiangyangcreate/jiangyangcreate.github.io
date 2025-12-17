@@ -1,11 +1,7 @@
 ---
 sidebar_position: 19
-title: （编写中）🐏Python与C互交互
+title: 与Python交互
 ---
-
-非常重要！
-
-## 概述
 
 Python与C语言的互操作是高性能计算和系统编程的关键技术。主要有三种方式：
 
@@ -17,7 +13,7 @@ Python与C语言的互操作是高性能计算和系统编程的关键技术。�
 
 ### 基本使用
 
-```python
+```python showLineNumbers
 from ctypes import CDLL, c_int, c_double, c_char_p
 
 # 加载C库
@@ -34,7 +30,7 @@ print(f"5 + 3 = {result}")
 
 ### 结构体处理
 
-```c
+```c showLineNumbers
 // example.h
 typedef struct {
     int x;
@@ -45,7 +41,7 @@ typedef struct {
 extern void print_point(Point *p);
 ```
 
-```python
+```python showLineNumbers
 from ctypes import Structure, c_int, c_char, CDLL
 
 class Point(Structure):
@@ -64,7 +60,7 @@ lib.print_point(point)
 
 ### 基本结构
 
-```c
+```c showLineNumbers
 #include <Python.h>
 
 static PyObject* add(PyObject* self, PyObject* args) {
@@ -95,7 +91,7 @@ PyMODINIT_FUNC PyInit_myextension(void) {
 
 ### 编译setup.py
 
-```python
+```python showLineNumbers
 from distutils.core import setup, Extension
 
 module = Extension(
@@ -114,7 +110,7 @@ setup(
 
 ### 基本语法
 
-```cython
+```cython showLineNumbers
 # mymodule.pyx
 def add(int a, int b):
     cdef int result = a + b
@@ -123,7 +119,7 @@ def add(int a, int b):
 
 ### 编译setup.py
 
-```python
+```python showLineNumbers
 from distutils.core import setup
 from Cython.Build import cythonize
 
@@ -136,7 +132,7 @@ setup(
 
 ### 引用计数
 
-```c
+```c showLineNumbers
 // 正确增加引用计数
 Py_INCREF(obj);
 
@@ -150,7 +146,7 @@ PyObject* item = PyList_GetItem(list, index);
 ### 内存泄漏检测
 
 使用Valgrind检测内存泄漏：
-```bash
+```bash showLineNumbers
 valgrind --leak-check=full python script.py
 ```
 
@@ -158,7 +154,7 @@ valgrind --leak-check=full python script.py
 
 ### C错误转Python异常
 
-```c
+```c showLineNumbers
 static PyObject* risky_function(PyObject* self, PyObject* args) {
     // 某些可能失败的操作
     if (operation_failed) {
@@ -175,7 +171,7 @@ static PyObject* risky_function(PyObject* self, PyObject* args) {
 
 ### 避免不必要的转换
 
-```c
+```c showLineNumbers
 // 不好的做法：频繁创建Python对象
 for (int i = 0; i < 1000000; i++) {
     PyObject* num = PyLong_FromLong(i);
@@ -195,7 +191,7 @@ PyObject* final = PyLong_FromLong(result);
 
 ### 释放GIL
 
-```c
+```c showLineNumbers
 Py_BEGIN_ALLOW_THREADS
 // 执行耗时操作（文件I/O、网络请求等）
 perform_time_consuming_operation();
@@ -206,7 +202,7 @@ Py_END_ALLOW_THREADS
 
 ### GDB调试C扩展
 
-```bash
+```bash showLineNumbers
 gdb --args python script.py
 (gdb) break myextension.c:25
 (gdb) run
@@ -223,7 +219,7 @@ gdb --args python script.py
 
 ### 图像处理扩展
 
-```c
+```c showLineNumbers
 // 快速的图像旋转函数
 static PyObject* rotate_image(PyObject* self, PyObject* args) {
     PyObject* image_obj;
@@ -246,20 +242,3 @@ static PyObject* rotate_image(PyObject* self, PyObject* args) {
     Py_RETURN_NONE;
 }
 ```
-
-## 工具链推荐
-
-- **编译**: GCC/Clang + distutils/setuptools
-- **调试**: GDB + Python调试器
-- **性能分析**: perf, gprof, cProfile
-- **内存检测**: Valgrind, AddressSanitizer
-
-## 最佳实践总结
-
-1. 优先使用Cython，语法更Pythonic
-2. 复杂项目使用C扩展模块
-3. 简单调用使用ctypes
-4. 始终注意内存管理和引用计数
-5. 在多线程环境中正确处理GIL
-6. 编写全面的错误处理代码
-7. 进行充分的测试和性能分析
