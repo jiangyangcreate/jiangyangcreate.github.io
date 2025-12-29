@@ -55,9 +55,54 @@ API，全称为 **应用程序编程接口**（Application Programming Interface
 
 安装：`pip install "fastapi[standard]"`
 
-### 基础用法
+### ASGI
 
-相较于 Flask，FastAPI 会自动生成 2 种风格的 API 文档，地址为：http://127.0.0.1:8000/docs 和 http://127.0.0.1:8000/redoc
+FastAPI 是一个现代的、快速的（高性能）、功能强大的 Web 框架，用于构建 API。运行在 ASGI 服务器上。
+
+* **A (Asynchronous)** ：异步。支持 `async/await` 特性，允许程序在等待 IO（如读数据库）时去处理其他请求。
+* **S (Server)** ：服务器。
+* **G (Gateway)** ：网关。
+* **I (Interface)** ：接口/标准。
+
+ASGI 服务器技术选型
+
+Uvicorn：目前最流行的轻量级、超快速的 ASGI 服务器。
+
+Daphne：最早的 ASGI 服务器（由 Django 团队开发）。
+
+Hypercorn：支持 HTTP/2 和 HTTP/3 的 ASGI 服务器。
+
+### 接口文档
+
+FastAPI 最受开发者欢迎的特性之一就是它原生内置了两套完全自动生成的交互式文档。你不需要写一行额外的文档代码，只要你写好了 API 逻辑，文档就实时生成了。
+
+这两套文档分别是 Swagger UI 和 ReDoc。
+
+FastAPI 并不是硬生生写了两套网页。它的逻辑是：
+
+1. **解析代码** ：FastAPI 扫描你的路径、参数、Pydantic 模型。
+2. **生成 OpenAPI 规范** ：它会自动生成一个符合国际标准 (OpenAPI/Swagger) 的  **JSON 架构文件** （你可以访问 `http://127.0.0.1:8000/openapi.json` 看到它）。
+3. **渲染 UI** ：Swagger UI 和 ReDoc 只是两个“皮肤”，它们读取这个 JSON 文件并将其可视化。
+
+#### Swagger UI
+
+访问地址：http://127.0.0.1:8000/docs
+
+核心用途：调试与测试。
+
+直接测试 (Try it out)：你不需要安装 Postman 或使用 curl 命令。点击 API 展开，点击 "Try it out"，填入参数，直接就能看到服务器返回的结果。
+
+实时校验：如果你定义的 Pydantic 模型要求某个字段是 int，你在 Swagger 里输入字符串，它会立刻变红提示你错误。
+
+#### ReDoc
+
+访问地址：http://127.0.0.1:8000/redoc
+
+核心用途：阅读与归档。
+
+极其整洁：它采用经典的三栏式布局（导航、说明、代码示例），非常适合给前端同学或第三方合作伙伴阅读。
+
+### 基础用法
 
 ```python showLineNumbers
 from fastapi import FastAPI, Header, HTTPException, Query, Path
@@ -354,8 +399,29 @@ if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
 ```
 
+:::tip
+如何验证 FastAPI 的真实并发能力？
 
-### 传输二进制
+通过代码而不是浏览器。如果你在 **同一个浏览器** （比如 Chrome）中打开两个标签页，同时请求同一个 URL：
+
+* **浏览器的锁定机制** ：大多数现代浏览器为了防止过度消耗服务器资源，会对**完全相同的 URL** 进行连接锁定。它会等待第一个请求完成后，才发出第二个。
+:::
+
+### 数据流
+
+在 Web 接口请求中，数据主要分布
+
+| **数据来源 (Location)** | **浏览器/HTTP 格式**   | **FastAPI 参数定义方式** | **Python 转换后的类型**  | **典型用途** |
+| ----------------------------- | ---------------------------- | ------------------------------ | ------------------------------ | ------------------ |
+| **Path (路径)**         | `/users/10`                | `user_id: int`               | `int`                        | 定位特定资源       |
+| **Query (查询)**        | `?q=fast&page=1`           | `q: str, page: int`          | `str`,`int`                | 搜索、排序、分页   |
+| **Body (JSON)**         | `{"id": 1, "name": "AI"}`  | `item: Item(BaseModel)`      | **Pydantic Model**       | 提交复杂业务数据   |
+| **Body (Form)**         | `user=me&pw=123`           | `user: str = Form()`         | `str`                        | 传统表单登录       |
+| **File (文件)**         | 二进制流 (Multipart)         | `file: UploadFile`           | **SpooledTemporaryFile** | 上传头像、文档     |
+| **Header (请求头)**     | `Authorization: Bearer...` | `token: str = Header()`      | `str`                        | 鉴权、设备信息     |
+| **Cookie**              | `session=xyz`              | `id: str = Cookie()`         | `str`                        | 身份追踪           |
+
+### 传输二进制案例
 
 接口除了可以传输文本数据，还可传输图片、视频等数据，OpenCV 可以捕获屏幕，将两者结合起来，实现内网直播功能，可以在局域网内通过浏览器观看屏幕共享。
 
