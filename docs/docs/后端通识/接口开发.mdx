@@ -53,7 +53,35 @@ API，全称为 **应用程序编程接口**（Application Programming Interface
 
 ## FastAPI
 
-安装：`pip install "fastapi[standard]"`
+:::info
+FastAPI的作者 Tiangolo（真名 Sebastián Ramírez）是一位来自哥伦比亚、目前居住在德国柏林的著名开源软件工程师。在 7 岁时就从天主教学校退学了。当时的原因非常有趣：因为他总是问太多的问题，被老师认为“太难对付”。
+
+在退学之后，他的父母并没有强迫他回到传统学校，而是支持他居家自学。涵盖了算法、机器学习、密码学和人工智能等核心计算机科学领域。甚至连英语也是通过在线资源自学的。
+
+他在 23 岁左右曾感到有些迷茫，因为当时他虽然已经掌握了大量深奥的知识，但由于没有正式学历和文凭，他在进入职场初期感到有些不自信。然而，他最终凭借在 GitHub 上的开源贡献和扎实的技术实力证明了自己，先后在迪拜和德国柏林的知名科技公司（如 Explosion AI 和 Forethought）担任高级/首席工程师。
+
+目前的核心工作是全职开源维护者。
+
+“工作经验”梗：著名的推特梗——有招聘要求 4 年 FastAPI 经验，但他作为创始人当时才写了这个框架 2.5 年，所以连他自己都没资格申请。
+
+他认为不应通过“工作年限”来评判开发者，而应通过他们解决问题的能力和开源贡献来衡量。因此本部分教程会从解决问题入手，学习FastAPI。
+:::
+
+### 安装
+
+= `pip install fastapi`：只安装核心框架。
+
+- `pip install "fastapi[standard]"`：安装核心框架的同时，自动捆绑安装开发一个标准项目所需的常用工具，包括：Uvicorn、FastAPI CLI、HTTPX、Pydantic
+
+方括号语法是 “可选依赖组”（Optional Dependencies / Extras）。你可以把它理解为增强版安装。
+
+如果你已经输入了`pip install fastapi`，依然可以通过`pip install "fastapi[standard]"`补全配件。
+
+:::tip
+相比之下，opencv采取的是发布多个独立包的策略：opencv-python、opencv-python-headless、opencv-contrib-python 和 opencv-python-headless。
+
+opencv的几个包是互斥的。装了 A 就不能装 B。一旦安装了多个，必须全部卸载，再单独安装你需要的版本。
+:::
 
 ### ASGI
 
@@ -67,6 +95,7 @@ FastAPI 是一个现代的、快速的（高性能）、功能强大的 Web 框�
 ASGI 服务器技术选型
 
 Uvicorn：目前最流行的轻量级、超快速的 ASGI 服务器。
+> 单独安装方式：`pip install uvicorn`
 
 Daphne：最早的 ASGI 服务器（由 Django 团队开发）。
 
@@ -581,6 +610,361 @@ if __name__ == '__main__':
     webbrowser.open(f'http://{ip_host}:80')
     uvicorn.run(app, host=ip_host2, port=80)
 ```
+
+### 并发执行环境
+
+对于外部 API 调用（如调用高德地图 API），如果调用耗时较长（例如 2 秒），需要根据函数定义方式选择合适的处理方式。
+
+#### async def 内部使用 requests
+
+在 `async def` 函数中使用同步的 `requests.get()` 而非 `httpx.get()` 时会发生阻塞。
+
+会阻塞整个事件循环（Event Loop）。`async def` 函数在事件循环中执行，而 `requests` 是同步阻塞库。FastAPI 使用单线程事件循环处理所有异步任务，在异步函数中执行同步阻塞操作会导致整个服务器的其他异步请求都被阻塞。在异步函数中阻塞 2 秒，所有其他异步请求也会被阻塞 2 秒。
+
+#### 普通的 def 内部使用 requests
+
+使用普通的 `def`（同步函数）时，FastAPI 会自动将该函数放入 External Thread Pool（外部线程池）执行。
+
+在线程池未满时不影响性能，线程池满时会排队等待。虽然会阻塞线程池中的线程，但不会阻塞事件循环，其他异步请求仍可正常处理。
+
+在 FastAPI 中，使用同步库（如 `requests`、`pyodbc`）时，应使用 `def` 而不是 `async def`。
+
+:::tip
+对于 IO 密集型任务（如网络请求、数据库查询），优先使用 `async def` 配合异步库（如 `httpx`、`asyncpg`）。
+
+对于 CPU 密集型任务或必须使用同步库的场景，使用 `def` 让 FastAPI 自动将其放入线程池执行。
+:::
+
+### 依赖注入
+
+`Depends` 是 FastAPI 的核心特性，用于实现代码解耦和业务逻辑分离。
+
+最佳实践是将鉴权、数据库连接等横切关注点从业务逻辑函数中分离，抽取为依赖函数，通过 `Depends` 注入。
+
+#### 用户鉴权示例
+
+为 API 添加用户鉴权功能：
+
+所有 `/admin` 开头的接口必须在 Header 中带上 `X-Token`。
+
+Token 不正确时返回 403。
+
+Token 正确时，路径函数可直接获取解析后的 `user_name`。
+
+```python showLineNumbers
+from fastapi import FastAPI, Depends, Header, HTTPException
+
+app = FastAPI()
+
+# 1. 定义依赖项
+async def verify_admin_token(x_token: str = Header(...)):
+    if x_token != "super-secret-token":
+        raise HTTPException(status_code=403, detail="Token 错误！")
+    return "Admin_User"  # 返回值可以被后续函数直接使用
+
+# 2. 在接口中注入
+@app.get("/admin/db-backup")
+async def backup(user: str = Depends(verify_admin_token)):
+    # 只有通过了 verify_admin_token，才会执行到这里
+    # user 的值就是 "Admin_User"
+    return {"message": f"Hello {user}, backup started..."}
+```
+
+优势：对于多个管理接口，只需在每个函数中添加 `Depends`，也可全局挂载到路由组（Router）。
+
+#### Depends 的执行顺序
+
+`Depends` 的执行顺序是先运行依赖函数，再进入路径函数。
+
+1. **扫描依赖**：FastAPI 看到路径函数声明了 `Depends(verify_admin_token)`
+2. **前置执行**：FastAPI 先调用 `verify_admin_token`，检查 Header，运行函数逻辑
+3. **异常中断**：如果在 `verify_admin_token` 里触发了 `raise HTTPException`，流程会直接中断，返回响应给前端。路径函数不会被执行
+4. **注入结果**：如果运行成功，`verify_admin_token` 的返回值会被赋值给路径函数的参数
+5. **业务逻辑**：最后才运行路径函数内部的代码
+
+#### 依赖缓存机制
+
+当接口依赖 A 和 B，且 A 和 B 都依赖数据库连接 `get_db` 时，FastAPI 默认在同一请求中只执行一次 `get_db`，并将结果缓存后分发给 A 和 B，节省资源。
+
+`Depends` 支持嵌套。`verify_admin_token` 也可以依赖其他函数（如 `get_db`）。
+
+#### 数据库选型建议
+
+承载 10k+ QPS 时，应选择异步 ORM（如 Tortoise-ORM 或 SQLAlchemy 2.0 async）而非同步 SQLAlchemy。
+
+- 同步 ORM：必须配合 `def` 使用。FastAPI 会使用线程池，但线程资源昂贵（每个线程占用数 MB 内存），大量线程可能导致服务器内存不足。
+- 异步 ORM：配合 `async def` 使用。不占用额外线程，在等待数据库返回时让出 CPU 处理其他请求。这是 FastAPI 高性能的关键。
+
+### Pydantic 的进阶数据校验
+
+在注册用户接口中，需要接收 `password` 和 `confirm_password`，并在 Pydantic 模型中校验这两个字段必须完全一致。
+
+校验失败时，FastAPI 应返回自定义错误信息（如 "两次密码不一致"）。
+
+实现字段间校验需要使用 `model_validator`。
+
+```python showLineNumbers
+from pydantic import BaseModel, model_validator
+
+class RegisterUser(BaseModel):
+    username: str
+    password: str
+    confirm_password: str
+
+    # mode='after' 表示数据初步解析完后再跑这个校验
+    @model_validator(mode='after')
+    def check_passwords_match(self):
+        pw1 = self.password
+        pw2 = self.confirm_password
+        if pw1 != pw2:
+            raise ValueError("两次输入的密码不一致！")
+        return self
+```
+
+当 Pydantic 抛出 `ValueError` 时，FastAPI 会自动捕获并转换成 422 Unprocessable Entity 错误返回给前端，并附带清晰的 JSON 错误说明。
+
+### 中间件
+
+中间件在请求被路径函数处理之前，以及响应返回之后运行。
+
+中间件是一个在 每个请求 被路径函数处理之前，以及在 每个响应 返回之后运行的逻辑。
+
+它的执行逻辑像一个“洋葱”：
+
+Request 进来 $\rightarrow$ 经过中间件（记录时间、检查黑名单）。
+
+到达目的地 $\rightarrow$ 执行你的路径函数（Business Logic）。
+
+Response 出去 $\rightarrow$ 再次经过中间件（添加自定义 Header、计算耗时）。
+
+```python showLineNumbers
+import time
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    # === 1. 请求到达前执行 ===
+    start_time = time.perf_counter()
+    
+    # === 2. 传递给后面的逻辑 (路径函数或其他中间件) ===
+    response = await call_next(request)
+    
+    # === 3. 响应返回前执行 ===
+    process_time = time.perf_counter() - start_time
+    # 在响应头里加个“耗时”字段
+    response.headers["X-Process-Time"] = str(process_time)
+    
+    return response
+```
+
+| 特性 | 中间件 (Middleware) | 依赖注入 (Depends) |
+|-----|-----|-----|
+| 执行范围 | 全局。只要挂载了，所有接口都会跑。 | 局部或特定路由。可以精细控制哪个接口用。 |
+| 访问权限 | 只能拿到原始 Request 对象，很难拿到 Pydantic 解析后的数据。 | 全能。能拿到解析后的参数、模型、甚至其他依赖。 |
+| 灵活性 | 适合做：CORS(跨域)、Gzip压缩、日志统计、全局异常捕获。 | 适合做：身份验证、数据库连接、权限校验。 |
+| 异步支持 | 必须是异步的。 | 可以是同步 def 也可以是异步 async def。 |
+
+#### 中间件的执行顺序
+
+中间件的执行顺序是：**最后添加的中间件最先处理请求，最先添加的中间件最后处理响应**。
+
+如果一个中间件直接返回响应（没有执行 `await call_next(request)`），那么内部的中间件和路径函数都不会被执行。
+
+```python showLineNumbers
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+@app.middleware("http")
+async def blacklist_middleware(request: Request, call_next):
+    user_ip = request.client.host
+    if user_ip in ["1.2.3.4"]:
+        # 如果是黑名单，直接返回 403，不会执行 call_next
+        return JSONResponse(content={"detail": "You are banned"}, status_code=403)
+    
+    # 如果不是黑名单，继续执行
+    response = await call_next(request)
+    return response
+```
+
+:::tip
+如果黑名单是基于 IP（简单判断），用 Middleware 或 Nginx 层解决。
+
+如果黑名单是基于用户 ID（涉及业务逻辑），用 Depends 挂在全局路由上。
+:::
+
+### 异常处理器
+
+在项目中，为了避免在每个地方都写 `try...except`，需要在程序崩溃或报错时返回统一格式的 JSON。
+
+FastAPI 提供了 `@app.exception_handler` 装饰器来实现统一异常捕获。
+
+```python showLineNumbers
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse
+
+app = FastAPI()
+
+# 定义一个自定义异常类
+class MyBusinessException(Exception):
+    def __init__(self, name: str):
+        self.name = name
+
+# 统一捕获这个异常
+@app.exception_handler(MyBusinessException)
+async def my_exception_handler(request: Request, exc: MyBusinessException):
+    return JSONResponse(
+        status_code=418,
+        content={"message": f"Oops! {exc.name} 触发了业务逻辑错误"},
+    )
+
+@app.get("/test/{name}")
+async def test_exception(name: str):
+    if name == "error":
+        # 抛出异常后，FastAPI 会自动去上面找对应的 handler
+        raise MyBusinessException(name=name)
+    return {"message": "Success"}
+```
+
+### BackgroundTasks
+
+高并发文件处理系统场景：用户上传大视频文件（如 1GB），系统需要对视频进行转码（CPU 密集型操作，耗时数分钟）。
+
+系统需要立即返回"正在处理中"，而非让用户等待转码完成。
+
+#### BackgroundTasks vs Celery
+
+对于这类场景，主要有以下几种选择：
+
+- **A. 在 `async def` 里直接写转码逻辑**：❌ 不适合，会阻塞整个事件循环
+- **B. 在 `def` 里写转码逻辑，靠线程池**：⚠️ 不能立刻返回"正在处理中"
+- **C. 使用 BackgroundTasks（FastAPI 内置后台任务）**：✅ 适合中小型项目
+- **D. 使用 Celery + Redis（分布式任务队列）**：✅ 适合大型/生产项目
+
+#### BackgroundTasks 的优势与局限
+
+`BackgroundTasks` 是 FastAPI 内置的功能，非常轻量。
+
+在 Response（"正在处理中"）发送给用户之后，在同一 Python 进程内启动任务继续执行。
+
+优点：
+- 不需要额外安装 Redis 或 RabbitMQ
+- 代码简洁
+- 可以立刻返回响应给用户
+
+局限性：任务仍在 Web 服务器进程内执行。转码视频占用 CPU 较高，多个并发转码任务可能导致 Web 服务器 CPU 占用率升至 100%，影响其他 API 请求的响应速度。
+
+#### 代码示例
+
+```python showLineNumbers
+from fastapi import FastAPI, BackgroundTasks, UploadFile, File
+from fastapi.responses import JSONResponse
+import time
+import os
+
+app = FastAPI()
+
+def process_video(file_path: str, output_path: str):
+    """
+    模拟视频转码任务（CPU 密集型操作）
+    注意：这里使用 def 而不是 async def，因为转码是 CPU 密集型任务
+    """
+    print(f"开始处理视频: {file_path}")
+    try:
+        # 模拟耗时操作（实际场景中这里会是视频转码逻辑，如使用 ffmpeg）
+        time.sleep(5)  # 模拟转码耗时
+        
+        # 模拟转码后的操作（如保存转码后的文件）
+        print(f"视频转码完成: {file_path} -> {output_path}")
+        
+        # 实际场景中可能还需要：
+        # - 更新数据库状态
+        # - 发送通知给用户
+        # - 清理临时文件等
+    except Exception as e:
+        print(f"转码失败: {e}")
+
+@app.post("/upload-video")
+async def upload_video(
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...)
+):
+    """
+    上传视频文件，立即返回响应，后台处理转码
+    
+    工作流程：
+    1. 接收文件并保存到临时目录
+    2. 将转码任务添加到后台任务队列
+    3. 立即返回"正在处理中"的响应
+    4. 后台任务在响应发送后开始执行
+    """
+    # 保存上传的文件
+    file_path = f"/tmp/{file.filename}"
+    os.makedirs("/tmp", exist_ok=True)
+    
+    with open(file_path, "wb") as f:
+        content = await file.read()
+        f.write(content)
+    
+    # 定义输出路径
+    output_path = f"/tmp/transcoded_{file.filename}"
+    
+    # 添加后台任务：在响应返回后执行
+    background_tasks.add_task(process_video, file_path, output_path)
+    
+    # 立即返回响应，不等待转码完成
+    return JSONResponse({
+        "message": "视频已上传，正在处理中",
+        "filename": file.filename,
+        "status": "processing",
+        "note": "转码完成后会通过其他方式通知您"
+    })
+```
+
+**关键点说明：**
+
+1. **`background_tasks: BackgroundTasks`**：通过依赖注入获取 BackgroundTasks 实例
+2. **`background_tasks.add_task()`**：添加后台任务，第一个参数是函数，后续参数是函数的参数
+3. **立即返回响应**：在添加后台任务后立即返回，不等待任务完成
+4. **任务执行时机**：后台任务会在响应发送给客户端**之后**才开始执行
+
+**测试方法：**
+
+```bash
+# 使用 curl 上传文件
+curl -X POST "http://127.0.0.1:8000/upload-video" \
+  -F "file=@your_video.mp4"
+
+# 响应会立即返回，但转码任务会在后台继续执行，可观察fastapi输出。
+```
+
+完成任务后通知用户的方式可以有多种，可以设置进程轮询定时查询任务状态，也可以使用WebSocket实时通知。
+
+**注意事项：**
+
+- 后台任务函数可以是 `def` 或 `async def`
+- 如果任务失败，不会影响已返回的响应
+- 任务在同一个 Python 进程中执行，不会跨进程或跨服务器
+- 适合轻量级任务，对于重量级任务建议使用 Celery
+
+在上面的示例中，`upload_video` 函数接收文件后立即返回响应，而 `process_video` 函数会在响应发送给客户端后，在后台执行。
+
+#### Celery + Redis 的优势
+
+Web 服务器将任务指令放入 Redis 队列后立即返回。由专门的 Worker 进程（可在其他服务器上）处理耗时的转码任务。
+
+优点：
+- 解耦：无论视频转码多慢，都不会影响 API 服务器的响应速度
+- 分布式：支持多台服务器处理任务，抗压能力强
+- 可扩展：可以根据任务量动态增加 Worker 数量
+
+适用场景：
+- 中小型项目、任务量不大：使用 `BackgroundTasks`
+- 大型项目、高并发、需要分布式处理：使用 `Celery + Redis`
+
 
 ## MCP
 
