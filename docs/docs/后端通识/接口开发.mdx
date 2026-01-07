@@ -61,24 +61,22 @@ FastAPI的作者 Tiangolo（真名 Sebastián Ramírez）是一位来自哥伦�
 他在 23 岁左右曾感到有些迷茫，因为当时他虽然已经掌握了大量深奥的知识，但由于没有正式学历和文凭，他在进入职场初期感到有些不自信。然而，他最终凭借在 GitHub 上的开源贡献和扎实的技术实力证明了自己，先后在迪拜和德国柏林的知名科技公司（如 Explosion AI 和 Forethought）担任高级/首席工程师。
 
 目前的核心工作是全职开源维护者。
-
-“工作经验”梗：著名的推特梗——有招聘要求 4 年 FastAPI 经验，但他作为创始人当时才写了这个框架 2.5 年，所以连他自己都没资格申请。
-
-他认为不应通过“工作年限”来评判开发者，而应通过他们解决问题的能力和开源贡献来衡量。因此本部分教程会从解决问题入手，学习FastAPI。
 :::
 
 ### 安装
 
-= `pip install fastapi`：只安装核心框架。
+- `pip install fastapi`：只安装核心框架。
 
 - `pip install "fastapi[standard]"`：安装核心框架的同时，自动捆绑安装开发一个标准项目所需的常用工具，包括：Uvicorn、FastAPI CLI、HTTPX、Pydantic
 
-方括号语法是 “可选依赖组”（Optional Dependencies / Extras）。你可以把它理解为增强版安装。
-
-如果你已经输入了`pip install fastapi`，依然可以通过`pip install "fastapi[standard]"`补全配件。
+方括号语法是 “可选依赖组”（Optional Dependencies / Extras）。你可以把它理解为增强版安装。如果你已经输入了`pip install fastapi`，依然可以通过`pip install "fastapi[standard]"`补全配件。
 
 :::tip
-相比之下，opencv采取的是发布多个独立包的策略：opencv-python、opencv-python-headless、opencv-contrib-python 和 opencv-python-headless。
+相比之下，opencv采取的是发布多个独立包的策略：
+- `opencv-python`
+- `opencv-python-headless`
+- `opencv-contrib-python` 
+- `opencv-contrib-python-headless`
 
 opencv的几个包是互斥的。装了 A 就不能装 B。一旦安装了多个，必须全部卸载，再单独安装你需要的版本。
 :::
@@ -450,8 +448,6 @@ if __name__ == "__main__":
 | **Header (请求头)**     | `Authorization: Bearer...` | `token: str = Header()`      | `str`                        | 鉴权、设备信息     |
 | **Cookie**              | `session=xyz`              | `id: str = Cookie()`         | `str`                        | 身份追踪           |
 
-### 传输二进制案例
-
 接口除了可以传输文本数据，还可传输图片、视频等数据，OpenCV 可以捕获屏幕，将两者结合起来，实现内网直播功能，可以在局域网内通过浏览器观看屏幕共享。
 
 ```python showLineNumbers
@@ -613,15 +609,13 @@ if __name__ == '__main__':
 
 ### 并发执行环境
 
-对于外部 API 调用（如调用高德地图 API），如果调用耗时较长（例如 2 秒），需要根据函数定义方式选择合适的处理方式。
-
-#### async def 内部使用 requests
+#### async def 内部使用 同步库
 
 在 `async def` 函数中使用同步的 `requests.get()` 而非 `httpx.get()` 时会发生阻塞。
 
 会阻塞整个事件循环（Event Loop）。`async def` 函数在事件循环中执行，而 `requests` 是同步阻塞库。FastAPI 使用单线程事件循环处理所有异步任务，在异步函数中执行同步阻塞操作会导致整个服务器的其他异步请求都被阻塞。在异步函数中阻塞 2 秒，所有其他异步请求也会被阻塞 2 秒。
 
-#### 普通的 def 内部使用 requests
+#### 普通的 def 内部使用 同步库
 
 使用普通的 `def`（同步函数）时，FastAPI 会自动将该函数放入 External Thread Pool（外部线程池）执行。
 
