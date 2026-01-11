@@ -1498,6 +1498,12 @@ print(type(obj))              # <class '__main__.DynamicClass'>
 `vars(object=None)->dict`: 获取对象的属性字典。返回对象的 `__dict__` 属性或当前作用域的局部变量字典
 - `object`: 目标对象，默认为当前作用域
 
+:::tip
+Python类默认的数据模型是`__dict__`。不论是属性，还是方法，都是存储在`__dict__`中。
+
+getattr的本质就是从`__dict__`中获取对应的值，如果是属性就是获取属性值，如果是方法就是获取方法对象。
+:::
+
 ```python showLineNumbers
 class Person:
     def __init__(self, name, age):
@@ -1521,6 +1527,7 @@ print("hasattr(person, 'greet'):", hasattr(person, 'greet'))      # True
 # getattr() - 获取属性值
 print("getattr(person, 'name'):", getattr(person, 'name'))                    # Alice
 print("getattr(person, 'height', 'Unknown'):", getattr(person, 'height', 'Unknown'))  # Unknown
+print(getattr(person, 'greet')()) # Hello, I'm Alice
 
 # setattr() - 设置属性值
 setattr(person, 'height', 170)

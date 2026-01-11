@@ -3,450 +3,686 @@ sidebar_position: 4
 title: 接口开发
 ---
 
-## API概述
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-API，全称为 **应用程序编程接口**（Application Programming Interface），是一组定义了不同软件组件之间如何交互的规则和协议。API 允许不同的软件系统通过预定义的接口进行通信，使得开发者能够利用现有的功能和服务，而无需从头开始构建。这种模块化的设计不仅提高了开发效率，还促进了软件生态系统的扩展和创新。
 
-一个典型的 API 包含以下几个关键组成部分：
+:::info
+接口也叫<HoverText text="API" explanation="Application Programming Interface，应用程序编程接口"/>。是一组定义了不同软件组件之间如何交互的规则和协议。
 
-- **请求（Request）：** 客户端向服务器发送的调用请求，通常包含请求的方法、URL、头信息和参数。
-- **响应（Response）：** 服务器对客户端请求的返回结果，包含状态码、头信息和数据载体。
-- **端点（Endpoint）：** API 提供的具体功能接口的 URL 地址。
-- **方法（Method）：** 定义在特定端点上可以执行的操作，如 GET、POST、PUT、DELETE 等。
-- **数据格式（Data Format）：** 传输数据的格式，常见的有 JSON、XML 等。
+API 允许不同的软件系统通过预定义的接口进行通信，使得开发者能够利用现有的功能和服务，而无需从头开始构建。
 
-### 接口标准
+在 Python 中，有多种接口开发框架可供选择：FastAPI、Flask、Django等。目前最主流的是 FastAPI。
 
-| 特性 | **OpenAI API 风格** | **MCP** | **OpenAPI** |
-|------|-------------------|---------|-------------|
-| **类型** | 商业 API 设计 | 开放通信协议 | 开放 API 描述规范 |
-| **是否开放治理** | ❌（OpenAI 控制） | ✅（社区驱动） | ✅（Linux 基金会） |
-| **是否可自由实现** | ⚠️（法律风险模糊） | ✅（MIT 许可） | ✅ |
-| **是否有正式规范文档** | ✅（但非标准组织发布） | ✅（mcp.spec） | ✅（openapis.org） |
-| **目标** | 调用 LLM | LLM 与工具通信 | 描述 RESTful API |
+FastAPI的作者 Tiangolo（真名 Sebastián Ramírez）是一位来自哥伦比亚、目前居住在德国柏林的著名全职开源维护者。
 
-### 开发框架
+在 7 岁时就从天主教学校退学了。在退学之后，他的父母并没有强迫他回到传统学校，而是支持他居家自学。涵盖了英语、算法、机器学习、密码学和人工智能等核心计算机科学领域。
 
-任何一家公司都可以定义符合自己公司业务需求的 API，但是他们可能使用的都是同一套开发框架在 Python 中，有多种接口开发框架可供选择：
+他在 23 岁左右凭借在 GitHub 上的开源贡献和扎实的技术实力证明了自己，先后在迪拜和德国柏林的知名科技公司（如 Explosion AI 和 Forethought）担任高级/首席工程师。
+:::
 
 | 维度                | FastAPI                         | Django                                |
 |-------------------|---------------------------------|---------------------------------------|
 | **发布时间**          | 2018 年                          | 2005 年                                |
-| **开发语言**          | Python                          | Python                                |
 | **架构风格**          | 微框架，基于 Starlette 和 Pydantic     | 大型框架，支持全栈开发，内置 ORM、Admin 等            |
-| **性能**            | 高，基于 ASGI，支持异步特性                | 中等，依赖于 WSGI                           |
-| **异步支持**          | 原生支持，使用 `async`/`await`         | 通过 Django 3.0+ 开始支持异步（仍在逐步完善）         |
 | **数据验证**          | 内置 Pydantic，支持强类型和自动验证          | 依赖于表单类（如 Forms 和 DRF 的 serializers）   |
 | **自动文档生成**        | 内置支持 OpenAPI 和 Swagger UI       | 不原生支持，需依赖 Django REST Framework (DRF) |
 | **学习曲线**          | 中等，需了解类型注解和异步编程                 | 较高，包含多种内置组件，适合系统性学习                   |
-| **社区和生态**         | 新兴框架，社区成长迅速，但生态略小               | 最悠久且成熟，生态完善，适合大型项目                    |
 | **可扩展性**          | 高，强大的原生功能减少了扩展需求                | 中等，内置组件强大，但灵活性相对较低                    |
 | **依赖注入支持**        | 原生支持依赖注入                        | 无原生支持                                 |
-| **生产就绪**          | 稳定性较高，但相比 Flask 和 Django 使用年限较短 | 成熟稳定，被广泛应用于大型生产系统                     |
-| **调试工具**          | 支持 Starlette 的调试功能              | 内置调试模式，适合开发测试                         |
-| **使用场景**          | 高性能、异步处理或自动文档的场景                | 大型系统开发，支持复杂业务逻辑和多用户系统                 |
-| **ORM 支持**        | 无原生支持，需借助 Tortoise-ORM 等        | 原生支持，提供 Django ORM                    |
 | **Admin 界面**      | 无，需要自行开发                        | 原生支持，提供强大的 Admin 管理后台                 |
-| **支持的 Python 版本** | Python 3.6+                     | Python 3.8+                           |
 | **对类型注解的支持**      | 原生支持，强类型友好                      | 不直接支持，但可结合第三方库使用                      |
-
-
-## FastAPI
-
-:::info
-FastAPI的作者 Tiangolo（真名 Sebastián Ramírez）是一位来自哥伦比亚、目前居住在德国柏林的著名开源软件工程师。在 7 岁时就从天主教学校退学了。当时的原因非常有趣：因为他总是问太多的问题，被老师认为“太难对付”。
-
-在退学之后，他的父母并没有强迫他回到传统学校，而是支持他居家自学。涵盖了算法、机器学习、密码学和人工智能等核心计算机科学领域。甚至连英语也是通过在线资源自学的。
-
-他在 23 岁左右曾感到有些迷茫，因为当时他虽然已经掌握了大量深奥的知识，但由于没有正式学历和文凭，他在进入职场初期感到有些不自信。然而，他最终凭借在 GitHub 上的开源贡献和扎实的技术实力证明了自己，先后在迪拜和德国柏林的知名科技公司（如 Explosion AI 和 Forethought）担任高级/首席工程师。
-
-目前的核心工作是全职开源维护者。
-:::
 
 ### 安装
 
+FastAPI 是一个运行在 <HoverText text="ASGI" explanation="Asynchronous Server Gateway Interface，异步服务器网关接口"/> 服务器上的高性能 Web 框架，它自身并不是一个大而全的框架，它通过绑定其他框架来实现其功能。
+
+- 运行服务是是 <HoverText text="Uvicorn" explanation="Uvicorn 是一个基于 ASGI 的 Python Web 服务器，单独安装方式：pip install uvicorn"/>，它是目前最流行的轻量级、超快速的 ASGI 服务器。
+- 处理HTTP请求和响应的是<HoverText text="starlette" explanation="单独安装方式：pip install starlette"/>，是FastAPI的底层框架，用于处理HTTP请求和响应。
+- 数据验证是 <HoverText text="Pydantic" explanation="Pydantic 是一个数据验证库，单独安装方式：pip install pydantic"/>，是FastAPI的底层框架，通常和标准库typing一起使用。
+
+编写FastAPI程序的过程中你会觉得自己在写通用的Python代码，非常友好，安装时推荐安装标准版。
+
 - `pip install fastapi`：只安装核心框架。
 
-- `pip install "fastapi[standard]"`：安装核心框架的同时，自动捆绑安装开发一个标准项目所需的常用工具，包括：Uvicorn、FastAPI CLI、HTTPX、Pydantic
+- `pip install "fastapi[standard]"`：安装核心框架与常用工具。
 
-方括号语法是 “可选依赖组”（Optional Dependencies / Extras）。你可以把它理解为增强版安装。如果你已经输入了`pip install fastapi`，依然可以通过`pip install "fastapi[standard]"`补全配件。
+> `pip`包名带方括号语法是 “可选依赖组”（Optional Dependencies / Extras）。你可以把它理解为增强版安装。
+> 
+> 如果你已经输入了`pip install fastapi`，依然可以通过`pip install "fastapi[standard]"`补全常用工具配件。
 
-:::tip
-相比之下，opencv采取的是发布多个独立包的策略：
+:::info
+opencv采取的是发布多个独立包的策略：
 - `opencv-python`
 - `opencv-python-headless`
 - `opencv-contrib-python` 
 - `opencv-contrib-python-headless`
 
-opencv的几个包是互斥的。装了 A 就不能装 B。一旦安装了多个，必须全部卸载，再单独安装你需要的版本。
+因为opencv的几个包是互斥的。装了 A 就不能装 B。一旦安装了多个，必须全部卸载，再单独安装你需要的版本。
 :::
-
-### ASGI
-
-FastAPI 是一个现代的、快速的（高性能）、功能强大的 Web 框架，用于构建 API。运行在 ASGI 服务器上。
-
-* **A (Asynchronous)** ：异步。支持 `async/await` 特性，允许程序在等待 IO（如读数据库）时去处理其他请求。
-* **S (Server)** ：服务器。
-* **G (Gateway)** ：网关。
-* **I (Interface)** ：接口/标准。
-
-ASGI 服务器技术选型
-
-Uvicorn：目前最流行的轻量级、超快速的 ASGI 服务器。
-> 单独安装方式：`pip install uvicorn`
-
-Daphne：最早的 ASGI 服务器（由 Django 团队开发）。
-
-Hypercorn：支持 HTTP/2 和 HTTP/3 的 ASGI 服务器。
 
 ### 接口文档
 
-FastAPI 最受开发者欢迎的特性之一就是它原生内置了两套完全自动生成的交互式文档。你不需要写一行额外的文档代码，只要你写好了 API 逻辑，文档就实时生成了。
-
-这两套文档分别是 Swagger UI 和 ReDoc。
-
-FastAPI 并不是硬生生写了两套网页。它的逻辑是：
-
-1. **解析代码** ：FastAPI 扫描你的路径、参数、Pydantic 模型。
-2. **生成 OpenAPI 规范** ：它会自动生成一个符合国际标准 (OpenAPI/Swagger) 的  **JSON 架构文件** （你可以访问 `http://127.0.0.1:8000/openapi.json` 看到它）。
-3. **渲染 UI** ：Swagger UI 和 ReDoc 只是两个“皮肤”，它们读取这个 JSON 文件并将其可视化。
-
-#### Swagger UI
-
-访问地址：http://127.0.0.1:8000/docs
-
-核心用途：调试与测试。
-
-直接测试 (Try it out)：你不需要安装 Postman 或使用 curl 命令。点击 API 展开，点击 "Try it out"，填入参数，直接就能看到服务器返回的结果。
-
-实时校验：如果你定义的 Pydantic 模型要求某个字段是 int，你在 Swagger 里输入字符串，它会立刻变红提示你错误。
-
-#### ReDoc
-
-访问地址：http://127.0.0.1:8000/redoc
-
-核心用途：阅读与归档。
-
-极其整洁：它采用经典的三栏式布局（导航、说明、代码示例），非常适合给前端同学或第三方合作伙伴阅读。
-
-### 基础用法
-
-```python showLineNumbers
-from fastapi import FastAPI, Header, HTTPException, Query, Path
-from pydantic import BaseModel
-from typing import Optional, Dict
-
-app = FastAPI()
-
-# Pydantic Models
-class PostExampleModel(BaseModel):
-    title: Optional[str] = "默认标题"
-    content: Optional[str] = "默认内容"
-
-class PutExampleModel(BaseModel):
-    name: Optional[str] = "默认名称"
-    description: Optional[str] = "默认描述"
-
-class ApiResourcePostModel(BaseModel):
-    key: str
-
-class ApiResourcePutModel(BaseModel):
-    field: str
-
-# GET /get_example/{user_id}
-@app.get("/get_example/{user_id}")
-def get_example(
-    user_id: int,
-    name: Optional[str] = Query("默认名字"),
-    user_agent: Optional[str] = Header("未知")
-):
-    """
-    **方法：** GET
-
-    **示例请求：**
-    http:day3.ipynb
-    GET /get_example/123?name=Alice HTTP/1.1
-    Host: example.com
-    User-Agent: Mozilla/5.0
-
-    **示例响应：**
-    json
-    {
-        "user_id": 123,
-        "name": "Alice",
-        "user_agent": "Mozilla/5.0"
-    }
-
-    """
-    return {"user_id": user_id, "name": name, "user_agent": user_agent}
-
-# POST /post_example
-@app.post("/post_example")
-def post_example(
-    data: PostExampleModel,
-    authorization: Optional[str] = Header("无授权")
-):
-    """
-    **方法：** POST
-
-    **示例请求：**
-    http
-    POST /post_example HTTP/1.1
-    Host: example.com
-    Content-Type: application/json
-    Authorization: Bearer token
-
-    {
-        "title": "示例标题",
-        "content": "示例内容"
-    }
-
-    **示例响应：**
-    json
-    {
-        "title": "示例标题",
-        "content": "示例内容",
-        "authorization": "Bearer token"
-    }
-
-    """
-    return {"title": data.title, "content": data.content, "authorization": authorization}
-
-# PUT /put_example/{item_id}
-@app.put("/put_example/{item_id}")
-def put_example(
-    item_id: int,
-    data: PutExampleModel,
-    x_custom_header: Optional[str] = Header("无自定义头")
-):
-    """
-    **方法：** PUT
-
-    **示例请求：**
-    http
-    PUT /put_example/456 HTTP/1.1
-    Host: example.com
-    Content-Type: application/x-www-form-urlencoded
-    X-Custom-Header: 自定义值
-
-    name=新名称&description=新描述
-
-    **示例响应：**
-    json
-    {
-        "item_id": 456,
-        "name": "新名称",
-        "description": "新描述",
-        "custom_header": "自定义值"
-    }
-
-    """
-    return {
-        "item_id": item_id,
-        "name": data.name,
-        "description": data.description,
-        "custom_header": x_custom_header,
-    }
-
-# DELETE /delete_example
-@app.delete("/delete_example")
-def delete_example(
-    confirm: bool = Query(False),
-    authorization: Optional[str] = Header("无授权")
-):
-    """
-    **方法：** DELETE
-
-    **示例请求（确认删除）：**
-    http
-    DELETE /delete_example?confirm=true HTTP/1.1
-    Host: example.com
-    Authorization: Bearer token
-
-    **示例响应（确认删除）：**
-    json
-    {
-        "deleted": true,
-        "authorization": "Bearer token"
-    }
-
-
-    **示例请求（未确认删除）：**
-    http
-    DELETE /delete_example HTTP/1.1
-    Host: example.com
-
-    **示例响应（未确认删除）：**
-    json
-    {
-        "message": "删除未确认"
-    }
-
-    HTTP 状态码：400
-    """
-    if not confirm:
-        raise HTTPException(status_code=400, detail="删除未确认")
-    return {"deleted": confirm, "authorization": authorization}
-
-# GET /api/resource/{resource_id}
-@app.get("/api/resource/{resource_id}")
-def api_resource_get(
-    resource_id: str,
-    detail: Optional[str] = Query("basic")
-):
-    """
-    **方法：** GET
-
-    **请求示例：**
-    GET /api/resource/abc123?detail=full HTTP/1.1
-    Host: example.com
-
-    **响应示例：**
-    json
-    {
-        "method": "GET",
-        "resource_id": "abc123",
-        "detail": "full"
-    }
-
-    """
-    return {"method": "GET", "resource_id": resource_id, "detail": detail}
-
-# POST /api/resource/{resource_id}
-@app.post("/api/resource/{resource_id}")
-def api_resource_post(
-    resource_id: str,
-    data: ApiResourcePostModel
-):
-    """
-    **方法：** POST
-
-    **请求示例：**
-    POST /api/resource/abc123 HTTP/1.1
-    Host: example.com
-    Content-Type: application/json
-
-    {
-        "key": "value"
-    }
-
-    **响应示例：**
-    json
-    {
-        "method": "POST",
-        "resource_id": "abc123",
-        "data": {
-            "key": "value"
-        }
-    }
-
-    """
-    return {"method": "POST", "resource_id": resource_id, "data": data.dict()}
-
-# PUT /api/resource/{resource_id}
-@app.put("/api/resource/{resource_id}")
-def api_resource_put(
-    resource_id: str,
-    data: ApiResourcePutModel
-):
-    """
-    **方法：** PUT
-
-    **请求示例：**
-    PUT /api/resource/abc123 HTTP/1.1
-    Host: example.com
-    Content-Type: application/x-www-form-urlencoded
-
-    field=new%20value
-
-    **响应示例：**
-    json
-    {
-        "method": "PUT",
-        "resource_id": "abc123",
-        "data": {
-            "field": "new value"
-        }
-    }
-
-    """
-    return {"method": "PUT", "resource_id": resource_id, "data": data.dict()}
-
-# DELETE /api/resource/{resource_id}
-@app.delete("/api/resource/{resource_id}")
-def api_resource_delete(
-    resource_id: str,
-    confirm: bool = Query(False)
-):
-    """
-    **方法：** DELETE
-
-    **请求示例：**
-    DELETE /api/resource/abc123?confirm=true HTTP/1.1
-    Host: example.com
-
-    **响应示例：**
-    json
-    {
-        "method": "DELETE",
-        "resource_id": "abc123",
-        "confirm": true
-    }
-
-    """
-    return {"method": "DELETE", "resource_id": resource_id, "confirm": confirm}
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-
-```
-
-下面是异步函数作为 FastAPI 的返回值的示例
-
-```python showLineNumbers
-from fastapi import FastAPI
-from fastapi.responses import StreamingResponse
-import asyncio
-import random
-
-app = FastAPI()
-
-async def async_range(n):
-    for i in range(n):
-        yield f"<p>{i}</p>"
-        await asyncio.sleep(random.randint(1, 3) * 1)
-
-@app.get("/stream")
-async def stream_numbers():
-    return StreamingResponse(async_range(5), media_type="html", background=None)
-
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
-```
+FastAPI 内置了两套根据你的代码自动实时生成的交互式文档。它的逻辑是：
+
+- 解析代码 ：FastAPI 扫描你的路径、参数、Pydantic 模型。
+- 生成 OpenAPI 规范 ：自动生成标准JSON API 架构文件 : http://127.0.0.1:8000/openapi.json
+- Swagger UI 读取这个文件生成<Highlight>可在线测试</Highlight>的网页: http://127.0.0.1:8000/docs
+- ReDoc 读取这个文件生成<Highlight>易于在线阅读</Highlight>的网页: http://127.0.0.1:8000/redoc
 
 :::tip
-如何验证 FastAPI 的真实并发能力？
+如果你忘记了这些地址，可以对app对象使用.openapi_url、.redoc_url、.docs_url属性获取。
 
-通过代码而不是浏览器。如果你在 **同一个浏览器** （比如 Chrome）中打开两个标签页，同时请求同一个 URL：
+同样的，如果你的希望更改这些默认地址的路由使其更有可读性，也可以通过属性设置。
 
-* **浏览器的锁定机制** ：大多数现代浏览器为了防止过度消耗服务器资源，会对**完全相同的 URL** 进行连接锁定。它会等待第一个请求完成后，才发出第二个。
+```python showLineNumbers
+import fastapi
+
+# 更改默认的文档地址
+app = fastapi.FastAPI(redoc_url="/test_doc",docs_url="/doc")
+print(app.openapi_url)
+print(app.redoc_url)
+print(app.docs_url)
+
+@app.get("/")
+def index():
+    return {"messages":"Hi"}
+"""
+/openapi.json
+/test_doc
+/doc
+"""
+```
+
+启动命令：`uv run uvicorn main:app --reload`
 :::
 
-### 数据流
+## 生命周期
 
-在 Web 接口请求中，数据主要分布
+从你构建一个一个FastAPI应用开始，到中间收发请求，最后应用关闭，这个过程就是FastAPI的请求生命周期。
+
+| 阶段       | 范畴 (Category)    | 核心组件             | 详细动作说明                                         |
+|----------|------------------|------------------|------------------------------------------------|
+| 1. 应用启动  | Lifespan (Start) | lifespan         | 初始化：建立数据库长连接、预加载 AI 模型、配置全局资源。                 |
+| 2. 请求拦截  | Request          | Middleware       | 解析与预检：解析 HTTP 报文，处理 CORS、GZip 解压、Session 状态还原。 |
+| 3. 路由匹配  | Request          | Router           | 定位：根据 URL 和 Method 找到匹配的路径函数。匹配失败则直接返回 404。    |
+| 4. 依赖注入  | Request          | Depends          | 前置准备：执行依赖项（如 Auth 校验、DB Session 开启）。若失败则抛出异常。  |
+| 5. 参数校验  | Request          | Pydantic         | 入参验证：将数据转为模型对象并校验格式。校验失败则返回 422。               |
+| 6. 业务执行  | Processing       | Path Function    | 逻辑运算：运行你编写的业务代码。若产生错误，将在此处抛出异常。                |
+| 7. 异常处理  | Processing       | Exc Handler      | 异常补救：捕获业务异常，将其转换为统一格式的 JSONResponse。           |
+| 8. 数据转换  | Response         | jsonable_encoder | 序列化：将 Python 对象、ORM 模型转换为 JSON 兼容的基础数据格式。      |
+| 9. 响应校验  | Response         | response_model   | 出参验证：根据 Schema 强制过滤字段（如剔除密码），确保输出安全。           |
+| 10. 响应拦截 | Response         | Middleware       | 后处理：最后一次修改 Header（如加签名）、计算耗时、记录访问日志。           |
+| 11. 物理发送 | Response         | ASGI Server      | 传输：通过网络套接字（Socket）将字节流正式传回客户端。                 |
+| 12. 后台任务 | Post-Response    | BackgroundTasks  | 扫尾：在连接断开后，异步执行耗时操作（如发送邮件、统计数据）。                |
+| 13. 应用关闭 | Lifespan (End)   | lifespan         | 释放：关闭数据库连接池，清理内存资源，确保程序优雅退出。                   |
+
+
+## 应用启动与关闭
+
+lifespan可以将应用启动时操作和应用关闭时操作写在同一个块代码中，避免人为的遗忘。
+
+```python showLineNumbers
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+
+def fake_answer_to_everything_ml_model(x):
+    """一个假的机器学习模型，返回一个数的2倍"""
+    return x * 2
+"""
+lifespan只接受异步的上下文管理器。
+
+而asynccontextmanager刚好可以把生成器变成上下文管理器
+
+yield 之前的内容等同于 with 语法执行。
+
+yield 之后的内容等同于 with 语法结束。
+"""
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # 加载模型（提前加载好模型，每次请求时就不用再耗时加载了）
+    # app.state 是一个全局的状态抽屉，你可以把所有全局要用的内容追加到其属性名当中
+    app.state.model = fake_answer_to_everything_ml_model
+    yield
+    del app.state.model
+    print("安全的关闭数据库并清理内存空间")
+
+app = FastAPI(lifespan=lifespan)
+
+# 请求约定与路由
+@app.get("/")
+# 自动读取类型标注为格式验证
+async def predict(x:float) :
+    result = app.state.model(x)
+    return {"result": result}
+```
+
+你可以通过`http://127.0.0.1:8000/?x=1`访问，结果是`{"result": 2}`。
+
+更推荐通过浏览器访问`http://127.0.0.1:8000/docs`。
+
+点击`Try it out`按钮，填写参数，点击`Execute`按钮，查看结果。
+
+## 接收请求
+
+前端大部分的请求是通过浏览器发送请求到后端，后端接收请求并处理，最后返回响应给前端。
+
+请求是一种相当复杂的数据类型，包含以下几个部分：
+
+```python showLineNumbers
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+@app.get("/index")
+async def catch_all(request: Request):
+    # 获取请求方法 (返回结果是大写的字符串，如 "POST")
+    method = request.method
+
+    # 获取请求URL
+    """
+    可以继续获取到请求URL的各个部分：
+    url.scheme : 协议
+    url.hostname : 主机
+    url.port : 端口
+    url.netloc : 网络位置(主机:端口)
+    url.path : 路径
+    url.query : 查询参数
+    url.is_secure : 是否使用安全连接
+    url.components : 组件元组(协议、主机、端口、路径、查询参数)
+    url.fragment : 锚点 (URL的锚点部分，以#开头，快速跳转到页面中的特定位置)
+
+    有些数据库连接URL会包含用户名和密码，如：http://admin:123456@192.168.1.10:9200
+    url.username : 用户名 (http://admin:123456@192.168.1.10:9200) 中的admin
+    url.password : 密码 (http://admin:123456@192.168.1.10:9200) 中的123456
+    """
+    url = request.url # "http://127.0.0.1:8000/index?id=1"
+
+    # 网络与客户端信息
+    """
+    可以获取到客户端的网络与客户端信息：
+    client.host : 主机
+    client.port : 端口
+    """
+    client_host = request.client.host # "127.0.0.1"
+    client_port = request.client.port # 8000
+    ## 获取服务器IP和端口
+    server_ip, server_port = request.scope.get("server") # ("127.0.0.1", 8000)
+
+    # 获取请求头字典
+    headers = dict(request.headers)
+    ## 获取请求头字典中的cookie的两种方式
+    cookies1 = dict(request.headers).get("Cookie", "")
+    cookies2 = request.cookies
+    # 使用request.cookies可以轻松获取sessionid
+    cookies_sessionid = request.cookies.get("sessionid")
+    ## 添加session中间件后，可以通过request.session获取session
+    """
+    from starlette.middleware.sessions import SessionMiddleware
+    app = FastAPI()
+    app.add_middleware(SessionMiddleware, secret_key="secret_key")
+    """
+    session = request.session
+
+    return {}
+```
+
+### 请求方法
+
+请求方法是指浏览器发送请求到后端时，所使用的方法。浏览器直接打开某个地址，就是GET方法。
+
+方法的本身带有一定的语义，比如:GET方法表示获取资源
+
+| 方法 | 语义 | 带 Body | 幂等 | 安全 | 可缓存 |
+|------|------|----------|-------|-------|---------|
+| GET | 获取资源 | ❌ 否 | ✅ 是 | ✅ 是 | ✅ 是 |
+| POST | 创建资源 | ✅ 是 | ❌ 否 | ❌ 否 | ❌ 否 |
+| PUT | 更新(全量) | ✅ 是 | ✅ 是 | ❌ 否 | ❌ 否 |
+| PATCH | 更新(局部) | ✅ 是 | ❌ 否 | ❌ 否 | ❌ 否 |
+| DELETE | 删除资源 | ⚠️ 建议不带 | ✅ 是 | ❌ 否 | ❌ 否 |
+| OPTIONS | 探测支持 | ❌ 否 | ✅ 是 | ✅ 是 | ❌ 否 |
+
+:::tip 幂等性 (Idempotence)
+同一个操作执行 1 次和执行 100 次，对系统资源的影响是否一致。
+
+**幂等 (Safe/Idempotent)：**
+
+- GET：查 100 次，数据不会变。
+- PUT：把 A 改成 B，改 100 次，结果依然是 B。
+- DELETE：删掉 ID 为 1 的用户，删 1 次和 100 次，结果都是"该用户不存在"。
+
+**非幂等 (Non-Idempotent)：**
+
+- POST：每点一次"提交"，后端就创建一个新订单。点 100 次，产生 100 个订单。
+- PATCH：不是必须幂等的（取决于实现，建议设计为幂等）。
+:::
+
+:::info 缓存机制 (Caching)
+GET 是可以被浏览器、CDN、代理服务器自动缓存的。
+
+POST 默认不会被缓存。这保证了金融交易、账号注册等操作必须实时到达后端。
+:::
+
+:::info 安全性 (Safe Methods)
+这里的"安全"是指**"是否会修改服务器数据"**：
+
+**安全方法：**
+
+- GET、HEAD、OPTIONS 被称为安全方法，因为它们理论上只读，不应该引起服务器状态变化。
+
+**不安全方法：**
+
+- POST、PUT、PATCH、DELETE 是不安全的，因为它们会改变数据库。
+:::
+
+```python showLineNumbers
+from fastapi import FastAPI, Request
+
+app = FastAPI()
+
+# 创建接受单一请求方式（GET）的接口
+@app.get("/")
+async def index():
+    return {"message": "Hello, GET!"}
+
+# 技术上同个路由可以绑定不同的方法，但并不推荐
+@app.delete("/")
+async def index():
+    return {"message": "Hello, DELETE!"}
+
+# 等价于
+@app.delete("/")
+@app.get("/")
+async def method(request: Request):
+    if request.method == "GET":
+        return {"message": "这是 GET 请求"}
+    return {"message": f"这是 {request.method} 请求"}
+```
+
+:::info
+OpenAPI 规范中，在同一个 Path 下，HTTP 方法（Operation）必须是唯一的。
+
+所以并不鼓励在同一个路由下绑定多个方法，也不推荐使用 `api_route` 来支持多种请求方式。
+
+遵循规范可以避免额外的BUG。
+:::
+
+### 请求URL
+
+请求URL是指浏览器发送请求到后端时的URL。由协议、域名/主机、端口、路径、查询参数组成。
+
+#### 协议
+
+| 协议名称 | 主要用途 | 类比生活中的场景 |
+|---------|---------|----------------|
+| HTTP | 访问网页 | 翻阅图书馆的书籍 |
+| HTTPS | 访问网页 | 翻阅图书馆的书籍 |
+| FTP | 上传/下载文件 | 搬运大件货物 |
+| SMTP | 发送邮件 | 邮递员把信投进邮筒 |
+| DNS | 网址解析 | 查电话本寻找联系人 |
+| MQTT | 物联网通信 | 智能家居传感器的小纸条 |
+
+#### 域名/主机
+
+当在本地开发时，域名/主机通常为`localhost`或`127.0.0.1`。
+当在服务器上部署时，域名/主机通常为服务器IP地址。
+
+#### 端口
+
+当协议为HTTP时，端口默认为80，当协议为HTTPS时，端口默认为443。
+
+#### 路径与查询参数
+
+路径与查询参数本身是可以传递信息的:
+
+- 路径参数(强制必填)
+- 查询参数(可设默认参数)
+
+```python showLineNumbers
+from fastapi import FastAPI,Query
+app = FastAPI()
+
+# 路径参数
+@app.get("/images_path/{image_width}/{image_height}")
+async def get_image(image_width: int, image_height: int):
+    """
+    浏览器参数格式：
+    http://localhost:8000/images_path/100/100
+
+    用于定位特定资源
+    """
+    return {"image_width": image_width, "image_height": image_height}
+
+# 查询参数
+@app.get("/images_query/")
+async def get_images(width: int = Query(default=100), height: int = Query(default=100)):
+    """
+    浏览器传入参数：
+    http://localhost:8000/images_query?width=100&height=100
+
+    浏览器使用默认值：
+    http://localhost:8000/images_query/
+
+    用于搜索、排序、分页
+    """
+    return {"width": width, "height": height}
+```
+
+### 请求头字典
+
+除了上面必备的请求信息之外，你还可以额外添加一些内容辅助服务器理解请求。可通过`request.headers`可以获取到请求头字典。
+
+```python showLineNumbers
+from fastapi import FastAPI,Query,Request
+app = FastAPI()
+
+@app.get("/")
+async def get_image(request: Request):
+    return dict(request.headers)
+"""
+{
+  "host": "127.0.0.1:8000",
+  "connection": "keep-alive",
+  "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
+  "sec-ch-ua-mobile": "?0",
+  "sec-ch-ua-platform": "\"Windows\"",
+  "upgrade-insecure-requests": "1",
+  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
+  "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+  "sec-fetch-site": "none",
+  "sec-fetch-mode": "navigate",
+  "sec-fetch-user": "?1",
+  "sec-fetch-dest": "document",
+  "accept-encoding": "gzip, deflate, br, zstd",
+  "accept-language": "zh-CN,zh;q=0.9",
+  "cookie": "csrftoken=9VZsSS9jnRLIopC5TbdIXRl3yMKhbq5c; sessionid=h8ofhxjbfysrbzbbmcnlo601zav5qxhl"
+}
+"""
+```
+
+- `User-Agent`:用于标识浏览器的信息，常用于区分移动端和PC端、初级反爬。
+- `Referer`:用于标识请求的来源，常用于统计分析。
+- `Cookie`:用于<HoverText text="标识请求的Cookie" explanation="Cookie是存储在浏览器端，Session是存储在服务器端。"/>，常用于用户身份验证。
+
+```python showLineNumbers
+from fastapi import FastAPI, Request
+import secrets
+
+app = FastAPI()
+"""
+secret_key选择足够复杂的即可。
+我这里生成一个 32 字节（256 位）的十六进制随机字符串作为secret_key，用来加密和解密 Session 数据。
+不要频繁更换：一旦你修改了 secret_key，所有之前发给用户的 Session Cookie 都会失效。用户会发现自己莫名其妙被踢出登录了。
+
+FastAPI 为了保持轻量和安全，默认不开启Session功能，因为 Session 涉及到 Cookie 的签名加密和安全性设置。
+"""
+from starlette.middleware.sessions import SessionMiddleware
+app.add_middleware(SessionMiddleware, 
+        secret_key=secrets.token_hex(32),
+        session_cookie="session_cookie", # 浏览器中显示的 Cookie 名称
+        max_age=1209600  # Session 有效期 2 周（1209600秒）
+        )
+
+@app.get("/index")
+async def catch_all(request: Request):
+
+    cookies1 = dict(request.headers).get("cookie")
+    cookies2 = request.cookies
+    cookies2.get("sessionid")
+    """
+    你可以通过request.cookies获取，但是要手动解析。
+    
+    cookie作为常用的请求头字段，有一个专门的属性cookies，方便你获取解析后的cookie字典。
+
+    "cookies1": "csrftoken=9VZsSS9jnRLIopC5TbdIXRl3yMKhbq5c; sessionid=h8ofhxjbfysrbzbbmcnlo601zav5qxhl",
+    "cookies2": {
+        "csrftoken": "9VZsSS9jnRLIopC5TbdIXRl3yMKhbq5c",
+        "sessionid": "h8ofhxjbfysrbzbbmcnlo601zav5qxhl"
+            }
+    """
+
+    ## 获取session
+    session = request.session
+    # 获取session中的views，如果为空则初始化为0
+    views = request.session.get("views", 1)
+    # 将views加1
+    request.session["views"] = views + 1
+    if request.session["views"] > 3:
+        # 手动清空session，可用于用户点击退出之后
+        request.session.clear()
+
+    return {
+        "message": f"欢迎回来！这是你第 {views} 次访问。",
+        "session":session,
+        "cookies1":cookies1,
+        "cookies2":cookies2
+    }
+
+"""
+{
+  "message": "欢迎回来！这是你第 2 次访问。",
+  "session": {
+    "views": 3
+  },
+  "cookies1": "session_cookie=eyJ2aWV3cyI6IDJ9.aWPV2A.Aeii6ixVKsV_dtCzXUW54GTFwTs",
+  "cookies2": {
+    "session_cookie": "eyJ2aWV3cyI6IDJ9.aWPV2A.Aeii6ixVKsV_dtCzXUW54GTFwTs"
+  }
+}
+"""
+
+```
+
+- `Content-Type`:用于标识请求的Content-Type,以便服务器正确解析请求体。
+
+<MarkmapHooks initialMarkdown={`
+
+# 1. 独立类型 (Discrete Types)
+
+## application (应用)
+
+* 需特定程序解析的数据
+* application/json (JSON数据)
+* application/pdf (PDF文档)
+* application/octet-stream (二进制流/未知类型)
+
+## text (文本)
+
+* 主要以文字形式呈现
+* text/html (网页)
+* text/plain (纯文本)
+* text/css (样式表)
+* text/javascript (脚本)
+
+## image (图像)
+
+* 静态图或动画
+* image/jpeg (照片)
+* image/png (透明图)
+* image/gif (动图)
+* image/webp (高效压缩图)
+
+## audio/video (音视频)
+
+* 声音或动态画面
+* audio/mpeg (MP3)
+* audio/wav (无损音频)
+* video/mp4 (通用视频)
+* video/webm (网络流视频)
+
+## font (字体)
+
+* 字库文件
+* font/woff (Web字体)
+* font/ttf (标准字体)
+
+# 2. 复合类型 (Multipart Types)
+
+## multipart (多部分)
+
+* 包含多个不同类型的数据块
+* multipart/form-data (文件上传/多字段)
+* multipart/byteranges (断点续传/部分下载)
+
+# 3. 结构化标记 (Suffixes)
+
+## +xml
+
+* 骨架为XML的自定义格式
+* image/svg+xml, application/xhtml+xml
+
+## +json
+
+* 骨架为JSON的自定义格式
+* application/ld+json, application/manifest+json
+`} />
+
+当然，实际资源与请求方式一致总是好的，但是有时候用户登录之后，你希望获取它的用户信息，包含：用户名、头像。
+
+一个是文本、一个是小图片，此时我们一般会选择把图片编码为base64字符串，然后和用户名一起返回给前端。这样可以减少一次请求。
+
+<Tabs>
+  <TabItem value="main" label="接口" default>
+```python showLineNumbers
+import base64
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+# 模拟读取本地头像文件并转换为 Base64
+def get_image_base64(file_path: str):
+    try:
+        with open(file_path, "rb") as image_file:
+            # 读取二进制数据 -> 转为 Base64 编码 -> 转为 UTF-8 字符串
+            encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+            return f"data:image/png;base64,{encoded_string}"
+    except FileNotFoundError:
+        return None
+
+@app.get("/user/profile")
+async def get_user_profile():
+    # 模拟从数据库获取数据
+    user_info = {
+        "username": "Gemini_User",
+        "user_id": 1024,
+        "email": "hello@example.com"
+    }
+    
+    # 获取图片的 Base64 字符串（假设文件名为 avatar.png）
+    avatar_base64 = get_image_base64("1.png")
+    
+    # 合并返回
+    return {
+        "code": 200,
+        "data": {
+            **user_info,
+            "avatar": avatar_base64  # 前端拿到后可以直接放在 <img src="..."> 中
+        }
+    }
+```
+  </TabItem>
+
+  <TabItem value="test" label="测试">
+```python showLineNumbers
+
+import httpx
+import base64
+
+url = "http://127.0.0.1:8000/user/profile"
+# 获取数据
+response = httpx.get(url=url)
+json_data = response.json()
+
+# 1. 提取 Base64 字符串
+# 假设格式是 "data:image/png;base64,iVBORw0KGgo..."
+full_base64_str = json_data["data"]["avatar"]
+
+# 2. 去掉前缀 (Data URI scheme)
+if "base64," in full_base64_str:
+    header, base64_str = full_base64_str.split("base64,")
+else:
+    base64_str = full_base64_str
+
+# 3. 字符串解码为字节串
+img_binary = base64.b64decode(base64_str)
+
+# 4. 保存图片
+with open("downloaded_avatar.png", "wb") as f:
+    f.write(img_binary)
+```
+  </TabItem>
+
+</Tabs>
+
+
+form表单是互联网的“元老”，诞生于 JSON 之前。它不能处理复杂的嵌套（比如列表里套对象）。如果你要编写一个具有兼容性的后台，支持form表单和JSON请求。
+
+你可以通过判断`Content-Type`来完成。
+
+<Tabs>
+  <TabItem value="main" label="接口" default>
+```python showLineNumbers
+from fastapi import FastAPI,Query,Request
+app = FastAPI()
+
+@app.post("/")
+async def get_image(request: Request):
+    """
+    Content-Type、Authorization 还是你自己定义的 X-Custom-Token
+    
+    都可以通过 request.headers.get(key, "") 来获取键值。
+    """
+    content_type = request.headers.get("Content-type", "")
+    xheader = request.headers.get("X-Content-type", "")
+    if xheader:
+        return {"message": "X-header"}
+    if content_type.startswith("multipart/form-data"):
+        return {"message": "From"}
+    elif content_type.startswith("application/json"):
+        return {"message": "JSON"}
+    
+    return {"message": f"UNknow: {content_type}"}
+```
+  </TabItem>
+
+  <TabItem value="test" label="测试">
+```python showLineNumbers
+import httpx
+
+url = "http://127.0.0.1:8000"
+headers = [
+    {"Content-type":"multipart/form-data"},
+    {"Content-type":"application/json"},
+    {"X-Content-type":"text/plain"},
+]
+
+for header in headers:
+    print(httpx.post(url=url,headers=header).content)
+
+"""
+b'{"message":"From"}'
+b'{"message":"JSON"}'
+b'{"message":"X-header"}'
+"""
+```
+  </TabItem>
+
+</Tabs>
+
+:::tip
+你也可以自定义任何名称的请求头。这些非标准头通常被称为 Custom Headers。
+
+自定义头推荐以 X- 开头（例如 X-My-Token），以区分标准头。
+:::
+
+### Body (请求体)
 
 | **数据来源 (Location)** | **浏览器/HTTP 格式**   | **FastAPI 参数定义方式** | **Python 转换后的类型**  | **典型用途** |
 | ----------------------------- | ---------------------------- | ------------------------------ | ------------------------------ | ------------------ |
-| **Path (路径)**         | `/users/10`                | `user_id: int`               | `int`                        | 定位特定资源       |
-| **Query (查询)**        | `?q=fast&page=1`           | `q: str, page: int`          | `str`,`int`                | 搜索、排序、分页   |
 | **Body (JSON)**         | `{"id": 1, "name": "AI"}`  | `item: Item(BaseModel)`      | **Pydantic Model**       | 提交复杂业务数据   |
 | **Body (Form)**         | `user=me&pw=123`           | `user: str = Form()`         | `str`                        | 传统表单登录       |
 | **File (文件)**         | 二进制流 (Multipart)         | `file: UploadFile`           | **SpooledTemporaryFile** | 上传头像、文档     |
-| **Header (请求头)**     | `Authorization: Bearer...` | `token: str = Header()`      | `str`                        | 鉴权、设备信息     |
-| **Cookie**              | `session=xyz`              | `id: str = Cookie()`         | `str`                        | 身份追踪           |
 
 接口除了可以传输文本数据，还可传输图片、视频等数据，OpenCV 可以捕获屏幕，将两者结合起来，实现内网直播功能，可以在局域网内通过浏览器观看屏幕共享。
 
@@ -607,129 +843,10 @@ if __name__ == '__main__':
     uvicorn.run(app, host=ip_host2, port=80)
 ```
 
-### 并发执行环境
 
-#### async def 内部使用 同步库
+## Middleware中间件
 
-在 `async def` 函数中使用同步的 `requests.get()` 而非 `httpx.get()` 时会发生阻塞。
-
-会阻塞整个事件循环（Event Loop）。`async def` 函数在事件循环中执行，而 `requests` 是同步阻塞库。FastAPI 使用单线程事件循环处理所有异步任务，在异步函数中执行同步阻塞操作会导致整个服务器的其他异步请求都被阻塞。在异步函数中阻塞 2 秒，所有其他异步请求也会被阻塞 2 秒。
-
-#### 普通的 def 内部使用 同步库
-
-使用普通的 `def`（同步函数）时，FastAPI 会自动将该函数放入 External Thread Pool（外部线程池）执行。
-
-在线程池未满时不影响性能，线程池满时会排队等待。虽然会阻塞线程池中的线程，但不会阻塞事件循环，其他异步请求仍可正常处理。
-
-在 FastAPI 中，使用同步库（如 `requests`、`pyodbc`）时，应使用 `def` 而不是 `async def`。
-
-:::tip
-对于 IO 密集型任务（如网络请求、数据库查询），优先使用 `async def` 配合异步库（如 `httpx`、`asyncpg`）。
-
-对于 CPU 密集型任务或必须使用同步库的场景，使用 `def` 让 FastAPI 自动将其放入线程池执行。
-:::
-
-### 依赖注入
-
-`Depends` 是 FastAPI 的核心特性，用于实现代码解耦和业务逻辑分离。
-
-最佳实践是将鉴权、数据库连接等横切关注点从业务逻辑函数中分离，抽取为依赖函数，通过 `Depends` 注入。
-
-#### 用户鉴权示例
-
-为 API 添加用户鉴权功能：
-
-所有 `/admin` 开头的接口必须在 Header 中带上 `X-Token`。
-
-Token 不正确时返回 403。
-
-Token 正确时，路径函数可直接获取解析后的 `user_name`。
-
-```python showLineNumbers
-from fastapi import FastAPI, Depends, Header, HTTPException
-
-app = FastAPI()
-
-# 1. 定义依赖项
-async def verify_admin_token(x_token: str = Header(...)):
-    if x_token != "super-secret-token":
-        raise HTTPException(status_code=403, detail="Token 错误！")
-    return "Admin_User"  # 返回值可以被后续函数直接使用
-
-# 2. 在接口中注入
-@app.get("/admin/db-backup")
-async def backup(user: str = Depends(verify_admin_token)):
-    # 只有通过了 verify_admin_token，才会执行到这里
-    # user 的值就是 "Admin_User"
-    return {"message": f"Hello {user}, backup started..."}
-```
-
-优势：对于多个管理接口，只需在每个函数中添加 `Depends`，也可全局挂载到路由组（Router）。
-
-#### Depends 的执行顺序
-
-`Depends` 的执行顺序是先运行依赖函数，再进入路径函数。
-
-1. **扫描依赖**：FastAPI 看到路径函数声明了 `Depends(verify_admin_token)`
-2. **前置执行**：FastAPI 先调用 `verify_admin_token`，检查 Header，运行函数逻辑
-3. **异常中断**：如果在 `verify_admin_token` 里触发了 `raise HTTPException`，流程会直接中断，返回响应给前端。路径函数不会被执行
-4. **注入结果**：如果运行成功，`verify_admin_token` 的返回值会被赋值给路径函数的参数
-5. **业务逻辑**：最后才运行路径函数内部的代码
-
-#### 依赖缓存机制
-
-当接口依赖 A 和 B，且 A 和 B 都依赖数据库连接 `get_db` 时，FastAPI 默认在同一请求中只执行一次 `get_db`，并将结果缓存后分发给 A 和 B，节省资源。
-
-`Depends` 支持嵌套。`verify_admin_token` 也可以依赖其他函数（如 `get_db`）。
-
-#### 数据库选型建议
-
-承载 10k+ QPS 时，应选择异步 ORM（如 Tortoise-ORM 或 SQLAlchemy 2.0 async）而非同步 SQLAlchemy。
-
-- 同步 ORM：必须配合 `def` 使用。FastAPI 会使用线程池，但线程资源昂贵（每个线程占用数 MB 内存），大量线程可能导致服务器内存不足。
-- 异步 ORM：配合 `async def` 使用。不占用额外线程，在等待数据库返回时让出 CPU 处理其他请求。这是 FastAPI 高性能的关键。
-
-### Pydantic 的进阶数据校验
-
-在注册用户接口中，需要接收 `password` 和 `confirm_password`，并在 Pydantic 模型中校验这两个字段必须完全一致。
-
-校验失败时，FastAPI 应返回自定义错误信息（如 "两次密码不一致"）。
-
-实现字段间校验需要使用 `model_validator`。
-
-```python showLineNumbers
-from pydantic import BaseModel, model_validator
-
-class RegisterUser(BaseModel):
-    username: str
-    password: str
-    confirm_password: str
-
-    # mode='after' 表示数据初步解析完后再跑这个校验
-    @model_validator(mode='after')
-    def check_passwords_match(self):
-        pw1 = self.password
-        pw2 = self.confirm_password
-        if pw1 != pw2:
-            raise ValueError("两次输入的密码不一致！")
-        return self
-```
-
-当 Pydantic 抛出 `ValueError` 时，FastAPI 会自动捕获并转换成 422 Unprocessable Entity 错误返回给前端，并附带清晰的 JSON 错误说明。
-
-### 中间件
-
-中间件在请求被路径函数处理之前，以及响应返回之后运行。
-
-中间件是一个在 每个请求 被路径函数处理之前，以及在 每个响应 返回之后运行的逻辑。
-
-它的执行逻辑像一个“洋葱”：
-
-Request 进来 $\rightarrow$ 经过中间件（记录时间、检查黑名单）。
-
-到达目的地 $\rightarrow$ 执行你的路径函数（Business Logic）。
-
-Response 出去 $\rightarrow$ 再次经过中间件（添加自定义 Header、计算耗时）。
+中间件是一个在 每个请求 被路径函数处理之前，以及在 每个响应 返回之后，发出响应前运行的逻辑。
 
 ```python showLineNumbers
 import time
@@ -752,15 +869,6 @@ async def add_process_time_header(request: Request, call_next):
     
     return response
 ```
-
-| 特性 | 中间件 (Middleware) | 依赖注入 (Depends) |
-|-----|-----|-----|
-| 执行范围 | 全局。只要挂载了，所有接口都会跑。 | 局部或特定路由。可以精细控制哪个接口用。 |
-| 访问权限 | 只能拿到原始 Request 对象，很难拿到 Pydantic 解析后的数据。 | 全能。能拿到解析后的参数、模型、甚至其他依赖。 |
-| 灵活性 | 适合做：CORS(跨域)、Gzip压缩、日志统计、全局异常捕获。 | 适合做：身份验证、数据库连接、权限校验。 |
-| 异步支持 | 必须是异步的。 | 可以是同步 def 也可以是异步 async def。 |
-
-#### 中间件的执行顺序
 
 中间件的执行顺序是：**最后添加的中间件最先处理请求，最先添加的中间件最后处理响应**。
 
@@ -790,7 +898,120 @@ async def blacklist_middleware(request: Request, call_next):
 如果黑名单是基于用户 ID（涉及业务逻辑），用 Depends 挂在全局路由上。
 :::
 
-### 异常处理器
+## Router路由
+
+### 同步路由
+
+使用普通的 `def`（同步函数）时，FastAPI 会自动将该函数放入 External Thread Pool（外部线程池）执行。
+
+默认线程池大小为40。在线程池未满时不影响性能，线程池满时会排队等待。
+
+虽然会阻塞线程池中的线程，但不会阻塞事件循环，其他异步请求仍可正常处理。
+
+在 FastAPI 中，使用同步库（如 `requests`、`pyodbc`）时，应使用 `def` 而不是 `async def`。
+
+### 异步路由
+
+在 `async def` 函数中使用同步的操作时会发生阻塞。会阻塞整个事件循环（Event Loop）。`async def` 函数在事件循环中执行，而同步操作是阻塞的。
+
+FastAPI 使用单线程事件循环处理所有异步任务，在异步函数中执行同步阻塞操作会导致整个服务器的其他异步请求都被阻塞。
+
+在异步函数中阻塞 2 秒，所有其他异步请求也会被阻塞 2 秒。
+
+:::tip
+对于 IO 密集型任务（如网络请求、数据库查询），优先使用 `async def` 配合异步库（如 `httpx`、`asyncpg`）。
+
+对于 CPU 密集型任务或必须使用同步库的场景，使用 `def` 让 FastAPI 自动将其放入线程池执行。
+:::
+
+```python showLineNumbers
+from fastapi import FastAPI
+import time
+import asyncio
+
+app = FastAPI()
+
+@app.get("/sleep_async")
+async def sleep():
+    # 应该使用await asyncio.sleep(3)避免阻塞事件循环
+    time.sleep(3)
+    return {"message": f"Sleeping for 3 seconds...{time.time()}"}
+
+@app.get("/sleep")
+def sleep():
+    time.sleep(3)
+    return {"message": f"Sleeping for 3 seconds...{time.time()}"}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+```
+
+:::tip
+验证 FastAPI 的真实并发能力应该通过代码而不是浏览器。如果你在 **同一个浏览器** （比如 Chrome）中打开50个标签页，同时请求同一个 URL：
+
+- **浏览器的锁定机制** ：大多数现代浏览器为了防止过度消耗服务器资源，会对**完全相同的 URL** 进行连接锁定。它会等待第一个请求完成后，才发出第二个。
+:::
+
+处处异步才能提升性能。承载 10k+ QPS 时，应选择异步 ORM（如 Tortoise-ORM 或 SQLAlchemy 2.0 async）而非同步 SQLAlchemy。
+
+- 同步 ORM：必须配合 `def` 使用。FastAPI 会使用线程池，但线程资源昂贵（每个线程占用数 MB 内存），大量线程可能导致服务器内存不足。
+- 异步 ORM：配合 `async def` 使用。不占用额外线程，在等待数据库返回时让出 CPU 处理其他请求。这是 FastAPI 高性能的关键。
+
+## Depends依赖
+
+`Depends` 是 FastAPI 的核心特性，用于实现代码解耦和业务逻辑分离。
+
+最佳实践是将鉴权、数据库连接等横切关注点从业务逻辑函数中分离，抽取为依赖函数，通过 `Depends` 注入。
+
+`Depends` 的执行顺序是先运行依赖函数，再进入路径函数。
+
+1. **扫描依赖**：FastAPI 看到路径函数声明了 `Depends(verify_admin_token)`
+2. **前置执行**：FastAPI 先调用 `verify_admin_token`，检查 Header，运行函数逻辑
+3. **异常中断**：如果在 `verify_admin_token` 里触发了 `raise HTTPException`，流程会直接中断，返回响应给前端。路径函数不会被执行
+4. **注入结果**：如果运行成功，`verify_admin_token` 的返回值会被赋值给路径函数的参数
+5. **业务逻辑**：最后才运行路径函数内部的代码
+
+- `Depends` 支持嵌套。`verify_admin_token` 也可以依赖其他函数（如 `get_db`）。
+- 当接口依赖 A 和 B，且 A 和 B 都依赖数据库连接 `get_db` 时，FastAPI 默认在同一请求中只执行一次 `get_db`，并将结果缓存后分发给 A 和 B，节省资源。
+
+| 特性 | 中间件 (Middleware) | 依赖注入 (Depends) |
+|-----|-----|-----|
+| 执行范围 | 全局。只要挂载了，所有接口都会跑。 | 局部或特定路由。可以精细控制哪个接口用。 |
+| 访问权限 | 只能拿到原始 Request 对象，很难拿到 Pydantic 解析后的数据。 | 全能。能拿到解析后的参数、模型、甚至其他依赖。 |
+| 灵活性 | 适合做：CORS(跨域)、Gzip压缩、日志统计、全局异常捕获。 | 适合做：身份验证、数据库连接、权限校验。 |
+| 异步支持 | 必须是异步的。 | 可以是同步 def 也可以是异步 async def。 |
+
+
+## pydantic参数校验
+
+在注册用户接口中，需要接收 `password` 和 `confirm_password`，并在 Pydantic 模型中校验这两个字段必须完全一致。
+
+校验失败时，FastAPI 应返回自定义错误信息（如 "两次密码不一致"）。
+
+实现字段间校验需要使用 `model_validator`。
+
+```python showLineNumbers
+from pydantic import BaseModel, model_validator
+
+class RegisterUser(BaseModel):
+    username: str
+    password: str
+    confirm_password: str
+
+    # mode='after' 表示数据初步解析完后再跑这个校验
+    @model_validator(mode='after')
+    def check_passwords_match(self):
+        pw1 = self.password
+        pw2 = self.confirm_password
+        if pw1 != pw2:
+            raise ValueError("两次输入的密码不一致！")
+        return self
+```
+
+当 Pydantic 抛出 `ValueError` 时，FastAPI 会自动捕获并转换成 422 Unprocessable Entity 错误返回给前端，并附带清晰的 JSON 错误说明。
+
+## exception_handler异常处理器
 
 在项目中，为了避免在每个地方都写 `try...except`，需要在程序崩溃或报错时返回统一格式的 JSON。
 
@@ -823,35 +1044,102 @@ async def test_exception(name: str):
     return {"message": "Success"}
 ```
 
-### BackgroundTasks
+## jsonable_encoder数据转换
+
+在业务执行（第 6 步）完成后，你可能返回的是一个 SQLAlchemy 模型对象、一个普通的 Python 类实例、或者是包含 datetime 对象的字典。但是，JSON 格式只支持字符串、数字、布尔值、数组、对象和 null。
+
+`jsonable_encoder` 的作用是将 Python 的复杂数据类型（非 JSON 原生支持的类型）转换为 JSON 兼容的基础类型。
+
+- 日期/时间 (datetime, date): 转换为 ISO 格式的字符串。
+- 数据库模型 (ORM Objects): 提取其属性并转换为字典。
+- UUID/Decimal: 转换为字符串或浮点数。
+- Set/Tuple: 转换为 List。
+
+:::info
+`json`标准库：遇到 datetime 对象、UUID、或者 Pydantic 模型、SQLAlchemy 数据库对象时，它会直接抛出 TypeError。
+
+`jsonable_encoder`：它是一个预处理器。它能识别这些复杂的 Python 对象，并递归地将它们转换为 JSON 兼容的格式（例如把 datetime 转为 ISO 字符串，把 Pydantic 模型转为 dict）。
+:::
+
+```python showLineNumbers
+from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
+from datetime import datetime
+from pydantic import BaseModel
+
+class Item(BaseModel):
+    name: str
+    timestamp: datetime
+
+# 模拟业务返回
+item = Item(name="AI Assistant", timestamp=datetime.now())
+
+# 直接用标准库,报错：Object of type Order is not JSON serializable
+# import json
+# json.dumps(my_order)
+json_compatible_data = jsonable_encoder(item)
+
+print(type(json_compatible_data)) 
+# 输出: <class 'dict'>
+
+print(json_compatible_data)
+# 输出: {"name": "AI Assistant", "timestamp": "2023-10-27T10:00:00.000000"} 
+# 注意：datetime 成功变成了字符串，没有报错
+```
+
+## response_model响应模型
+
+```python showLineNumbers
+from fastapi import FastAPI
+from pydantic import BaseModel, EmailStr
+from typing import Optional
+
+app = FastAPI()
+
+# 定义响应模型：只有用户名和邮箱，没有密码
+class UserOut(BaseModel):
+    username: str
+    email: EmailStr
+    nickname: Optional[str] = None
+
+# 模拟数据库中的完整原始数据
+fake_db_user = {
+    "username": "Gemini_User",
+    "password": "hashed_password_123456",  # 敏感字段
+    "email": "hello@example.com",
+    "is_admin": True,                      # 内部字段
+    "nickname": "小杰"
+}
+
+@app.get("/user", response_model=UserOut)
+async def get_user():
+    # 哪怕我返回了包含密码的完整字典，FastAPI 也会根据 UserOut 进行过滤
+    return fake_db_user
+
+# 结果：{"username": "Gemini_User", "email": "hello@example.com", "nickname": "小杰"}
+```
+
+
+## BackgroundTasks
 
 高并发文件处理系统场景：用户上传大视频文件（如 1GB），系统需要对视频进行转码（CPU 密集型操作，耗时数分钟）。
 
 系统需要立即返回"正在处理中"，而非让用户等待转码完成。
 
-#### BackgroundTasks vs Celery
-
 对于这类场景，主要有以下几种选择：
 
-- **A. 在 `async def` 里直接写转码逻辑**：❌ 不适合，会阻塞整个事件循环
-- **B. 在 `def` 里写转码逻辑，靠线程池**：⚠️ 不能立刻返回"正在处理中"
-- **C. 使用 BackgroundTasks（FastAPI 内置后台任务）**：✅ 适合中小型项目
-- **D. 使用 Celery + Redis（分布式任务队列）**：✅ 适合大型/生产项目
-
-#### BackgroundTasks 的优势与局限
+- 在 `async def` 里直接写转码逻辑会阻塞整个事件循环
+- 在 `def` 里写转码逻辑，靠线程池不能立刻返回"正在处理中"
+- 使用 BackgroundTasks（FastAPI 内置后台任务）：✅ 适合中小型项目
+- 使用 Celery + Redis（分布式任务队列）：✅ 适合大型/生产项目
 
 `BackgroundTasks` 是 FastAPI 内置的功能，非常轻量。
 
 在 Response（"正在处理中"）发送给用户之后，在同一 Python 进程内启动任务继续执行。
 
-优点：
-- 不需要额外安装 Redis 或 RabbitMQ
-- 代码简洁
-- 可以立刻返回响应给用户
+优点：不需要额外安装 Redis 或 RabbitMQ、代码简洁、可以立刻返回响应给用户
 
 局限性：任务仍在 Web 服务器进程内执行。转码视频占用 CPU 较高，多个并发转码任务可能导致 Web 服务器 CPU 占用率升至 100%，影响其他 API 请求的响应速度。
-
-#### 代码示例
 
 ```python showLineNumbers
 from fastapi import FastAPI, BackgroundTasks, UploadFile, File
@@ -946,7 +1234,7 @@ curl -X POST "http://127.0.0.1:8000/upload-video" \
 
 在上面的示例中，`upload_video` 函数接收文件后立即返回响应，而 `process_video` 函数会在响应发送给客户端后，在后台执行。
 
-#### Celery + Redis 的优势
+### Celery + Redis 的优势
 
 Web 服务器将任务指令放入 Redis 队列后立即返回。由专门的 Worker 进程（可在其他服务器上）处理耗时的转码任务。
 
@@ -958,411 +1246,3 @@ Web 服务器将任务指令放入 Redis 队列后立即返回。由专门的 Wo
 适用场景：
 - 中小型项目、任务量不大：使用 `BackgroundTasks`
 - 大型项目、高并发、需要分布式处理：使用 `Celery + Redis`
-
-
-## MCP
-
-**Model Context Protocol（MCP）** 是一种开放协议，旨在标准化应用程序与大型语言模型（LLM）之间的上下文交互。
-
-MCP最初设计的对象是<Highlight>各类AI客户端（如 Claude Desktop、Cursor）,客户端通过配置文件连接 MCP 服务器</Highlight>。
-
-MCP 服务器可以暴露多种类型的功能：
-
-- **Resources（资源）：** 只读数据源，如文件内容、数据库查询结果等
-- **Tools（工具）：** LLM 可以调用的函数，用于执行操作或获取动态数据
-- **Prompts（提示词）：** 预定义的提示词模板，可供 LLM 使用
-- **Sampling(采样)：** 工具可反向调用大模型为自己生成一些内容
-
-并不是所有的主要类型功能都被支持，其中Tools支持范围最广。
-
-为了更快速的构建MCP，可以使用FastMCP 处理所有复杂的协议细节，专注于构建。大多数情况下，只需装饰一个 Python 函数即可，FastMCP 会处理剩下的工作。
-
-参考地址：https://github.com/jlowin/fastmcp
-
-### 代码示例
-
-```python showLineNumbers title="file_server.py"
-"""
-FastMCP Echo Server
-"""
-
-from fastmcp import FastMCP
-
-# Create server
-mcp = FastMCP("Echo Server")
-
-
-@mcp.tool
-def echo_tool(text: str) -> str:
-    """Echo the input text"""
-    return text
-
-
-@mcp.resource("echo://static")
-def echo_resource() -> str:
-    return "Echo!"
-
-
-@mcp.resource("echo://{text}")
-def echo_template(text: str) -> str:
-    """Echo the input text"""
-    return f"Echo: {text}"
-
-
-@mcp.prompt("echo")
-def echo_prompt(text: str) -> str:
-    return text
-```
-
-### 配置文件
-
-上面的代码我部署在`https://fastmcp.cloud/`中，下面的地址是其为我随机分配的。填入cursor后登录验证即可。
-
-```json showLineNumbers
-{
-  "mcpServers": {
-    "fastmcp": {
-      "url": "https://magnificent-crimson-antlion.fastmcp.app/mcp",
-      "transport": "http"
-    }
-  }
-}
-```
-
-如果是通过放在本地，则只需要配置全局的`fastmcp`,确保路径正确即可。
-
-```json showLineNumbers
-{
-  "mcpServers": {
-    "local-echo-server": {
-      "command": "fastmcp",
-      "args": ["run", "C:\\Users\\allen\\Desktop\\MCP\\server.py"],
-      "transport": "stdio"
-    }
-  }
-}
-```
-
-更多信息请参考 [MCP 官方文档](https://modelcontextprotocol.github.io/python-sdk/api/) 和 [PyPI 包页面](https://pypi.org/project/mcp/)。
-
-
-## Django
-
-### 基础用法
-
-Django 的接口开发，需要先创建项目和应用，然后创建视图函数，最后在 urls.py 中配置路由。
-
-虽然 Django 的接口开发比较繁琐，但是 Django 的接口开发比较规范，易于维护。
-
-安装 Django 和 Django REST framework
-
-```bash showLineNumbers
-pip install django djangorestframework
-```
-
-创建项目和应用
-
-```bash showLineNumbers
-django-admin startproject myproject
-cd myproject
-django-admin startapp apiapp
-```
-
-项目结构如下：
-
-```bash showLineNumbers
-myproject/
-├── apiapp/
-│   ├── __init__.py
-│   ├── views.py
-│   ├── urls.py
-│   └── serializers.py
-├── myproject/
-│   ├── __init__.py
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-└── manage.py
-```
-
-在 `myproject/settings.py` 中添加 `rest_framework` 和 `apiapp` 到 `INSTALLED_APPS` 列表中：
-```python showLineNumbers title=myproject/settings.py
-INSTALLED_APPS = [
-    ... # 保持原有配置
-    'rest_framework',
-    'apiapp',
-]
-```
-
-定义序列化器，有助于验证和解析输入数据。
-
-```python showLineNumbers title="apiapp/serializers.py"
-from rest_framework import serializers
-
-class PostExampleSerializer(serializers.Serializer):
-    title = serializers.CharField(default="默认标题", required=False)
-    content = serializers.CharField(default="默认内容", required=False)
-
-class PutExampleSerializer(serializers.Serializer):
-    name = serializers.CharField(default="默认名称", required=False)
-    description = serializers.CharField(default="默认描述", required=False)
-
-class ApiResourcePostSerializer(serializers.Serializer):
-    key = serializers.CharField()
-
-class ApiResourcePutSerializer(serializers.Serializer):
-    field = serializers.CharField()
-```
-
-定义视图函数
-
-```python showLineNumbers title="apiapp/views.py"
-from rest_framework import status
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.views import APIView
-
-from .serializers import (
-    PostExampleSerializer,
-    PutExampleSerializer,
-    ApiResourcePostSerializer,
-    ApiResourcePutSerializer,
-)
-
-@api_view(['GET'])
-def get_example(request, user_id):
-    """
-    **方法：** GET
-
-    **示例请求：**
-    GET /get_example/123?name=Alice HTTP/1.1
-    Host: example.com
-    User-Agent: Mozilla/5.0
-
-    **示例响应：**    ```json
-    {
-        "user_id": 123,
-        "name": "Alice",
-        "user_agent": "Mozilla/5.0"
-    }
-    """
-    name = request.query_params.get('name', '默认名字')
-    user_agent = request.headers.get('User-Agent', '未知')
-    return Response({"user_id": user_id, "name": name, "user_agent": user_agent})
-
-@api_view(['POST'])
-def post_example(request):
-    """
-    **方法：** POST
-
-    **示例请求：**
-    POST /post_example HTTP/1.1
-    Host: example.com
-    Content-Type: application/json
-    Authorization: Bearer token
-
-    {
-        "title": "示例标题",
-        "content": "示例内容"
-    }
-
-    **示例响应：**    ```json
-    {
-        "title": "示例标题",
-        "content": "示例内容",
-        "authorization": "Bearer token"
-    }
-    """
-    serializer = PostExampleSerializer(data=request.data)
-    if serializer.is_valid():
-        title = serializer.validated_data.get('title', '默认标题')
-        content = serializer.validated_data.get('content', '默认内容')
-        auth = request.headers.get('Authorization', '无授权')
-        return Response({"title": title, "content": content, "authorization": auth})
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['PUT'])
-def put_example(request, item_id):
-    """
-    **方法：** PUT
-
-    **示例请求：**
-    PUT /put_example/456 HTTP/1.1
-    Host: example.com
-    Content-Type: application/x-www-form-urlencoded
-    X-Custom-Header: 自定义值
-
-    name=新名称&description=新描述
-
-    **示例响应：**    ```json
-    {
-        "item_id": 456,
-        "name": "新名称",
-        "description": "新描述",
-        "custom_header": "自定义值"
-    }
-    """
-    serializer = PutExampleSerializer(data=request.data)
-    if serializer.is_valid():
-        name = serializer.validated_data.get('name', '默认名称')
-        description = serializer.validated_data.get('description', '默认描述')
-        custom_header = request.headers.get('X-Custom-Header', '无自定义头')
-        return Response({
-            "item_id": item_id,
-            "name": name,
-            "description": description,
-            "custom_header": custom_header,
-        })
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['DELETE'])
-def delete_example(request):
-    """
-    **方法：** DELETE
-
-    **示例请求（确认删除）：**
-    DELETE /delete_example?confirm=true HTTP/1.1
-    Host: example.com
-    Authorization: Bearer token
-
-    **示例响应（确认删除）：**    ```json
-    {
-        "deleted": true,
-        "authorization": "Bearer token"
-    }    ```
-
-    **示例请求（未确认删除）：**
-    DELETE /delete_example HTTP/1.1
-    Host: example.com
-
-    **示例响应（未确认删除）：**    ```json
-    {
-        "message": "删除未确认"
-    }    ```
-    HTTP 状态码：400
-    """
-    confirm = request.query_params.get('confirm', 'false').lower() == 'true'
-    auth = request.headers.get('Authorization', '无授权')
-    if not confirm:
-        return Response({"message": "删除未确认"}, status=status.HTTP_400_BAD_REQUEST)
-    return Response({"deleted": confirm, "authorization": auth})
-
-class ApiResourceView(APIView):
-    """
-    **方法：** GET, POST, PUT, DELETE
-
-    **GET 请求示例：**
-    GET /api/resource/abc123?detail=full HTTP/1.1
-    Host: example.com
-
-    **GET 响应示例：**    ```json
-    {
-        "method": "GET",
-        "resource_id": "abc123",
-        "detail": "full"
-    }
-    """
-
-    def get(self, request, resource_id):
-        detail = request.query_params.get('detail', 'basic')
-        return Response({"method": "GET", "resource_id": resource_id, "detail": detail})
-
-    def post(self, request, resource_id):
-        """
-        **POST 请求示例：**
-        POST /api/resource/abc123 HTTP/1.1
-        Host: example.com
-        Content-Type: application/json
-
-        {
-            "key": "value"
-        }
-
-        **POST 响应示例：**        ```json
-        {
-            "method": "POST",
-            "resource_id": "abc123",
-            "data": {
-                "key": "value"
-            }
-        }        ```
-        """
-        serializer = ApiResourcePostSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data
-            return Response({"method": "POST", "resource_id": resource_id, "data": data})
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, request, resource_id):
-        """
-        **PUT 请求示例：**
-        PUT /api/resource/abc123 HTTP/1.1
-        Host: example.com
-        Content-Type: application/x-www-form-urlencoded
-
-        field=new%20value
-
-        **PUT 响应示例：**        ```json
-        {
-            "method": "PUT",
-            "resource_id": "abc123",
-            "data": {
-                "field": "new value"
-            }
-        }        ```
-        """
-        serializer = ApiResourcePutSerializer(data=request.data)
-        if serializer.is_valid():
-            data = serializer.validated_data
-            return Response({"method": "PUT", "resource_id": resource_id, "data": data})
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, resource_id):
-        """
-        **DELETE 请求示例：**
-        DELETE /api/resource/abc123?confirm=true HTTP/1.1
-        Host: example.com
-
-        **DELETE 响应示例：**        ```json
-        {
-            "method": "DELETE",
-            "resource_id": "abc123",
-            "confirm": true
-        }        ```
-        """
-        confirm = request.query_params.get('confirm', 'false').lower() == 'true'
-        return Response({"method": "DELETE", "resource_id": resource_id, "confirm": confirm})
-```
-
-在 `apiapp/urls.py` 中配置路由
-
-```python showLineNumbers title="apiapp/urls.py"
-from django.urls import path
-from . import views
-
-urlpatterns = [
-    path('get_example/<int:user_id>/', views.get_example, name='get_example'),
-    path('post_example/', views.post_example, name='post_example'),
-    path('put_example/<int:item_id>/', views.put_example, name='put_example'),
-    path('delete_example/', views.delete_example, name='delete_example'),
-    path('api/resource/<str:resource_id>/', views.ApiResourceView.as_view(), name='api_resource'),
-]
-```
-
-在 `myproject/urls.py` 中包含 `apiapp.urls`
-
-```python showLineNumbers title="myproject/urls.py"
-from django.contrib import admin
-from django.urls import path, include
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('apiapp.urls')),
-]
-```
-
-运行项目
-
-```bash showLineNumbers
-python manage.py runserver
-```
