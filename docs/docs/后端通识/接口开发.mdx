@@ -104,23 +104,23 @@ def index():
 | 阶段       | 范畴 (Category)    | 核心组件             | 详细动作说明                                         |
 |----------|------------------|------------------|------------------------------------------------|
 | 1. 应用启动  | Lifespan (Start) | lifespan         | 初始化：建立数据库长连接、预加载 AI 模型、配置全局资源。                 |
-| 2. 请求拦截  | Request          | Middleware       | 解析与预检：解析 HTTP 报文，处理 CORS、GZip 解压、Session 状态还原。 |
-| 3. 路由匹配  | Request          | Router           | 定位：根据 URL 和 Method 找到匹配的路径函数。匹配失败则直接返回 404。    |
-| 4. 依赖注入  | Request          | Depends          | 前置准备：执行依赖项（如 Auth 校验、DB Session 开启）。若失败则抛出异常。  |
-| 5. 参数校验  | Request          | Pydantic         | 入参验证：将数据转为模型对象并校验格式。校验失败则返回 422。               |
-| 6. 业务执行  | Processing       | Path Function    | 逻辑运算：运行你编写的业务代码。若产生错误，将在此处抛出异常。                |
-| 7. 异常处理  | Processing       | Exc Handler      | 异常补救：捕获业务异常，将其转换为统一格式的 JSONResponse。           |
-| 8. 数据转换  | Response         | jsonable_encoder | 序列化：将 Python 对象、ORM 模型转换为 JSON 兼容的基础数据格式。      |
-| 9. 响应校验  | Response         | response_model   | 出参验证：根据 Schema 强制过滤字段（如剔除密码），确保输出安全。           |
-| 10. 响应拦截 | Response         | Middleware       | 后处理：最后一次修改 Header（如加签名）、计算耗时、记录访问日志。           |
-| 11. 物理发送 | Response         | ASGI Server      | 传输：通过网络套接字（Socket）将字节流正式传回客户端。                 |
-| 12. 后台任务 | Post-Response    | BackgroundTasks  | 扫尾：在连接断开后，异步执行耗时操作（如发送邮件、统计数据）。                |
-| 13. 应用关闭 | Lifespan (End)   | lifespan         | 释放：关闭数据库连接池，清理内存资源，确保程序优雅退出。                   |
+| 2. 请求接收  | Request          | ASGI Server      | 接收：通过网络套接字（Socket）接收客户端请求。                 |
+| 3. 请求拦截  | Request          | Middleware       | 解析与预检：解析 HTTP 报文，处理 CORS、GZip 解压、Session 状态还原。 |
+| 4. 路由匹配  | Request          | Router           | 定位：根据 URL 和 Method 找到匹配的路径函数。匹配失败则直接返回 404。    |
+| 5. 依赖注入  | Request          | Depends          | 前置准备：执行依赖项（如 Auth 校验、DB Session 开启）。若失败则抛出异常。  |
+| 6. 参数校验  | Request          | Pydantic         | 入参验证：将数据转为模型对象并校验格式。校验失败则返回 422。               |
+| 7. 业务执行  | Processing       | Path Function    | 逻辑运算：运行你编写的业务代码。若产生错误，将在此处抛出异常。                |
+| 8. 异常处理  | Processing       | Exc Handler      | 异常补救：捕获业务异常，将其转换为统一格式的 JSONResponse。           |
+| 9. 数据转换  | Response         | jsonable_encoder | 序列化：将 Python 对象、ORM 模型转换为 JSON 兼容的基础数据格式。      |
+| 10. 响应校验  | Response        | response_model   | 出参验证：根据 Schema 强制过滤字段（如剔除密码），确保输出安全。           |
+| 11. 响应拦截 | Response         | Middleware       | 后处理：最后一次修改 Header（如加签名）、计算耗时、记录访问日志。           |
+| 12. 物理发送 | Response         | ASGI Server      | 传输：通过网络套接字（Socket）将字节流正式传回客户端。                 |
+| 13. 后台任务 | Post-Response    | BackgroundTasks  | 扫尾：在连接断开后，异步执行耗时操作（如发送邮件、统计数据）。                |
+| 14. 应用关闭 | Lifespan (End)   | lifespan         | 释放：关闭数据库连接池，清理内存资源，确保程序优雅退出。                   |
 
+## Lifespan
 
-## 应用启动与关闭
-
-lifespan可以将应用启动时操作和应用关闭时操作写在同一个块代码中，避免人为的遗忘。
+Lifespan可以将应用启动时操作和应用关闭时操作写在同一个块代码中，避免人为的遗忘。
 
 ```python showLineNumbers
 from contextlib import asynccontextmanager
@@ -167,65 +167,7 @@ async def predict(x:float) :
 
 前端大部分的请求是通过浏览器发送请求到后端，后端接收请求并处理，最后返回响应给前端。
 
-请求是一种相当复杂的数据类型，包含以下几个部分：
-
-```python showLineNumbers
-from fastapi import FastAPI, Request
-
-app = FastAPI()
-
-@app.get("/index")
-async def catch_all(request: Request):
-    # 获取请求方法 (返回结果是大写的字符串，如 "POST")
-    method = request.method
-
-    # 获取请求URL
-    """
-    可以继续获取到请求URL的各个部分：
-    url.scheme : 协议
-    url.hostname : 主机
-    url.port : 端口
-    url.netloc : 网络位置(主机:端口)
-    url.path : 路径
-    url.query : 查询参数
-    url.is_secure : 是否使用安全连接
-    url.components : 组件元组(协议、主机、端口、路径、查询参数)
-    url.fragment : 锚点 (URL的锚点部分，以#开头，快速跳转到页面中的特定位置)
-
-    有些数据库连接URL会包含用户名和密码，如：http://admin:123456@192.168.1.10:9200
-    url.username : 用户名 (http://admin:123456@192.168.1.10:9200) 中的admin
-    url.password : 密码 (http://admin:123456@192.168.1.10:9200) 中的123456
-    """
-    url = request.url # "http://127.0.0.1:8000/index?id=1"
-
-    # 网络与客户端信息
-    """
-    可以获取到客户端的网络与客户端信息：
-    client.host : 主机
-    client.port : 端口
-    """
-    client_host = request.client.host # "127.0.0.1"
-    client_port = request.client.port # 8000
-    ## 获取服务器IP和端口
-    server_ip, server_port = request.scope.get("server") # ("127.0.0.1", 8000)
-
-    # 获取请求头字典
-    headers = dict(request.headers)
-    ## 获取请求头字典中的cookie的两种方式
-    cookies1 = dict(request.headers).get("Cookie", "")
-    cookies2 = request.cookies
-    # 使用request.cookies可以轻松获取sessionid
-    cookies_sessionid = request.cookies.get("sessionid")
-    ## 添加session中间件后，可以通过request.session获取session
-    """
-    from starlette.middleware.sessions import SessionMiddleware
-    app = FastAPI()
-    app.add_middleware(SessionMiddleware, secret_key="secret_key")
-    """
-    session = request.session
-
-    return {}
-```
+请求是一种相当复杂的数据类型。
 
 ### 请求方法
 
@@ -245,34 +187,22 @@ async def catch_all(request: Request):
 :::tip 幂等性 (Idempotence)
 同一个操作执行 1 次和执行 100 次，对系统资源的影响是否一致。
 
-**幂等 (Safe/Idempotent)：**
+- **幂等 (Safe/Idempotent)**： GET：查 100 次，数据不会变。
 
-- GET：查 100 次，数据不会变。
-- PUT：把 A 改成 B，改 100 次，结果依然是 B。
-- DELETE：删掉 ID 为 1 的用户，删 1 次和 100 次，结果都是"该用户不存在"。
-
-**非幂等 (Non-Idempotent)：**
-
-- POST：每点一次"提交"，后端就创建一个新订单。点 100 次，产生 100 个订单。
-- PATCH：不是必须幂等的（取决于实现，建议设计为幂等）。
+- **非幂等 (Non-Idempotent)**： POST：每点一次"提交"，后端就创建一个新订单。点 100 次，产生 100 个订单。
 :::
 
 :::info 缓存机制 (Caching)
-GET 是可以被浏览器、CDN、代理服务器自动缓存的。
+- GET 是可以被浏览器、CDN、代理服务器自动缓存的。
 
-POST 默认不会被缓存。这保证了金融交易、账号注册等操作必须实时到达后端。
+- POST 默认不会被缓存。这保证了金融交易、账号注册等操作必须实时到达后端。
 :::
 
 :::info 安全性 (Safe Methods)
-这里的"安全"是指**"是否会修改服务器数据"**：
+这里的"安全"是指"是否会修改服务器数据"：
 
-**安全方法：**
-
-- GET、HEAD、OPTIONS 被称为安全方法，因为它们理论上只读，不应该引起服务器状态变化。
-
-**不安全方法：**
-
-- POST、PUT、PATCH、DELETE 是不安全的，因为它们会改变数据库。
+- **安全**：GET理论上只读，不应该引起服务器状态变化。
+- **不安全**：POST、PUT、PATCH、DELETE 是不安全的，因为它们会改变数据库。
 :::
 
 ```python showLineNumbers
@@ -311,25 +241,48 @@ OpenAPI 规范中，在同一个 Path 下，HTTP 方法（Operation）必须是�
 
 请求URL是指浏览器发送请求到后端时的URL。由协议、域名/主机、端口、路径、查询参数组成。
 
-#### 协议
+- 常见的协议有:HTTP、HTTPS、FTP、SMTP、DNS、MQTT。
+- 当在本地开发时，域名/主机通常为`localhost`或`127.0.0.1`。`0.0.0.0`表示所有IP地址。
+- 当协议为HTTP/HTTPS时，端口默认为80/443。可省略不写。
 
-| 协议名称 | 主要用途 | 类比生活中的场景 |
-|---------|---------|----------------|
-| HTTP | 访问网页 | 翻阅图书馆的书籍 |
-| HTTPS | 访问网页 | 翻阅图书馆的书籍 |
-| FTP | 上传/下载文件 | 搬运大件货物 |
-| SMTP | 发送邮件 | 邮递员把信投进邮筒 |
-| DNS | 网址解析 | 查电话本寻找联系人 |
-| MQTT | 物联网通信 | 智能家居传感器的小纸条 |
+```python showLineNumbers
+from fastapi import FastAPI, Request
 
-#### 域名/主机
+app = FastAPI()
 
-当在本地开发时，域名/主机通常为`localhost`或`127.0.0.1`。
-当在服务器上部署时，域名/主机通常为服务器IP地址。
+@app.get("/index")
+async def catch_all(request: Request):
+    # 获取请求URL
+    """
+    可以继续获取到请求URL的各个部分：
+    url.scheme : 协议
+    url.hostname : 主机
+    url.port : 端口
+    url.netloc : 网络位置(主机:端口)
+    url.path : 路径
+    url.query : 查询参数
+    url.is_secure : 是否使用安全连接
+    url.components : 组件元组(协议、主机、端口、路径、查询参数)
+    url.fragment : 锚点 (URL的锚点部分，以#开头，快速跳转到页面中的特定位置)
 
-#### 端口
+    有些数据库连接URL会包含用户名和密码，如：http://admin:123456@192.168.1.10:9200
+    url.username : 用户名 (http://admin:123456@192.168.1.10:9200) 中的admin
+    url.password : 密码 (http://admin:123456@192.168.1.10:9200) 中的123456
+    """
+    url = request.url # "http://127.0.0.1:8000/index?id=1"
 
-当协议为HTTP时，端口默认为80，当协议为HTTPS时，端口默认为443。
+    # 网络与客户端信息
+    """
+    可以获取到客户端的网络与客户端信息：
+    client.host : 主机
+    client.port : 端口
+    """
+    client_host = request.client.host # "127.0.0.1"
+    client_port = request.client.port # 8000
+    ## 获取服务器IP和端口
+    server_ip, server_port = request.scope.get("server") # ("127.0.0.1", 8000)
+    return {}
+```
 
 #### 路径与查询参数
 
@@ -372,106 +325,9 @@ async def get_images(width: int = Query(default=100), height: int = Query(defaul
 
 除了上面必备的请求信息之外，你还可以额外添加一些内容辅助服务器理解请求。可通过`request.headers`可以获取到请求头字典。
 
-```python showLineNumbers
-from fastapi import FastAPI,Query,Request
-app = FastAPI()
-
-@app.get("/")
-async def get_image(request: Request):
-    return dict(request.headers)
-"""
-{
-  "host": "127.0.0.1:8000",
-  "connection": "keep-alive",
-  "sec-ch-ua": "\"Google Chrome\";v=\"143\", \"Chromium\";v=\"143\", \"Not A(Brand\";v=\"24\"",
-  "sec-ch-ua-mobile": "?0",
-  "sec-ch-ua-platform": "\"Windows\"",
-  "upgrade-insecure-requests": "1",
-  "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/143.0.0.0 Safari/537.36",
-  "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
-  "sec-fetch-site": "none",
-  "sec-fetch-mode": "navigate",
-  "sec-fetch-user": "?1",
-  "sec-fetch-dest": "document",
-  "accept-encoding": "gzip, deflate, br, zstd",
-  "accept-language": "zh-CN,zh;q=0.9",
-  "cookie": "csrftoken=9VZsSS9jnRLIopC5TbdIXRl3yMKhbq5c; sessionid=h8ofhxjbfysrbzbbmcnlo601zav5qxhl"
-}
-"""
-```
-
 - `User-Agent`:用于标识浏览器的信息，常用于区分移动端和PC端、初级反爬。
 - `Referer`:用于标识请求的来源，常用于统计分析。
 - `Cookie`:用于<HoverText text="标识请求的Cookie" explanation="Cookie是存储在浏览器端，Session是存储在服务器端。"/>，常用于用户身份验证。
-
-```python showLineNumbers
-from fastapi import FastAPI, Request
-import secrets
-
-app = FastAPI()
-"""
-secret_key选择足够复杂的即可。
-我这里生成一个 32 字节（256 位）的十六进制随机字符串作为secret_key，用来加密和解密 Session 数据。
-不要频繁更换：一旦你修改了 secret_key，所有之前发给用户的 Session Cookie 都会失效。用户会发现自己莫名其妙被踢出登录了。
-
-FastAPI 为了保持轻量和安全，默认不开启Session功能，因为 Session 涉及到 Cookie 的签名加密和安全性设置。
-"""
-from starlette.middleware.sessions import SessionMiddleware
-app.add_middleware(SessionMiddleware, 
-        secret_key=secrets.token_hex(32),
-        session_cookie="session_cookie", # 浏览器中显示的 Cookie 名称
-        max_age=1209600  # Session 有效期 2 周（1209600秒）
-        )
-
-@app.get("/index")
-async def catch_all(request: Request):
-
-    cookies1 = dict(request.headers).get("cookie")
-    cookies2 = request.cookies
-    cookies2.get("sessionid")
-    """
-    你可以通过request.cookies获取，但是要手动解析。
-    
-    cookie作为常用的请求头字段，有一个专门的属性cookies，方便你获取解析后的cookie字典。
-
-    "cookies1": "csrftoken=9VZsSS9jnRLIopC5TbdIXRl3yMKhbq5c; sessionid=h8ofhxjbfysrbzbbmcnlo601zav5qxhl",
-    "cookies2": {
-        "csrftoken": "9VZsSS9jnRLIopC5TbdIXRl3yMKhbq5c",
-        "sessionid": "h8ofhxjbfysrbzbbmcnlo601zav5qxhl"
-            }
-    """
-
-    ## 获取session
-    session = request.session
-    # 获取session中的views，如果为空则初始化为0
-    views = request.session.get("views", 1)
-    # 将views加1
-    request.session["views"] = views + 1
-    if request.session["views"] > 3:
-        # 手动清空session，可用于用户点击退出之后
-        request.session.clear()
-
-    return {
-        "message": f"欢迎回来！这是你第 {views} 次访问。",
-        "session":session,
-        "cookies1":cookies1,
-        "cookies2":cookies2
-    }
-
-"""
-{
-  "message": "欢迎回来！这是你第 2 次访问。",
-  "session": {
-    "views": 3
-  },
-  "cookies1": "session_cookie=eyJ2aWV3cyI6IDJ9.aWPV2A.Aeii6ixVKsV_dtCzXUW54GTFwTs",
-  "cookies2": {
-    "session_cookie": "eyJ2aWV3cyI6IDJ9.aWPV2A.Aeii6ixVKsV_dtCzXUW54GTFwTs"
-  }
-}
-"""
-
-```
 
 - `Content-Type`:用于标识请求的Content-Type,以便服务器正确解析请求体。
 
@@ -537,9 +393,80 @@ async def catch_all(request: Request):
 * application/ld+json, application/manifest+json
 `} />
 
-当然，实际资源与请求方式一致总是好的，但是有时候用户登录之后，你希望获取它的用户信息，包含：用户名、头像。
+:::tip
+你也可以自定义任何名称的请求头。这些非标准头通常被称为 Custom Headers。
 
-一个是文本、一个是小图片，此时我们一般会选择把图片编码为base64字符串，然后和用户名一起返回给前端。这样可以减少一次请求。
+自定义头推荐以 X- 开头（例如 X-My-Token），以区分标准头。
+:::
+
+```python showLineNumbers
+from fastapi import FastAPI, Request
+import secrets
+
+app = FastAPI()
+"""
+secret_key选择足够复杂的即可。
+我这里生成一个 32 字节（256 位）的十六进制随机字符串作为secret_key，用来加密和解密 Session 数据。
+不要频繁更换：一旦你修改了 secret_key，所有之前发给用户的 Session Cookie 都会失效。用户会发现自己莫名其妙被踢出登录了。
+
+FastAPI 为了保持轻量和安全，默认不开启Session功能，因为 Session 涉及到 Cookie 的签名加密和安全性设置。
+"""
+from starlette.middleware.sessions import SessionMiddleware
+app.add_middleware(SessionMiddleware, 
+        secret_key=secrets.token_hex(32),
+        session_cookie="session_cookie", # 浏览器中显示的 Cookie 名称
+        max_age=1209600  # Session 有效期 2 周（1209600秒）
+        )
+
+@app.get("/index")
+async def catch_all(request: Request):
+    # 你可以通过request.cookies获取，但是要手动解析。
+    """
+    csrftoken=9VZsSS9jnRLIopC5TbdIXRl3yMKhbq5c; sessionid=h8ofhxjbfysrbzbbmcnlo601zav5qxhl
+    """
+    cookies1 = dict(request.headers).get("cookie")
+
+    # cookie作为常用的请求头字段，有一个专门的属性cookies对象
+    cookies2 = request.cookies
+    """
+    {
+        "csrftoken": "9VZsSS9jnRLIopC5TbdIXRl3yMKhbq5c",
+        "sessionid": "h8ofhxjbfysrbzbbmcnlo601zav5qxhl"
+            }
+    """
+    # 方便获取解析后的cookie字典。
+    cookies2.get("sessionid")
+
+    ## 获取session
+    session = request.session
+    # 获取session中的views，如果为空则初始化为0
+    views = request.session.get("views", 1)
+    # 将views加1
+    request.session["views"] = views + 1
+    if request.session["views"] > 3:
+        # 手动清空session，可用于用户点击退出之后
+        request.session.clear()
+
+    return {
+        "message": f"欢迎回来！这是你第 {views} 次访问。",
+        "session":session,
+    }
+
+"""
+{
+  "message": "欢迎回来！这是你第 2 次访问。",
+  "session": {
+    "views": 3
+  }
+}
+"""
+```
+
+#### base64图片处理
+
+有时候用户登录之后，你希望获取它的用户信息，包含：用户名、头像。一个是文本、一个是小图片。
+
+此时我们一般会选择把图片编码为base64字符串，然后和用户名一起返回给前端。这样可以减少一次请求。此时base64字符串可当作JSON数据之一传输。
 
 <Tabs>
   <TabItem value="main" label="接口" default>
@@ -616,6 +543,8 @@ with open("downloaded_avatar.png", "wb") as f:
 </Tabs>
 
 
+#### Content-Type实现兼容处理
+
 form表单是互联网的“元老”，诞生于 JSON 之前。它不能处理复杂的嵌套（比如列表里套对象）。如果你要编写一个具有兼容性的后台，支持form表单和JSON请求。
 
 你可以通过判断`Content-Type`来完成。
@@ -670,13 +599,7 @@ b'{"message":"X-header"}'
 
 </Tabs>
 
-:::tip
-你也可以自定义任何名称的请求头。这些非标准头通常被称为 Custom Headers。
-
-自定义头推荐以 X- 开头（例如 X-My-Token），以区分标准头。
-:::
-
-### Body (请求体)
+### Body
 
 | **数据来源 (Location)** | **浏览器/HTTP 格式**   | **FastAPI 参数定义方式** | **Python 转换后的类型**  | **典型用途** |
 | ----------------------------- | ---------------------------- | ------------------------------ | ------------------------------ | ------------------ |
@@ -983,7 +906,7 @@ if __name__ == "__main__":
 | 异步支持 | 必须是异步的。 | 可以是同步 def 也可以是异步 async def。 |
 
 
-## pydantic参数校验
+## Pydantic参数校验
 
 在注册用户接口中，需要接收 `password` 和 `confirm_password`，并在 Pydantic 模型中校验这两个字段必须完全一致。
 
