@@ -2257,3 +2257,398 @@ cv2.destroyAllWindows()
 ```
   </TabItem>
 </Tabs>
+
+### PT格式转OM格式
+
+pt可以转为onnx再转为om，om格式是国产芯片的推理格式。使用OM格式的模型推理代码如下：
+
+```python showLineNumbers
+import sys
+import os
+import cv2
+import time
+import numpy as np
+from typing import List, Dict, Tuple
+import argparse
+import subprocess
+import tempfile
+import shutil
+
+try:
+    import ais_bench
+    AISBENCH_AVAILABLE = True
+except ImportError:
+    AISBENCH_AVAILABLE = False
+    print("警告: ais_bench 未安装，OM 模型推理将不可用。")
+
+# ==========================================
+# YOLOv8 基础逻辑 (预处理、NMS、后处理)
+# ==========================================
+class BaseYOLOv8Logic:
+    """YOLOv8 的核心计算逻辑"""
+    def __init__(self, conf_threshold: float = 0.25, iou_threshold: float = 0.5):
+        self.conf_threshold = conf_threshold
+        self.iou_threshold = iou_threshold
+        self.target_h = 640
+        self.target_w = 640
+        
+        # 类别定义
+        self.vehicle_classes = [3, 4, 5, 8, 9]
+        self.class_names = {
+            0: 'pedestrian', 1: 'people', 2: 'bicycle', 3: 'car', 
+            4: 'van', 5: 'truck', 6: 'tricycle', 7: 'awning-tricycle', 
+            8: 'bus', 9: 'motor', 10: 'others'
+        }
+
+    def _preprocess(self, frame: np.ndarray) -> Tuple[np.ndarray, float, float, Tuple[int, int]]:
+        """预处理图像"""
+        h, w = frame.shape[:2]
+        scale = min(self.target_h / h, self.target_w / w)
+        new_h, new_w = int(h * scale), int(w * scale)
+        
+        # 注意：必须使用 (new_w, new_h) 避免维度不匹配错误
+        img_resized = cv2.resize(frame, (new_w, new_h), interpolation=cv2.INTER_LINEAR)
+        
+        img_padded = np.full((self.target_h, self.target_w, 3), 114, dtype=np.uint8)
+        
+        pad_h = (self.target_h - new_h) // 2
+        pad_w = (self.target_w - new_w) // 2
+        img_padded[pad_h:pad_h+new_h, pad_w:pad_w+new_w] = img_resized
+        
+        img_rgb = cv2.cvtColor(img_padded, cv2.COLOR_BGR2RGB)
+        img_normalized = img_rgb.astype(np.float32) / 255.0
+        img_nchw = np.transpose(img_normalized, (2, 0, 1))
+        img_batch = np.expand_dims(img_nchw, axis=0)
+        
+        scale_w = new_w / w
+        scale_h = new_h / h
+        
+        return img_batch, scale_w, scale_h, (pad_w, pad_h)
+
+    def _apply_nms(self, boxes: np.ndarray, scores: np.ndarray) -> np.ndarray:
+        """非极大值抑制"""
+        if len(boxes) == 0: return np.array([])
+        
+        x1, y1, x2, y2 = boxes[:, 0], boxes[:, 1], boxes[:, 2], boxes[:, 3]
+        areas = (x2 - x1 + 1) * (y2 - y1 + 1)
+        order = scores.argsort()[::-1]
+        
+        keep = []
+        while order.size > 0:
+            i = order[0]
+            keep.append(i)
+            if order.size == 1: break
+            
+            xx1 = np.maximum(x1[i], x1[order[1:]])
+            yy1 = np.maximum(y1[i], y1[order[1:]])
+            xx2 = np.minimum(x2[i], x2[order[1:]])
+            yy2 = np.minimum(y2[i], y2[order[1:]])
+            
+            w = np.maximum(0.0, xx2 - xx1 + 1)
+            h = np.maximum(0.0, yy2 - yy1 + 1)
+            inter = w * h
+            
+            iou = inter / (areas[i] + areas[order[1:]] - inter)
+            inds = np.where(iou <= self.iou_threshold)[0]
+            order = order[inds + 1]
+        
+        return np.array(keep)
+
+    def _postprocess(self, output: np.ndarray, 
+                     scale_w: float, scale_h: float, 
+                     pad_offset: Tuple[int, int],
+                     original_shape: Tuple[int, int]) -> List[Dict]:
+        """后处理模型输出"""
+        detections = []
+        if output.ndim == 3:
+            output = np.transpose(output, (0, 2, 1))
+            if output.shape[0] == 1:
+                output = output[0]
+            
+            coords = output[:, :4]
+            class_scores = output[:, 4:]
+            
+            confidences = np.max(class_scores, axis=1)
+            class_ids = np.argmax(class_scores, axis=1)
+            
+            valid_mask = confidences >= self.conf_threshold
+            valid_coords = coords[valid_mask]
+            valid_ids = class_ids[valid_mask]
+            valid_confs = confidences[valid_mask]
+            
+            if len(valid_coords) > 0:
+                boxes = np.zeros_like(valid_coords)
+                boxes[:, 0] = valid_coords[:, 0] - valid_coords[:, 2] / 2
+                boxes[:, 1] = valid_coords[:, 1] - valid_coords[:, 3] / 2
+                boxes[:, 2] = valid_coords[:, 0] + valid_coords[:, 2] / 2
+                boxes[:, 3] = valid_coords[:, 1] + valid_coords[:, 3] / 2
+                boxes = np.clip(boxes, 0, self.target_w)
+                
+                keep = self._apply_nms(boxes, valid_confs)
+                
+                pad_w, pad_h = pad_offset
+                oh, ow = original_shape[:2]
+                
+                for idx in keep:
+                    x1, y1, x2, y2 = boxes[idx]
+                    x1 -= pad_w; y1 -= pad_h; x2 -= pad_w; y2 -= pad_h
+                    
+                    unp_h = self.target_h - 2 * pad_h if pad_h > 0 else self.target_h
+                    unp_w = self.target_w - 2 * pad_w if pad_w > 0 else self.target_w
+                    
+                    if unp_h > 0 and unp_w > 0:
+                        x1 = x1 / unp_w * ow
+                        y1 = y1 / unp_h * oh
+                        x2 = x2 / unp_w * ow
+                        y2 = y2 / unp_h * oh
+                    
+                    x1 = max(0, min(ow, x1))
+                    y1 = max(0, min(oh, y1))
+                    x2 = max(0, min(ow, x2))
+                    y2 = max(0, min(oh, y2))
+                    
+                    detections.append({
+                        'bbox': [float(x1), float(y1), float(x2), float(y2)],
+                        'confidence': float(valid_confs[idx]),
+                        'class_id': int(valid_ids[idx]),
+                        'class_name': self.class_names.get(valid_ids[idx], f'Class_{valid_ids[idx]}')
+                    })
+        return detections
+
+
+# ==========================================
+# OM 模型推理类
+# ==========================================
+class OMInference(BaseYOLOv8Logic):
+    def __init__(self, model_path: str, device_id: int = 0, conf_threshold: float = 0.25, iou_threshold: float = 0.5):
+        super().__init__(conf_threshold, iou_threshold)
+        self.model_path = model_path
+        self.device_id = device_id
+        self.model_type = "OM"
+        
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(f"模型不存在: {model_path}")
+
+        self._check_and_fix_permissions(model_path)
+        
+        self.use_python_api = False
+        self.session = None
+        
+        if AISBENCH_AVAILABLE:
+            try:
+                from ais_bench.infer.interface import InferSession
+                self.session = InferSession(device_id, model_path)
+                self.use_python_api = True
+                print(f"[{self.model_type}] ✓ 使用 Python API 加载成功")
+            except Exception as e:
+                print(f"[{self.model_type}] API 加载失败: {e}")
+
+        self.temp_dir = tempfile.mkdtemp(prefix="om_infer_")
+        os.environ['QT_QPA_PLATFORM'] = 'offscreen'
+
+    def _check_and_fix_permissions(self, path: str):
+        """修复 root 用户权限问题"""
+        try:
+            stat_info = os.stat(path)
+            if os.getuid() == 0 and stat_info.st_uid != 0:
+                print(f"[{self.model_type}] 检测到权限问题，尝试修复...")
+                try:
+                    os.chown(path, 0, 0)
+                    if os.path.dirname(path): os.chown(os.path.dirname(path), 0, 0)
+                    print(f"[{self.model_type}] ✓ 权限修复完成")
+                except Exception:
+                    pass
+        except Exception:
+            pass
+
+    def warmup(self, warmup_iterations: int = 3):
+        """预热"""
+        print(f"[{self.model_type}] 预热模型 ({warmup_iterations}次)...")
+        dummy_img = np.random.randint(0, 255, (640, 640, 3), dtype=np.uint8)
+        for _ in range(warmup_iterations):
+            self.predict(dummy_img)
+        print(f"[{self.model_type}] ✓ 预热完成")
+
+    def predict(self, frame: np.ndarray) -> Tuple[List[Dict], int, float]:
+        """单帧推理"""
+        # 1. 预处理
+        img_batch, scale_w, scale_h, pad_offset = self._preprocess(frame)
+        
+        # 2. 推理
+        start_time = time.time()
+        output = np.array([])
+        
+        if self.use_python_api:
+            try:
+                out = self.session.infer([img_batch])
+                if isinstance(out, list) and len(out) > 0: output = out[0]
+            except Exception as e:
+                print(f"推理错误: {e}")
+        else:
+            # CLI 回退
+            temp_input = os.path.join(self.temp_dir, "input.npy")
+            np.save(temp_input, img_batch)
+            output_dir = os.path.join(self.temp_dir, "output")
+            if os.path.exists(output_dir): shutil.rmtree(output_dir)
+            os.makedirs(output_dir)
+            
+            cmd = ["python3", "-m", "ais_bench", "--model", self.model_path, "--input", temp_input,
+                   "--output", output_dir, "--outfmt", "NPY", "--device", str(self.device_id), "--loop", "1"]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.returncode == 0:
+                for f in os.listdir(output_dir):
+                    if f.endswith('.npy'):
+                        output = np.load(os.path.join(output_dir, f))
+                        break
+        
+        inference_time = (time.time() - start_time) * 1000
+        
+        # 3. 后处理
+        detections = []
+        if output.size > 0:
+            detections = self._postprocess(output, scale_w, scale_h, pad_offset, frame.shape)
+            
+        vehicle_count = sum(1 for d in detections if d['class_id'] in self.vehicle_classes)
+        return detections, vehicle_count, inference_time
+
+    def draw_detections(self, frame: np.ndarray, detections: List[Dict]) -> np.ndarray:
+        """绘制结果"""
+        img = frame.copy()
+        for det in detections:
+            x1, y1, x2, y2 = map(int, det['bbox'])
+            cid = det['class_id']
+            color = (0, 255, 0) if cid in self.vehicle_classes else (0, 0, 255)
+            
+            cv2.rectangle(img, (x1, y1), (x2, y2), color, 2)
+            label = f"{det['class_name']} {det['confidence']:.2f}"
+            (tw, th), _ = cv2.getTextSize(label, 0, 0.5, 1)
+            cv2.rectangle(img, (x1, y1 - th - 5), (x1 + tw, y1), color, -1)
+            cv2.putText(img, label, (x1, y1 - 5), 0, 0.5, (255, 255, 255), 1)
+        return img
+
+
+# ==========================================
+# 主程序
+# ==========================================
+def main():
+    parser = argparse.ArgumentParser(description="Ascend OM 模型推理工具 (调试增强版)")
+    parser.add_argument("--model", type=str, required=True, help="OM 模型路径")
+    parser.add_argument("--input", type=str, required=True, help="输入路径 (图片或视频)")
+    parser.add_argument("--output-dir", type=str, default="./om_output_debug", help="结果保存目录")
+    parser.add_argument("--device-id", type=int, default=0, help="Ascend 设备 ID")
+    parser.add_argument("--conf", type=float, default=0.25, help="置信度阈值")
+    parser.add_argument("--iou", type=float, default=0.5, help="NMS IoU 阈值")
+    parser.add_argument("--max-frames", type=int, default=None, help="视频最大处理帧数 (None=全部)")
+    parser.add_argument("--verbose", action="store_true", help="开启详细打印：输出每一帧的每个检测框坐标")
+    
+    args = parser.parse_args()
+
+    print("\n" + "="*60)
+    print("Ascend OM 模型推理工具 (调试增强版)")
+    print("="*60)
+
+    # 初始化
+    try:
+        inferencer = OMInference(args.model, args.device_id, args.conf, args.iou)
+        inferencer.warmup()
+    except Exception as e:
+        print(f"初始化失败: {e}")
+        return
+
+    os.makedirs(args.output_dir, exist_ok=True)
+
+    # 判断输入类型
+    if args.input.lower().endswith(('.jpg', '.png', '.jpeg', '.bmp')):
+        print(f"\n处理图片: {args.input}")
+        frame = cv2.imread(args.input)
+        if frame is None:
+            print("读取图片失败")
+            return
+        
+        dets, count, time_cost = inferencer.predict(frame)
+        res_img = inferencer.draw_detections(frame, dets)
+        
+        out_name = os.path.basename(args.input)
+        out_path = os.path.join(args.output_dir, f"res_{out_name}")
+        cv2.imwrite(out_path, res_img)
+        
+        print(f"推理完成: {len(dets)} 个对象, {count} 个车辆, 耗时 {time_cost:.1f}ms")
+        print(f"结果已保存: {out_path}")
+        
+        if args.verbose:
+            print("\n[详细检测结果]")
+            for i, det in enumerate(dets):
+                print(f"  {i+1}. {det['class_name']} ({det['confidence']:.2f}) - {det['bbox']}")
+
+    elif args.input.lower().endswith(('.mp4', '.avi', '.mov', '.mkv')):
+        print(f"\n处理视频: {args.input}")
+        cap = cv2.VideoCapture(args.input)
+        if not cap.isOpened():
+            print("打开视频失败")
+            return
+        
+        video_name = os.path.splitext(os.path.basename(args.input))[0]
+        # 创建子目录专门存放该视频的帧
+        frame_dir = os.path.join(args.output_dir, f"{video_name}_frames")
+        os.makedirs(frame_dir, exist_ok=True)
+        
+        total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        f_count = 0
+        total_time = 0
+        
+        print(f"总帧数: {total_frames}")
+        print(f"保存目录: {frame_dir}")
+        print(f"调试模式: {'开启 (打印所有检测框)' if args.verbose else '关闭 (仅打印摘要)'}")
+        print("-" * 80)
+        
+        while True:
+            if args.max_frames and f_count >= args.max_frames:
+                print(f"\n[完成] 达到最大帧数限制: {args.max_frames}")
+                break
+            
+            ret, frame = cap.read()
+            if not ret:
+                print("\n[完成] 视频处理完毕或读取结束")
+                break
+            
+            f_count += 1
+            
+            # 推理
+            dets, count, time_cost = inferencer.predict(frame)
+            total_time += time_cost
+            
+            # 绘制并保存 (每一帧都保存)
+            res_img = inferencer.draw_detections(frame, dets)
+            save_name = f"frame_{f_count:05d}.jpg"
+            save_path = os.path.join(frame_dir, save_name)
+            cv2.imwrite(save_path, res_img)
+            
+            # 打印每一帧的调试信息
+            # 格式: [帧号/总帧] 耗时 检测数 车辆数 保存路径
+            print(f"[Frame {f_count:04d}/{total_frames}] Time: {time_cost:6.2f}ms | "
+                  f"Detections: {len(dets):2d} | Vehicles: {count:2d} | "
+                  f"Saved: {save_name}")
+            
+            # 如果开启 verbose，打印每个检测框的详情
+            if args.verbose:
+                for i, det in enumerate(dets):
+                    bbox_str = f"[{det['bbox'][0]:.0f}, {det['bbox'][1]:.0f}, {det['bbox'][2]:.0f}, {det['bbox'][3]:.0f}]"
+                    print(f"  -> [{i+1}] {det['class_name']:15s} conf:{det['confidence']:.2f} bbox:{bbox_str}")
+        
+        cap.release()
+        avg_time = total_time / f_count if f_count > 0 else 0
+        print("-" * 80)
+        print(f"\n视频处理统计:")
+        print(f"  处理帧数: {f_count}")
+        print(f"  总耗时: {total_time:.1f}ms")
+        print(f"  平均耗时: {avg_time:.1f}ms")
+        print(f"  平均FPS: {1000/avg_time:.1f}" if avg_time > 0 else "  平均FPS: N/A")
+        print(f"  结果保存在: {frame_dir}")
+        
+    else:
+        print("不支持的文件格式")
+
+
+if __name__ == "__main__":
+    main()
+```
