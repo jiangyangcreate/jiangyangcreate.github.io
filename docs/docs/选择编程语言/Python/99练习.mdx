@@ -93,13 +93,11 @@ while i<10: #控制行，1到9
 
 ### 复利的力量
 
-小明从2026年1月1日每日定投100元，年化收益率为10%，考虑到交易日，问小明在第几年可以实现100万的目标？
+小明从2026年1月1日每日定投100元，年化收益率为10%，考虑到交易日(仅排除周末)，问小明在第几年可以实现100万的目标？
 
 #### 题解
 
 ```python showLineNumbers
-# 小明从2026年1月1日每日定投300元，年化收益率为10%，考虑到交易日（周一到周五），问小明在第几年可以实现100万的目标？
-
 from datetime import datetime, timedelta
 import calendar
 
@@ -112,19 +110,21 @@ target_amount = 1000000  # 目标金额 100万元
 start_date = datetime(2026, 1, 1)
 current_date = start_date
 
-# 计算每日收益率（假设每年约250个交易日）
-# 先估算，后面会根据实际交易日数调整
-estimated_trading_days = 250
-daily_return_rate = (1 + annual_return_rate) ** (1 / estimated_trading_days) - 1
 
-print("=" * 60)
-print("定投计算（实际交易日：周一到周五）")
-print("=" * 60)
-print(f"起始日期: {start_date.strftime('%Y年%m月%d日')}")
-print(f"每日收益率: {daily_return_rate * 100:.6f}%")
-print(f"每日定投: {daily_investment} 元")
-print(f"目标金额: {target_amount:,} 元")
-print("-" * 60)
+def count_trading_days(year):
+    """统计某一年内的交易日数（仅排除周末）"""
+    days = 0
+    date_cursor = datetime(year, 1, 1)
+    end_date = datetime(year + 1, 1, 1)
+    while date_cursor < end_date:
+        if date_cursor.weekday() < 5:
+            days += 1
+        date_cursor += timedelta(days=1)
+    return days
+
+
+trading_days_in_year = count_trading_days(start_date.year)
+daily_return_rate = (1 + annual_return_rate) ** (1 / trading_days_in_year) - 1
 
 # 模拟每日定投
 total_amount = 0  # 当前总金额
@@ -146,6 +146,8 @@ while total_amount < target_amount:
         trading_days_this_year = 0
         last_year_end_amount = total_amount
         last_year_trading_days = 0
+        trading_days_in_year = count_trading_days(current_year)
+        daily_return_rate = (1 + annual_return_rate) ** (1 / trading_days_in_year) - 1
     
     if weekday < 5:  # 周一到周五（0-4）是交易日
         trading_day_count += 1

@@ -165,8 +165,10 @@ uv add ruff
 # uv 的 pip 默认可用，但是不安装于 .venv 中，如果某些包（如 ipynb 内核）需要安装于 .venv 中且依赖 pip，可以使用 uv add pip 命令。
 uv add pip
 
-# 自动检查代码格式
+# 检查语法错误、代码风格（Linting）、未使用的变量、导入错误等。
 uv run ruff check
+# 检查类型一致性。确保你传给函数的参数类型是正确的。
+uv run ty check
 
 # 根据pyproject.toml安装项目依赖
 uv sync
@@ -187,6 +189,13 @@ uv init --app
 # 快速启动项目
 uv run fastapi dev
 ```
+
+`uv` 下有个`uvx`命令，是 `uv tool run` 的简写（别名），专门用于运行那些发布在 PyPI 上的 可执行工具。因此以下命令等价：
+- `uv tool run ty check`
+- `uvx ty check`
+
+如果是当前项目的虚拟环境中运行 `ty check`也可以使用
+- `uv run ty check` 
 
 ### C开发环境搭建
 
