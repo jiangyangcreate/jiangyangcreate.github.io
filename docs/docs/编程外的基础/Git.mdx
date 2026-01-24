@@ -40,6 +40,8 @@ import MarkmapHooks from '@site/src/components/MarkmapHooks';
 
 ## Git 命令概览
 
+我们常用的命令约 30-40个，底层命令加参数组合起来有数千个，因此上[git-scm.com随用随查](https://git-scm.com/docs)，记住核心思想最重要。
+
 <MarkmapHooks initialMarkdown={`
 
 # Git 命令概览
@@ -205,27 +207,39 @@ Git 默认不追踪空文件夹，如果你想在仓库中保留一个空文件�
 
 **操作步骤**
 
-1. 执行 `git rebase -i HEAD~3`（针对最近 3 次提交）。
-2. 在编辑器中，将第 2、3 行开头的 `pick` 改为 `squash` (或简写为 `s`)。
-3. 保存并退出，在随后的弹窗中编辑合并后的提交说明（Commit Message）。
-
+- 执行 `git rebase -i HEAD~3`（针对最近 3 次提交）。
+- 在编辑器中，将第 2、3 行开头的 `pick` 改为 `squash` (或简写为 `s`)。
+- 保存并退出，在随后的弹窗中编辑合并后的提交说明（Commit Message）。
 
 ### 修复不完美提交
 
-**问题描述：** 修复BUG，已经 push 到了远程，但发现之前的代码并没真的修复，还差一些细节。目前还没有其他人提交。现在本地已经真正修复完了。
+**问题描述：** 修复BUG，已经 push 到了远程，但发现之前的代码并没真的修复，现在本地已经真正修复完了。
 
-**解决方案：** 修改最近一次提交。
+**解决方案**
+修改最近一次提交。
 
-* **操作步骤：**
+**目前还没有其他人提交：**
+
 1. 暂存修改： 在本地完成真正的修复后，执行 `git add .`
 2. 合并提交： 执行 `git commit --amend --no-edit`
-`--amend` 表示将当前的修改合并到上一次提交中。
-`--no-edit` 表示沿用上一次的提交信息（不用重新写 Commit Message）。
+- `--amend` 表示将当前的修改合并到上一次提交中。
+- `--no-edit` 表示沿用上一次的提交信息（不用重新写 Commit Message）。
+- 如果你发现上一次提交的 Commit Message 写错了，只需要把 `--no-edit` 去掉，或者换成 `-m "新消息"` 即可。
 3. 强制推送： 执行 `git push origin <分支名> --force-with-lease`。
+- `--force-with-lease`只有在远程没有新提交时才覆盖。
+- `--force`极其危险，会盲目覆盖远程一切内容。
 
 远程仓库的那条“没修好”的记录会被这条“真正修好”的记录直接替换。
 
-* **注意：** 如果该分支有其他人在协作，强制推送前务必打招呼，否则会造成他人的提交历史错乱。
+**目前有其他人提交：**
+
+- 暂存修改： 在本地完成真正的修复后，执行 `git add .`
+- 查找记录： 在本地执行`git log` 找到之前那次不完美提交的`hash`值
+- 合并： 执行`git commit --fixup <commit-hash>`
+- 提交： 执行 `git rebase -i --autosquash` 时，Git 会自动把这些 fixup 提交合并到对应的原始提交中
+- 推送： `git push`
+
+这种修复方式会新增一条fixup记录，但是不会导致其他人的记录不可用，最推荐。
 
 ### 处理多人协作冲突
 
@@ -242,35 +256,38 @@ A 和 B 同时修改了同一文件。B 先推送，A 在推送时被拒绝。
 
 **操作步骤**
 
-1. 执行 `git pull --rebase`。
-2. 若遇冲突，Git 会提示冲突文件。打开文件手动修复。
-3. 解决后执行 `git add <file>`。
-4. 执行 `git rebase --continue`，重复此步骤直到合并完成。
+- 执行 `git pull --rebase`。
+- 若遇冲突，Git 会提示冲突文件。打开文件手动修复。
+- 解决后执行 `git add <file>`。
+- 执行 `git rebase --continue`，重复此步骤直到合并完成。
 
 ### 应忽略的内容误推至远程
 
 **问题描述：** 将 `.env`、API Key 或 SSH 私钥不小心 `git push` 到了公共仓库。
-**解决方案：** 仅删除当前提交是不够的，必须从历史记录中彻底抹除。否则 `.git` 文件夹会包含该文件，导致仓库体积激增，拉取缓慢。。
 
-* **推荐工具：** [git-filter-repo](https://github.com/newren/git-filter-repo) (官方推荐) 或 BFG Repo-Cleaner。
-* **操作步骤：**
-1. **立即撤销泄露密钥的有效性**（这是最安全的操作，假设密钥已泄露）。
-2. 安装工具后执行：`git filter-repo --path secret.txt --invert-paths`（从所有历史中删除指定文件）。
-3. 强制推送到远程：`git push origin --force --all`。
+**解决方案**
+仅删除当前提交是不够的，必须从历史记录中彻底抹除。否则 `.git` 文件夹会包含该文件，导致仓库体积激增，拉取缓慢。
 
-* **预防：** 在项目根目录配置 `.gitignore`，** 对于密钥泄露，**修改代码是补救，更换密钥是根治**。一旦信息进入过互联网，就应视为已泄露。
+**操作步骤：**
+- 安装[git-filter-repo](https://github.com/newren/git-filter-repo)
+- **立即撤销泄露密钥的有效性**（这是最安全的操作，假设密钥已泄露）。
+- 安装工具后执行：`git filter-repo --path secret.txt --invert-paths`（从所有历史中删除指定文件）。
+- 强制推送到远程：`git push origin --force --all`。
+
+预防： 在项目根目录配置 `.gitignore`，对于密钥泄露，修改代码是补救，更换密钥是根治。一旦信息进入过互联网，就应视为已泄露。
 
 ### 推错分支
 
 **问题描述：** 在错误的分支上进行了提交并已推送到远程（本应推到 feature，误推到了 main）。
 
-**解决方案：** 转移提交并重置原分支。
+**解决方案**
+转移提交并重置原分支。
 
-* **操作步骤：**
-1. 先在当前错误分支创建新分支保存进度：`git branch feature-correct`。
-2. 切回 `main` 分支：`git checkout main`。
-3. 强制重置 `main` 到上一个版本：`git reset --hard HEAD~1`。
-4. 强制推送回远程：`git push origin main --force`。
+**操作步骤：**
+- 先在当前错误分支创建新分支保存进度：`git branch feature-correct`。
+- 切回 `main` 分支：`git checkout main`。
+- 强制重置 `main` 到上一个版本：`git reset --hard HEAD~1`。
+- 强制推送回远程：`git push origin main --force`。
 
 ### 线上 Bug 紧急回退
 
@@ -282,14 +299,14 @@ A 修复 Bug 后已推送，B 随后也提交了代码。现发现 A 的修复�
 
 **对比差异**
 
-* **Reset：** 物理抹除记录，会造成他人本地仓库与远程不一致。
-* **Revert：** 创建一个新提交来抵消旧提交。这是多人协作中安全的回退方式。
+- **Reset：** 物理抹除记录，会造成他人本地仓库与远程不一致。
+- **Revert：** 创建一个新提交来抵消旧提交。这是多人协作中安全的回退方式。
 
 **操作步骤**
 
-1. 获取错误提交的哈希值（如 `abc1234`）。
-2. 执行 `git revert abc1234`。
-3. 推送生成的“抵消”提交。此时 A 的错误被撤销，B 的代码完好无损。
+- 获取错误提交的哈希值（如 `abc1234`）。
+- 执行 `git revert abc1234`。
+- 推送生成的“抵消”提交。此时 A 的错误被撤销，B 的代码完好无损。
 
 ### 临时切换任务
 
@@ -301,9 +318,9 @@ A 修复 Bug 后已推送，B 随后也提交了代码。现发现 A 的修复�
 
 **操作步骤**
 
-1. 执行 `git stash`，工作区恢复干净。
-2. 切换分支修复 Bug 并提交。
-3. 切回原分支，执行 `git stash pop` 恢复之前的进度。
+- 执行 `git stash`，工作区恢复干净。
+- 切换分支修复 Bug 并提交。
+- 切回原分支，执行 `git stash pop` 恢复之前的进度。
 
 ## GitHub Actions
 
