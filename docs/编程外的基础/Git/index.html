@@ -15,7 +15,7 @@
 
 
 <link rel="stylesheet" href="/katex/katex.min.css"><link rel="stylesheet" href="/assets/css/styles.57232b87.css">
-<script src="/assets/js/runtime~main.65a22164.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.cc523b54.js" defer="defer"></script>
 <script src="/assets/js/main.56c1aabe.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -107,8 +107,8 @@
 <li>保存并退出，在随后的弹窗中编辑合并后的提交说明（Commit Message）。</li>
 </ol>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="commit-message写错">Commit Message写错<a href="#commit-message写错" class="hash-link" aria-label="Direct link to Commit Message写错" title="Direct link to Commit Message写错" translate="no">​</a></h3>
-<p><strong>问题描述：</strong> 已经 push 到了远程，但发现提交信息里有错别字或违反了团队规范。
-<strong>解决方案：</strong> 修改最近一次提交。</p>
+<p><strong>问题描述：</strong> 已经 push 到了远程，但发现提交信息里有错别字或违反了团队规范。</p>
+<p><strong>解决方案：</strong> 修改最近一次提交。</p>
 <ul>
 <li><strong>操作步骤：</strong></li>
 </ul>
@@ -136,7 +136,7 @@ A 和 B 同时修改了同一文件。B 先推送，A 在推送时被拒绝。</
 <li>解决后执行 <code>git add &lt;file&gt;</code>。</li>
 <li>执行 <code>git rebase --continue</code>，重复此步骤直到合并完成。</li>
 </ol>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="应忽略的内容误推至远程">应忽略的内容误推至远程<a href="#应忽略的内容误推至 远程" class="hash-link" aria-label="Direct link to 应忽略的内容误推至远程" title="Direct link to 应忽略的内容误推至远程" translate="no">​</a></h3>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="应忽略的内容误推至远程">应忽略的内容误推至远程<a href="#应忽略的内容误推至远程" class="hash-link" aria-label="Direct link to 应忽略的内容误推至远程" title="Direct link to 应忽略的内容误推至远程" translate="no">​</a></h3>
 <p><strong>问题描述：</strong> 将 <code>.env</code>、API Key 或 SSH 私钥不小心 <code>git push</code> 到了公共仓库。
 <strong>解决方案：</strong> 仅删除当前提交是不够的，必须从历史记录中彻底抹除。否则 <code>.git</code> 文件夹会包含该文件，导致仓库体积激增，拉取缓慢。。</p>
 <ul>
@@ -152,8 +152,8 @@ A 和 B 同时修改了同一文件。B 先推送，A 在推送时被拒绝。</
 <li><strong>预防：</strong> 在项目根目录配置 <code>.gitignore</code>，** 对于密钥泄露，<strong>修改代码是补救，更换密钥是根治</strong>。一旦信息进入过互联网，就应视为已泄露。</li>
 </ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="推错分支">推错分支<a href="#推错分支" class="hash-link" aria-label="Direct link to 推错分支" title="Direct link to 推错分支" translate="no">​</a></h3>
-<p><strong>问题描述：</strong> 在错误的分支上进行了提交并已推送到远程（本应推到 feature，误推到了 main）。
-<strong>解决方案：</strong> 转移提交并重置原分支。</p>
+<p><strong>问题描述：</strong> 在错误的分支上进行了提交并已推送到远程（本应推到 feature，误推到了 main）。</p>
+<p><strong>解决方案：</strong> 转移提交并重置原分支。</p>
 <ul>
 <li><strong>操作步骤：</strong></li>
 </ul>
