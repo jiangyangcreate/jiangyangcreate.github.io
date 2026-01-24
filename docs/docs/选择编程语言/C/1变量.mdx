@@ -82,9 +82,11 @@ int b = a; // 相当于把a中存储的10拷贝了一份给b
 #include <stdio.h>
 // 在程序开头使用 #define 预处理器指令
 #define PI 3.14159
+#define HI "Hello,World"
 
 int main(){
     printf("PI = %f\n", PI);
+    printf("%s\n", HI);
     return 0;
 }
 ```
@@ -107,6 +109,39 @@ int main(){
     return 0;
 }
 ```
+
+:::tip 一些明示常量
+
+```c showLineNumbers
+//  使用limit.h和float头文件中定义的明示常量
+#include <stdio.h>
+#include <limits.h>    // 整型限制
+#include <float.h>     // 浮点型限制
+int main(void)
+{
+     printf("Some number limits for this system:\n");
+     printf("Biggest int: %d\n", INT_MAX);
+     printf("Smallest long long: %lld\n", LLONG_MIN);
+     printf("One byte = %d bits on this system.\n", CHAR_BIT);
+     printf("Largest double: %e\n", DBL_MAX);
+     printf("Smallest normal float: %e\n", FLT_MIN);
+     printf("float precision = %d digits\n", FLT_DIG);
+     printf("float epsilon = %e\n", FLT_EPSILON);
+
+     return 0;
+}
+/*
+Some number limits for this system:
+Biggest int: 2147483647
+Smallest long long: -9223372036854775808
+One byte = 8 bits on this system.
+Largest double: 1.797693e+308
+Smallest normal float: 1.175494e-38
+float precision = 6 digits
+float epsilon = 1.192093e-07
+*/
+```
+:::
 
 ### enum
 
@@ -327,8 +362,7 @@ int main(){
 
 2. 格式化输出
 
-
-调用格式为:`printf("格式控制字符串",输出项列表);`
+调用格式为:`printf( 格式字符串, 待打印项1, 待打印项2,...);`
 
 格式控制字符串形式: `%[标志][输出宽度][.精度][长度]类型`。类型是必选，其它是可选。
 
@@ -351,39 +385,42 @@ int main(){
 
 类型字符串用以表示输出数据的类型, 其格式符和意义如下所示
 
-| 类型  | 含义                                | 示例 |
-| ----- | ----------------------------------- | ---- |
-| **字符类型** |
-| c     | 单个字符                            | `%c` |
-| s     | 字符串（char 数组）                 | `%s` |
-| **整数类型** |
-| d / i | 有符号 10 进制整数                  | `%d`, `%i` |
-| hd / hi | short int（短整型）               | `%hd`, `%hi` |
-| ld / li | long int（长整型）                | `%ld`, `%li` |
-| lld / lli | **long long int（长长整型）**   | `%lld`, `%lli` |
-| u     | 无符号 10 进制整数                  | `%u` |
-| hu    | unsigned short int                 | `%hu` |
-| lu    | unsigned long int                  | `%lu` |
-| llu   | **unsigned long long int**         | `%llu` |
-| **其他进制整数** |
-| o     | 无符号 8 进制整数                   | `%o` |
-| lo    | unsigned long int（8进制）         | `%lo` |
-| llo   | **unsigned long long int（8进制）** | `%llo` |
-| x / X | 无符号 16 进制整数                  | `%x`, `%X` |
-| lx / lX | unsigned long int（16进制）       | `%lx`, `%lX` |
-| llx / llX | **unsigned long long int（16进制）** | `%llx`, `%llX` |
-| **浮点数类型** |
-| f     | float/double（默认保留 6 位小数）   | `%f` |
-| lf    | double（推荐用法）                  | `%lf` |
-| Lf    | long double（扩展精度浮点型）        | `%Lf` |
-| e / E | 科学计数法输出浮点数                | `%e`, `%E` |
-| Le / LE | long double（科学计数法）           | `%Le`, `%LE` |
-| g / G | 自动选择最短格式输出浮点数          | `%g`, `%G` |
-| **特殊类型** |
-| p     | 指针地址                            | `%p` |
-| n     | 不输出字符，存储已输出字符数        | `%n` |
-| %     | 输出百分号字符 %                    | `%%` |
+| 类型 | 含义 | 示例 |
+| --- | --- | --- |
+| **字符与字符串** |  |  |
+| **c** | 单个字符 | `%c` |
+| **s** | 字符串（char 数组） | `%s` |
+| **整数类型 (10进制)** |  |  |
+| **d / i** | 有符号 10 进制整数 | `%d`, `%i` |
+| **hd / hi** | short int（短整型） | `%hd`, `%hi` |
+| **ld / li** | long int（长整型） | `%ld`, `%li` |
+| **lld / lli** | **long long int（长长整型）** | `%lld`, `%lli` |
+| **u** | 无符号 10 进制整数 | `%u` |
+| **hu** | unsigned short int | `%hu` |
+| **lu** | unsigned long int | `%lu` |
+| **llu** | **unsigned long long int** | `%llu` |
+| **其他进制整数** |  |  |
+| **o** | 无符号 8 进制整数 | `%o` |
+| **lo / llo** | unsigned long / long long（8进制） | `%lo`, `%llo` |
+| **x / X** | 无符号 16 进制整数（`x`小写字母，`X`大写字母） | `%x`, `%X` |
+| **lx / lX** | unsigned long int（16进制） | `%lx`, `%lX` |
+| **llx / llX** | **unsigned long long int（16进制）** | `%llx`, `%llX` |
+| **浮点数类型** |  |  |
+| **f** | float / double（默认保留 6 位小数） | `%f` |
+| **lf** | double（printf中与%f通用，scanf中必须区分） | `%lf` |
+| **Lf** | long double（扩展精度浮点型） | `%Lf` |
+| **e / E** | 科学计数法（指数形式）输出浮点数 | `%e`, `%E` |
+| **Le / LE** | long double 的科学计数法形式 | `%Le`, `%LE` |
+| **g / G** | **自动选择**：根据数值大小自动选 `%f` 或 `%e/%E`（当指数 < -4 或 >= 精度时使用指数格式） | `%g`, `%G` |
+| **a / A** | **十六进制浮点数**，p记数法 (C99/C11标准) | `%a`, `%A` |
+| **特殊类型** |  |  |
+| **p** | 指针地址（十六进制形式） | `%p` |
+| **n** | 不产生输出，而是将**已打印字符数**存入对应的 int 指针变量 | `%n` |
+| **%** | 打印一个百分号字符 `%` 本身 | `%%` |
 
+:::tip
+关于 `%i`：在 printf 中与 `%d` 相同；但在 scanf 中，`%i` 会根据输入的前缀自动识别进制（如 0x 开头识别为十六进制，0 开头识别为八进制）。
+:::
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -442,153 +479,75 @@ int main(){
 }
 ```
 
+:::tip 打印%符号
 
-### 宽度
+由于printf()函数使用%符号来标识转换说明，因此打印%符号就成了个问题。
 
-格式: `printf("a = %[宽度]类型", a);`
+如果单独使用一个%符号，编译器会认为漏掉了一个转换字符。解决方法很简单，使用两个%符号就行了。
 
-用十进制整数来指定输出的宽度, 如果实际位数多于指定宽度,则按照实际位数输出, 如果实际位数少于指定宽度则以空格补位
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    // 实际位数小于指定宽度
-    int a = 1;
-    printf("a =|%d|\n", a); // |1|
-    printf("a =|%5d|\n", a); // |    1|
-    // 实际位数大于指定宽度
-    int b = 1234567;
-    printf("b =|%d|\n", b); // |1234567|
-    printf("b =|%5d|\n", b); // |1234567|
-}
-```
+`printf("%d%% 的人是男性.\n", 50);` 50%的人是男性
+:::
 
 
-### 标志
+### 标志、宽度、精度、长度
 
-格式: `printf("a = %[标志][宽度]类型", a);`
+在 C 语言中，`printf` 的完整格式化语法为： `printf("a = %[标志][宽度][.精度][长度转换修饰符]类型", a);`
 
-| 标志 | 含义                                                  |
-| ---- | ----------------------------------------------------- |
-| -    | 左对齐, 默认右对齐                                    |
-| +    | 当输出值为正数时,在输出值前面加上一个+号, 默认不显示  |
-| 0    | 右对齐时, 用 0 填充宽度.(默认用空格填充)              |
-| 空格 | 输出值为正数时,在输出值前面加上空格, 为负数时加上负号 |
-| #    | 对 c、s、d、u 类型无影响                              |
-| #    | 对 o 类型, 在输出时加前缀 o                           |
-| #    | 对 x 类型,在输出时加前缀 0x                           |
+#### 格式标志符（Flags）
 
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    int a = 1;
-    int b = -1;
-    // -号标志
-    printf("a =|%d|\n", a); // |1|
-    printf("a =|%5d|\n", a); // |    1|
-    printf("a =|%-5d|\n", a);// |1    |
-    // +号标志
-    printf("a =|%d|\n", a); // |1|
-    printf("a =|%+d|\n", a);// |+1|
-    printf("b =|%d|\n", b); // |-1|
-    printf("b =|%+d|\n", b);// |-1|
-    // 0标志
-    printf("a =|%5d|\n", a); // |    1|
-    printf("a =|%05d|\n", a); // |00001|
-    // 空格标志
-    printf("a =|% d|\n", a); // | 1|
-    printf("b =|% d|\n", b); // |-1|
-    // #号
-    int c = 10;
-    printf("c = %o\n", c); // 12
-    printf("c = %#o\n", c); // 012
-    printf("c = %x\n", c); // a
-    printf("c = %#x\n", c); // 0xa
-}
-```
+| 标志 | 含义 | 示例 |
+| --- | --- | --- |
+| **`-`** | **左对齐**。默认是右对齐。 | `%-5d` |
+| **`+`** | **显示正负号**。正数前加 `+`，负数前加 `-`。 | `%+d` |
+| **`0`** | **零填充**。右对齐时，空位用 `0` 填充而非空格。 | `%05d` |
+| **`空格`** | **留空正号**。正数前加空格，负数前显示 `-`。 | `% d` |
+| **`#`** | **特殊前缀**。对 `o` 加 `0`；对 `x/X` 加 `0x/0X`；对浮点数强制显示小数点。 | `%#x` |
+
+#### 宽度与精度控制
+
+* **宽度 (Width)**：用十进制整数指定最小输出位数。
+* 实际位数 < 宽度：用空格（或 0）补位。
+* 实际位数 > 宽度：按实际位数原样输出。
 
 
-### 精度
-格式: `printf("a = %[精度]类型", a); `
+* **精度 (.Precision)**：以 `.` 开头，后跟整数。
+* **浮点数**：控制小数点后的位数（四舍五入）。
+* **字符串**：控制最大输出字符数。
+已经为你将**长度转换修饰符（Length Modifiers）**加入到体系中。
 
-精度格式符以"."开头, 后面跟上十进制整数, 用于指定需要输出多少位小数, 如果输出位数大于指定的精度, 则删除超出的部分
+#### 长度转换修饰符
+
+| 长度插件 | 对应数据类型 | 说明 |
+| --- | --- | --- |
+| **`hh`** | `char` / `unsigned char` | 以单字节整数形式输出 (C99) |
+| **`h`** | `short` / `unsigned short` | 短整型 |
+| **(无)** | `int` / `unsigned int` / `float` | 默认整型/单精度浮点型 |
+| **`l`** (小写L) | `long` / `unsigned long` / `double` | 长整型或双精度浮点 |
+| **`ll`** (双L) | `long long` / `unsigned long long` | **长长整型** (C99) |
+| **`L`** (大写L) | `long double` | 扩展精度浮点型 |
+| **`z`** | `size_t` | 用于输出 `sizeof` 的返回结果 (C99) |
+
+
+如果你想打印一个：**左对齐、占10位宽、保留2位小数、双精度**的数字：
+`%-10.2lf`
 
 ```c showLineNumbers
 #include <stdio.h>
-int main(){
-    double a = 3.1415926;
-    printf("a = %.2f\n", a); // 3.14
+
+int main() {
+    double d = 123.456;
+    
+    // [标志:-][宽度:10][精度:.2][长度:l][类型:f]
+    printf("结果: |%-10.2lf|\n", d); 
+    // 输出: |123.46    |  (左对齐，总宽10，四舍五入)
+    
+    // [标志:0][宽度:10][精度:.2][长度:l][类型:f]
+    printf("结果: |%010.2lf|\n", d); 
+    // 输出: |0000123.46|  (右对齐，0填充)
+
+    return 0;
 }
-```
 
-- 动态指定保留小数位数
-  - 格式: `printf("a = %.*f", a);`
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    double a = 3.1415926;
-    printf("a = %.*f", 2, a); // 3.14
-}
-```
-
-- 实型(浮点类型)有效位数问题
-  - 对于单精度数,使用%f 格式符输出时,仅前 6~7 位是有效数字
-  - 对于双精度数,使用%lf 格式符输出时,前 15~16 位是有效数字
-  - 有效位数和精度(保留多少位)不同, 有效位数是指从第一个非零数字开始,误差不超过本数位半个单位的、精确可信的数位
-  - 有效位数包含小数点前的非零数位
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    //        1234.567871093750000
-    float a = 1234.567890123456789;
-    //         1234.567890123456900
-    double b = 1234.567890123456789;
-    printf("a = %.15f\n", a); // 前8位数字是准确的, 后面的都不准确
-    printf("b = %.15f\n", b); // 前16位数字是准确的, 后面的都不准确
-}
-```
-
-
-### 长度
-
-格式: `printf("a = %[长度]类型", a);`
-
-| 长度 | 修饰类型      | 含义               |
-| ---- | ------------- | ------------------ |
-| hh   | d、i、o、u、x | 输出 char          |
-| h    | d、i、o、u、x | 输出 short int     |
-| l    | d、i、o、u、x | 输出 long int      |
-| ll   | d、i、o、u、x | 输出 long long int |
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    char a = 'a';
-    short int b = 123;
-    int  c = 123;
-    long int d = 123;
-    long long int e = 123;
-    printf("a = %hhd\n", a); // 97
-    printf("b = %hd\n", b); // 123
-    printf("c = %d\n", c); // 123
-    printf("d = %ld\n", d); // 123
-    printf("e = %lld\n", e); // 123
-}
-```
-
-### 转义字符
-
-格式: `printf("%f%%", 3.1415);`
-
-%号在格式控制字符串中有特殊含义, 所以想输出%必须添加一个转义字符
-
-```c showLineNumbers
-#include <stdio.h>
-int main(){
-    printf("%f%%", 3.1415); // 输出结果3.1415%
-}
 ```
 
 
@@ -607,6 +566,24 @@ int main(){
     scanf("%d", &number); // 接收一个整数
     printf("number = %d\n", number);
 }
+```
+
+它在遇到第1个空白（空格、制表符或换行符）时就不再读取输入。
+
+```c showLineNumbers
+/* praise1.c -- 使用不同类型的字符串 */
+#include <stdio.h>
+int main(void)
+{
+     char name[40];
+     printf("What's your name? ");
+     scanf("%s", name);
+     printf("Hello, %s.\n", name);
+     return 0;
+}
+
+//What's your name? Angela Plains
+//Hello, Angela. 
 ```
 
 ### 分隔符
