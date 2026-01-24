@@ -22,4 +22,4 @@ yarn-error.log*
 # draft
 draft
 
-*table.py
+**/test

@@ -3,13 +3,6 @@ sidebar_position: 5
 title: 控制流
 ---
 
-为了方便我们控制程序的运行流程，C 语言提供 3 种流程控制结构，不同的流程控制结构可以实现不同的运行流程。
-
-- 顺序结构：按书写顺序从上至下依次执行
-- 选择结构：对给定的条件进行判断，再根据判断结果来决定执行代码
-- 循环结构：在给定条件成立的情况下，反复执行某一段代码
-
-
 ## 选择结构
 
 - C 语言中提供了两大选择结构，分别是 if 和 switch
@@ -401,7 +394,8 @@ int main() {
 }
 ```
 
-- switch 中只要任意一个 case 匹配，其它所有的 case 和 default 都会失效。所以如果 case 和 default 后面没有 break 就会出现穿透问题
+- switch 中只要任意一个 case 匹配，其它所有的 case 和 default 都会失效。程序将无条件地继续执行后续所有 case 或 default 分支中的代码，直到遇到 break 或整个 switch 块结束为止。
+- 所以如果 case 和 default 后面没有 break 就会出现穿透问题
 
 ```c showLineNumbers
 #include <stdio.h>

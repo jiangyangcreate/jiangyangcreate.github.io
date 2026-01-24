@@ -3,6 +3,86 @@ sidebar_position: 0
 title: 基础语法
 ---
 
+## 基础概念
+
+### 编写代码
+
+定义程序的目标、设计程序、编写代码是一个整理，有时，要在不同的步骤之间往复。
+
+用C语言编写程序时，编写的内容被存储在文本文件中，该文件被称为<Highlight>源代码文件</Highlight>。通常以`.c`拓展名结尾。
+
+### 编译与链接
+
+C编程的基本策略是，用程序把源代码文件转换为可执行文件（其中包含可直接运行的机器语言代码）​。
+
+典型的C实现通过编译和链接两个步骤来完成这一过程。编译器把源代码转换成中间代码，链接器把中间代码和其他代码(启动代码和库代码)合并，生成可执行文件。
+
+- 编译：C使用这种分而治之的方法方便对程序进行模块化，可以独立编译单独的模块，稍后再用链接器合并已编译的模块。通过这种方式，如果只更改某个模块，不必因此重新编译其他模块。
+
+- 链接：另外，链接器还将你编写的程序和预编译的库代码合并。目标文件中存储的是编译器翻译的源代码，这还不是一个完整的程序。链接器的作用是，把你编写的目标代码、系统的标准启动代码和库代码这3部分合并成一个文件，即可执行文件。对于库代码，链接器只会把程序中要用到的库函数代码提取出来
+
+有些系统中，必须分别运行编译程序和链接程序，而在另一些系统中，编译器会自动启动链接器，用户只需给出编译命令即可。
+
+:::info
+这样的设计让一份C的源代码，在不同操作系统上通过对应的编译器编译，即可适配到特定的目标机器指令集上。
+
+即：一次编写，处处编译。
+:::
+```mermaid
+graph TD
+    %% 定义节点
+    SourceCode["源代码<br/>(concrete.c)"]
+    Compiler["编译器"]
+    ObjectCode["目标代码<br/>(concrete.obj)"]
+    LibraryCode["库代码"]
+    StartUpCode["启动代码"]
+    Linker["链接器"]
+    Executable["可执行代码<br/>(concrete.exe)"]
+
+    %% 定义连接关系
+    SourceCode --> Compiler
+    Compiler --> ObjectCode
+    ObjectCode --> Linker
+    LibraryCode --> Linker
+    StartUpCode --> Linker
+    Linker --> Executable
+
+    %% 样式美化
+    style Compiler fill:#ddd,stroke:#333
+    style Linker fill:#ddd,stroke:#333
+    style SourceCode fill:#fff,stroke:#333
+    style ObjectCode fill:#fff,stroke:#333
+    style Executable fill:#fff,stroke:#333
+```
+
+UNIX系统提供的C编译器通常来自一些其他源，然后以cc命令作为编译器的别名。因此，虽然在不同的系统中会调用不同的编译器，但用户仍可以继续使用相同的命令。
+
+编译inform.c，要输入以下命令： `cc inform.c` 等价于：`gcc inform.c`
+
+```c showLineNumbers title="inform.c"
+#include <stdio.h>
+int main(void)
+{
+     printf("C 语言程序的源代码文件以 .c 作为后缀。\n");
+
+     return 0;
+}
+```
+
+如果使用ls命令列出文件，会发现有一个a.out文件​。该文件是包含已翻译（或已编译）程序的可执行文件。
+
+要运行该文件，只需输入：`a.out`
+
+:::tip
+如果要存储可执行文件（a.out）​，应该把它重命名。否则，该文件会被下一次编译程序时生成的新a.out文件替换。
+:::
+
+:::info
+在该例中，目标代码文件是inform.o。然而，却找不到这个文件，因为一旦链接器生成了完整的可执行程序，就会将其删除。
+
+如果原始程序有多个源代码文件，则保留目标代码文件。学到后面多文件程序时，你会明白到这样做的好处。
+:::
+
 ## main函数
 
 一个 C 语言程序**有且只有一个main函数**，程序运行时系统会**自动调用**。
@@ -15,10 +95,13 @@ title: 基础语法
   - `int` 代表函数执行之后会返回一个整数类型的值
   - `main` 代表这个函数的名字叫做 main
   - `()` 代表这是一个函数
-  - `{}` 代表这个程序段的范围
+  - `{}` 代表这个程序段的范围（花括号还可用于把函数中的多条语句合并为一个单元或块。）
   - `return 0;` 代表函数执行完之后返回整数 0
 
-```c showLineNumbers
+```c showLineNumbers title="test.c"
+// test.c是完整的文件名
+// 其中test是文件名
+// .c 是C语言的文件拓展名。
 int main() {
     // insert code here...
     return 0;
@@ -27,7 +110,7 @@ int main() {
 :::info
 - C 语言中,每条完整的语句后面都必须以<Highlight>英文分号</Highlight>结尾
 - main 函数前面的 int 可以不写或换成 void
-- main 函数中的 return 0 可以不写
+- 养成在main()函数中保留return语句的好习惯。因为main 函数中的 return 0 可以不写。
 :::
 
 - 其它函数定义的格式
@@ -45,20 +128,36 @@ int call() {
 
 :::info
 
-- main函数会由系统自动调用, 其它函数需要开发者**在 main 函数中手动调用**。
-  - call 代表找到名称叫做 call 的某个东西
-  - () 代表要找到的名称叫 call 的某个东西是一个函数
-  - ; 代表调用函数的语句已经编写完成
-  - 所以 `call();`代表找到 call 函数, 并执行 call 函数
+无论main()在程序文件中处于什么位置，所有的C程序都从main()开始执行。
 
-```c showLineNumbers
-int call() {
-    return 0;
+main函数会由系统自动调用, 其它函数需要开发者**在 main 函数中手动调用**。
+
+但是，C的惯例是把main()放在开头，因为它提供了程序的基本框架。
+
+```c showLineNumbers title="two_func.c"
+/* two_func.c -- 一个文件中包含两个函数 */
+#include <stdio.h>
+// 第1个void表明，butler()函数没有返回值
+// 第2个void（butler(void)中的void）的意思是butler()函数不带参数
+void butler(void); /* ANSI/ISO C函数原型 */
+int main(void)
+{
+     printf("I will summon the butler function.\n");
+     butler();
+     printf("Yes. Bring me some tea and writeable DVDs.\n");
+
+     return 0;
 }
-int main() {
-    call();
+void butler(void) /* 函数定义开始 */
+{
+     printf("You rang, sir?\n");
 }
 ```
+butler()函数在程序中出现了3次。
+- 第1次是函数原型（prototype）​，告知编译器在程序中要使用该函数；
+- 第2次以函数调用（functioncall）的形式出现在main()中；
+- 最后一次出现在函数定义（functiondefinition）中，函数定义即是函数本身的源代码。
+
 :::
 
 ## 注释
@@ -147,6 +246,25 @@ C语言的核心设计理念是<Highlight>小而精</Highlight>，它只提供�
 - register: 寄存器存储类别
 - static: 静态存储类别
 - extern: 外部存储类别
+
+### C99 性能优化与函数特性
+- inline:内联函数修饰符
+- restrict:用于指针的修饰符
+
+### C99/C11 新增基础类型
+- _Bool: 布尔类型。
+- _Complex: 复数类型。
+- _Imaginary: 虚数类型。
+
+### C11 内存对齐与并发处理
+- _Alignas: 设置变量或类型的内存对齐字节数。
+- _Alignof: 查询类型的内存对齐要求。
+- _Atomic: 原子操作修饰符，用于多线程并发。
+- _Thread_local: 声明线程局部变量。
+- _Static_assert: 静态断言（编译时检查）。
+- _Noreturn: 告诉编译器该函数不会返回（如调用了 exit 的函数）。
+- _Generic: 泛型选择表达式。
+
 `} />
 
 ### 数据类型
@@ -425,7 +543,11 @@ C语言的核心设计理念是<Highlight>小而精</Highlight>，它只提供�
 
 `} />
 
+:::info
+`#include <stdio.h>`作用相当于把stdio.h文件中的所有内容都输入该行所在的位置。实际上，这是一种“拷贝-粘贴”的操作。
 
+这行代码是一条C预处理器指令（preprocessor directive）​。通常，C编译器在编译前会对源代码做一些准备工作，即预处理（preprocessing）​。
+:::
 
 ## 运算符
 
