@@ -15,7 +15,7 @@
 
 
 <link rel="stylesheet" href="/katex/katex.min.css"><link rel="stylesheet" href="/assets/css/styles.57232b87.css">
-<script src="/assets/js/runtime~main.ca348dff.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.336c3a7b.js" defer="defer"></script>
 <script src="/assets/js/main.56c1aabe.js" defer="defer"></script>
 </head>
 <body class="navigation-with-keyboard">
@@ -102,14 +102,15 @@
 <p><strong>解决方案</strong>
 使用交互式变基：<code>git rebase -i</code>。</p>
 <p><strong>操作步骤</strong></p>
-<ol>
+<ul>
 <li>执行 <code>git rebase -i HEAD~3</code>（针对最近 3 次提交）。</li>
 <li>在编辑器中，将第 2、3 行开头的 <code>pick</code> 改为 <code>squash</code> (或简写为 <code>s</code>)。</li>
 <li>保存并退出，在随后的弹窗中编辑合并后的提交说明（Commit Message）。</li>
-</ol>
+</ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="修复不完美提交">修复不完美提交<a href="#修复不完美提交" class="hash-link" aria-label="Direct link to 修复不完美提交" title="Direct link to 修复不完美提交" translate="no">​</a></h3>
 <p><strong>问题描述：</strong> 修复BUG，已经 push 到了远程，但发现之前的代码并没真的修复，现在本地已经真正修复完了。</p>
-<p><strong>解决方案：</strong> 修改最近一次提交。</p>
+<p><strong>解决方案</strong>
+修改最近一次提交。</p>
 <p><strong>目前还没有其他人提交：</strong></p>
 <ol>
 <li>暂存修改： 在本地完成真正的修复后，执行 <code>git add .</code></li>
@@ -129,13 +130,13 @@
 </ul>
 <p>远程仓库的那条“没修好”的记录会被这条“真正修好”的记录直接替换。</p>
 <p><strong>目前有其他人提交：</strong></p>
-<ol>
+<ul>
 <li>暂存修改： 在本地完成真正的修复后，执行 <code>git add .</code></li>
 <li>查找记录： 在本地执行<code>git log</code> 找到之前那次不完美提交的<code>hash</code>值</li>
 <li>合并： 执行<code>git commit --fixup &lt;commit-hash&gt;</code></li>
 <li>提交： 执行 <code>git rebase -i --autosquash</code> 时，Git 会自动把这些 fixup 提交合并到对应的原始提交中</li>
 <li>推送： <code>git push</code></li>
-</ol>
+</ul>
 <p>这种修复方式会新增一条fixup记录，但是不会导致其他人的记录不可用，最推荐。</p>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="处理多人协作冲突">处理多人协作冲突<a href="#处理多人协作冲突" class="hash-link" aria-label="Direct link to 处理多人协作冲突" title="Direct link to 处理多人协作冲突" translate="no">​</a></h3>
 <p><strong>场景描述</strong>
@@ -148,39 +149,35 @@ A 和 B 同时修改了同一文件。B 先推送，A 在推送时被拒绝。</
 <li><strong>Rebase：</strong> 将本地提交“移至”远程最新提交之后，保持一条直线。</li>
 </ul>
 <p><strong>操作步骤</strong></p>
-<ol>
+<ul>
 <li>执行 <code>git pull --rebase</code>。</li>
 <li>若遇冲突，Git 会提示冲突文件。打开文件手动修复。</li>
 <li>解决后执行 <code>git add &lt;file&gt;</code>。</li>
 <li>执行 <code>git rebase --continue</code>，重复此步骤直到合并完成。</li>
-</ol>
-<h3 class="anchor anchorWithStickyNavbar_LWe7" id="应忽略的内容误推至远程">应忽略的内容误推至远程<a href="#应忽略的内容误推至远程" class="hash-link" aria-label="Direct link to 应忽略的内容误推至远程" title="Direct link to 应忽略的内容误推至远程" translate="no">​</a></h3>
-<p><strong>问题描述：</strong> 将 <code>.env</code>、API Key 或 SSH 私钥不小心 <code>git push</code> 到了公共仓库。
-<strong>解决方案：</strong> 仅删除当前提交是不够的，必须从历史记录中彻底抹除。否则 <code>.git</code> 文件夹会包含该文件，导致仓库体积激增，拉取缓慢。。</p>
-<ul>
-<li><strong>推荐工具：</strong> <a href="https://github.com/newren/git-filter-repo" target="_blank" rel="noopener noreferrer">git-filter-repo</a> (官方推荐) 或 BFG Repo-Cleaner。</li>
-<li><strong>操作步骤：</strong></li>
 </ul>
-<ol>
+<h3 class="anchor anchorWithStickyNavbar_LWe7" id="应忽略的内容误推至远程">应忽略的内容误推至远程<a href="#应忽略的内容误推至远程" class="hash-link" aria-label="Direct link to 应忽略的内容误推至远程" title="Direct link to 应忽略的内容误推至远程" translate="no">​</a></h3>
+<p><strong>问题描述：</strong> 将 <code>.env</code>、API Key 或 SSH 私钥不小心 <code>git push</code> 到了公共仓库。</p>
+<p><strong>解决方案</strong>
+仅删除当前提交是不够的，必须从历史记录中彻底抹除。否则 <code>.git</code> 文件夹会包含该文件，导致仓库体积激增，拉取缓  慢。</p>
+<p><strong>操作步骤：</strong></p>
+<ul>
+<li>安装<a href="https://github.com/newren/git-filter-repo" target="_blank" rel="noopener noreferrer">git-filter-repo</a></li>
 <li><strong>立即撤销泄露密钥的有效性</strong>（这是最安全的操作，假设密钥已泄露）。</li>
 <li>安装工具后执行：<code>git filter-repo --path secret.txt --invert-paths</code>（从所有历史中删除指定文件）。</li>
 <li>强制推送到远程：<code>git push origin --force --all</code>。</li>
-</ol>
-<ul>
-<li><strong>预防：</strong> 在项目根目录配置 <code>.gitignore</code>，** 对于密钥泄露，<strong>修改代码是补救，更换密钥是根治</strong>。一旦信息进入过互联网，就应视为已泄露。</li>
 </ul>
+<p>预防： 在项目根目录配置 <code>.gitignore</code>，对于密钥泄露，修改代码是补救，更换密钥是根治。一旦信息进入过互联网，就应视为已泄露。</p>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="推错分支">推错分支<a href="#推错分支" class="hash-link" aria-label="Direct link to 推错分支" title="Direct link to 推错分支" translate="no">​</a></h3>
 <p><strong>问题描述：</strong> 在错误的分支上进行了提交并已推送到远程（本应推到 feature，误推到了 main）。</p>
-<p><strong>解决方案：</strong> 转移提交并重置原分支。</p>
+<p><strong>解决方案</strong>
+转移提交并重置原分支。</p>
+<p><strong>操作步骤：</strong></p>
 <ul>
-<li><strong>操作步骤：</strong></li>
-</ul>
-<ol>
 <li>先在当前错误分支创建新分支保存进度：<code>git branch feature-correct</code>。</li>
 <li>切回 <code>main</code> 分支：<code>git checkout main</code>。</li>
 <li>强制重置 <code>main</code> 到上一个版本：<code>git reset --hard HEAD~1</code>。</li>
 <li>强制推送回远程：<code>git push origin main --force</code>。</li>
-</ol>
+</ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="线上-bug-紧急回退">线上 Bug 紧急回退<a href="#线上-bug-紧急回退" class="hash-link" aria-label="Direct link to 线上 Bug 紧急回退" title="Direct link to 线上 Bug 紧急回退" translate="no">​</a></h3>
 <p><strong>场景描述</strong>
 A 修复 Bug 后已推送，B 随后也提交了代码。现发现 A 的修复方案有误，需撤销 A 的修改，但必须保留 B 的代码。</p>
@@ -192,28 +189,28 @@ A 修复 Bug 后已推送，B 随后也提交了代码。现发现 A 的修复�
 <li><strong>Revert：</strong> 创建一个新提交来抵消旧提交。这是多人协作中安全的回退方式。</li>
 </ul>
 <p><strong>操作步骤</strong></p>
-<ol>
+<ul>
 <li>获取错误提交的哈希值（如 <code>abc1234</code>）。</li>
 <li>执行 <code>git revert abc1234</code>。</li>
 <li>推送生成的“抵消”提交。此时 A 的错误被撤销，B 的代码完好无损。</li>
-</ol>
+</ul>
 <h3 class="anchor anchorWithStickyNavbar_LWe7" id="临时切换任务">临时切换任务<a href="#临时切换任务" class="hash-link" aria-label="Direct link to 临时切换任务" title="Direct link to 临时切换任务" translate="no">​</a></h3>
 <p><strong>场景描述</strong>
 功能开发到一半，需紧急切换到 <code>master</code> 分支修复 Bug，但当前代码尚不具备提交条件。</p>
 <p><strong>解决方案</strong>
 使用 <code>git stash</code> 将修改暂存至堆栈。</p>
 <p><strong>操作步骤</strong></p>
-<ol>
+<ul>
 <li>执行 <code>git stash</code>，工作区恢复干净。</li>
 <li>切换分支修复 Bug 并提交。</li>
 <li>切回原分支，执行 <code>git stash pop</code> 恢复之前的进度。</li>
-</ol>
+</ul>
 <h2 class="anchor anchorWithStickyNavbar_LWe7" id="github-actions">GitHub Actions<a href="#github-actions" class="hash-link" aria-label="Direct link to GitHub Actions" title="Direct link to GitHub Actions" translate="no">​</a></h2>
 <p>GitHub Actions 是一种工作流，是 CI/CD 最常用的工具。</p>
 <ul>
 <li>CI/CD（持续集成/持续部署）是自动化构建、测试和部署应用程序的实践，其主要目标是及早发现问题，并更快地发布到生产环境。</li>
 </ul>
-<p>工作流是一个可配置的自动化过程，它将运行一个或多个作业。工作流由签入您的存储库的 YAML 文件定义，并在由存储库中的事件触发时运行，或者它们可以手动触发或按定义的时间表触发。</p>
+<p>工作流是一个可配置的自动化过程，它将运行一个或多个作业。工作流由签入您的存储库的 YAML 文件定义，并在由 存储库中的事件触发时运行，或者它们可以手动触发或按定义的时间表触发。</p>
 <p>工作流在存储库的 <code>.github/workflows</code> 目录中定义，存储库可以有多个工作流，每个工作流可以执行一组不同的任务。例如，您可以有一个工作流来构建和测试拉取请求，另一个工作流在每次创建发布时部署您的应用程序，还有另一个工作流在每次有人打开新问题时添加标签。</p>
 <p><a href="https://docs.github.com/en/actions" target="_blank" rel="noopener noreferrer">GitHub Actions documentation</a></p><div class="margin-vert--lg" style="display:flex;align-items:center;justify-content:center"><a class="button button--link" href="https://github.com/jiangyangcreate/jiangyangcreate.github.io/blob/main/docs/docs/编程外的基础/Git.mdx" target="_blank" rel="noreferrer noopener" aria-label="edit on github" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 512 512" height="20" width="20" style="margin-right:7px"><g transform="translate(0.000000,512.000000) scale(0.100000,-0.100000)" fill="url(#grad1)" stroke="none"><path d="M2384 5060 c-1012 -69 -1891 -738 -2235 -1703 -53 -146 -102 -349 -125 -512 -23 -157 -25 -496 -5 -655 102 -816 575 -1526 1287 -1932 164 -94 418 -200 483 -202 51 -1 94 20 116 57 18 30 19 50 16 267 -1 129 -3 236 -4 236 -1 1 -38 -4 -82 -12 -263 -43 -497 16 -646 165 -58 58 -76 86 -134 206 -94 196 -149 271 -255 348 -78 56 -120 98 -120 119 0 50 121 67 217 30 125 -47 208 -119 299 -258 126 -191 284 -276 485 -261 77 6 233 49 245 68 3 6 13 38 20 71 19 80 68 181 110 228 40 45 44 42 -86 60 -103 14 -282 60 -368 94 -362 143 -571 410 -649 829 -25 134 -25 463 0 567 36 149 103 285 195 398 l43 53 -15 47 c-52 161 -46 370 16 564 20 61 24 67 54 73 107 20 352 -68 576 -206 l98 -61 87 20 c204 47 298 57 553 57 256 0 349 -10 553 -57 l88 -20 77 48 c153 96 304 167 407 193 85 21 159 31 191 25 28 -5 33 -12 52 -72 57 -178 67 -404 23 -542 l-21 -65 20 -25 c98 -121 175 -269 212 -409 26 -98 36 -348 19 -488 -74 -608 -407 -935 -1041 -1023 -120 -16 -118 -15 -83 -53 46 -48 90 -134 115 -223 20 -74 22 -106 27 -529 7 -492 5 -482 66 -507 47 -20 102 -13 200 26 348 135 622 311 884 569 417 410 679 942 752 1527 20 159 18 498 -5 655 -173 1219 -1151 2131 -2373 2215 -161 11 -175 11 -339 0z"></path></g></svg></a><a class="button button--link" href="https://twitter.com/intent/tweet?url=https%3A%2F%2Fjiangmiemie.com%2Fdocs%2F%25E7%25BC%2596%25E7%25A8%258B%25E5%25A4%2596%25E7%259A%2584%25E5%259F%25BA%25E7%25A1%2580%2FGit&amp;text=%E6%88%91%E5%88%9A%E5%88%9A%E8%AF%BB%E4%BA%86%20%22Git%22%20by%20%40jiangyangcreate" target="_blank" rel="noreferrer noopener" aria-label="share on twitter" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 24 24" height="20" width="20" style="margin-right:7px"><g fill="url(#grad1)"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></g></svg></a><a class="button button--link" href="https://jiangmiemie.com/blog/rss.xml" target="_blank" rel="noreferrer noopener" aria-label="rss reader link" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 16 16" height="20" width="20" style="margin-right:7px"><g fill="url(#grad1)"><linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#D8262C;stop-opacity:1"></stop><stop offset="100%" style="stop-color:#E6B800;stop-opacity:1"></stop></linearGradient><circle cx="3" cy="13" r="2"></circle><path d="M1 5.667v2.667A6.674 6.674 0 0 1 7.667 15h2.666c0-5.146-4.187-9.333-9.333-9.333z"></path><path d="M1 1v2.667C7.25 3.667 12.334 8.75 12.334 15H15C15 7.28 8.72 1 1 1z"></path></g></svg></a><a class="button button--link" href="mailto:jiangyangcreate@gmail.com" target="_blank" rel="noreferrer noopener" aria-label="send email" style="display:inline-flex;align-items:center"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 1024 1024" style="margin-right:7px;height:20px;width:20px"><g><path style="opacity:0.996;fill:url(#grad1)" d="M 243.5,420.5 C 189.523,379.185 135.857,337.518 82.5,295.5C 140.987,183.298 229.487,104.632 348,59.5C 432.42,30.213 518.587,23.713 606.5,40C 693.576,57.6997 769.243,96.6997 833.5,157C 787.833,202.667 742.167,248.333 696.5,294C 695.5,294.667 694.5,294.667 693.5,294C 642.378,246.775 581.711,222.942 511.5,222.5C 407.283,227.337 327.117,273.337 271,360.5C 259.938,379.624 250.771,399.624 243.5,420.5 Z"></path></g><g><path style="opacity:0.996;fill:url(#grad1)" d="M 82.5,295.5 C 135.857,337.518 189.523,379.185 243.5,420.5C 223.5,481.168 223.5,541.835 243.5,602.5C 189.523,643.815 135.857,685.482 82.5,727.5C 31.7513,624.612 18.5846,516.945 43,404.5C 51.5465,366.35 64.7132,330.016 82.5,295.5 Z"></path></g><g><path style="opacity:0.998;fill:url(#grad1)" d="M 829.5,876.5 C 777.833,835.833 726.167,795.167 674.5,754.5C 725.318,718.61 756.985,669.944 769.5,608.5C 683.503,607.5 597.503,607.167 511.5,607.5C 511.5,546.167 511.5,484.833 511.5,423.5C 662.5,423.5 813.5,423.5 964.5,423.5C 979.017,509.532 974.517,594.532 951,678.5C 928.206,755.703 887.706,821.703 829.5,876.5 Z"></path></g><g><path style="opacity:0.997;fill:url(#grad1)" d="M 243.5,602.5 C 274.71,690.744 334.043,751.577 421.5,785C 487.78,805.861 553.78,804.861 619.5,782C 638.723,774.388 657.056,765.222 674.5,754.5C 726.167,795.167 777.833,835.833 829.5,876.5C 762.129,936.339 683.462,972.839 593.5,986C 437.233,1008.45 300.566,967.451 183.5,863C 141.888,823.583 108.222,778.416 82.5,727.5C 135.857,685.482 189.523,643.815 243.5,602.5 Z"></path></g></svg></a></div></div></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/docs/编程外的基础/YAML/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">YAML</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/docs/编程外的基础/Terminal/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Terminal</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#git-命令概览" class="table-of-contents__link toc-highlight">Git 命令概览</a></li><li><a href="#git-commit-规范" class="table-of-contents__link toc-highlight">Git commit 规范</a><ul><li><a href="#gitignore" class="table-of-contents__link toc-highlight">.gitignore</a></li><li><a href="#gitattributes" class="table-of-contents__link toc-highlight">.gitattributes</a></li><li><a href="#gitkeep" class="table-of-contents__link toc-highlight">.gitkeep</a></li></ul></li><li><a href="#常见-git-事故修复方案" class="table-of-contents__link toc-highlight">常见 Git 事故修复方案：</a><ul><li><a href="#提交历史不整洁" class="table-of-contents__link toc-highlight">提交历史不整洁</a></li><li><a href="#修复不完美提交" class="table-of-contents__link toc-highlight">修复不完美提交</a></li><li><a href="#处理多人协作冲突" class="table-of-contents__link toc-highlight">处理多人协作冲突</a></li><li><a href="#应忽略的内容误推至远程" class="table-of-contents__link toc-highlight">应忽略的内容误推至远程</a></li><li><a href="#推错分支" class="table-of-contents__link toc-highlight">推错分支</a></li><li><a href="#线上-bug-紧急回退" class="table-of-contents__link toc-highlight">线上 Bug 紧急回退</a></li><li><a href="#临时切换任务" class="table-of-contents__link toc-highlight">临时切换任务</a></li></ul></li><li><a href="#github-actions" class="table-of-contents__link toc-highlight">GitHub Actions</a></li></ul></div></div></div></div></main></div></div></div><footer class="theme-layout-footer footer"><div class="container container-fluid"><div class="footer__bottom text--center"><div class="footer__copyright"><div style="font-size: 0.75rem;">Copyright ©  jiangyang 2026<div></div></div></div></div></footer></div>
 </body>
