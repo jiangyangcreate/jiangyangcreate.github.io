@@ -107,6 +107,8 @@ import MarkmapHooks from '@site/src/components/MarkmapHooks';
 
 - git reset --hard HEAD^：回退到上一版本
 - git reset --hard commit_id：回退到指定版本
+- git reset --hard HEAD~1 + push -f ：撤销最近一次 Push
+- git reset --soft HEAD~1 ： 只撤销 Push 但保留代码
 
 ## 标签管理
 
@@ -132,6 +134,7 @@ import MarkmapHooks from '@site/src/components/MarkmapHooks';
 
 `} />
 
+
 ## Git commit 规范
 
 Git commit 的规范是为了更好地管理代码，方便后续的代码维护和版本回退。
@@ -143,6 +146,164 @@ Git commit 的规范是为了更好地管理代码，方便后续的代码维护
 > Gitmoji 是一种在 Git 提交消息中使用表情符号来表示提交目的的规范。每个表情符号（emoji）都代表着一种特定的提交类型，使提交消息更加生动和易读。Gitmoji 的目标是通过简单的图标和表情符号传达清晰的信息，从而提高代码提交历史的可读性和可理解性。
 
 > Gitmoji 提供 VS Code 插件，可以在提交时选择对应的表情符号，然后填写提交信息。
+
+### .gitignore
+
+.gitignore 文件用于指定 Git 应该忽略的未跟踪文件。这能防止敏感信息（如 API Key）或编译产物（如 node_modules）进入版本库。
+
+建议包含的内容：
+
+- 系统文件： .DS_Store (macOS), Thumbs.db (Windows)。
+
+- 依赖包： node_modules/, vendor/。
+
+- 编译产物： dist/, build/, *.exe, *.log。
+
+- 环境配置： .env, .env.local。
+
+推荐工具： [gitignore.io](https://www.toptal.com/developers/gitignore) 可以根据你的开发环境（如 Java, Node, Python）自动生成完整的模板。
+
+### .gitattributes
+
+.gitattributes 用于定义特定文件或目录的路径属性。它最常见的用途是解决跨平台协作时的换行符问题。
+
+常见配置项：
+```bash
+// 统一换行符： 强制所有文本文件在 Git 库中以 LF 存储，防止 Windows 用户提交 CRLF 导致冲突。
+* text=auto eol=lf
+
+// LFS (Large File Storage)： 指定哪些大文件通过 Git LFS 管理。
+*.psd filter=lfs diff=lfs merge=lfs -text
+
+// 语言统计： 告诉 GitHub/GitLab 忽略某些文件夹的语言统计。
+docs/* linguist-documentation
+```
+
+### .gitkeep
+
+Git 默认不追踪空文件夹，如果你想在仓库中保留一个空文件夹（如 logs/），可以在里面放一个空的 `.gitkeep`。
+
+
+## 常见 Git 事故修复方案：
+
+事故发生前，养成好习惯来预防是成本最低的：
+
+* **先拉后推：** 养成 `git push` 前先执行 `git pull --rebase` 的习惯。
+* **原子化提交：** 每个 commit 只解决一个问题。禁止将逻辑修改与格式优化混在一起。
+* **分支隔离：** 严禁直接在 `main` 或 `master` 分支开发，所有新特性应在 `feature/` 分支进行。
+
+在多人协作中，除了基础的操作外，提交记录的整洁度和冲突处理能力是衡量开发者水平的重要标准，以下是一些常见 Git 事故修复方案：
+
+### 提交历史不整洁
+
+**场景描述**
+在开发功能时产生了多次琐碎提交（如：`fix typo`, `add logic`, `update test`）。在推送到主分支前，需要将这些记录合并为一个完整的提交。
+> **注意：** 仅在尚未推送到远程仓库时进行此操作，严禁对已共享的公共分支记录进行变基。
+
+**解决方案**
+使用交互式变基：`git rebase -i`。
+
+**操作步骤**
+
+1. 执行 `git rebase -i HEAD~3`（针对最近 3 次提交）。
+2. 在编辑器中，将第 2、3 行开头的 `pick` 改为 `squash` (或简写为 `s`)。
+3. 保存并退出，在随后的弹窗中编辑合并后的提交说明（Commit Message）。
+
+
+### 修复不完美提交
+
+**问题描述：** 修复BUG，已经 push 到了远程，但发现之前的代码并没真的修复，还差一些细节。目前还没有其他人提交。现在本地已经真正修复完了。
+
+**解决方案：** 修改最近一次提交。
+
+* **操作步骤：**
+1. 暂存修改： 在本地完成真正的修复后，执行 `git add .`
+2. 合并提交： 执行 `git commit --amend --no-edit`
+`--amend` 表示将当前的修改合并到上一次提交中。
+`--no-edit` 表示沿用上一次的提交信息（不用重新写 Commit Message）。
+3. 强制推送： 执行 `git push origin <分支名> --force-with-lease`。
+
+远程仓库的那条“没修好”的记录会被这条“真正修好”的记录直接替换。
+
+* **注意：** 如果该分支有其他人在协作，强制推送前务必打招呼，否则会造成他人的提交历史错乱。
+
+### 处理多人协作冲突
+
+**场景描述**
+A 和 B 同时修改了同一文件。B 先推送，A 在推送时被拒绝。
+
+**解决方案**
+使用 `git pull --rebase` 保持提交线性的整洁。
+
+**推荐理由**
+
+* **Merge：** 会产生额外的“Merge branch...”节点，使分支图谱出现交叉。
+* **Rebase：** 将本地提交“移至”远程最新提交之后，保持一条直线。
+
+**操作步骤**
+
+1. 执行 `git pull --rebase`。
+2. 若遇冲突，Git 会提示冲突文件。打开文件手动修复。
+3. 解决后执行 `git add <file>`。
+4. 执行 `git rebase --continue`，重复此步骤直到合并完成。
+
+### 应忽略的内容误推至远程
+
+**问题描述：** 将 `.env`、API Key 或 SSH 私钥不小心 `git push` 到了公共仓库。
+**解决方案：** 仅删除当前提交是不够的，必须从历史记录中彻底抹除。否则 `.git` 文件夹会包含该文件，导致仓库体积激增，拉取缓慢。。
+
+* **推荐工具：** [git-filter-repo](https://github.com/newren/git-filter-repo) (官方推荐) 或 BFG Repo-Cleaner。
+* **操作步骤：**
+1. **立即撤销泄露密钥的有效性**（这是最安全的操作，假设密钥已泄露）。
+2. 安装工具后执行：`git filter-repo --path secret.txt --invert-paths`（从所有历史中删除指定文件）。
+3. 强制推送到远程：`git push origin --force --all`。
+
+* **预防：** 在项目根目录配置 `.gitignore`，** 对于密钥泄露，**修改代码是补救，更换密钥是根治**。一旦信息进入过互联网，就应视为已泄露。
+
+### 推错分支
+
+**问题描述：** 在错误的分支上进行了提交并已推送到远程（本应推到 feature，误推到了 main）。
+
+**解决方案：** 转移提交并重置原分支。
+
+* **操作步骤：**
+1. 先在当前错误分支创建新分支保存进度：`git branch feature-correct`。
+2. 切回 `main` 分支：`git checkout main`。
+3. 强制重置 `main` 到上一个版本：`git reset --hard HEAD~1`。
+4. 强制推送回远程：`git push origin main --force`。
+
+### 线上 Bug 紧急回退
+
+**场景描述**
+A 修复 Bug 后已推送，B 随后也提交了代码。现发现 A 的修复方案有误，需撤销 A 的修改，但必须保留 B 的代码。
+
+**解决方案**
+使用 `git revert` 生成反向提交。
+
+**对比差异**
+
+* **Reset：** 物理抹除记录，会造成他人本地仓库与远程不一致。
+* **Revert：** 创建一个新提交来抵消旧提交。这是多人协作中安全的回退方式。
+
+**操作步骤**
+
+1. 获取错误提交的哈希值（如 `abc1234`）。
+2. 执行 `git revert abc1234`。
+3. 推送生成的“抵消”提交。此时 A 的错误被撤销，B 的代码完好无损。
+
+### 临时切换任务
+
+**场景描述**
+功能开发到一半，需紧急切换到 `master` 分支修复 Bug，但当前代码尚不具备提交条件。
+
+**解决方案**
+使用 `git stash` 将修改暂存至堆栈。
+
+**操作步骤**
+
+1. 执行 `git stash`，工作区恢复干净。
+2. 切换分支修复 Bug 并提交。
+3. 切回原分支，执行 `git stash pop` 恢复之前的进度。
 
 ## GitHub Actions
 
