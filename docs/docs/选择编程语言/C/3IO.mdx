@@ -1,0 +1,454 @@
+---
+sidebar_position: 3
+title: IO
+---
+
+输入与输出都接收多个参数，使用相同的类型字符串用以表示输出数据的类型。
+
+scanf()把输入的字符串转换成整数、浮点数、字符或字符串，而printf()正好与它相反，把整数、浮点数、字符和字符串转换成显示在屏幕上的文本。
+
+## 格式符
+
+其格式符和意义如下所示：
+
+| 类型 | 含义 | 示例 |
+| --- | --- | --- |
+| **字符与字符串** |  |  |
+| **c** | 单个字符 | `%c` |
+| **s** | 字符串（char 数组） | `%s` |
+| **整数类型 (10进制)** |  |  |
+| **d / i** | 有符号 10 进制整数 | `%d`, `%i` |
+| **hd / hi** | short int（短整型） | `%hd`, `%hi` |
+| **ld / li** | long int（长整型） | `%ld`, `%li` |
+| **lld / lli** | **long long int（长长整型）** | `%lld`, `%lli` |
+| **u** | 无符号 10 进制整数 | `%u` |
+| **hu** | unsigned short int | `%hu` |
+| **lu** | unsigned long int | `%lu` |
+| **llu** | **unsigned long long int** | `%llu` |
+| **其他进制整数** |  |  |
+| **o** | 无符号 8 进制整数 | `%o` |
+| **lo / llo** | unsigned long / long long（8进制） | `%lo`, `%llo` |
+| **x / X** | 无符号 16 进制整数（`x`小写字母，`X`大写字母） | `%x`, `%X` |
+| **lx / lX** | unsigned long int（16进制） | `%lx`, `%lX` |
+| **llx / llX** | **unsigned long long int（16进制）** | `%llx`, `%llX` |
+| **浮点数类型** |  |  |
+| **f** | float / double（默认保留 6 位小数） | `%f` |
+| **lf** | double（printf中与%f通用，scanf中必须区分） | `%lf` |
+| **Lf** | long double（扩展精度浮点型） | `%Lf` |
+| **e / E** | 科学计数法（指数形式）输出浮点数 | `%e`, `%E` |
+| **Le / LE** | long double 的科学计数法形式 | `%Le`, `%LE` |
+| **g / G** | **自动选择**：根据数值大小自动选 `%f` 或 `%e/%E`（当指数 < -4 或 >= 精度时使用指数格式） | `%g`, `%G` |
+| **a / A** | **十六进制浮点数**，p记数法 (C99/C11标准) | `%a`, `%A` |
+| **特殊类型** |  |  |
+| **p** | 指针地址（十六进制形式） | `%p` |
+| **n** | 不产生输出，而是将**已打印字符数**存入对应的 int 指针变量 | `%n` |
+| **%** | 打印一个百分号字符 `%` 本身 | `%%` |
+
+:::tip
+格式符说明是翻译说明，`%d`的意思是“把给定的值翻译成十进制整数文本并打印出来”​。`%c`转换说明把`01001100`转换成字符 L。
+
+```c showLineNumbers
+int main(void)
+{
+     char ch = 'A';
+     printf("字符: %c\n", ch);  
+     printf("字符序号: %d\n", ch);    
+     return 0;
+}
+```
+在 Python 中：'A' 是一个字符串对象（str），而不是整数。Python 是一门强类型语言，它不会自动把“字符串”看作“数字”。如果你直接写 "%d" % 'A'，Python 会抛出报错（TypeError）。
+```python showLineNumbers
+ch = 'A'
+print("字符: %s" % ch)        # Python 中字符也是字符串，用 %s
+print("字符序号: %d" % ch)# 必须显式调用 ord() 转换为整数
+```
+
+关于 `%i`：在 printf 中与 `%d` 相同；但在 scanf 中，`%i` 会根据输入的前缀自动识别进制（如 0x 开头识别为十六进制，0 开头识别为八进制）。
+:::
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    // 字符和字符串
+    char ch = 'A';
+    char str[] = "Hello";
+    printf("字符: %c\n", ch);  //A 
+    printf("字符序号: %d\n", ch); //65        // A
+    printf("字符串: %s\n", str);        // Hello
+    
+    // 各种整数类型
+    short short_num = 12345;
+    int int_num = 123456;
+    long long_num = 1234567890L;
+    long long longlong_num = 1234567890123456789LL;
+    
+    // %提醒程序，要在该处打印一个变量，d表明把变量作为十进制整数打印。
+    printf("short: %hd\n", short_num);           // 12345
+    printf("int: %d\n", int_num);               // 123456
+    printf("long: %ld\n", long_num);            // 1234567890
+    printf("long long: %lld\n", longlong_num);  // 1234567890123456789
+    
+    // 无符号整数
+    unsigned int uint_num = 4294967295U;
+    unsigned long long ulonglong_num = 18446744073709551615ULL;
+    
+    printf("unsigned int: %u\n", uint_num);           // 4294967295
+    printf("unsigned long long: %llu\n", ulonglong_num); // 18446744073709551615
+    
+    // 不同进制输出
+    int num = 255;
+    printf("十进制: %d\n", num);        // 255
+    printf("八进制: %o\n", num);        // 377
+    printf("十六进制: %x\n", num);      // ff
+    printf("十六进制(大写): %X\n", num); // FF
+    
+    // long long 的不同进制
+    long long big_num = 255LL;
+    printf("long long 八进制: %llo\n", big_num);    // 377
+    printf("long long 十六进制: %llx\n", big_num);   // ff
+    
+    // 浮点数
+    float f_num = 3.14159f;
+    double d_num = 3.141592653589793;
+    
+    printf("float: %f\n", f_num);       // 3.141590
+    printf("double: %lf\n", d_num);     // 3.141593
+    printf("科学计数法: %e\n", d_num);   // 3.141593e+00
+    printf("自动格式: %g\n", d_num);     // 3.14159
+    
+    // 指针地址
+    int *ptr = &int_num;
+    printf("指针地址: %p\n", ptr);       // 类似 0x7fff5fbff6ac
+    
+    return 0;
+}
+```
+
+:::tip 打印%符号
+由于printf()函数使用%符号来标识转换说明，因此打印%符号就成了个问题。
+
+如果单独使用一个%符号，编译器会认为漏掉了一个转换字符。解决方法很简单，使用两个%符号就行了。
+
+`printf("%d%% 的人是男性.\n", 50);` 50%的人是男性
+:::
+
+
+## printf
+
+printf 函数称之为格式输出函数,方法名称的最后一个字母 f 表示 format。其功能是按照用户指定的格式,把指定的数据输出到屏幕上
+
+printf 有两种基本用法：
+
+1. 字符串字面量输出（非格式化输出）
+
+当 printf 只输出**字符串字面量**且不包含任何**格式说明符**时，可以直接打印纯文本：
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    // 纯文本输出，不包含格式说明符
+    printf("Hello, World!\n");
+    printf("AaBb\n");
+    printf("这是一行纯文本\n");
+    return 0;
+}
+```
+
+2. 格式化输出
+
+调用格式为:`printf( 格式字符串, 待打印项1, 待打印项2,...);`
+
+格式控制字符串形式: `%[标志][输出宽度][.精度][长度]类型`。类型是必选，其它是可选。
+
+例如:
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int a = 10;
+    int b = 20;
+    // 最简单的形式，只使用类型。输出: 10 20
+    printf("%d %d",a, b);
+
+    // 格式控制字符串和输出项在数量和类型上必须一一对应
+    printf("%d %d %d",a, b); // 危险！输出项不足会导致未定义行为
+    return 0;
+}
+```
+:::tip
+printf 完全信任你提供的格式占位符（%ld），而不会去检查你实际传入的变量类型。
+
+当你调用 printf 时，参数会被压入栈中：并按照占位符对应的长度依次提取。
+:::
+
+### 返回值
+
+`printf()`函数也有一个返回值，它返回打印字符的个数(针对所有字符数，包括空格和不可见的换行符​)。如果有输出错误，printf()则返回一个负值
+
+```c showLineNumbers
+/* prntval.c -- printf()的返回值 */
+#include <stdio.h>
+int main(void)
+{
+     int bph2o = 212;
+     int rv;
+
+     rv = printf("%d F is water's boiling point.\n", bph2o);
+     printf("The printf() function printed %d characters.\n",
+               rv);
+     return 0;
+}
+
+// 212 F is water's boiling point.
+// The printf() function printed 32 characters.
+```
+
+### 打印较长的字符串
+
+有时，printf()语句太长，在屏幕上不方便阅读。如果空白（空格、制表符、换行符）仅用于分隔不同的部分，C编译器会忽略它们。因此，一条语句可以写成多行，只需在不同部分之间输入空白即可。例如，程序清单4.13中的一条printf()语句：
+
+```c showLineNumbers
+/* longstrg.c ––打印较长的字符串 */
+#include <stdio.h>
+int main(void)
+{
+     printf("Here's one way to print a ");
+     printf("long string.\n");
+     printf("Here's another way to print a \
+long string.\n");
+     printf("Here's the newest way to print a "
+               "long string.\n");      /* ANSI C */
+
+     return 0;
+}
+
+```
+- 方法1：使用多个printf()语句。因为第1个字符串没有以\n字符结束，所以第2个字符串紧跟第1个字符串末尾输出。
+
+- 方法2：用反斜杠（\）和Enter（或Return）键组合来断行。这使得光标移至下一行，而且字符串中不会包含换行符。其效果是在下一行继续输出。但是，下一行代码必须和程序清单中的代码一样从最左边开始。如果缩进该行，比如缩进5个空格，那么这5个空格就会成为字符串的一部分。
+
+- 方法3：ANSI C引入的字符串连接。在两个用双引号括起来的字符串之间用空白隔开，C编译器会把多个字符串看作是一个字符串。
+
+### 标志、宽度、精度、长度
+
+在 C 语言中，`printf` 的完整格式化语法为： `printf("a = %[标志][宽度][.精度][长度转换修饰符]类型", a);`
+
+#### 格式标志符（Flags）
+
+| 标志 | 含义 | 示例 |
+| --- | --- | --- |
+| **`-`** | **左对齐**。默认是右对齐。 | `%-5d` |
+| **`+`** | **显示正负号**。正数前加 `+`，负数前加 `-`。 | `%+d` |
+| **`0`** | **零填充**。右对齐时，空位用 `0` 填充而非空格。 | `%05d` |
+| **`空格`** | **留空正号**。正数前加空格，负数前显示 `-`。 | `% d` |
+| **`#`** | **特殊前缀**。对 `o` 加 `0`；对 `x/X` 加 `0x/0X`；对浮点数强制显示小数点。 | `%#x` |
+
+#### 宽度与精度控制
+
+* **宽度 (Width)**：用十进制整数指定最小输出位数。
+* 实际位数 < 宽度：用空格（或 0）补位。
+* 实际位数 > 宽度：按实际位数原样输出。
+
+
+* **精度 (.Precision)**：以 `.` 开头，后跟整数。
+* **浮点数**：控制小数点后的位数（四舍五入）。
+* **字符串**：控制最大输出字符数。
+已经为你将**长度转换修饰符（Length Modifiers）**加入到体系中。
+
+#### 长度转换修饰符
+
+| 长度插件 | 对应数据类型 | 说明 |
+| --- | --- | --- |
+| **`hh`** | `char` / `unsigned char` | 以单字节整数形式输出 (C99) |
+| **`h`** | `short` / `unsigned short` | 短整型 |
+| **(无)** | `int` / `unsigned int` / `float` | 默认整型/单精度浮点型 |
+| **`l`** (小写L) | `long` / `unsigned long` / `double` | 长整型或双精度浮点 |
+| **`ll`** (双L) | `long long` / `unsigned long long` | **长长整型** (C99) |
+| **`L`** (大写L) | `long double` | 扩展精度浮点型 |
+| **`z`** | `size_t` | 用于输出 `sizeof` 的返回结果 (C99) |
+
+
+如果你想打印一个：**左对齐、占10位宽、保留2位小数、双精度**的数字：
+`%-10.2lf`
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main() {
+    double d = 123.456;
+    
+    // [标志:-][宽度:10][精度:.2][长度:l][类型:f]
+    printf("结果: |%-10.2lf|\n", d); 
+    // 输出: |123.46    |  (左对齐，总宽10，四舍五入)
+    
+    // [标志:0][宽度:10][精度:.2][长度:l][类型:f]
+    printf("结果: |%010.2lf|\n", d); 
+    // 输出: |0000123.46|  (右对齐，0填充)
+
+    return 0;
+}
+
+```
+
+
+## scanf
+
+scanf 函数用于接收键盘输入的内容, 是一个阻塞式函数,程序会停在 scanf 函数出现的地方。直到用户输入数据，按下回车键（输入`\n`）后，scanf接收到数据才会执行后面的代码。
+
+调用格式为:`scanf("格式控制字符串", 地址列表);`
+
+地址列表项中只能传入变量地址, 变量地址可以通过&符号+变量名称的形式获取
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int number;
+    scanf("%d", &number); // 接收一个整数
+    printf("number = %d\n", number);
+}
+```
+
+它在遇到第1个空白（空格、制表符或换行符）时就不再读取输入。
+
+```c showLineNumbers
+/* praise1.c -- 使用不同类型的字符串 */
+#include <stdio.h>
+int main(void)
+{
+     char name[40];
+     printf("What's your name? ");
+     scanf("%s", name);
+     printf("Hello, %s.\n", name);
+     return 0;
+}
+
+//What's your name? Angela Plains
+//Hello, Angela. 
+```
+
+### 分隔符
+
+如果你要输入多个数据，怎么确定输入的哪个数据是给哪个变量赋值？这就是分隔符的作用。
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int number;
+    int value;
+    // 推荐使用空格
+    // 可以输入 数字 空格 数字
+    scanf("%d %d", &number, &value);
+    printf("number = %d\n", number);
+    printf("value = %d\n", value);
+}
+```
+
+如果将分隔符指定为其他形式，例如逗号需要<Highlight>注意中英文之分</Highlight>，再次推荐使用空格。
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int number;
+    int value;
+    // 输入 数字,数字 即可
+    scanf("%d,%d", &number, &value);
+    printf("number = %d\n", number);
+    printf("value = %d\n", value);
+}
+```
+
+下面的写法相当于把分割符指定为`number = `
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int number;
+    // 用户必须输入number = 数字  , 否则会得到一个意外的值
+    // 示例：如果你希望输入10，就必须输入number = 10【回车】
+    scanf("number = %d", &number);
+    printf("number = %d\n", number);
+}
+```
+
+### 忽略空白字符
+
+接收非字符和字符串类型时, 空格、Tab 和回车会被自动忽略
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    float num;
+    // 例如:输入 Tab 空格 回车 回车 Tab 空格 3.14 , 得到的结果还是3.14
+    scanf("%f", &num);
+    printf("num = %f\n", num);
+}
+```
+
+### 缓冲区
+
+- 系统会将用户输入的内容先放入输入缓冲区
+- scanf 方式会从输入缓冲区中逐个取出内容赋值给变量
+- 如果输入缓冲区的内容不为空,scanf 会一直从缓冲区中获取,而不要求再次输入
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int num1;
+    int num2;
+    char ch1;
+    // 如果在这里一次性输入：10a20b30
+    // 从缓冲区中提取整数、文本、整数
+    scanf("%d%c%d", &num1, &ch1, &num2);
+    printf("num1 = %d, ch1 = %c, num2 = %d\n", num1, ch1, num2);
+    char ch2;
+    int num3;
+    // 继续从缓冲区中提取文本、整数（无需输入）
+    scanf("%c%d",&ch2, &num3);
+    printf("ch2 = %c, num3 = %d\n", ch2, num3);
+    //
+}
+```
+
+那我万一输入多了，影响后面的变量接收怎么办？
+
+可以利用以下方法清空输入缓冲区：
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int num1;
+    int num2;
+    char ch1;
+    scanf("%d%c%d", &num1, &ch1, &num2);
+    printf("num1 = %d, ch1 = %c, num2 = %d\n", num1, ch1, num2);
+    
+    // 标准方法，通过getchar获取到回车符或EOF为止。
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF);
+
+    // 方法二
+    setbuf(stdin, NULL); 
+    
+    char ch2;
+    int num3;
+    scanf("%c%d",&ch2, &num3);
+    printf("ch2 = %c, num3 = %d\n", ch2, num3);
+}
+```
+
+## putchar 和 getchar
+
+通常在逻辑判断中，用于获取用户输入的回车确认。
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    char ch;
+    ch = getchar();// 获取一个字符
+    printf("%c\n", ch);
+    
+    // 等价于
+    // 向屏幕输出一个字符
+    putchar(ch); // 输出a
+    putchar('\n'); // 输出换行
+}
+```
