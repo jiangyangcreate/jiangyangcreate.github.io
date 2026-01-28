@@ -2,13 +2,11 @@
 sidebar_position: 1
 title: multiprocessing
 ---
-### multiprocessing 模块
+## multiprocessing 模块
 
 进程是系统独立安排和分配系统资源（CPU、内存）的基本单位，操作系统以进程为单位分配存储空间，操作系统管理所有进程的执行，为它们合理的分配资源。
 
 一个进程就是 macOS 中的“活动监视器”、Windows 中的“任务管理器”的一个执行程序。
-
-#### 多进程
 
 进程之间是相互独立的，Python 中的进程通信一般由进程对 Queue 完成。
 
@@ -17,6 +15,10 @@ title: multiprocessing
 进程的数量等于 CPU 核心的数量，这是最有效的。如果核数太多，就不能充分利用核数。如果太少，会造成进程切换，增加程序的运行时间。
 
 [multiprocessing](https://docs.python.org/zh-cn/3.14/library/multiprocessing.html?highlight=multiprocessing#module-multiprocessing):Multiprocessing Module Code Documentation
+
+### Pool
+
+通常来说，Pool 中的 Worker 进程的生命周期和进程池的工作队列一样长。
 
 ```python showLineNumbers
 from multiprocessing import Pool
@@ -34,90 +36,54 @@ if __name__ == '__main__':
 # [1, 4, 9]
 ```
 
-我们来完成 1~100000000 求和的计算密集型任务，循环解决，暂时也不考虑列表切片操作花费的时间，只是把做运算和合并运算结果的时间统计出来。
+### 守护与阻塞
+
+| 守护状态 (Daemon) | 调用 join() | 运行行为 (结果) | 逻辑说明 |
+| --- | --- | --- | --- |
+| **False** (非守护) | **是** (阻塞) | **等待** | join 显式要求同步，主程序必须等待。 |
+| **False** (非守护) | **否** (非阻塞) | **不等待但会后台运行完** | 主程序运行完即止，但子任务会在后台继续跑完。 |
+| **True** (守护) | **是** (阻塞) | **等待** | 即使是守护状态，join 的优先级也更高。 |
+| **True** (守护) | **否** (非阻塞) | **直接结束** | 随主程序一同自杀，主程序不会等它。 |
 
 ```python showLineNumbers
-from time import time
+from multiprocessing import Process
+import time
 
-
-def main():
-    total = 0
-    number_list = [x for x in range(1, 100000001)]
-    start = time()
-    for number in number_list:
-        total += number
-    print(total)
-    end = time()
-    print('Execution time: %.3fs' % (end - start))
-
-```
-
-```python showLineNumbers
-main()
-# 5000000050000000
-# Execution time: 6.798s
-```
-
-利用多进程“分而治之”，
-
-当我们将这个任务分解到 8 个进程中去执行：
-
-```python showLineNumbers
-from multiprocessing import Process, Queue
-from time import time
-
-core_num = 8
-
-
-def task_handler(curr_list, result_queue):
-    total = 0
-    for number in curr_list:
-        total += number
-    result_queue.put(total)
-
-
-def main():
-    processes = []
-    number_list = [x for x in range(1, 100000001)]
-    result_queue = Queue()
-    index = 0
-    # 启动core_num(8)个进程将数据切片后进行运算
-    index_batch = int(100000000 / core_num)
-    for _ in range(core_num):
-        p = Process(target=task_handler,
-                    args=(number_list[index:index + index_batch], result_queue))
-        index += index_batch
-        processes.append(p)
-        p.start()
-    # 开始记录所有进程执行完成花费的时间
-    start = time()
-    for p in processes:
-        p.join()
-    # 合并执行结果
-    total = 0
-    while not result_queue.empty():
-        total += result_queue.get()
-    print(total)
-    end = time()
-    print('Execution time: ', (end - start), 's', sep='')
-
+def f(name):
+    time.sleep(1)
+    print('hello', name) 
 
 if __name__ == '__main__':
-    main()
-
+    p = Process(target=f, args=('bob',))
+    # True表示让子进程对象p成为主进程对象的守护者，类似游戏中被契约的宠物。
+    # 一旦主人（主进程）死亡，契约的宠物(子进程)也会跟着死亡。
+    # 陪葬的情况仅在主进程先完成，子进程后完成时会发生。
+    p.daemon = False
+    p.start() # 创建进程后必须start启动才可以
+    p.join() # 让主进程停顿，等待子进程完成，结束阻塞
+    print(3)
 ```
 
-以上代码保存为 multi_process.py
+
+主进程创建子进程时，会把当前系统状态，拷贝一份给子进程。此后，各自在独立的内存空间中，互不影响。
 
 ```python showLineNumbers
-!python multi_process.py
+from multiprocessing import Process
+import time
+
+a = 1
+
+def f(name):
+    time.sleep(1)
+    print(a)
+
+if __name__ == '__main__':
+    p = Process(target=f, args=('bob',))
+    p.start() 
+    a = 2
+    print(3)
+"""
+3
+1
+"""
 ```
-
-```python showLineNumbers
-# 5000000050000000
-# Execution time: 0.7936668395996094s
-```
-
-明显，多进程更快。
-
-使用多进程后由于获得了更多的 CPU 执行时间以及更好的利用了 CPU 的多核特性，明显的减少了程序的执行时间，而且计算量越大效果越明显。
