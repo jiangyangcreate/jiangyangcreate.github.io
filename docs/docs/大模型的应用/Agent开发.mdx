@@ -28,8 +28,7 @@ Agent的三个核心板块：模型、工具、流程。
 
 <Highlight>Agent中的大模型，第一核心能力是让“大模型做选择填空，并返回特定格式”的指令遵循能力</Highlight>。
 
-
-#### langchain框架中Tool原理
+### Tool原理
 
 ```python showLineNumbers
 import json
@@ -257,30 +256,15 @@ if __name__ == '__main__':
 
 ```
 
+### 智能体架构类型
 
-#### Mcp
+langgraph在[《multi_agent架构》](https://langchain-ai.github.io/langgraph/concepts/multi_agent/)中总结了多智能体系统的架构类型：
 
-一种专为大模型设计的API接口，简单易用，岗位要求基本与传统API开发一致，但需要对大模型特性有所了解。
-
-Mcp的优点
-1.无需提示词即可运行，降低使用门槛。
-2.具备工作流与工具开发解耦特性，利于灵活拓展、维护，分工更清晰。
-3.支持实时加载与自动更新，能及时迭代、适配新需求。
-4.无需关注 API 内部细节，简化开发流程，让开发者聚焦业务逻辑 。
-
-MCP 的缺点
-1. 需要额外安装 MCP 客户端，增加了使用成本。
-2. 大部分MCP无法解决复杂任务，只是简化了常用API的调用门槛。
-3. MCP 需要联网，在开发内部项目时需要额外对工具库项目封装。
-
-
-### 智能体流程架构类型分析
 
 ![alt text](https://langchain-ai.github.io/langgraph/concepts/img/multi_agent/architectures.png)
 
-参考文章：https://langchain-ai.github.io/langgraph/concepts/multi_agent/
 
-以下表格总结了多智能体系统失效分类体系（MASFT）及其失效模式的发生频率：
+[《Why Do Multi-Agent LLM Systems Fail?》](https://www.aimodels.fyi/papers/arxiv/why-do-multi-agent-llm-systems-fail)中总结了多智能体系统失效分类体系（MASFT）及其失效模式的发生频率：
 
 | 失效类别           | 发生频率 (%) | 失效模式             | 发生频率 (%) |
 | ------------------ | ------------ | -------------------- | ------------ |
@@ -299,5 +283,3 @@ MCP 的缺点
 |                    |              | 无或不完全验证       | 4.71         |
 |                    |              | 验证不正确           | 13.09        |
 
-
-参考文章： https://www.aimodels.fyi/papers/arxiv/why-do-multi-agent-llm-systems-fail
