@@ -3,89 +3,10 @@ sidebar_position: 5
 title: 接口测试
 ---
 
-本章列举了一些直接发起请求的第三方模块，这些模块在 HTTP1.0 时期，非 Js 渲染时代是我们获取网页数据的利器。
-
-现在是[HTTP2.0](https://http2-explained.haxx.se/)（简称 h2）以及以 VUE 为代表的 Js 渲染页面时代。因此这些模块现在主要用于获取直接的数据，譬如：图片、视频、纯静态的 HTML 网页或 XHR(XMLHttpRequest)类型的请求。
-
-请求的方法与 HTTP 协议对资源的操作对应
-
-(1) GET：请求获取 URL 位置的资源
-(2) HEAD：请求获取 URL 位置资源的响应消息报告，即获得该资源的头部信息
-(3) POST：请求向 URL 位置的资源后附加新的数据
-(4) PUT：请求向 URL 位置存储一个资源，覆盖原 URL 位置的资源
-(5) PATCH：请求局部更新 URL 位置的资源，即更改该处资源的部分内容
-(6) DELETE：请求删除 URL 位置存储的资源
-(特殊)options ：向服务器获取一些服务器和客户端能够打交道的参数，但与获取资源并不直接相关
-
-request 模块：仅支持 HTTP1.0 仅同步 是基于 urllib3 的再次封装，因此语法更简单
-
-aiohttp 模块：支持 HTTP2.0 仅异步
 
 httpx 模块：支持 HTTP1.1/2.0 同步异步，双卡双待，是直接发起请求的模块中最全能的模块。
 
 locust 模块：大规模的并发测试，可以实时查看吞吐量、响应时间和错误和/或导出以供以后分析。
-
-## requests
-
-requests 是基于 urllib3 开发的一个优雅而简单的 PythonHTTP 库，为人类构建。
-
-[requests 模块官方文档](https://requests.readthedocs.io/en/latest/)
-
-### requests 发送请求
-
-```python showLineNumbers
-import requests
-r = requests.get('https://api.github.com/events')
-r = requests.post('https://httpbin.org/post', data={'key': 'value'})
-r = requests.put('https://httpbin.org/put', data={'key': 'value'})
-r = requests.delete('https://httpbin.org/delete')
-r = requests.head('https://httpbin.org/get')
-r = requests.patch('http://httpbin.org/patch',data ={'key': 'value'})
-r = requests.options('https://httpbin.org/get')
-```
-
-### requests 异常处理
-
-Requests 库通过 raise_for_status()引发支持六种常用的连接异常
-
-(1) requests.ConnectionError：网络连接错误异常，如 DNS 查询失败、拒绝连接等
-(2) requests.HTTPError：HTTP 错误异常
-(3) requests.URLRequired：URL 缺失异常
-(4) requests.TooManyRedirects：超过最大重定向次数，产生重定向异常
-(5) requests.ConnectTimeout：连接远程服务器超时异常
-(6) requests.Timeout：请求 URL 超时，产生超时异常（发出请求到获得内容的整个过程的超时异常）
-
-```python showLineNumbers
-import requests
-try:
-    r=requests.get("https://www.baidu.com/error",timeout=30) #请求一个url链接
-    r.raise_for_status() #如果状态不是200，引发HTTPError异常
-except requests.HTTPError as e:
-    print(e)# 404 Client Error: Not Found for url: https://www.baidu.com/error
-```
-
-## aiohttp
-
-[aiohttp 模块官方文档](https://docs.aiohttp.org/en/stable/)
-
-### aiohttp 发起请求
-
-```python showLineNumbers
-import aiohttp
-import asyncio
-
-async def main():
-    async with aiohttp.ClientSession('http://httpbin.org') as session:
-        async with session.post('/post', data=b'data'):
-            pass
-        async with session.put('/put', data=b'data'):
-            pass
-        async with session.get('/get') as resp:
-            print(resp.status)
-            print(await resp.text())
-
-asyncio.run(main())
-```
 
 ## httpx
 
