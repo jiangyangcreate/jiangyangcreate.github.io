@@ -1,20 +1,15 @@
 ---
 sidebar_position: 5
-title: 接口测试
+title: HTTPX
 ---
 
-
 httpx 模块：支持 HTTP1.1/2.0 同步异步，双卡双待，是直接发起请求的模块中最全能的模块。
-
-locust 模块：大规模的并发测试，可以实时查看吞吐量、响应时间和错误和/或导出以供以后分析。
-
-## httpx
 
 HTTPX 是 Python 3 的全功能 HTTP 客户端，它提供同步和异步 API，并支持 HTTP / 1.1 和 HTTP / 2。配置代理和请求头也很容易。httpx 还有 web 测试模式、精细化配置代理 IP、Event Hooks、SSL 证书等语法，但是因为 VUE 时代的到来，这些实现都有了新的方案，所以不再过多介绍。
 
 [httpx 代码文档](https://www.python-httpx.org/)
 
-### httpxH2 检测
+## httpxH2 检测
 
 ```python showLineNumbers
 import httpx
@@ -33,7 +28,7 @@ async def main():
 asyncio.run(main())
 ```
 
-### httpx 发起请求
+## httpx 发起请求
 
 ```python showLineNumbers
 import httpx
@@ -109,7 +104,7 @@ r.request.headers['X-Custom'] # 'from-request'
 
 ```
 
-### httpx 高级用法
+## httpx 高级用法
 
 如果需要监视大型响应的下载进度，可以使用响应流式处理并检查属性。response.num_bytes_downloaded
 
@@ -134,39 +129,3 @@ with tempfile.NamedTemporaryFile() as download_file:
                 download_file.write(chunk)
                 progress.update(download_task, completed=response.num_bytes_downloaded)
 ```
-
-## locust
-
-locust 需要创建一个`locustfile.py`的文件，他只是一个普通的 Python 模块，它可以从其他文件或包中导入代码。
-
-```python showLineNumbers
-import time
-from locust import HttpUser, task, between
-
-# 要使文件成为有效的 locustfile，它必须至少包含一个继承自 User 的类。
-class QuickstartUser(HttpUser):
-    # 模拟用户在执行每个任务（见下文）后等待 1 到 5 秒。
-    wait_time = between(1, 5)
-
-    # 用 @task 修饰的方法是 locust 文件的核心。对于每个正在运行的 User，Locust 都会创建一个 greenlet（协程或“微线程”），它将调用这些方法。任务中的代码是按顺序执行的（它只是常规的 Python 代码），因此在收到来自 /hello 的响应之前，不会调用 /world。
-    @task
-    def hello_world(self):
-        self.client.get("/hello")
-        self.client.get("/world")
-
-    # 我们通过使用 @task 装饰两个方法来声明两个任务，其中一个方法被赋予了更高的权重 （3）。当我们的 QuickstartUser 运行时，它将选择声明的任务之一 - 在本例中为 hello_world 或 view_items - 并执行它。任务是随机选择的，但您可以为其赋予不同的权重。上述配置将使 Locust 采摘 view_items 的可能性是 hello_world 的三倍。当任务完成执行后，用户将休眠其指定的等待时间（在本例中为 1 到 5 秒）。然后它将选择一个新任务。
-    @task(3)
-    def view_items(self):
-        for item_id in range(10):
-            self.client.get(f"/item?id={item_id}", name="/item")
-            time.sleep(1)
-    # 只有用 @task 修饰的方法才会被选中，因此你可以用任何你喜欢的方式定义自己的内部帮助程序方法。
-    def on_start(self):
-        self.client.post("/login", json={"username":"foo", "password":"bar"})
-```
-
-启动压力测试可以在通过 `locust` 命令，这将会启动一个可视化操作界面。输入测试时间、并发用户、目标网址等信息即可查看压测结果图表。
-
-如果在服务器上执行，可以使用命令行`locust --headless --users 10 --spawn-rate 1 -H http://your-server.com`
-
-更多示例可以查看[官方文档](https://docs.locust.io/)
