@@ -16,6 +16,45 @@ title: multiprocessing
 
 [multiprocessing](https://docs.python.org/zh-cn/3.14/library/multiprocessing.html?highlight=multiprocessing#module-multiprocessing):Multiprocessing Module Code Documentation
 
+
+### 工作原理 
+
+```python showLineNumbers
+print("程序启动")
+from multiprocessing import Pool
+
+def f(x):
+    # 3.14中，会将其设为__mp_main__
+    print(__name__) # __mp_main__
+    return x*x
+
+if __name__ == '__main__': # 如果不加，则新创建的子进程会自上而下执行所有代码，尝试创新的池
+    print(__name__) # __main__
+    # 创建子进程的过程，在不同操作系统上底层不一样。spawn、fork、forkserver。
+    # Windows是spawn。
+    # 1. 为每个子进程启动一个独立的Python解释器
+    # 2. 然后将主进程的所有资源（代码）序列化，发送
+    # 3. 子进程接收，反序列化，在自己的内存空间和Python解释器下，自上而下的运行代码
+    with Pool(3) as p:
+        print(p.map(f, [1, 2]))
+else:
+    print('我是子进程')
+
+"""
+程序启动
+__main__
+程序启动
+我是子进程
+程序启动
+我是子进程
+程序启动
+我是子进程
+__mp_main__
+__mp_main__
+[1, 4]
+"""
+```
+
 ### Pool
 
 通常来说，Pool 中的 Worker 进程的生命周期和进程池的工作队列一样长。

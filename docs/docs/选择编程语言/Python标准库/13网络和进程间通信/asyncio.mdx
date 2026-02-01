@@ -16,14 +16,13 @@ asyncio 模块包含了一些工具，用于编写异步代码。
 
 每次任务会被挂起至事件循环队列中，然后按顺序执行。
 
-await 关键字用于挂起协程，直到它被调用。
+await 关键字用于挂起协程，如果阻塞，就把CPU赶走，直到被事件循环再次调用。
 
 async 关键字用于定义协程。
 
 asyncio 模块用于实现异步编程。
 
 [asyncio](https://docs.python.org/3.14/library/asyncio.html#module-asyncio):asyncio Multiprocessing Module Code Documentation
-
 
 一些常用函数：
 
@@ -190,4 +189,77 @@ async def main2():
     print(f"总耗时: {time.time() - start:.2f}秒")
 
 asyncio.run(main2())
+```
+
+### 示例代码
+
+```python showLineNumbers
+"""
+一个容量有限的队列，需要放入2倍其容量的任务。假设容量为2，任务为4。
+
+消费者侧有2个消费者在消费。消费与添加同步发生。
+
+希望当所有任务（4个）被消费完成，程序退出。
+"""
+
+import asyncio
+import random
+
+# 配置参数
+QUEUE_CAPACITY = 2
+TOTAL_TASKS = 4
+NUM_CONSUMERS = 5
+
+async def producer(q):
+
+    for i in range(1, TOTAL_TASKS + 1):
+        print(f"[生产者] 尝试放入任务 {i}...")
+        # 如果队列满了，put 会在这里挂起（yield），直到有空间
+        await q.put(i)
+        print(f"[生产者] 成功放入任务 {i}。当前队列大小: {q.qsize()}")
+    print("[生产者] 所有任务投放完毕。")
+
+async def consumer(name, q):
+    while True:
+        # 获取任务，如果队列为空，这里会挂起
+        task = await q.get()
+        print(f"    [消费者 {name}] 正在处理任务 {task}...")
+        
+        # 模拟异步 IO 耗时（不会阻塞整个事件循环）
+        await asyncio.sleep(random.uniform(0.5, 1.5))
+        
+        print(f"    [消费者 {name}] 完成任务 {task}。")
+        
+        # 标记任务完成
+        q.task_done()
+
+async def main():
+    # 1. 创建有限容量的任务队列
+    task_queue = asyncio.Queue(maxsize=QUEUE_CAPACITY)
+
+    # 2. 启动生产者
+    producer_task = asyncio.create_task(producer(task_queue))
+
+    # 3. 启动多个消费者
+    consumers = [
+        asyncio.create_task(consumer(f"C-{i+1}", task_queue)) 
+        for i in range(NUM_CONSUMERS)
+    ]
+
+    # 4. 等待生产者放完所有东西
+    await producer_task
+
+    # 5. 关键：等待队列中所有任务被 task_done
+    await task_queue.join()
+    print("\n[主程序] 所有任务处理完毕。")
+
+    # 6. 优雅清理：取消还在 while True 循环中的消费者协程
+    for c in consumers:
+        c.cancel()
+    
+    # 等待消费者协程彻底结束（可选，但推荐）
+    await asyncio.gather(*consumers, return_exceptions=True)
+
+if __name__ == "__main__":
+    asyncio.run(main())
 ```

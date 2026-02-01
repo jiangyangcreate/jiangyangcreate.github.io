@@ -2,3 +2,58 @@
 sidebar_position: 5
 title: concurrent
 ---
+
+concurrent是对标准库：multiprocessing 和 threading的二次封装。
+
+[pep-3148](https://peps.python.org/pep-3148/)
+
+### as_completed
+
+as_completed可以在futures对象完成时将，按完成顺序将其抛出，还可以捕获其状态。
+
+```python showLineNumbers
+# 模拟一个爬虫程序，共5个，当其中4个跑完，则终止剩余进程。开始总结
+import random
+import time
+from concurrent import futures
+from multiprocessing import Manager
+urls = [
+"https://1.com",
+"https://2.com",
+"https://3.com",
+"https://4.com",
+"https://5.com",
+]
+# 必需
+def sprider(url,done_list):
+    sleep_time = random.randint(1,2)
+    # 模拟某个进程很慢
+    if url[-5] == '3': sleep_time = 5
+    print(f'{url}开始运行,预计耗时 {sleep_time}')
+    for i in range(sleep_time):
+        time.sleep(i)
+        # 检查状态 是否触发条件
+        if len(done_list)>=4:
+            return f"任务{url[-5]}取消"
+    done_list.append(url[-5])
+    return url[-5]
+
+if __name__ == '__main__':
+    with Manager() as manager:
+        # 跨进程的列表，可以用于共享进程状态。
+        done_list = manager.list()
+        # 创建池并获取语柄(内存地址)
+        with futures.ThreadPoolExecutor(max_workers=5) as executor:
+            future_to_url = []
+            for url in urls:
+                # 创建子进程
+                p = executor.submit(sprider,url,done_list)
+                future_to_url.append(p)
+            # as_complete 是个迭代器：生成一个，返回一个，只有当任务完成才会返回。
+            # 因此 as_complete 内只能检查返回的结果和状态，不能修改其状态。
+            for future in futures.as_completed(future_to_url):
+                if future.done(): # 如果没有报错的寿终正寝
+                    print(future.result(),"完成")
+        # 打印结果
+        print(done_list)
+```
