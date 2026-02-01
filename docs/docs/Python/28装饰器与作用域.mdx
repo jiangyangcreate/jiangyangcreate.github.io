@@ -276,6 +276,22 @@ test2
 - 全局作用域（Global）：在模块文件中定义的变量，可以在模块文件的任何地方访问。全局作用域是全局变量。
 - 内置作用域（Built-in）：Python 内置的变量、函数、类、关键字等，可以在任何地方访问。
 
+:::tip
+<Highlight>Python在编译函数时会静态分析作用域，而非运行时动态判断</Highlight>
+
+```python showLineNumbers
+x = 10
+def foo():
+    print(x) # 此句直接报错
+    x = 5
+foo()
+```
+
+- 一旦函数体内出现 x = 5（对 x 的赋值），Python立即将 x 标记为局部变量
+- 因此 print(x) 会在局部作用域查找 x，但此时 x 尚未赋值（运行时），导致 UnboundLocalError
+- 关键点：不是"局部不能修改全局"，而是"局部变量在赋值前被引用"
+:::
+
 ### global
 
 global 语句将应用于函数或类语句体的整个作用域。 如果一个变量在本作用域的 global 声明之前被使用或赋值则会引发 SyntaxError。

@@ -15,32 +15,32 @@ title: 文件操作
 
 在正式读写文件之前，先把几个高频概念说清楚，这会帮你避开大量「看起来很玄学」的 Bug。
 
-- **文件名与扩展名**  
+- 文件名与扩展名  
   - 一个完整文件名通常由「主文件名 + 扩展名」组成，如 `report.pdf`、`data.csv`。  
-  - **扩展名只是约定俗成的类型提示**，操作系统通常不会强制校验；真正决定内容的是文件内部的格式规范。
+  - 扩展名只是约定俗成的类型提示，操作系统通常不会强制校验；真正决定内容的是文件内部的格式规范。
   - 主文件名和扩展名都可以省略，例如：`.gitignore`、`.env`、`Dockerfile`、`LICENSE`。
 
-- **路径：绝对路径与相对路径**  
-  - **绝对路径**：从磁盘根目录开始描述文件位置，例如 `C:\Users\jiang\Desktop\file.txt` 或 `/home/user/file.txt`。  
-  - **相对路径**：以当前<HoverText text="工作目录" explanation="当前 Python 进程认为的“起点目录”，通常为终端的工作目录，可用 os.getcwd() 查看。"/>为参照，如 `./data/file.txt`、`../logs/app.log`。  
+- 路径：绝对路径与相对路径  
+  - 绝对路径：从磁盘根目录开始描述文件位置，例如 `C:\Users\jiang\Desktop\file.txt` 或 `/home/user/file.txt`。  
+  - 相对路径：以当前<HoverText text="工作目录" explanation="当前 Python 进程认为的“起点目录”，通常为终端的工作目录，可用 os.getcwd() 查看。"/>为参照，如 `./data/file.txt`、`../logs/app.log`。  
   - 跨平台时要注意路径分隔符差异（Windows 常见 `\`，Linux/macOS 使用 `/`），推荐使用 `pathlib` 统一处理。
 
-- **文件类型：文本文件与二进制文件**  
-  - **文本文件**：内容是按某种字符编码保存的文本，例如 `.txt`、`.md`、`.py`。 通过记事本可正常打开的都属于文本文件。 
-  - **二进制文件**：内容是原始字节流，例如图片、音频、视频、数据库、可执行程序等需要专门软件打开的文件。  
+- 文件类型：文本文件与二进制文件  
+  - 文本文件：内容是按某种字符编码保存的文本，例如 `.txt`、`.md`、`.py`。 通过记事本可正常打开的都属于文本文件。 
+  - 二进制文件：内容是原始字节流，例如图片、音频、视频、数据库、可执行程序等需要专门软件打开的文件。  
   - 在 Python 中，主要区别体现在打开模式：`'t'`（文本模式，默认）与 `'b'`（二进制模式），以及是否需要编码/解码。
 
-- **编码格式（encoding）**  
+- 编码格式（encoding）  
   - 文本文件在落盘时必须选择一种字符编码（如 `UTF-8`、`GBK`、`ISO-8859-1` 等）。  
   - 读取文本时，Python 会按照你提供的编码参数（或系统默认编码）把字节解码为 `str`；编码不匹配时就会出现“乱码”或 `UnicodeDecodeError`。  
-  - 建议**统一使用 UTF-8**，并在 `open()` 时显式指定 `encoding='utf-8'`，避免不同平台默认编码不一致的问题。
+  - 建议统一使用 UTF-8，并在 `open()` 时显式指定 `encoding='utf-8'`，避免不同平台默认编码不一致的问题。
 
-- **换行符与跨平台差异**  
+- 换行符与跨平台差异  
   - Unix 系统使用 `\n` 作为换行符，Windows 传统上使用 `\r\n`。  
   - 文本模式下，Python 会自动进行换行符转换（具体行为受 `newline` 参数控制），二进制模式则保持字节原样，不做任何转换。  
   - 如果你在不同系统之间传文件、做文本对比工具，最好了解这一点，以免出现“明明一样却行数不对”的困惑。
 
-- **文件元数据与权限（了解即可）**  
+- 文件元数据与权限（了解即可）  
   - 每个文件除了内容本身，还有大小、创建/修改时间、权限、拥有者等元数据，可通过 `os.stat()`、`pathlib.Path.stat()` 获取。  
   - 在类 Unix 系统上，读写权限会直接影响 Python 能否打开文件；在 Windows 上也会涉及文件占用、锁等问题。
 
@@ -48,13 +48,13 @@ title: 文件操作
 
 `open()` 函数是 Python 内置的，用于打开文件并返回对应的文件对象。
 
-函数签名：`open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)`
+函数签名：`open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None) -> file objec`
 
--   **`file`**：
+-   `file`：
     -   一个 [path-like object](https://docs.python.org/zh-cn/3/glossary.html#term-path-like-object)，表示将要打开的文件的路径（绝对路径或相对当前工作目录的路径）。
     -   也可以是要封装文件对应的整数类型文件描述符（如果给出的是文件描述符，则当返回的 I/O 对象关闭时它也会关闭，除非将 `closefd` 设为 `False`）。
 
--   **`mode`**：
+-   `mode`：
     -   一个指明文件打开模式的可选字符串，默认为 `'r'` (以文本模式读取)。
     -   详细模式字符及含义见下表。参数 mode 可以叠加使用，例如 `rb` 表示以二进制模式读取并写入。
     - `'r'`：读取（默认）               
@@ -65,18 +65,18 @@ title: 文件操作
     - `'t'`：文本模式（默认）           
     - `'+'`：打开用于更新（读取与写入） 
 
--   **`buffering`**：
+-   `buffering`：
     -   一个可选的整数，用于设置缓冲策略。
     -   `0`：关闭缓冲（仅在二进制模式下允许）。
     -   `1`：行缓冲（仅在文本模式下写入时可用）。
     -   `>1`：表示固定大小的块缓冲区的字节大小。
     -   默认行为：二进制文件通常使用 128KB 块缓冲；交互式文本文件使用行缓冲；其他文本文件使用与二进制文件相同的块缓冲策略。
 
--   **`encoding`**：
+-   `encoding`：
     -   用于编码或解码文件的编码格式名称，仅在文本模式下使用。
     -   默认编码格式依赖于具体平台（`locale.getencoding()`）。
 
--   **`errors`**：
+-   `errors`：
     -   可选字符串参数，指定如何处理编码和解码错误，不能在二进制模式下使用。
     -  `'strict'` (默认，引发 `ValueError`)
     -  `'ignore'`：忽略错误，继续执行。
@@ -86,21 +86,23 @@ title: 文件操作
     -  `'backslashreplace'`：替换为反斜杠。
     -  `'namereplace'`：替换为名称。
 
--   **`newline`**：
+-   `newline`：
     -   决定如何解析来自流的换行符。可为 `None`, `''`, `'\n'`, `'\r'` 和 `'\r\n'`。 
     -   读取时：`None` 启用通用换行模式并转换为 `'\n'`；`''` 启用通用换行模式但不转换；其他值则按给定字符串终止行且不转换。
     -   写入时：`None` 转换为系统默认行分隔符 `os.linesep`；`''` 或 `'\n'` 不进行翻译；其他值转换为给定字符串。
 
--   **`closefd`**：
+-   `closefd`：
     -   如果为 `False` 且 `file` 是文件描述符，则当文件对象关闭时，底层文件描述符保持打开状态。如果 `file` 是文件名，则 `closefd` 必须为 `True`（默认值）。
 
--   **`opener`**：
+-   `opener`：
     -   一个可调用的自定义开启器。通过 `opener(file, flags)` 获取文件对象的基础文件描述符。
 
 
-#### 读写文本文件
+#### 文本文件
 
 使用 `'w'` 模式（写入并清空）、`'a'` 模式（追加写入）或 `'w+'` （读写并清空）模式打开文件进行写入。如果文件不存在，这些模式会自动创建文件。
+
+内存中文本流也可以作为 StringIO 对象使用：`f = io.StringIO("some initial text data")`
 
 ```python showLineNumbers
 # 使用 'w' 模式写入，如果文件不存在则创建，存在则清空
@@ -140,19 +142,40 @@ lines = f.readlines()
 print(lines) # 输出：['hello world. morning.
 ']
 f.close()
+```
 
-# 迭代文件对象，逐行读取内容
+迭代文件对象，逐行读取内容。从文件中读取多行时，可以用循环遍历整个文件对象。这种操作能高效利用内存，快速，且代码简单：
+
+```python showLineNumbers
 f = open('test.txt')
+# 即便 test.txt 是一个 100GB 的巨型文件，这段代码依然能平稳运行。
 for line in f:
     print(line, end='') # end='' 防止额外换行
 f.close()
 ```
 
-#### 读写二进制文件
+如需以列表形式读取文件中的所有行，可以用 `list(f)` 或 `f.readlines()`。但是可能会内存溢出。
+
+如果你的文件非常特殊（比如一个没有换行符的巨型 JSON 文件），那么 for line in f 依然会因为找不到换行符而尝试读取超大块数据，导致内存告急。
+
+在这种极端情况下，你需要按字节块（Chunk）读取：
+
+```python showLineNumbers
+with open('test.txt', 'rb') as f:
+    while True:
+        chunk = f.read(4096) # 每次只读 4KB
+        if not chunk:
+            break
+        process(chunk)
+```
+
+#### 二进制文件
 
 当需要处理图片、音频、视频等非文本数据时，应以二进制模式（`'b'`）打开文件。
 
 在二进制模式下，所有数据都以 `bytes` 对象形式读写，不进行任何编码或解码。
+
+内存中二进制流也可以作为 BytesIO 对象使用：`f = io.BytesIO(b"some initial binary data: \x00\x01")`
 
 ```python showLineNumbers
 import os

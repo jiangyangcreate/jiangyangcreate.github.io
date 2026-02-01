@@ -1,6 +1,225 @@
-## deque 对象
+---
+sidebar_position: 1
+title: collections
+---
 
-Deque 队列是对栈或 queue 队列的泛化（该名称的发音为 "deck"，是 "double-ended queue" 的简写形式)。 
+collections实现了专用的容器数据类型，提供了 Python 通用内置容器 dict、list 的替代方案， 集合和元组 。
 
-Deque 支持线程安全，高度节省内存地从 deque 的任一端添加和弹出条目，在两个方向上的大致性能均为 O(1)。
+## OrderedDict
 
+OrderedDict是一种确定的有序字典。
+
+```python showLineNumbers
+"""
+支持 get(key) 和 put(key, value) 操作，时间复杂度 O(1)
+容量固定，超出时淘汰最久未使用的 key
+线程安全：多线程并发调用不出现数据竞争
+提供缓存命中率统计
+"""
+from collections import OrderedDict
+import threading
+
+class LRUCache:
+    def __init__(self, capacity: int):
+        self.capacity = capacity
+        self.cache = OrderedDict()  # 有序字典：尾部最新，头部最旧
+        self.hits = 0
+        self.requests = 0
+        self.lock = threading.RLock()  # 可重入锁，避免 get/put 嵌套调用死锁
+
+    def get(self, key):
+        with self.lock:
+            self.requests += 1
+            if key not in self.cache:
+                return -1
+            self.cache.move_to_end(key)  # O(1) 移至尾部（最近使用）
+            self.hits += 1
+            return self.cache[key]
+
+    def put(self, key, value):
+        with self.lock:
+            if key in self.cache:
+                self.cache.move_to_end(key)  # 更新位置
+            elif len(self.cache) >= self.capacity:
+                self.cache.popitem(last=False)  # O(1) 淘汰头部（最久未用）
+            self.cache[key] = value
+
+    @property
+    def hit_rate(self) -> float:
+        with self.lock:
+            if self.requests == 0:
+                return 0.0
+            return round(self.hits / self.requests * 100, 2)
+
+cache = LRUCache(capacity=3)
+cache.put("a", 1)
+cache.put("b", 2)
+cache.get("a")  # 返回 1
+cache.put("c", 3)
+cache.put("d", 4)  # 淘汰 "b"
+print(cache.get("b"))  # 返回 -1（未命中）
+print(cache.hit_rate)  # 打印命中率
+```
+
+## ChainMap
+
+ChainMap 将多个映射链在一起，形成一个可当作「单个视图」使用的类字典结构。查找时按顺序在底层映射中搜索；写入、更新、删除只作用在**第一个**映射。常用于模拟嵌套作用域、或「命令行参数 > 环境变量 > 默认值」这类优先级配置。
+
+- **maps**：底层映射列表，可修改。
+- **new_child(m=None, \*\*kwargs)**：在链前插入新映射，得到新的 ChainMap，常用于创建子上下文。
+- **parents**：等价于去掉第一个映射的 ChainMap，用于向上查找。
+
+```python showLineNumbers
+from collections import ChainMap
+# 创建一个空链
+c = ChainMap()
+c["x"] = 0
+# 子上下文：在链前加一层，修改不影响上层
+# 复制c并创建新的子映射
+d = c.new_child()
+d["y"] = 2
+print(d["x"], d["y"], c.maps)   # 0 2 [{'x': 0}, {'y': 2}]
+
+# 只包含原始C的数据，不包含d的数据
+print(c.maps) # [{'x': 0}]
+```
+
+## deque
+
+deque（发音 "deck"，double-ended queue）是双端队列：在**两端**进行 append/pop 均为 O(1)，线程安全且省内存。list 的 `pop(0)` 和 `insert(0, v)` 是 O(n)，需要频繁在头尾操作时用 deque 更合适。
+
+- **append / appendleft**：在右/左端添加。
+- **pop / popleft**：从右/左端弹出。
+- **extend / extendleft**：从右/左端扩展；extendleft 会把可迭代对象逆序加入。
+- **rotate(n=1)**：整体向右循环 n 步（n 为负则向左）。
+- **maxlen**：若构造时指定，deque 为定长，满时一端进、另一端自动出，可用来实现「只保留最近 n 项」。
+
+```python showLineNumbers
+from collections import deque
+
+d = deque("ghi")
+d.append("j")
+d.appendleft("f")
+print(list(d))           # ['f', 'g', 'h', 'i', 'j']
+print(d.pop(), d.popleft())  # j f
+print(d[0], d[-1])       # g i（两端 O(1) 索引）
+
+# 定长 deque：类似 Unix tail，只保留最后 n 行
+def tail(filename, n=10):
+    with open(filename) as f:
+        return deque(f, n)
+
+# 轮转：rotate(1) 等价于 appendleft(pop())
+d = deque(["a", "b", "c"])
+d.rotate(1)
+print(list(d))           # ['c', 'a', 'b']
+```
+
+## namedtuple
+
+`namedtuple(typename, field_names, ...)` 是工厂函数，用于生成**带字段名**的元组子类。实例既可用索引访问，也可用属性访问，且内存与普通元组相当。适合表示记录（如 csv/sqlite 的一行）、坐标点等。
+
+- **_make(iterable)**：从序列构建实例。
+- **_asdict()**：转为字段名到值的字典。
+- **_replace(\*\*kwargs)**：返回替换部分字段后的新实例（不可变）。
+- **_fields**：字段名元组。
+
+```python showLineNumbers
+from collections import namedtuple
+
+Point = namedtuple("Point", ["x", "y"])
+p = Point(11, y=22)
+print(p.x, p.y)          # 11 22
+print(p[0] + p[1])       # 33
+print(p)                 # Point(x=11, y=22)
+
+# 从序列创建
+t = [11, 22]
+p2 = Point._make(t)
+print(p2._asdict())      # {'x': 11, 'y': 22}
+
+# 替换部分字段（返回新实例）
+p3 = p._replace(x=33)
+print(p3)                # Point(x=33, y=22)
+```
+
+## Counter
+
+Counter 是 dict 的子类，用于计数 **hashable** 对象：键为元素，值为出现次数。查询不存在的键返回 0 而非 KeyError。支持从可迭代对象或映射构造，以及 `+`、`-`、`&`、`|` 等运算（多集语义）。
+
+- **elements()**：按计数值重复产出元素（计数值 &lt; 1 的会被忽略）。
+- **most_common(n)**：返回出现次数最多的 n 个 (元素, 次数)。
+- **subtract(iterable_or_mapping)**：原地减去计数；**update** 则为加上。
+- **total()**：所有计数值之和（Python 3.10+）。
+
+```python showLineNumbers
+from collections import Counter
+
+# 从可迭代对象计数
+cnt = Counter(["red", "blue", "red", "green", "blue", "blue"])
+print(cnt)               # Counter({'blue': 3, 'red': 2, 'green': 1})
+print(cnt["red"], cnt["black"])  # 2 0（无 key 返回 0）
+
+# 从字符串计数
+c = Counter("abracadabra")
+print(c.most_common(3))  # [('a', 5), ('b', 2), ('r', 2)]
+
+# 加减与集合运算
+c1, c2 = Counter(a=3, b=1), Counter(a=1, b=2)
+print(c1 + c2)           # Counter({'a': 4, 'b': 3})
+print(c1 - c2)            # Counter({'a': 2})，只保留正计数
+print(c1 & c2)            # Counter({'a': 1, 'b': 1})，取最小计数
+print(c1 | c2)            # Counter({'a': 3, 'b': 2})，取最大计数
+```
+
+## defaultdict
+
+字典的子类。构造时传入的 **default_factory** 是「默认值的工厂」——一个无参可调用对象（如 `list`、`int`、`set`），不是键的类型。
+
+访问不存在的键时，会调用 `default_factory()` 得到**值**并写入该键，再返回
+
+```python showLineNumbers
+from collections import defaultdict
+
+# 传入不同的 default_factory，访问不存在的键时返回对应的default_factory()结果。
+for i in [list, int, set, None]:
+    default_factory = i
+    d = defaultdict(default_factory)
+    print(d["key"])
+"""
+[]
+0
+set()
+KeyError
+"""
+```
+常用于「按键分组」或「按键计数」，省去 `if key not in d` 和手写默认值。
+
+```python showLineNumbers
+from collections import defaultdict
+
+# 按键分组：key -> list of values
+pairs = [("yellow", 1), ("blue", 2), ("yellow", 3), ("blue", 4)]
+d = defaultdict(list)
+for k, v in pairs:
+    d[k].append(v)
+print(dict(d))  # {'yellow': [1, 3], 'blue': [2, 4]}
+
+# 计数：缺键视为 0
+cnt = defaultdict(int)
+for ch in "mississippi":
+    cnt[ch] += 1
+print(dict(cnt))  # {'m': 1, 'i': 4, 's': 4, 'p': 2}
+```
+
+## UserDict
+
+封装了内置 dict，底层数据在 **data** 属性。需要自定义「类字典」行为时，继承 UserDict 比直接继承 dict 更简单（避免 `__setitem__` 等与内部实现的耦合）。多数场景直接继承 dict 即可。
+
+## UserList
+
+封装了内置 list，底层数据在 **data** 属性。用于自定义「类列表」类型时作为基类，比直接继承 list 更易控制。多数场景直接继承 list 即可。
+
+## UserString
+
+封装了内置 str，底层数据在 **data** 属性。用于自定义「类字符串」类型时作为基类。多数场景直接继承 str 即可。
