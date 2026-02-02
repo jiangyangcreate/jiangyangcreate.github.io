@@ -106,6 +106,27 @@ print(a.itemsize)  # 8 (64位整数)
 - `itemsize`：每个元素占用的字节数
 :::
 
+### 数组类型转换
+
+astype函数签名：`astype(dtype, order='K', casting='unsafe', subok=False, copy=True)`
+参数说明：
+- `dtype`：要转换的数据类型
+- `order`：可选，排序方式，'K'表示保持原顺序，'C'表示按列优先，'F'表示按行优先
+- `casting`：可选，转换方式，'unsafe'表示不检查数据类型，'safe'表示检查数据类型
+- `subok`：可选，是否返回子类
+- `copy`：可选，是否复制数据
+
+返回值：
+- 返回转换后的数组
+
+```python showLineNumbers
+import numpy as np
+a = np.array([1, 2, 3, 4])
+b = a.astype(float)
+print(b)  # [1. 2. 3. 4.]
+```
+
+
 ###  创建数组的多种方式
 
 ```python showLineNumbers

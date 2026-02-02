@@ -105,6 +105,10 @@ cv2.imshow函数签名：`cv2.imshow(winname, img)`
 - `winname`：窗口名称
 - `img`：要显示的图像对象
 
+如果img是二维数组（灰度图）根据其数据类型，imshow做不同处理：
+- 浮点数的二维数组，imshow的时候，会把0当作黑。1.0及以上当作白，0~1中间的是灰色。
+- 整型的二维数组，imshow的时候，会把0当作黑。255及以上当作白，0~255中间的是灰色。
+
 cv2.waitKey函数签名：`cv2.waitKey([delay]) -> retval`
 
 参数说明：
@@ -145,6 +149,35 @@ if key == ord('q'):
     cv2.destroyWindow('Image') 
 # 关闭所有窗口
 cv2.destroyAllWindows()
+```
+
+
+```python showLineNumbers
+import cv2
+import numpy as np
+from numpy.typing import NDArray
+img1 = cv2.imread('desktop_avatar.jpg')
+print(img1.shape)
+img = cv2.resize(img1, (100, 100))
+img.shape
+print(img.shape)
+# 把这张图片变成灰度图
+# Gray = R*0.299 + G*0.587 + B*0.114 
+B = img[:,:,0] # 数组
+G = img[:,:,1] # 数组
+R = img[:,:,2] # 数组
+
+gray:NDArray = B*0.114 + G*0.587 + R*0.299 
+int_gray = gray.astype(np.uint8)
+float_gray = gray/255
+# 浮点数的二维数组，imshow的时候，会把0当作黑。1.0及以上当作白，0~1中间的是灰色。
+# 整型的二维数组，imshow的时候，会把0当作黑。255及以上当作白，0~255中间的是灰色。
+cv2.imshow("Image Window1",int_gray)
+cv2.imshow("Image Window2",float_gray)
+
+key = cv2.waitKey(0)
+if key == ord('q'):
+    cv2.destroyAllWindows()
 ```
 
 
@@ -208,9 +241,9 @@ import numpy as np
 cap = cv2.VideoCapture(0) # 摄像头的语柄
 
 # 视频的编码格式
-fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-# 视频的输出路径
-out = cv2.VideoWriter('output.mp4', fourcc, 20.0, (640,480))
+fourcc = cv2.VideoWriter_fourcc(*'MJPG')
+# 视频的输出路径、编码格式、帧率、帧大小
+out = cv2.VideoWriter('output.avi', fourcc, 20.0, (640,480))
 
 
 if not cap.isOpened():
@@ -390,24 +423,31 @@ from PIL import Image, ImageDraw, ImageFont
 # 打开图片
 img = Image.open('imgs/img/10.jpg')  # 替换为你的图片路径
 # 设置字体（确保路径正确，Windows下常见字体路径如下）
-font_path = "simhei.ttf"  # 黑体
+font_path = "SIMHEI.TTF"  # 黑体（确保该字体文件存在）
 font_size = 60
 font = ImageFont.truetype(font_path, font_size)
+
 # 要绘制的文字
 text = "机器视觉"
+
 # 创建绘图对象
 draw = ImageDraw.Draw(img)
-# 计算文字尺寸
-text_width, text_height = draw.textsize(text, font=font)
-# 计算图片中心
-img_width, img_height = img.size
-x = (img_width - text_width) // 2
-y = (img_height - text_height) // 2
-# 绘制文字（可设置颜色和描边等）
-draw.text((x, y), text, font=font, fill=(255, 0, 0))  # 红色
-# 保存或显示图片
-img.show()
-# img.save('output.jpg')
+
+# 计算文本的边界框（使用 textbbox）新版的PIL用textbbox
+bbox = draw.textbbox((0, 0), text, font=font)
+text_width = bbox[2] - bbox[0]
+text_height = bbox[3] - bbox[1]
+
+# 计算居中位置：(x, y) 是文本左上角坐标
+x = (width - text_width) // 2
+y = (height - text_height) // 2
+
+# 绘制文字（红色）
+draw.text((x, y), text, font=font, fill=(255, 0, 0))
+
+# 保存结果
+img.save('output.jpg')
+img.show()  # 可选：显示图片
 ```
 
 ## 图像运算
