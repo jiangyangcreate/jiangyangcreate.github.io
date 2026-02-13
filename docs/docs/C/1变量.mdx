@@ -119,27 +119,32 @@ int main(){
 #include <float.h>     // 浮点型限制
 int main(void)
 {
-     printf("Some number limits for this system:\n");
-     printf("Biggest int: %d\n", INT_MAX);
-     printf("Smallest long long: %lld\n", LLONG_MIN);
-     printf("One byte = %d bits on this system.\n", CHAR_BIT);
-     printf("Largest double: %e\n", DBL_MAX);
-     printf("Smallest normal float: %e\n", FLT_MIN);
-     printf("float precision = %d digits\n", FLT_DIG);
-     printf("float epsilon = %e\n", FLT_EPSILON);
+
+     // 1. 基础整型：就像你的书架容量
+     printf("整型(int)能装下的最大数: %d\n", INT_MAX);
+     
+     // 2. 超长整型：就像宿舍的大行李箱
+     printf("最长整型(long long)能承受的底线: %lld\n", LLONG_MIN);
+     
+     // 3. 最小单位：这规定了一个字节(Byte)里挤了几个“比特”位
+     printf("在本系统中，1个字节等于 %d 位。\n", CHAR_BIT);
+
+     printf("\n--- 浮点型（小数）精度规格 ---\n");
+
+     // 4. 双精度：像实验室里的高精密天平
+     printf("双精度(double)能存的最大值: %e\n", DBL_MAX);
+     
+     // 5. 单精度：像食堂大妈打菜的手感
+     printf("单精度(float)能感知的最小正数: %e\n", FLT_MIN);
+     
+     // 6. 精度有效位：你能保证小数点后几位是不出错的？
+     printf("float 类型保证不报错的精度是 %d 位数字。\n", FLT_DIG);
+     
+     // 7. 最小误差(Epsilon)：两个不同数字之间的“最小缝隙”
+     printf("float 的机器极小值（分辨率）为: %e\n", FLT_EPSILON);
 
      return 0;
 }
-/*
-Some number limits for this system:
-Biggest int: 2147483647
-Smallest long long: -9223372036854775808
-One byte = 8 bits on this system.
-Largest double: 1.797693e+308
-Smallest normal float: 1.175494e-38
-float precision = 6 digits
-float epsilon = 1.192093e-07
-*/
 ```
 :::
 

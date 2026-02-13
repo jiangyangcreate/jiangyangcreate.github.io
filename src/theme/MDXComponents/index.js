@@ -4,6 +4,8 @@ import { PhotoAlbums } from '@site/src/components/PhotoAlbums';
 import DocCardList from '@theme/DocCardList';
 import Highlight from '@site/src/components/Highlight';
 import HoverText from '@site/src/components/HoverText';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 export default {
   // 复用默认的映射
@@ -12,5 +14,7 @@ export default {
   MarkmapHooks,
   DocCardList,
   Highlight,
-  HoverText
+  HoverText,
+  Tabs,
+  TabItem,
 };

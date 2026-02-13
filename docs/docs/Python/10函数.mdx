@@ -314,6 +314,105 @@ def fact(n):
 print(fact(5))  # 120
 ```
 
+### 魔法变量
+
+魔法变量无处不在，从全局的`__name__`到函数的`__code__`以及类的`__dict__`，其大多是你无需定义自动赋值、自动执行的变量或方法。
+
+了解有哪些魔法变量可以理解Python工作原理，合理利用可以减少开发工作量。
+
+```python showLineNumbers
+from typing import Callable
+def func(a=0,/, b:int=9, *, c=None) -> Callable:
+    """
+    这是一个函数
+    / 前的参数只能通过位置传递
+    * 后的参数只能通过关键字传递
+    b 即可通过位置传递，也可通过关键字传递，也可以不传递
+    """
+    x = 1
+    y = 2
+    def inner():
+        nonlocal x # 声明x为非局部变量
+        print("inner")
+        return 100
+    return inner
+    
+
+# ----- 函数对象的魔法变量 -----
+
+# __code__.co_code：字节码（bytecode），即函数体编译后的指令序列，由解释器执行
+print(func.__code__.co_code)
+# b'^\x05\x95\x00S\x01m\x05S\x02n\x03[\x01\x00\x00\x00\x00\x00\x00\x00\x00S\x035\x01\x00\x00\x00\x00\x00\x00 \x00U\x054\x01S\x04\x1a\x00j\x08n\x04U\x04$\x00'
+
+# __code__.co_freevars：函数体中用到的所有“外部变量”的名字(freevars:自由变量，是指在一个函数中使用，但既不是在该函数内定义的，也不是作为参数传入的变量。)
+print(func.__code__.co_freevars) # ()
+print(func().__code__.co_freevars) # ('x',)
+
+# __code__.co_varnames：函数内使用的局部变量名元组（含参数名）
+print(func.__code__.co_varnames)  # ('a', 'b', 'c', 'y', 'inner')
+print(func().__code__.co_varnames)  # ()
+
+# __code__.co_cellvars：被内部函数引用的变量（在父级函数看来）
+print(func.__code__.co_cellvars) # ('x',)
+print(func().__code__.co_cellvars)  # ()
+
+
+# __code__.co_consts：函数体中用到的常量元组（含 docstring、字面量、None 等）
+print(func.__code__.co_consts)  #('\n这是一个函数\n/ 前的参数只能通过位置传递\n* 后的参数只能通过关键字传递\nb 即可通过位置传递，也可通过关键字 传递，也可以不传递\n', 1, 2, <code object inner at 0x000002232295CB70, file "c:\Users\jiang\Desktop\github\jiangyangcreate.github.io\test\new.py", line 11>)
+
+# __defaults__：存储可通过位置传递的参数的默认值
+print(func.__defaults__)  # (0, 9)
+
+# __kwdefaults__：仅关键字参数（* 之后的参数）的默认值字典；无则为 None
+print(func.__kwdefaults__)  # {'c': None}
+
+# __annotations__：参数与返回值的类型注解字典（PEP 484），未注解则为 {}
+print(func.__annotations__)  # {'b': <class 'int'>, 'return': typing.Callable}
+
+# __doc__：函数的文档字符串（即紧贴 def 下方的三引号字符串），未定义则为 None
+print(func.__doc__)  
+"""
+这是一个函数
+/ 前的参数只能通过位置传递
+* 后的参数只能通过关键字传递
+b 即可通过位置传递，也可通过关键字传递，也可以不传递
+"""
+# __name__：函数定义时的名字（字符串）
+print(func.__name__)  # func
+
+# __module__：函数所在模块的模块名；当前脚本直接运行时为 '__main__'，被 import 时为模块名
+print(func.__module__)  # __main__
+
+# __closure__：闭包中引用的外部变量（Cell 对象）元组；非闭包函数为 None
+print(func.__closure__)  # None
+
+inner_fn = func()  # 得到闭包函数
+print(inner_fn.__closure__)  # (<cell at 0x00000173EBE017E0: int object at 0x00007FFC7A6753A8>,)
+# 这是一个闭包函数，所以__closure__不为None，里面有一个Cell对象，里面存储了外层变量x的值，可通过迭代取出Cell对象的cell_contents属性
+
+# 用法：用 .cell_contents 读出每个 Cell 里“捕获”的当前值；顺序与 __code__.co_freevars 一致
+print(inner_fn.__code__.co_freevars)  # ('x',)  inner 引用的外层变量名
+
+for name, cell in zip(inner_fn.__code__.co_freevars, inner_fn.__closure__ or ()):
+    print(f"  {name} = {cell.cell_contents}")  # x = 1
+
+# __globals__：函数定义时所在的全局命名空间引用（即该模块的 __dict__）
+print(func.__globals__)
+"""
+{'__name__': '__main__', 
+'__doc__': None, 
+'__package__': None, 
+'__loader__': <_frozen_importlib_external.SourceFileLoader object at 0x0000010543B24C00>, 
+'__spec__': None, 
+'__annotations__': {}, 
+'__builtins__': <module 'builtins' (built-in)>, 
+'__file__': 'c:\\Users\\jiang\\Desktop\\github\\jiangyangcreate.github.io\\test\\new.py', 
+'__cached__': None, 
+'Callable': typing.Callable, 
+'func': <function func at 0x0000010543ADFE20>}
+"""
+```
+
 ## 内置函数
 
 ### map函数

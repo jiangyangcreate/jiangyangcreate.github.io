@@ -3,15 +3,16 @@ sidebar_position: 5
 title: subprocess
 ---
 
-### subprocess 模块
+:::info
+在任何编程语言中，启动新进程都是一项常见任务，在像 Python 这样的高级语言中更是如此。因此，我们需要对这项任务提供良好的支持，原因如下：
 
-用来启动新进程，执行系统命令，拿到输出结果。
+- 启动进程时使用不合适的函数可能意味着安全风险：如果程序通过 shell 启动，并且参数包含 shell 元字符，则后果可能不堪设想。
+- 这使得 Python 成为替代过于复杂的 shell 脚本的更佳语言。
 
-简单说，就是在 Python 里运行 shell 命令的工具。
+[PEP 324 – subprocess – 新流程模块](https://peps.python.org/pep-0324/)
+:::
 
-[subprocess](https://docs.python.org/zh-cn/3/library/subprocess.html):subprocess Module Code Documentation
-
-### run() 方法
+## run
 
 最推荐的用法，简单直接。
 
@@ -35,8 +36,6 @@ print(result.returncode)  # 返回码，0表示成功
 - `timeout`: 超时时间（秒），超时会抛异常
 - `check`: True 时，如果命令返回非 0 会抛异常
 
-### shell=True 的使用
-
 有时候需要执行管道、重定向等 shell 特性：
 
 ```python showLineNumbers
@@ -55,7 +54,7 @@ print(result.stdout)
 `shell=True` 有安全风险，不要传入用户输入的内容，避免命令注入。
 :::
 
-### 处理错误
+## 处理错误
 
 ```python showLineNumbers
 import subprocess
@@ -75,7 +74,7 @@ except subprocess.TimeoutExpired:
     print("命令执行超时")
 ```
 
-### Popen() 方法
+## Popen() 方法
 
 更底层的接口，用于需要精细控制的场景。
 
@@ -99,7 +98,7 @@ return_code = process.wait()
 print(f"进程结束，返回码: {return_code}")
 ```
 
-### 与进程交互
+## 与进程交互
 
 ```python showLineNumbers
 import subprocess
@@ -117,15 +116,16 @@ stdout, stderr = process.communicate(input='print("Hello from stdin")\n')
 print(stdout)
 ```
 
-### 实际例子
+## 实际例子
 
-#### 执行 git 命令
+### 执行 git 命令
 
 ```python showLineNumbers
 import subprocess
 
 def git_status():
     result = subprocess.run(
+        # 简短的查看git提交变动
         ['git', 'status', '--short'],
         capture_output=True,
         text=True
@@ -139,12 +139,34 @@ def git_commit(message):
 print(git_status())
 ```
 
-#### 调用其他 Python 脚本
+### 调用其他 Python 脚本
+
+一个文件处理脚本
+
+```python showLineNumbers title="data_process.py"
+import argparse
+
+# 1. 创建解析器
+parser = argparse.ArgumentParser()
+
+# 2. 定义程序接受哪些参数
+parser.add_argument('--input', help='输入文件的路径')
+
+# 3. 解析参数
+args = parser.parse_args()
+
+# 4. 使用参数
+print(f"正在处理文件: {args.input}") 
+# 如果你传了 data.csv，这里的 args.input 就是 "data.csv"
+```
+
+通过subprocess调用这个脚本
 
 ```python showLineNumbers
 import subprocess
 
 result = subprocess.run(
+    # 
     ['python', 'data_process.py', '--input', 'data.csv'],
     capture_output=True,
     text=True,
@@ -159,91 +181,3 @@ else:
     print(result.stderr)
 ```
 
-#### Windows 特定
-
-```python showLineNumbers
-import subprocess
-import sys
-
-if sys.platform == 'win32':
-    # Windows 下执行命令
-    result = subprocess.run('dir', shell=True, capture_output=True, text=True)
-    print(result.stdout)
-    
-    # 或者使用 cmd
-    result = subprocess.run(
-        ['cmd', '/c', 'dir'],
-        capture_output=True,
-        text=True
-    )
-    print(result.stdout)
-```
-
-### 常见问题
-
-**Q: 什么时候用 run()，什么时候用 Popen()？**
-
-A: 大部分情况用 `run()`。只有需要实时读取输出、手动控制进程生命周期时才用 `Popen()`。
-
-**Q: 命令参数要不要加引号？**
-
-A: 用列表形式时不需要引号，Python 会自动处理：
-```python
-# 正确
-subprocess.run(['echo', 'hello world'])
-
-# 也可以，但不推荐
-subprocess.run('echo "hello world"', shell=True)
-```
-
-**Q: 为什么输出是空的？**
-
-A: 可能忘了 `capture_output=True` 或 `stdout=subprocess.PIPE`。
-
-**Q: 中文乱码怎么办？**
-
-A: 指定编码：
-```python
-result = subprocess.run(
-    ['python', 'script.py'],
-    capture_output=True,
-    encoding='utf-8'  # 或 'gbk' (Windows中文)
-)
-```
-
-### 最佳实践
-
-1. 优先用列表传参数，避免 shell 注入风险
-2. 设置合理的 timeout，避免进程卡死
-3. 使用 `check=True` 自动处理错误
-4. 指定 `text=True` 或 `encoding`，避免处理字节
-5. 不信任的输入不要用 `shell=True`
-
-```python showLineNumbers
-# 推荐写法
-import subprocess
-
-def run_command(cmd_list, timeout=30):
-    """运行命令的封装函数"""
-    try:
-        result = subprocess.run(
-            cmd_list,
-            capture_output=True,
-            text=True,
-            timeout=timeout,
-            check=True
-        )
-        return result.stdout
-    except subprocess.CalledProcessError as e:
-        print(f"命令失败: {' '.join(cmd_list)}")
-        print(f"错误: {e.stderr}")
-        return None
-    except subprocess.TimeoutExpired:
-        print(f"命令超时: {' '.join(cmd_list)}")
-        return None
-
-# 使用
-output = run_command(['ls', '-la'])
-if output:
-    print(output)
-```

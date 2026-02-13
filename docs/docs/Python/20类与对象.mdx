@@ -455,7 +455,7 @@ discount_price 被读取
 
 Python 使用 \_\_ 开头的名字来定义特殊方法与特殊属性
 
-### `__mro__`与mro()与`__bases__`
+### \_\_mro\_\_与mro()与\_\_bases\_\_
 
 `__mro__`与`mro()`用于获取类的继承关系。
 
@@ -478,7 +478,7 @@ print(Child.__mro__) # (<class '__main__.Child'>, <class '__main__.Parent'>, <cl
 print(Child.__bases__) # (<class '__main__.Parent'>,)
 ```
 
-### `__init__` 与 `__new__` 方法详解
+### \_\_init\_\_ 与 \_\_new\_\_ 方法详解
 
 - `__new__()` 在每次<Highlight>创建实例时</Highlight>时被调用，用于创建实例。它至少有一个参数，约定俗成为`cls`，代表当前类。必须返回一个实例。
 

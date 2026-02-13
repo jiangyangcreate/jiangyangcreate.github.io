@@ -3,9 +3,14 @@ sidebar_position: 5
 title: concurrent
 ---
 
-concurrent是对标准库：multiprocessing 和 threading的二次封装。
+:::info
+Python 目前拥有强大的原语来构建多线程和多进程应用，但并行化简单作需要大量工作，比如显式启动进程/线程、构建工作/结果队列，以及等待完成或其他终止条件（如失败、超时）。当每个组件都发明自己的并行执行策略时，设计具有全局进程/线程限制的应用程序也变得困难。
 
-[pep-3148](https://peps.python.org/pep-3148/)
+该提案包将被称为“futures”，并存在于一个新的“concurrent”顶层包中。
+
+[PEP-3148 – futures-异步执行计算](https://peps.python.org/pep-3148/)
+:::
+
 
 ### as_completed
 

@@ -3,10 +3,6 @@ sidebar_position: 2
 title: threading
 ---
 
-threading模块用于创建和管理线程。
-
-## threading 模块
-
 线程是系统调度资源的最小单位（CPU 通过计时器来切换线程）
 
 在 Python 中，同个时间只有一个线程在运行
@@ -25,7 +21,7 @@ Python 的标准库提供了两个模块：\_thread 和 threading，\_thread 是
 
 [threading](https://docs.python.org/zh-cn/3.14/library/threading.html?highlight=threading#module-threading):Threading Multiprocessing Module Code Documentation
 
-### 基本用法
+## 基本用法
 
 ```python showLineNumbers
 import time
@@ -40,7 +36,7 @@ for i in range(5):
     print(i)
 ```
 
-### 多线程
+## 多线程
 
 ```python showLineNumbers
 
@@ -85,7 +81,7 @@ hi
 
 ```
 
-### 守护线程
+## 守护线程
 
 设置守护线程的子线程会在主线程结束时自动结束。
 
@@ -122,7 +118,7 @@ Main thread has ended!
 
 这是因为主线程中没有阻塞等待子线程，执行到`print('Main thread has ended!')`时，主线程结束，此时子线程还在`time.sleep`，由于子线程是守护线程，所以会立即结束，还未执行的代码不会执行。
 
-### 多线程实现下载任务
+## 多线程实现下载任务
 
 
 如下所示的界面中，有“下载”和“关于”两个按钮，用休眠的方式模拟点击“下载”按钮会联网下载文件需要耗费 10 秒的时间，当点击“下载”按钮后，整个任务阻塞：
