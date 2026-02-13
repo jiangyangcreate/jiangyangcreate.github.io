@@ -2,7 +2,6 @@
 sidebar_position: 1
 title: multiprocessing
 ---
-## multiprocessing 模块
 
 进程是系统独立安排和分配系统资源（CPU、内存）的基本单位，操作系统以进程为单位分配存储空间，操作系统管理所有进程的执行，为它们合理的分配资源。
 
@@ -16,7 +15,7 @@ title: multiprocessing
 
 [multiprocessing](https://docs.python.org/zh-cn/3.14/library/multiprocessing.html?highlight=multiprocessing#module-multiprocessing):Multiprocessing Module Code Documentation
 
-### 工作原理 
+## 工作原理 
 
 ```python showLineNumbers
 print("程序启动")
@@ -56,7 +55,7 @@ __mp_main__
 
 创建子进程时，会从主进程中拷贝一份当前系统状态给子进程。因此，子进程和主进程有相同的系统状态，但是是独立的，互不干扰。
 
-### Pool
+## Pool
 
 通常来说，Pool 中的 Worker 进程的生命周期和进程池的工作队列一样长。
 
@@ -76,7 +75,7 @@ if __name__ == '__main__':
 # [1, 4, 9]
 ```
 
-### 守护与阻塞
+## 守护与阻塞
 
 | 守护状态 (Daemon) | 调用 join() | 运行行为 (结果) | 逻辑说明 |
 | --- | --- | --- | --- |

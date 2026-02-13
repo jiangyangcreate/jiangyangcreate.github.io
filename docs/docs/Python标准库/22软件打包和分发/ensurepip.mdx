@@ -48,7 +48,7 @@ python -m ensurepip --default-pip
 
 对于需要在程序中动态管理 `pip` 安装的场景，`ensurepip` 提供了两个函数：
 
-### `ensurepip.version()`
+### ensurepip.version()
 
 返回一个字符串，指明在`ensurepip`初始创建环境时,将被安装的 `pip` 版本。
 
@@ -57,7 +57,7 @@ import ensurepip
 print(ensurepip.version()) # 例如输出: '25.2'
 ```
 
-### `ensurepip.bootstrap()`
+### ensurepip.bootstrap()
 
 初始创建 `pip` 到当前的或指定的环境中。它提供了与命令行选项对应的参数。
 

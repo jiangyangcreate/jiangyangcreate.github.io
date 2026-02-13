@@ -211,7 +211,6 @@ TOTAL_TASKS = 4
 NUM_CONSUMERS = 5
 
 async def producer(q):
-
     for i in range(1, TOTAL_TASKS + 1):
         print(f"[生产者] 尝试放入任务 {i}...")
         # 如果队列满了，put 会在这里挂起（yield），直到有空间
@@ -237,16 +236,16 @@ async def main():
     # 1. 创建有限容量的任务队列
     task_queue = asyncio.Queue(maxsize=QUEUE_CAPACITY)
 
-    # 2. 启动生产者
+    # 2. 生产者加入协程循环
     producer_task = asyncio.create_task(producer(task_queue))
 
-    # 3. 启动多个消费者
+    # 3. 多个消费者加入协程循环
     consumers = [
         asyncio.create_task(consumer(f"C-{i+1}", task_queue)) 
         for i in range(NUM_CONSUMERS)
     ]
 
-    # 4. 等待生产者放完所有东西
+    # 4. 协程循环启动，从生产者开始执行
     await producer_task
 
     # 5. 关键：等待队列中所有任务被 task_done
