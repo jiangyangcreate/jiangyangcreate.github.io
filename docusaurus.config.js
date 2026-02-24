@@ -166,8 +166,15 @@ module.exports = {
     //全局索引插件
     algolia: {
       appId: "B8DUWB4CMX",
-      apiKey: "36cbcb8eb4d417b32200be7e427d68fd",
+      apiKey: "36cbcb8eb4d417b32200be7e427d68fd", // 站内搜索用的 key
       indexName: websitename,
+      askAi: {
+        appId: "B8DUWB4CMX",
+        apiKey: "7324233c84b4ffb7c51f7a11136750a9", 
+        indexName: "markdown-index",              // 你的 markdown 索引名
+        assistantId: "PSPEr8rtpc0W",
+        // Docusaurus 3.9 当前的 schema 不支持 suggestedQuestions 字段
+      },
     },
     colorMode: {
       defaultMode: "light", //定义首次访问的颜色

@@ -1,6 +1,6 @@
 ## 项目概览
 
-欢迎来到这个基于[Docusaurus 3](https://docusaurus.io/)最新版本构建的定制站点。
+欢迎来到这个基于[Docusaurus 3.9](https://docusaurus.io/)最新版本构建的定制站点。
 
 我从[Docusaurus Site Showcase](https://docusaurus.io/showcase)中汲取了许多灵感，但我更倾向于简洁且精美的设计，以确保代码能够便于维护,同时使用markmap与mermaid制图，使得文本均可被选中，易于被网页翻译。
 
@@ -13,6 +13,8 @@
 ## 核心特性
 
 - 配置生成式 AI 文章总结，完全的Github部署。[访问 博客文本摘要](https://jiangmiemie.com/blog/2024/1/31/)
+
+- 集成 Algolia 的ASK AI功能，本地技术文档与博客变动态RAG，如需配置可在`docusaurus.config.js`中搜索`Algolia`。
 
 - 内置多种字体高亮、集成 mermaid 、markmap、 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown](https://jiangmiemie.com/docs/编程外的基础/Markdown/)
 
@@ -28,8 +30,6 @@
 - RSS 订阅，支持博客的 RSS 订阅。访问[访问 RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
 
 - 支持生成静态站点，托管至 GitHub Page。[查看 workflows](.github\workflows\update.yml)
-
-- Algolia 全局搜索，支持站内搜索，帮助你快速找到所需内容，如需配置可在`docusaurus.config.js`中搜索`Algolia`。
 
 - Google Analytics，可查看网站访问情况，如需配置可在`docusaurus.config.js`中搜索`gtag`。
 
