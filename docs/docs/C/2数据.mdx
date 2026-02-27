@@ -474,7 +474,22 @@ void array[10];                     // 错误！不能创建void数组
 
 ## 类型转换
 
-单一数据类型之间的转换有显式转换和隐式转换两大方式，非显示转化都属于隐式转化。
+### 趋零截断
+
+整数除法的结果是整数。整数是没有小数部分的数。这使得5除以3结果为1，因为实际结果有小数部分。
+
+在C语言中，整数除法结果的小数部分被丢弃，这一过程被称为截断（truncation）​。
+
+C 取整时，总是向0取整。这种方法被称为“<Highlight>趋零截断</Highlight>”​，
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int a ;
+    a = 5 /3; // 1
+    a = 5.0 / 3.0; // 1.666667
+    return 0;
+}
+```
 
 ### 显式转换
 
@@ -511,6 +526,14 @@ int a = 10.6;
 ### 运算时转换
 
 当运算符左右两边类型不一致时，系统会自动对占用内存较少的类型做一个“自动类型提升”的操作。
+
+:::info
+类型的级别从高至低依次是long double、double、float、unsignedlong long、long long、unsigned long、long、unsigned int、int。
+
+例外的情况是，当long和int的大小相同时，unsigned int比long的级别高。
+
+之所以short和char类型没有列出，是因为它们已经被升级到int或unsigned int。
+:::
 
 先将其转换为当前算数表达式中占用内存高的类型, 然后再参与运算。
 

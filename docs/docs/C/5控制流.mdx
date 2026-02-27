@@ -3,6 +3,36 @@ sidebar_position: 5
 title: 控制流
 ---
 
+## 语句
+
+
+语句（statement）是C程序的基本构建块。一条语句相当于一条完整的计算机指令。
+
+在C中，大部分语句都以分号结尾 或 被大括号`{}`包裹。除此之外，还有用于`goto`跳转的标号语句，格式为`标号:`,例如`aa:`,`bb:`。
+
+最简单的语句是空语句：
+
+```c showLineNumbers
+;
+```
+
+一条语句（或者至少是一条有用的语句）相当于一条完整的指令。
+
+因此一些意想不到的结果可能是错误的添加分号（空语句）导致的。
+
+下面代码会运行10次空语句`;`，然后运行1次复合语句`{ printf("Hello, World!\n"); }`，所以只打印1次"Hello, World!"。
+
+```c showLineNumbers
+#include <stdio.h>
+int main(void)
+{
+     for(int i = 0; i < 10; i++); {
+        printf("Hello, World!\n");
+     }
+     return 0;
+}
+```
+
 ## 选择结构
 
 - C 语言中提供了两大选择结构，分别是 if 和 switch
@@ -19,6 +49,7 @@ if(表达式) {
 }
 后续语句;
 ```
+
 
 ```c showLineNumbers
 #include <stdio.h>
@@ -754,7 +785,7 @@ for(初始化表达式; 循环条件表达式; 循环后的操作表达式) {
 #include <stdio.h>
 int main(){
     for(int i = 0; i < 10; i++){
-        printf("发射子弹~哔哔哔哔\n");
+        printf("Hello, World!\n");
     }
     return 0;
 }
@@ -968,6 +999,8 @@ int main(){
 
 :::warning
 goto 语句，仅能在本函数内实现跳转，不能实现跨函数跳转（短跳转）。
+
+通常结合标号语句使用。
 
 goto 会破坏结构化程序设计流程，它将使程序层次不清，且不易读，所以慎用。
 :::

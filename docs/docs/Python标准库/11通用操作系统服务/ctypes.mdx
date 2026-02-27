@@ -1,0 +1,159 @@
+---
+sidebar_position: 1
+title: ctypes
+---
+
+如果你在客户的服务器上，需要调用一个系统动态库（.so 或 .dll），但你没有权限安装编译器（ GCC 、Cython、Visual Studio），可以考虑使用 ctypes 来调用。
+
+可以把 ctypes 的学习分为三个层级：调现成的库、处理数据类型、处理结构体。
+
+## 调用系统标准库
+
+```python showLineNumbers title="run.py"
+import ctypes
+import ctypes.util
+
+# 找到标准 C 库的路径
+libc_path = ctypes.util.find_library('c')
+libc = ctypes.CDLL(libc_path)
+
+# 调用 C 的 printf
+libc.printf(b"Hello from C's printf!\n")
+```
+
+运行：`python3 run.py`
+
+输出：`Hello from C's printf!`
+
+## 处理数据类型
+
+Python 对象和 C 数据的内存表示完全不同。ctypes 提供了一组与 C 兼容的基础数据类型，充当两者之间的翻译层。
+
+常用类型对照表：
+
+| ctypes 类型 | C 类型 | Python 类型 |
+|-------------|--------|-------------|
+| c_bool | _Bool | bool |
+| c_char | char | 单字符 bytes |
+| c_int | int | int |
+| c_uint | unsigned int | int |
+| c_long | long | int |
+| c_float | float | float |
+| c_double | double | float |
+| c_char_p | char* | bytes 或 None |
+| c_wchar_p | wchar_t* | str 或 None |
+| c_void_p | void* | int 或 None |
+
+```python showLineNumbers title="run.py"
+import ctypes
+import ctypes.util
+
+libc_path = ctypes.util.find_library('c')
+libc = ctypes.CDLL(libc_path)
+
+# --- 指定参数类型和返回类型 ---
+# C 原型: double pow(double x, double y)
+# 需要加载 libm.so 库
+libm_path = ctypes.util.find_library('m')
+libm = ctypes.CDLL(libm_path)
+# 指定参数类型
+libm.pow.argtypes = [ctypes.c_double, ctypes.c_double]
+# 指定返回类型
+libm.pow.restype = ctypes.c_double
+print(libm.pow(2.0, 10.0))  # 1024.0
+
+# --- 传递指针（引用传参）---
+# C 原型: int sscanf(const char *str, const char *format, ...)
+i = ctypes.c_int()
+f = ctypes.c_float()
+libc.sscanf(b"42 3.14", b"%d %f", ctypes.byref(i), ctypes.byref(f))
+print(i.value, f.value)  # 42 3.140000104904175
+
+# --- 字符串缓冲区 ---
+buf = ctypes.create_string_buffer(32)
+libc.sprintf(buf, b"Hello %s, %d!", b"ctypes", 2026)
+print(buf.value)  # b'Hello ctypes, 2026!'
+```
+
+## 处理结构体
+
+C 语言中的结构体（struct）可以将多个不同类型的字段打包在一起。ctypes 通过继承 `Structure` 并定义 `_fields_` 来实现相同的功能。
+
+```python showLineNumbers title="run.py"
+import ctypes
+
+class Point(ctypes.Structure):
+    _fields_ = [
+        ("x", ctypes.c_double),
+        ("y", ctypes.c_double),
+    ]
+
+p = Point(3.0, 4.0)
+print(f"({p.x}, {p.y})")  # (3.0, 4.0)
+
+# 结构体可以嵌套
+class Rect(ctypes.Structure):
+    _fields_ = [
+        ("origin", Point),
+        ("size", Point),
+    ]
+
+r = Rect(Point(0, 0), Point(100, 200))
+print(f"origin=({r.origin.x}, {r.origin.y}), size=({r.size.x}, {r.size.y})")
+
+# 结构体数组
+PointArray3 = Point * 3
+points = PointArray3(Point(1, 2), Point(3, 4), Point(5, 6))
+for pt in points:
+    print(f"  ({pt.x}, {pt.y})")
+```
+
+C 中大量函数通过指针来传递和返回数据。ctypes 提供了两种方式：
+
+- `POINTER(type)` — 创建一个指针**类型**，如 `POINTER(c_int)` 相当于 C 的 `int*`
+- `pointer(obj)` — 创建一个指向已有实例的指针**对象**
+- `byref(obj)` — 轻量版的 `pointer()`，只能用于函数调用传参，但速度更快
+
+```python showLineNumbers title="run.py"
+import ctypes
+
+# POINTER 创建指针类型
+IntPointer = ctypes.POINTER(ctypes.c_int)
+
+# pointer 创建指针实例
+val = ctypes.c_int(42)
+ptr = ctypes.pointer(val)
+print(ptr.contents.value)  # 42
+
+# 通过指针修改原始值
+ptr.contents.value = 100
+print(val.value)  # 100
+
+# byref 是轻量替代，仅用于函数调用传参
+# 效果等同于 pointer()，但不创建完整指针对象
+import ctypes.util
+libc = ctypes.CDLL(ctypes.util.find_library('c'))
+result = ctypes.c_int()
+libc.sscanf(b"99", b"%d", ctypes.byref(result))
+print(result.value)  # 99
+```
+
+结合结构体使用指针：
+
+```python showLineNumbers title="run.py"
+import ctypes
+import ctypes.util
+
+class timeval(ctypes.Structure):
+    _fields_ = [
+        ("tv_sec", ctypes.c_long),
+        ("tv_usec", ctypes.c_long),
+    ]
+
+# 仅 Linux/macOS 可用
+# C 原型: int gettimeofday(struct timeval *tv, struct timezone *tz)
+libc = ctypes.CDLL(ctypes.util.find_library('c'))
+tv = timeval()
+libc.gettimeofday(ctypes.byref(tv), None)
+print(f"seconds since epoch: {tv.tv_sec}")
+```
