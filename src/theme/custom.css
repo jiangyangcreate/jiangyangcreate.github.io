@@ -1603,3 +1603,65 @@ input::placeholder {
     transform: translateY(0) translateX(-50%);
   }
 }
+
+article header.with-copy-btn {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  overflow: visible;
+}
+
+article header.with-copy-btn h1 {
+  flex: 1 1 auto;
+  margin: 0;
+}
+
+.copy-markdown-portal {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.copy-markdown-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--ifm-color-emphasis-300);
+  background: var(--ifm-background-surface-color, #fff);
+  color: var(--ifm-font-color-base);
+  font-size: 14px;
+  line-height: 1.4;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  white-space: nowrap;
+}
+
+.copy-markdown-btn:hover {
+  border-color: var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.copy-markdown-btn:active {
+  transform: scale(0.97);
+}
+
+.copy-markdown-btn svg {
+  flex-shrink: 0;
+}
+
+[data-theme="dark"] .copy-markdown-btn {
+  background: var(--ifm-background-surface-color, #1b1b1d);
+}
+
+@media (max-width: 768px) {
+  .copy-markdown-btn span {
+    display: none;
+  }
+  .copy-markdown-btn {
+    padding: 6px;
+  }
+}

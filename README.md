@@ -14,20 +14,24 @@
 
 - 配置生成式 AI 文章总结，完全的Github部署。[访问 博客文本摘要](https://jiangmiemie.com/blog/2024/1/31/)
 
-- 集成 Algolia 的ASK AI功能，本地技术文档与博客变动态RAG，如需配置可在`docusaurus.config.js`中搜索`Algolia`。
-
 - 内置多种字体高亮、集成 mermaid 、markmap、 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown](https://jiangmiemie.com/docs/编程外的基础/Markdown/)
 
 - 集成 React Photo Album，布局优雅，点击照片可放大并展示照片描述、拍摄地、照片尺寸等信息。[访问 照片墙](https://jiangmiemie.com/gallery/)
 
 - 集成 giscus，使用 GitHub 账号评论，还能一键分享至 twitter。[访问 博客页](https://jiangmiemie.com/blog/)
 
-<details>
-  <summary>点击以查看更多信息</summary>
-
 - 集成 infinum，轻松创建个人案例页，优雅展示个人作品。[访问 个案页](https://jiangmiemie.com/case/)
 
 - RSS 订阅，支持博客的 RSS 订阅。访问[访问 RSS](https://jiangmiemie.com/blog/rss.xml)即可订阅。
+
+- 集成 Algolia 的ASK AI功能，本地技术文档与博客变动态RAG，如需配置可在`docusaurus.config.js`中搜索`Algolia`。
+
+- 文档支持Copy as Markdonw，让AI读懂你的文档，工作原理可以搜索`CopyMarkdownButton`。
+
+- PWA (Progressive Web App)，让使用网页像使用原生应用一样，可在`docusaurus.config.js`中搜索`pwa`。
+
+<details>
+  <summary>点击以查看更多信息</summary>
 
 - 支持生成静态站点，托管至 GitHub Page。[查看 workflows](.github\workflows\update.yml)
 
@@ -36,8 +40,6 @@
 - 公告栏 (announcementBar)，允许在设置一个公告，如需配置可在`docusaurus.config.js`中搜索`announcementBar`。
 
 - 自动明暗模式切换，评论组件、画布、相册都实现了明暗优化。如允许用户主动切换，可在`docusaurus.config.js`中搜索`明暗切换按钮`。
-
-- PWA (Progressive Web App)，让使用网页像使用原生应用一样，可在`docusaurus.config.js`中搜索`pwa`。
 
 </details>
 

@@ -39,6 +39,8 @@
     "react-photo-album": "^2.3.0",
     "rehype-katex": "^7.0.0",
     "remark-math": "^6.0.0",
+    "turndown": "^7.2.2",
+    "turndown-plugin-gfm": "^1.0.2",
     "yet-another-react-lightbox": "^3.15.6"
   },
   "devDependencies": {

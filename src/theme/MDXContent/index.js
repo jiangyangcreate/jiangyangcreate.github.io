@@ -2,6 +2,7 @@ import React from "react";
 import { MDXProvider } from "@mdx-js/react";
 import MDXComponents from "@theme/MDXComponents";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import CopyMarkdownButton from "@site/src/components/CopyMarkdownButton";
 export default function MDXContent({ children }) {
   const metadata = children.type.metadata;
   const context = useDocusaurusContext();
@@ -17,6 +18,7 @@ export default function MDXContent({ children }) {
 
   return (
     <>
+      <CopyMarkdownButton />
       <MDXProvider components={MDXComponents}>{children}</MDXProvider>
 
       <div
