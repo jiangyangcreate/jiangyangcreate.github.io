@@ -12,7 +12,7 @@
 
 ## 核心特性
 
-- 配置生成式 AI 文章总结，完全的Github部署。[访问 博客文本摘要](https://jiangmiemie.com/blog/2024/1/31/)
+- 配置生成式 AI 文章总结、对谈音频生成，完全的Github部署。[访问 博客文本摘要](https://jiangmiemie.com/blog/2024/1/31/)
 
 - 内置多种字体高亮、集成 mermaid 、markmap、 KaTeX ，让数学公式和流程图的编辑更加便捷。[访问 markdown](https://jiangmiemie.com/docs/编程外的基础/Markdown/)
 

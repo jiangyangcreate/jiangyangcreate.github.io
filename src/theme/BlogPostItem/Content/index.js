@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import clsx from "clsx";
 import { blogPostContainerID } from "@docusaurus/utils-common";
 import {useBlogPost} from '@docusaurus/plugin-content-blog/client';
@@ -33,7 +33,7 @@ const JsonReader = ({
 }) => {
   // 替换url与/
   const path = fieldToMatch.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
-  const url = `https://jiangmiemie.com/jiangyangcreate/summary/${path}.json`;
+  const url = `https://chat.jiangyang.fun/summary/${path}.json`;
   const [jsonData, setJsonData] = useState(null);
 
   useEffect(() => {
@@ -67,26 +67,130 @@ const JsonReader = ({
 };
 
 const Aisummary = ({ children }) => (
-  <div class="post-ai">
-    <div class="ai-title">
+  <div className="post-ai">
+    <div className="ai-title">
       <a
-        class="ai-title-left"
+        className="ai-title-left"
         href="/blog/2024/1/31/"
         title="查看详情"
         data-pjax-state=""
       >
-        <div class="ai-title-text">文章摘要</div>
+        <div className="ai-title-text">文章摘要</div>
       </a>
     </div>
-    <div class="ai-explanation" style={{ display: "block" }}>
-      <JsonReader fieldToMatch = {children}/>
+    <div className="ai-explanation" style={{ display: "block" }}>
+      <JsonReader fieldToMatch={children} />
     </div>
-    <div class="ai-suggestions"></div>
-    <div class="ai-bottom">
-      <div class="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div>
+    <div className="ai-suggestions"></div>
+    <div className="ai-bottom">
+      <div className="ai-tips">此内容根据文章生成，仅用于文章内容的解释与总结</div>
     </div>
   </div>
 );
+
+function formatTime(seconds) {
+  if (!seconds || !isFinite(seconds)) return "0:00";
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
+}
+
+const AiPodcast = ({ pageurl }) => {
+  const path = pageurl.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
+  const audioUrl = `https://chat.jiangyang.fun/summary/${path}.mp3`;
+
+  const audioRef = useRef(null);
+  const [available, setAvailable] = useState(null);
+  const [playing, setPlaying] = useState(false);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+
+  useEffect(() => {
+    fetch(audioUrl, { method: "HEAD" })
+      .then((res) => setAvailable(res.ok))
+      .catch(() => setAvailable(false));
+  }, [audioUrl]);
+
+  const togglePlay = useCallback(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playing) {
+      audio.pause();
+    } else {
+      audio.play();
+    }
+    setPlaying(!playing);
+  }, [playing]);
+
+  const handleTimeUpdate = useCallback(() => {
+    if (audioRef.current) setCurrentTime(audioRef.current.currentTime);
+  }, []);
+
+  const handleLoaded = useCallback(() => {
+    if (audioRef.current) setDuration(audioRef.current.duration);
+  }, []);
+
+  const handleEnded = useCallback(() => setPlaying(false), []);
+
+  const handleSeek = useCallback((e) => {
+    const audio = audioRef.current;
+    if (!audio || !duration) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const ratio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    audio.currentTime = ratio * duration;
+  }, [duration]);
+
+  if (available === null || available === false) return null;
+
+  const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+  return (
+    <div className="post-ai podcast-player">
+      <audio
+        ref={audioRef}
+        src={audioUrl}
+        preload="metadata"
+        onTimeUpdate={handleTimeUpdate}
+        onLoadedMetadata={handleLoaded}
+        onEnded={handleEnded}
+      />
+      <div className="ai-title">
+        <div className="ai-title-left">
+          <div className="ai-title-text">AI 对谈</div>
+        </div>
+      </div>
+      <div className="podcast-controls">
+        <button
+          className="podcast-play-btn"
+          onClick={togglePlay}
+          aria-label={playing ? "暂停" : "播放"}
+        >
+          {playing ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <rect x="6" y="4" width="4" height="16" rx="1" />
+              <rect x="14" y="4" width="4" height="16" rx="1" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          )}
+        </button>
+        <div className="podcast-progress-wrap" onClick={handleSeek}>
+          <div className="podcast-progress-bar">
+            <div className="podcast-progress-fill" style={{ width: `${progress}%` }} />
+          </div>
+        </div>
+        <span className="podcast-time">
+          {formatTime(currentTime)} / {formatTime(duration)}
+        </span>
+      </div>
+      <div className="ai-bottom">
+        <div className="ai-tips">AI 根据文章生成的播客对话，仅供参考</div>
+      </div>
+    </div>
+  );
+};
 
 export default function BlogPostItemContent({ children, className }) {
   const { isBlogPostPage } = useBlogPost();
@@ -101,6 +205,7 @@ export default function BlogPostItemContent({ children, className }) {
       itemProp="articleBody"
     >
       <Aisummary children={pageurl} />
+      <AiPodcast pageurl={pageurl} />
       <MDXContent>{children}</MDXContent>
     </div>
   );

@@ -1593,6 +1593,67 @@ input::placeholder {
   color: gray
 }
 
+.podcast-player {
+  min-height: auto;
+}
+
+.podcast-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 8px 12px;
+  background: #1b1c20;
+  border-radius: 8px;
+  border: 1px solid #3d3d3f;
+}
+
+.podcast-play-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: none;
+  background: #ffc848;
+  color: #21232a;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.podcast-play-btn:hover {
+  opacity: 0.85;
+}
+
+.podcast-progress-wrap {
+  flex: 1;
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.podcast-progress-bar {
+  height: 4px;
+  border-radius: 2px;
+  background: #3d3d3f;
+  overflow: hidden;
+}
+
+.podcast-progress-fill {
+  height: 100%;
+  background: #ffc848;
+  border-radius: 2px;
+  transition: width 0.1s linear;
+}
+
+.podcast-time {
+  font-size: 12px;
+  color: #a1a2b8;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1604,22 +1665,10 @@ input::placeholder {
   }
 }
 
-article header.with-copy-btn {
+.copy-markdown-wrap {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  overflow: visible;
-}
-
-article header.with-copy-btn h1 {
-  flex: 1 1 auto;
-  margin: 0;
-}
-
-.copy-markdown-portal {
-  flex-shrink: 0;
-  margin-left: auto;
+  justify-content: flex-end;
+  margin-bottom: 0.5rem;
 }
 
 .copy-markdown-btn {

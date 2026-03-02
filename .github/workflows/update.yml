@@ -31,3 +31,8 @@ jobs:
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           SERVER_IP: ${{ secrets.IP }}
+      - name: generate summary
+        run: |
+          curl -X POST "https://chat.jiangyang.fun/blog/update?key=${{ secrets.KEY }}"
+        env:
+          KEY: ${{ secrets.KEY }}
