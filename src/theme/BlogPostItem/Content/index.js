@@ -6,15 +6,17 @@ import MDXContent from "@theme/MDXContent";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 
 const TypingComponent = ({ text, speed = 100 }) => {
+  const safeText = text || '摘要生成中...';
   const [displayedText, setDisplayedText] = useState('');
 
   useEffect(() => {
     let index = 0;
+    setDisplayedText('');
 
     const typingInterval = setInterval(() => {
       setDisplayedText((prevText) => {
-        if (index < text.length) {
-          return prevText + text[index++];
+        if (index < safeText.length) {
+          return prevText + safeText[index++];
         } else {
           clearInterval(typingInterval);
           return prevText;
@@ -23,7 +25,7 @@ const TypingComponent = ({ text, speed = 100 }) => {
     }, speed);
 
     return () => clearInterval(typingInterval);
-  }, [text, speed]);
+  }, [safeText, speed]);
 
   return <>{displayedText}</>;
 };
@@ -33,17 +35,18 @@ const JsonReader = ({
 }) => {
   // 替换url与/
   const path = fieldToMatch.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
-  const url = `https://chat.jiangyang.fun/summary/${path}.json`;
+  const url = `https://chat.jiangyang.fun/static/summary/${path}.json`;
   const [jsonData, setJsonData] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(url);
+        if (!response.ok) return;
         const data = await response.json();
         setJsonData(data);
       } catch (error) {
-        console.error("Error fetching JSON:", error);
+        // fetch failed, keep jsonData as null to show fallback text
       }
     };
 
@@ -97,7 +100,7 @@ function formatTime(seconds) {
 
 const AiPodcast = ({ pageurl }) => {
   const path = pageurl.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
-  const audioUrl = `https://chat.jiangyang.fun/summary/${path}.mp3`;
+  const audioUrl = `https://chat.jiangyang.fun/static/summary/${path}.mp3`;
 
   const audioRef = useRef(null);
   const [available, setAvailable] = useState(null);
@@ -105,11 +108,16 @@ const AiPodcast = ({ pageurl }) => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
-  useEffect(() => {
-    fetch(audioUrl, { method: "HEAD" })
-      .then((res) => setAvailable(res.ok))
-      .catch(() => setAvailable(false));
-  }, [audioUrl]);
+  const handleLoaded = useCallback(() => {
+    if (audioRef.current) {
+      setDuration(audioRef.current.duration);
+      setAvailable(true);
+    }
+  }, []);
+
+  const handleError = useCallback(() => {
+    setAvailable(false);
+  }, []);
 
   const togglePlay = useCallback(() => {
     const audio = audioRef.current;
@@ -126,10 +134,6 @@ const AiPodcast = ({ pageurl }) => {
     if (audioRef.current) setCurrentTime(audioRef.current.currentTime);
   }, []);
 
-  const handleLoaded = useCallback(() => {
-    if (audioRef.current) setDuration(audioRef.current.duration);
-  }, []);
-
   const handleEnded = useCallback(() => setPlaying(false), []);
 
   const handleSeek = useCallback((e) => {
@@ -140,20 +144,25 @@ const AiPodcast = ({ pageurl }) => {
     audio.currentTime = ratio * duration;
   }, [duration]);
 
-  if (available === null || available === false) return null;
+  if (available === false) return null;
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   return (
-    <div className="post-ai podcast-player">
+    <>
       <audio
         ref={audioRef}
         src={audioUrl}
+        // 如果需要操作音频，确保audio标签通过CORS校验缓存数据
+        // crossOrigin="anonymous"
         preload="metadata"
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoaded}
         onEnded={handleEnded}
+        onError={handleError}
       />
+      {available === true && (
+    <div className="post-ai podcast-player">
       <div className="ai-title">
         <div className="ai-title-left">
           <div className="ai-title-text">AI 对谈</div>
@@ -189,6 +198,8 @@ const AiPodcast = ({ pageurl }) => {
         <div className="ai-tips">AI 根据文章生成的播客对话，仅供参考</div>
       </div>
     </div>
+      )}
+    </>
   );
 };
 
