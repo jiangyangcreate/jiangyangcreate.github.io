@@ -18,7 +18,7 @@ export default function MDXContent({ children }) {
 
   return (
     <>
-      <CopyMarkdownButton />
+
       <MDXProvider components={MDXComponents}>{children}</MDXProvider>
 
       <div

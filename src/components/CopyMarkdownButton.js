@@ -20,7 +20,8 @@ turndownService.addRule("removeNonContent", {
       node.classList?.contains("theme-doc-breadcrumbs") ||
       node.classList?.contains("pagination-nav") ||
       node.classList?.contains("post-ai") ||
-      node.classList?.contains("copy-markdown-wrap")
+      node.classList?.contains("copy-markdown-wrap") ||
+      node.classList?.contains("markdown-actions-container")
     );
   },
   replacement: () => "",
@@ -49,6 +50,9 @@ export default function CopyMarkdownButton() {
 
     const clone = articleEl.cloneNode(true);
     clone.querySelectorAll(".copy-markdown-wrap").forEach((el) => el.remove());
+    clone
+      .querySelectorAll(".markdown-actions-container")
+      .forEach((el) => el.remove());
     clone.querySelectorAll("button").forEach((el) => el.remove());
     clone.querySelectorAll(".hash-link").forEach((el) => el.remove());
 
@@ -69,25 +73,41 @@ export default function CopyMarkdownButton() {
   }, []);
 
   return (
-    <div className="copy-markdown-wrap">
-      <button
-        className="copy-markdown-btn"
-        onClick={handleCopy}
-        title="复制为 Markdown"
-        aria-label="复制为 Markdown"
-      >
-        {copied ? (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        ) : (
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
-          </svg>
-        )}
-        <span>{copied ? "已复制" : "复制为 Markdown"}</span>
-      </button>
-    </div>
+    <button
+      className="copy-markdown-btn"
+      onClick={handleCopy}
+      title="复制为 Markdown"
+      aria-label="复制为 Markdown"
+    >
+      {copied ? (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <polyline points="20 6 9 17 4 12" />
+        </svg>
+      ) : (
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+          <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+        </svg>
+      )}
+      <span>{copied ? "已复制" : "复制为 Markdown"}</span>
+    </button>
   );
 }
