@@ -566,6 +566,30 @@ df.to_json('data.json', orient='values')   # 只保存值
 ```
 :::
 
+###  JSONL 文件
+
+```python showLineNumbers
+import pandas as pd
+
+# 准备 JSONL 数据
+data = [
+    {"id": 1, "text": "你好\n我是第一行"},
+    {"id": 2, "text": "这是第二个对象"}
+]
+# 创建 DataFrame
+df = pd.DataFrame(data)
+# 写入 JSONL 文件  
+# orient='records'表示每条记录（每行）是一个独立的JSON对象（即列表中的字典形式）
+# lines=True 表示每行一个JSON对象
+df.to_json('data.jsonl', orient='records', lines=True)
+# 读取 JSONL 文件  lines=True 表示每行一个JSON对象
+df = pd.read_json('data.jsonl', lines=True)
+print(df)
+#      id    text
+# 0     1  你好\n我是第一行
+# 1     2  这是第二个对象
+```
+
 ###  SQL 数据库
 
 ```python showLineNumbers

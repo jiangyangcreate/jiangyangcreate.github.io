@@ -1,5 +1,9 @@
+---
+sidebar_position: 14
+title: json
+---
 
-## json 模块
+## 格式转换规则
 
 Python 字典 (Dict) 和 JSON 字符串 (String) 是导致校验失败的最常见原因。
 
@@ -35,6 +39,29 @@ JSON 时，字典中所有的键都会被强制转换为字符串。这所造成
 json 模块还有一些其他参数可以控制：编码形式、格式化输出等，不过很少用到
 
 [json 官方模块文档](https://docs.python.org/zh-cn/3/library/json.html#module-json)
+
+## json
+
+我们常见的标准 JSON 文件，后缀为：`.json`。
+
+```json
+[
+    {
+        "name": "John",
+        "age": 30
+    },
+    {
+        "name": "Jane",
+        "age": 25
+    }
+]
+```
+
+- 外层用方括号 [] 包裹。
+
+- 读取时，解析器必须一次性将整个文件加载到内存中。
+
+- 如果文件非常大（比如几个 GB），普通电脑的内存会直接“爆掉”。
 
 ### json.load 与 json.dump
 
@@ -86,4 +113,60 @@ print(type(res_p)) # <class 'dict'>
 
 res_j = json.dumps(res_p)
 print(type(res_j)) # <class 'str'>
+```
+
+## jsonl
+
+JSONL 的全称是 JSON Lines。后缀为：`.jsonl`或`.ndjson`。
+
+它的核心逻辑是：每一行都是一个独立的、合法的 JSON 对象。
+
+```json
+{"name": "John", "age": 30}
+{"name": "Jane", "age": 25}
+{"name": "Jim", "age": 35}
+```
+
+- 没有外层的方括号，各行之间也没有逗号。
+
+- 流式处理友好：你可以一行一行地读取文件，而不需要一次性加载整个文件。这在处理大数据集或模型训练（如大语言模型的预训练语料）时简直是救星。
+
+- 容错性高：如果文件末尾损坏了，之前的行依然是有效的；而标准的 JSON 文件如果少了一个反括号，整个文件就废了。
+
+### 读取JSONL文件
+
+```python showLineNumbers
+import json
+
+# 假设文件名为 data.jsonl
+with open('data.jsonl', 'r', encoding='utf-8') as f:
+    for line in f:
+        # 核心：每一行都是一个独立的 JSON 字符串
+        try:
+            item = json.loads(line)
+            print(f"处理 ID 为 {item.get('id')} 的数据: {item.get('text')}")
+        except json.JSONDecodeError:
+            print("跳过损坏的行")
+```
+
+### 写入JSONL文件
+
+在使用 json.dumps() 时，如果你不小心设置了 indent=4（每一层级缩进 4 个空格，并自动在逗号后换行。）
+
+生成的就不再是标准的 JSONL 了，因为一个对象会被拆成多行，后续读取会直接报错。
+
+```python showLineNumbers
+import json
+
+data_list = [
+    {"id": 1, "text": "你好\n我是第一行"},
+    {"id": 2, "text": "这是第二个对象"}
+]
+
+with open('output.jsonl', 'w', encoding='utf-8') as f:
+    for entry in data_list:
+        # 重点：ensure_ascii=False 可以让中文不变成 \uXXXX
+        # 不设置 indent，保证一个对象只占物理上的一行
+        json_record = json.dumps(entry, ensure_ascii=False)
+        f.write(json_record + '\n')
 ```

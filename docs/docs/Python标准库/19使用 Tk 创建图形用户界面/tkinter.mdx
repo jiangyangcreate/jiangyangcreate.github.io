@@ -1,4 +1,11 @@
+---
+sidebar_position: 19
+title: Tkinter
+---
 
+Tkinter是Python的标准库，用于创建图形用户界面（GUI）。有一些第三方库的主题可以很方便的美化默认样式。
+
+仅使用标准库，Tkinter也可以添加很多好看的样式。
 
 ### 图书馆系统
 
@@ -15,263 +22,1053 @@
 7. 用户类和图书类的方法中，需要对用户的借书列表和图书的状态进行修改
 8. 用户类和图书类的方法中，需要打印出用户的借书列表和图书的状态
 9. 使用图形化界面工具，如tkinter
-安装命令 pip install tkinter-page
+
 
 
 #### 题解
 
+
 ```python  showLineNumbers
+from __future__ import annotations
 
-
-from tkinter import *
-
-"""
-提前安装好模块:pip install tkinter-page
-需要掌握的知识：Python基础、Mysql命令、os模块、tkinter模块
-"""
-from tkinter import *
-import sqlite3
 import os
+import sqlite3
+from dataclasses import dataclass
+
+import tkinter as tk
+from tkinter import ttk, messagebox
 
 
-class db:
-    def addmysql(name, author, comment, state):  # 添加数据
-        Desktoppath = "./StrayLibrary/book.db"
-        db = sqlite3.connect(Desktoppath)  # 使用cursor()方法获取操作游标
-        cursor = db.cursor()  # SQL 插入语句
-        sql = "INSERT INTO EMPLOYEE(name,author,comment,state)VALUES ('{}','{}','{}','{}')".format(
-            name, author, comment, state
-        )
-        try:  # 执行sql语句
-            cursor.execute(sql)  # 提交到数据库执行
-            db.commit()
-        except:  # Rollback in case there is any error
-            db.rollback()
-        db.close()  # 关闭数据库连接
+# ── Configuration ────────────────────────────────────────────────────
 
-    def changemysql(state, name):  # 更改数据状态
-        Desktoppath = "./StrayLibrary/book.db"
-        db = sqlite3.connect(Desktoppath)
-        cursor = db.cursor()  # 使用cursor()方法获取操作游标
-        sql = "UPDATE EMPLOYEE SET state = '%s' where name = '%s' " % (state, name)
-        try:
-            cursor.execute(sql)
-            db.commit()
-        except:
-            pass
-        db.close()
-
-    def checkmysql():  # 检索数据库
-        Desktoppath = "./StrayLibrary/book.db"
-        db = sqlite3.connect(Desktoppath)
-        cursor = db.cursor()  # 使用cursor()方法获取操作游标
-        sql = "SELECT * FROM EMPLOYEE"  # SQL 查询语句
-        try:
-            cursor.execute(sql)  # 获取所有记录列表
-            results = cursor.fetchall()
-            return results
-        except:
-            pass
-        db.close()
-
-    def bulildmysql():
-        try:
-            os.makedirs("./StrayLibrary")  # 创建一个文件夹
-            Desktoppath = "./StrayLibrary/book.db"  # 文件夹下创建一个数据库
-            file = open(Desktoppath, "w")
-            file.close()
-
-            db = sqlite3.connect(Desktoppath)
-            cursor = db.cursor()  # 使用cursor()方法获取操作游标
-            cursor.execute(
-                "DROP TABLE IF EXISTS EMPLOYEE"
-            )  # 如果数据表已经存在使用 execute() 方法删除表。
-            sql = """CREATE TABLE EMPLOYEE (name  TEXT(255),author  TEXT(255),comment TEXT(255),state TEXT(255))"""
-            cursor.execute(sql)  # 创建数据表SQL语句
-            db.close()
-            db.addmysql(
-                "惶然录", "费尔南多·佩索阿", "一个迷失方向且濒于崩溃的灵魂的自我启示、一首对默默无闻、失败、智慧、困难和沉默的赞美诗。", "未借出"
-            )
-            db.addmysql(
-                "以箭为翅", "简媜", "调和空灵文风与禅宗境界，刻画人间之缘起缘灭。像一条柔韧的绳子，情这个字，不知勒痛多少人的心肉。", "未借出"
-            )
-            db.addmysql(
-                "心是孤独的猎手", "卡森·麦卡勒斯", "我们渴望倾诉，却从未倾听。女孩、黑人、哑巴、醉鬼、鳏夫的孤独形态各异，却从未退场。", "已借出"
-            )
-        except:
-            pass
+DB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "StrayLibrary")
+DB_PATH = os.path.join(DB_DIR, "book.db")
 
 
+# ── Theme Tokens ─────────────────────────────────────────────────────
+
+class C:
+    BG         = "#f0f2f5"
+    CARD       = "#ffffff"
+    SIDEBAR    = "#1e293b"
+    SB_HV      = "#334155"
+    SB_ACT     = "#6366f1"
+    PRIMARY    = "#6366f1"
+    PRIMARY_HV = "#4f46e5"
+    WHITE      = "#ffffff"
+    SUCCESS    = "#10b981"
+    SUCCESS_LT = "#d1fae5"
+    WARNING    = "#f59e0b"
+    WARNING_LT = "#fef3c7"
+    DANGER     = "#ef4444"
+    DANGER_LT  = "#fee2e2"
+    TEXT       = "#1e293b"
+    TEXT2      = "#64748b"
+    TEXT3      = "#94a3b8"
+    BORDER     = "#e2e8f0"
+    SB_FG      = "#94a3b8"
+    SB_FG_ACT  = "#ffffff"
+    ROW_ALT    = "#f8fafc"
+
+
+def F(size: int = 10, bold: bool = False) -> tuple:
+    return ("Segoe UI", size, "bold" if bold else "normal")
+
+
+# ── Data Models ──────────────────────────────────────────────────────
+
+@dataclass
 class Book:
-    def __init__(self, name, author, comment, state):
-        self.name = name
-        self.author = author
-        self.comment = comment
-        self.state = state
+    id: int
+    title: str
+    author: str
+    comment: str
+    state: str
+    added_at: str = ""
 
-    def __str__(self):
-        return "\n名称：《%s》 \n作者：%s \n推荐语：%s\n状态：%s \n---------" % (
-            self.name,
-            self.author,
-            self.comment,
-            self.state,
+
+@dataclass
+class LogEntry:
+    id: int
+    book_title: str
+    action: str
+    timestamp: str
+
+
+# ── Database ─────────────────────────────────────────────────────────
+
+class Database:
+
+    def __init__(self, path: str = DB_PATH) -> None:
+        self.path = path
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        self._init_schema()
+
+    def _conn(self) -> sqlite3.Connection:
+        return sqlite3.connect(self.path)
+
+    def _init_schema(self) -> None:
+        with self._conn() as c:
+            c.execute(
+                "CREATE TABLE IF NOT EXISTS books ("
+                "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                "  title TEXT NOT NULL, author TEXT NOT NULL,"
+                "  comment TEXT NOT NULL,"
+                "  state TEXT NOT NULL DEFAULT '未借出',"
+                "  added_at TEXT NOT NULL DEFAULT (datetime('now','localtime'))"
+                ")"
+            )
+            cols = {r[1] for r in c.execute("PRAGMA table_info(books)").fetchall()}
+            if "added_at" not in cols:
+                c.execute("ALTER TABLE books ADD COLUMN added_at TEXT NOT NULL DEFAULT ''")
+            c.execute(
+                "CREATE TABLE IF NOT EXISTS history ("
+                "  id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                "  book_title TEXT NOT NULL, action TEXT NOT NULL,"
+                "  timestamp TEXT NOT NULL DEFAULT (datetime('now','localtime'))"
+                ")"
+            )
+            if c.execute("SELECT COUNT(*) FROM books").fetchone()[0] == 0:
+                self._seed(c)
+
+    def _seed(self, c: sqlite3.Connection) -> None:
+        rows = [
+            ("惶然录", "费尔南多·佩索阿",
+             "一个迷失方向且濒于崩溃的灵魂的自我启示，一首对默默无闻、失败、智慧、困难和沉默的赞美诗。",
+             "未借出"),
+            ("以箭为翅", "简媜",
+             "调和空灵文风与禅宗境界，刻画人间之缘起缘灭。像一条柔韧的绳子，情这个字，不知勒痛多少人的心肉。",
+             "未借出"),
+            ("心是孤独的猎手", "卡森·麦卡勒斯",
+             "我们渴望倾诉，却从未倾听。女孩、黑人、哑巴、醉鬼、鳏夫的孤独形态各异，却从未退场。",
+             "已借出"),
+            ("百年孤独", "加西亚·马尔克斯",
+             "魔幻现实主义的代表作。描写布恩迪亚家族七代人的传奇故事，以及小镇马孔多的百年兴衰。",
+             "未借出"),
+            ("小王子", "圣-埃克苏佩里",
+             "所有的大人都曾经是小孩，虽然只有少数人记得。献给每一个曾经是孩子的大人。",
+             "已借出"),
+        ]
+        c.executemany(
+            "INSERT INTO books(title,author,comment,state) VALUES(?,?,?,?)", rows
+        )
+        c.executemany(
+            "INSERT INTO history(book_title,action) VALUES(?,'新书入馆')",
+            [(r[0],) for r in rows],
         )
 
+    def all_books(self) -> list[Book]:
+        with self._conn() as c:
+            return [Book(*r) for r in c.execute(
+                "SELECT id,title,author,comment,state,added_at FROM books ORDER BY id"
+            ).fetchall()]
+
+    def search_books(self, kw: str) -> list[Book]:
+        with self._conn() as c:
+            return [Book(*r) for r in c.execute(
+                "SELECT id,title,author,comment,state,added_at FROM books "
+                "WHERE title LIKE ? OR author LIKE ? ORDER BY id",
+                (f"%{kw}%", f"%{kw}%"),
+            ).fetchall()]
+
+    def add_book(self, title: str, author: str, comment: str) -> None:
+        with self._conn() as c:
+            c.execute(
+                "INSERT INTO books(title,author,comment) VALUES(?,?,?)",
+                (title, author, comment),
+            )
+            c.execute(
+                "INSERT INTO history(book_title,action) VALUES(?,'新书入馆')",
+                (title,),
+            )
+
+    def update_book(self, bid: int, title: str, author: str, comment: str) -> None:
+        with self._conn() as c:
+            c.execute(
+                "UPDATE books SET title=?,author=?,comment=? WHERE id=?",
+                (title, author, comment, bid),
+            )
+
+    def delete_book(self, bid: int) -> None:
+        with self._conn() as c:
+            row = c.execute("SELECT title FROM books WHERE id=?", (bid,)).fetchone()
+            if row:
+                c.execute("DELETE FROM books WHERE id=?", (bid,))
+                c.execute(
+                    "INSERT INTO history(book_title,action) VALUES(?,'移除出馆')",
+                    (row[0],),
+                )
+
+    def set_state(self, bid: int, new: str) -> None:
+        with self._conn() as c:
+            row = c.execute("SELECT title FROM books WHERE id=?", (bid,)).fetchone()
+            if row:
+                c.execute("UPDATE books SET state=? WHERE id=?", (new, bid))
+                act = "借出" if new == "已借出" else "归还"
+                c.execute(
+                    "INSERT INTO history(book_title,action) VALUES(?,?)",
+                    (row[0], act),
+                )
+
+    def history(self, limit: int = 50) -> list[LogEntry]:
+        with self._conn() as c:
+            return [LogEntry(*r) for r in c.execute(
+                "SELECT id,book_title,action,timestamp "
+                "FROM history ORDER BY id DESC LIMIT ?",
+                (limit,),
+            ).fetchall()]
+
+    def stats(self) -> dict[str, int]:
+        with self._conn() as c:
+            t = c.execute("SELECT COUNT(*) FROM books").fetchone()[0]
+            b = c.execute(
+                "SELECT COUNT(*) FROM books WHERE state='已借出'"
+            ).fetchone()[0]
+            return {"total": t, "available": t - b, "borrowed": b}
+
+
+# ── Canvas Helpers ───────────────────────────────────────────────────
+
+def _rrect(cv: tk.Canvas, x1, y1, x2, y2, r=10, **kw):
+    """Draw a rounded rectangle on *cv* using a smooth polygon."""
+    pts = [
+        x1+r, y1, x1+r, y1, x2-r, y1, x2-r, y1,
+        x2, y1, x2, y1+r, x2, y1+r, x2, y2-r,
+        x2, y2-r, x2, y2, x2-r, y2, x2-r, y2,
+        x1+r, y2, x1+r, y2, x1, y2, x1, y2-r,
+        x1, y2-r, x1, y1+r, x1, y1+r, x1, y1,
+    ]
+    return cv.create_polygon(pts, smooth=True, **kw)
+
+
+# ── Toast Notification ───────────────────────────────────────────────
+
+class Toast:
+    _COLORS = {
+        "info": (C.PRIMARY, C.WHITE),
+        "success": (C.SUCCESS, C.WHITE),
+        "warning": (C.WARNING, C.WHITE),
+        "error": (C.DANGER, C.WHITE),
+    }
+
+    def __init__(self, parent: tk.Widget) -> None:
+        self._p = parent
+        self._lbl = tk.Label(parent, font=F(10), padx=20, pady=8)
+        self._job: str | None = None
+
+    def show(self, msg: str, kind: str = "info") -> None:
+        bg, fg = self._COLORS.get(kind, self._COLORS["info"])
+        self._lbl.configure(text=msg, bg=bg, fg=fg)
+        self._lbl.place(relx=0.5, rely=0.96, anchor="s")
+        self._lbl.lift()
+        if self._job:
+            self._p.after_cancel(self._job)
+        self._job = self._p.after(2800, lambda: self._lbl.place_forget())
+
+
+# ── Sidebar ──────────────────────────────────────────────────────────
+
+class _SidebarItem(tk.Frame):
+
+    def __init__(self, parent, icon: str, text: str, cmd) -> None:
+        super().__init__(parent, bg=C.SIDEBAR, cursor="hand2")
+        self._cmd = cmd
+        self._active = False
+        self._icon = tk.Label(
+            self, text=icon, bg=C.SIDEBAR, fg=C.SB_FG, font=F(13),
+        )
+        self._text = tk.Label(
+            self, text=text, bg=C.SIDEBAR, fg=C.SB_FG, font=F(10),
+        )
+        self._icon.pack(side="left", padx=(20, 10), pady=11)
+        self._text.pack(side="left", pady=11, padx=(0, 20))
+        for w in (self, self._icon, self._text):
+            w.bind("<Enter>", self._enter)
+            w.bind("<Leave>", self._leave)
+            w.bind("<Button-1>", lambda e: self._cmd())
+
+    def _enter(self, _):
+        if not self._active:
+            self._bg(C.SB_HV)
+
+    def _leave(self, _):
+        if not self._active:
+            self._bg(C.SIDEBAR)
+
+    def _bg(self, c):
+        for w in (self, self._icon, self._text):
+            w.configure(bg=c)
+
+    def set_active(self, v: bool):
+        self._active = v
+        self._bg(C.SB_ACT if v else C.SIDEBAR)
+        fg = C.SB_FG_ACT if v else C.SB_FG
+        self._icon.configure(fg=fg)
+        self._text.configure(fg=fg)
+
+
+class Sidebar(tk.Frame):
+
+    def __init__(self, parent, on_nav) -> None:
+        super().__init__(parent, bg=C.SIDEBAR, width=200)
+        self.pack_propagate(False)
+
+        tk.Label(
+            self, text="\u2003流浪图书馆", bg=C.SIDEBAR, fg=C.WHITE,
+            font=F(13, bold=True),
+        ).pack(pady=(28, 24), padx=16, anchor="w")
+        tk.Frame(self, bg=C.SB_HV, height=1).pack(fill="x", padx=16, pady=(0, 12))
+
+        self.items: dict[str, _SidebarItem] = {}
+        for key, icon, label in [
+            ("dashboard", "\u25c9", "\u2003仪表盘"),
+            ("library",   "\u25eb", "\u2003图书馆"),
+            ("history",   "\u2630", "\u2003借阅记录"),
+        ]:
+            it = _SidebarItem(self, icon, label, lambda k=key: on_nav(k))
+            it.pack(fill="x")
+            self.items[key] = it
+
+        tk.Frame(self, bg=C.SIDEBAR).pack(fill="both", expand=True)
+        tk.Frame(self, bg=C.SB_HV, height=1).pack(fill="x", padx=16, pady=(0, 8))
+        tk.Label(
+            self, text="v2.0  ·  仅用标准库构建",
+            bg=C.SIDEBAR, fg=C.TEXT3, font=F(8),
+        ).pack(pady=(0, 16))
+
+    def set_active(self, key: str):
+        for k, it in self.items.items():
+            it.set_active(k == key)
+
+
+# ── Stat Card (Canvas) ──────────────────────────────────────────────
+
+class StatCard(tk.Canvas):
+
+    def __init__(self, parent, accent: str, value: int,
+                 label: str, icon: str) -> None:
+        super().__init__(parent, width=190, height=88,
+                         bg=C.BG, highlightthickness=0)
+        self._accent = accent
+        self._label = label
+        self._icon = icon
+        self._job: str | None = None
+        self._draw_bg()
+        self._set_num(value)
+
+    def _draw_bg(self):
+        w, h, r = 190, 88, 12
+        _rrect(self, 0, 0, w, h, r, fill=C.CARD, outline=C.BORDER)
+        self.create_rectangle(
+            0, r, 4, h - r, fill=self._accent, outline=self._accent,
+        )
+        self.create_text(
+            28, 30, text=self._icon, font=F(18),
+            fill=self._accent, anchor="w",
+        )
+        self.create_text(
+            174, 62, text=self._label, font=F(10),
+            fill=C.TEXT2, anchor="e",
+        )
+
+    def _set_num(self, v: int):
+        self.delete("num")
+        self.create_text(
+            28, 62, text=str(v), font=F(22, True),
+            fill=C.TEXT, anchor="w", tags="num",
+        )
+
+    def set_value(self, target: int):
+        if self._job:
+            self.after_cancel(self._job)
+        self.delete("all")
+        self._draw_bg()
+        self._anim(target, 0)
+
+    def _anim(self, target: int, cur: int):
+        self._set_num(cur)
+        if cur < target:
+            nxt = min(cur + max(1, (target - cur + 2) // 3), target)
+            self._job = self.after(30, self._anim, target, nxt)
+        else:
+            self._job = None
+
+
+# ── Dashboard View ───────────────────────────────────────────────────
+
+class DashboardView(tk.Frame):
+
+    def __init__(self, parent, db: Database, app: "StrayLibrary") -> None:
+        super().__init__(parent, bg=C.BG)
+        self.db = db
+        self.app = app
+        self._build()
+
+    def _build(self):
+        hdr = tk.Frame(self, bg=C.BG)
+        hdr.pack(fill="x", padx=28, pady=(28, 0))
+        tk.Label(
+            hdr, text="仪表盘", bg=C.BG, fg=C.TEXT, font=F(18, bold=True),
+        ).pack(side="left")
+        tk.Label(
+            hdr, text="书籍是流浪的灵魂栖息之所",
+            bg=C.BG, fg=C.TEXT2, font=F(10),
+        ).pack(side="left", padx=(12, 0), pady=(6, 0))
+
+        cf = tk.Frame(self, bg=C.BG)
+        cf.pack(fill="x", padx=28, pady=(20, 0))
+        s = self.db.stats()
+        self._c_total = StatCard(cf, C.PRIMARY, s["total"], "馆藏总数", "\u25a6")
+        self._c_avail = StatCard(cf, C.SUCCESS, s["available"], "可借阅", "\u2713")
+        self._c_borr = StatCard(cf, C.WARNING, s["borrowed"], "借出中", "\u2197")
+        for card in (self._c_total, self._c_avail, self._c_borr):
+            card.pack(side="left", padx=(0, 16))
+
+        mid = tk.Frame(self, bg=C.BG)
+        mid.pack(fill="both", expand=True, padx=28, pady=(20, 28))
+
+        ch_card = tk.Frame(
+            mid, bg=C.CARD,
+            highlightbackground=C.BORDER, highlightthickness=1,
+        )
+        ch_card.pack(side="left", fill="both", expand=True, padx=(0, 10))
+        tk.Label(
+            ch_card, text="馆藏概览", bg=C.CARD, fg=C.TEXT, font=F(11, bold=True),
+        ).pack(anchor="w", padx=16, pady=(12, 4))
+        self._chart = tk.Canvas(
+            ch_card, bg=C.CARD, highlightthickness=0, height=180,
+        )
+        self._chart.pack(fill="both", expand=True, padx=16, pady=(0, 16))
+        self._chart.bind("<Configure>", lambda _: self._draw_chart())
+
+        act_card = tk.Frame(
+            mid, bg=C.CARD,
+            highlightbackground=C.BORDER, highlightthickness=1,
+        )
+        act_card.pack(side="right", fill="both", expand=True, padx=(10, 0))
+        tk.Label(
+            act_card, text="最近动态", bg=C.CARD, fg=C.TEXT, font=F(11, bold=True),
+        ).pack(anchor="w", padx=16, pady=(12, 4))
+        self._act_frame = tk.Frame(act_card, bg=C.CARD)
+        self._act_frame.pack(fill="both", expand=True, padx=16, pady=(0, 16))
+
+    def _draw_chart(self):
+        cv = self._chart
+        cv.delete("all")
+        s = self.db.stats()
+        w, h = cv.winfo_width(), cv.winfo_height()
+        if w < 50 or h < 50:
+            return
+        bars = [
+            ("馆藏总数", s["total"], C.PRIMARY),
+            ("可借阅", s["available"], C.SUCCESS),
+            ("借出中", s["borrowed"], C.WARNING),
+        ]
+        mx = max((v for _, v, _ in bars), default=0) or 1
+        bh, gap, sy, lw, rp = 30, 18, 16, 70, 48
+        for i, (lbl, val, col) in enumerate(bars):
+            y = sy + i * (bh + gap)
+            cv.create_text(
+                lw - 8, y + bh // 2, text=lbl,
+                font=F(9), fill=C.TEXT2, anchor="e",
+            )
+            bw = max(int((w - lw - rp) * val / mx), 6) if val else 6
+            _rrect(cv, lw, y + 2, lw + bw, y + bh - 2, r=6, fill=col, outline="")
+            cv.create_text(
+                lw + bw + 10, y + bh // 2, text=str(val),
+                font=F(10, bold=True), fill=C.TEXT, anchor="w",
+            )
+
+    def _fill_activity(self):
+        for w in self._act_frame.winfo_children():
+            w.destroy()
+        entries = self.db.history(8)
+        if not entries:
+            tk.Label(
+                self._act_frame, text="暂无动态",
+                bg=C.CARD, fg=C.TEXT3, font=F(10),
+            ).pack(pady=20)
+            return
+        acol = {
+            "新书入馆": C.PRIMARY, "借出": C.WARNING,
+            "归还": C.SUCCESS, "移除出馆": C.DANGER,
+        }
+        for e in entries:
+            row = tk.Frame(self._act_frame, bg=C.CARD)
+            row.pack(fill="x", pady=3)
+            tk.Label(
+                row, text="\u25cf", bg=C.CARD,
+                fg=acol.get(e.action, C.TEXT2), font=F(6),
+            ).pack(side="left", padx=(0, 6))
+            tk.Label(
+                row, text=f"{e.action}\u2003《{e.book_title}》",
+                bg=C.CARD, fg=C.TEXT, font=F(9),
+            ).pack(side="left")
+            tk.Label(
+                row, text=e.timestamp[5:],
+                bg=C.CARD, fg=C.TEXT3, font=F(8),
+            ).pack(side="right")
+
+    def refresh(self):
+        s = self.db.stats()
+        self._c_total.set_value(s["total"])
+        self._c_avail.set_value(s["available"])
+        self._c_borr.set_value(s["borrowed"])
+        self._draw_chart()
+        self._fill_activity()
+
+
+# ── Library View ─────────────────────────────────────────────────────
+
+class LibraryView(tk.Frame):
+
+    def __init__(self, parent, db: Database, app: "StrayLibrary") -> None:
+        super().__init__(parent, bg=C.BG)
+        self.db = db
+        self.app = app
+        self.books: list[Book] = []
+        self._filter = "all"
+        self._sort_col = "title"
+        self._sort_rev = False
+        self._build()
+
+    @staticmethod
+    def _pill(parent, text, bg, bg_hv, cmd, fg=C.WHITE):
+        lbl = tk.Label(
+            parent, text=text, bg=bg, fg=fg,
+            font=F(10), padx=14, pady=6, cursor="hand2",
+        )
+        lbl.bind("<Button-1>", lambda _: cmd())
+        lbl.bind("<Enter>", lambda _: lbl.configure(bg=bg_hv))
+        lbl.bind("<Leave>", lambda _: lbl.configure(bg=bg))
+        return lbl
+
+    def _build(self):
+        # ── header ──
+        hdr = tk.Frame(self, bg=C.BG)
+        hdr.pack(fill="x", padx=28, pady=(28, 0))
+        tk.Label(
+            hdr, text="图书馆", bg=C.BG, fg=C.TEXT, font=F(18, bold=True),
+        ).pack(side="left")
+        self._pill(
+            hdr, "＋ 添加图书", C.PRIMARY, C.PRIMARY_HV, self.add_dialog,
+        ).pack(side="right")
+
+        # ── search + filter ──
+        sf = tk.Frame(self, bg=C.BG)
+        sf.pack(fill="x", padx=28, pady=(16, 0))
+        sw = tk.Frame(
+            sf, bg=C.CARD,
+            highlightbackground=C.BORDER, highlightthickness=1,
+        )
+        sw.pack(side="left")
+        tk.Label(sw, text=" \U0001f50d", bg=C.CARD, fg=C.TEXT3, font=F(9)).pack(
+            side="left", padx=(4, 2),
+        )
+        self._sv = tk.StringVar()
+        self._sv.trace_add("write", lambda *_: self.refresh())
+        self._se = tk.Entry(
+            sw, textvariable=self._sv, bg=C.CARD, fg=C.TEXT,
+            font=F(10), relief="flat", width=22, insertbackground=C.TEXT,
+        )
+        self._se.pack(side="left", padx=(0, 8), pady=6, ipady=2)
+
+        self._tabs_f = tk.Frame(sf, bg=C.BG)
+        self._tabs_f.pack(side="left", padx=(16, 0))
+        self._tabs: dict[str, tk.Label] = {}
+        for key, txt in [("all", "全部"), ("available", "可借阅"),
+                         ("borrowed", "已借出")]:
+            lbl = tk.Label(
+                self._tabs_f, text=txt, bg=C.BG, fg=C.TEXT2,
+                font=F(10), padx=12, pady=6, cursor="hand2",
+            )
+            lbl.pack(side="left", padx=(0, 4))
+            lbl.bind("<Button-1>", lambda _, k=key: self._set_filter(k))
+            self._tabs[key] = lbl
+
+        # ── main = tree + detail ──
+        main = tk.Frame(self, bg=C.BG)
+        main.pack(fill="both", expand=True, padx=28, pady=(12, 28))
+
+        tc = tk.Frame(
+            main, bg=C.CARD,
+            highlightbackground=C.BORDER, highlightthickness=1,
+        )
+        tc.pack(side="left", fill="both", expand=True, padx=(0, 12))
+
+        cols = ("title", "author", "state")
+        self.tree = ttk.Treeview(
+            tc, columns=cols, show="headings", selectmode="browse",
+        )
+        for cid, txt, w, anc in [
+            ("title", "书名", 160, "w"),
+            ("author", "作者", 100, "center"),
+            ("state", "状态", 60, "center"),
+        ]:
+            self.tree.heading(cid, text=txt,
+                              command=lambda c=cid: self._sort(c))
+            self.tree.column(cid, width=w, minwidth=50, anchor=anc)
+        self.tree.tag_configure("alt", background=C.ROW_ALT)
+        self.tree.tag_configure("borrowed", foreground=C.WARNING)
+        self.tree.bind("<<TreeviewSelect>>", lambda _: self._on_select())
+        self.tree.bind("<Double-1>", lambda _: self.edit_dialog())
+
+        tsb = ttk.Scrollbar(tc, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=tsb.set)
+        self.tree.pack(side="left", fill="both", expand=True)
+        tsb.pack(side="right", fill="y")
+
+        self._empty_lbl = tk.Label(
+            tc, text="没有找到匹配的图书",
+            bg=C.CARD, fg=C.TEXT3, font=F(11),
+        )
+
+        # ── detail panel ──
+        dc = tk.Frame(
+            main, bg=C.CARD,
+            highlightbackground=C.BORDER, highlightthickness=1, width=240,
+        )
+        dc.pack(side="right", fill="y")
+        dc.pack_propagate(False)
+
+        self._d_placeholder = tk.Label(
+            dc, text="\u2190 选择一本书\n查看详情",
+            bg=C.CARD, fg=C.TEXT3, font=F(11), justify="center",
+        )
+        self._d_content = tk.Frame(dc, bg=C.CARD, padx=16, pady=16)
+
+        self._d_title = tk.Label(
+            self._d_content, text="", bg=C.CARD, fg=C.TEXT,
+            font=F(13, bold=True), wraplength=200, justify="left",
+        )
+        self._d_title.pack(anchor="w")
+        self._d_author = tk.Label(
+            self._d_content, text="", bg=C.CARD, fg=C.TEXT2, font=F(10),
+        )
+        self._d_author.pack(anchor="w", pady=(4, 0))
+        self._d_state = tk.Label(
+            self._d_content, text="", bg=C.CARD, font=F(9), padx=8, pady=2,
+        )
+        self._d_state.pack(anchor="w", pady=(8, 0))
+
+        tk.Frame(self._d_content, bg=C.BORDER, height=1).pack(
+            fill="x", pady=12,
+        )
+        tk.Label(
+            self._d_content, text="推荐语",
+            bg=C.CARD, fg=C.TEXT2, font=F(9),
+        ).pack(anchor="w")
+        self._d_comment = tk.Label(
+            self._d_content, text="", bg=C.CARD, fg=C.TEXT, font=F(10),
+            wraplength=200, justify="left",
+        )
+        self._d_comment.pack(anchor="w", pady=(4, 0), fill="x")
+
+        bf = tk.Frame(self._d_content, bg=C.CARD)
+        bf.pack(fill="x", side="bottom")
+        self._act_btn = tk.Label(
+            bf, text="借阅此书", bg=C.SUCCESS, fg=C.WHITE,
+            font=F(10), padx=14, pady=6, cursor="hand2",
+        )
+        self._act_btn.pack(fill="x", pady=(0, 6))
+        self._act_btn.bind("<Button-1>", lambda _: self._toggle_state())
+        self._pill(
+            bf, "编辑", C.BG, C.BORDER, self.edit_dialog, fg=C.TEXT,
+        ).pack(fill="x", pady=(0, 6))
+        self._pill(
+            bf, "删除", C.DANGER_LT, C.DANGER_LT, self.delete_selected,
+            fg=C.DANGER,
+        ).pack(fill="x")
+
+        self._show_placeholder(True)
+
+        # ── context menu ──
+        self._ctx = tk.Menu(self.tree, tearoff=0)
+        self._ctx.add_command(label="借阅 / 归还", command=self._toggle_state)
+        self._ctx.add_command(label="编辑", command=self.edit_dialog)
+        self._ctx.add_separator()
+        self._ctx.add_command(label="删除", command=self.delete_selected)
+        self.tree.bind("<Button-3>", self._show_ctx)
+
+    def _show_placeholder(self, show: bool):
+        if show:
+            self._d_content.pack_forget()
+            self._d_placeholder.place(relx=0.5, rely=0.45, anchor="center")
+        else:
+            self._d_placeholder.place_forget()
+            self._d_content.pack(fill="both", expand=True)
+
+    def _set_filter(self, key: str):
+        self._filter = key
+        self.refresh()
+
+    def _sort(self, col: str):
+        self._sort_rev = not self._sort_rev if self._sort_col == col else False
+        self._sort_col = col
+        self.refresh()
+
+    def refresh(self):
+        kw = self._sv.get().strip()
+        src = self.db.search_books(kw) if kw else self.db.all_books()
+
+        if self._filter == "available":
+            books = [b for b in src if b.state == "未借出"]
+        elif self._filter == "borrowed":
+            books = [b for b in src if b.state == "已借出"]
+        else:
+            books = list(src)
+
+        km = {
+            "title": lambda b: b.title,
+            "author": lambda b: b.author,
+            "state": lambda b: b.state,
+        }
+        books.sort(key=km.get(self._sort_col, km["title"]),
+                   reverse=self._sort_rev)
+        self.books = books
+
+        self.tree.delete(*self.tree.get_children())
+        for i, b in enumerate(books):
+            tags = (["alt"] if i % 2 else []) + (
+                ["borrowed"] if b.state == "已借出" else []
+            )
+            self.tree.insert(
+                "", "end", iid=str(b.id),
+                values=(b.title, b.author, b.state), tags=tags,
+            )
+
+        if books:
+            self._empty_lbl.place_forget()
+        else:
+            self._empty_lbl.place(relx=0.5, rely=0.5, anchor="center")
+
+        self._show_placeholder(True)
+        self._update_tabs(src)
+
+    def _update_tabs(self, src: list[Book]):
+        cnt = {
+            "all": len(src),
+            "available": sum(1 for b in src if b.state == "未借出"),
+            "borrowed": sum(1 for b in src if b.state == "已借出"),
+        }
+        names = {"all": "全部", "available": "可借阅", "borrowed": "已借出"}
+        for k, lbl in self._tabs.items():
+            lbl.configure(
+                text=f"{names[k]} ({cnt[k]})",
+                bg=C.PRIMARY if k == self._filter else C.BG,
+                fg=C.WHITE if k == self._filter else C.TEXT2,
+            )
+
+    def _selected(self) -> Book | None:
+        sel = self.tree.selection()
+        if not sel:
+            return None
+        bid = int(sel[0])
+        return next((b for b in self.books if b.id == bid), None)
+
+    def _on_select(self):
+        book = self._selected()
+        if not book:
+            self._show_placeholder(True)
+            return
+        self._show_placeholder(False)
+        self._d_title.configure(text=f"《{book.title}》")
+        self._d_author.configure(text=f"作者：{book.author}")
+        avail = book.state == "未借出"
+        self._d_state.configure(
+            text="\u25cf 可借阅" if avail else "\u25cf 已借出",
+            fg=C.SUCCESS if avail else C.WARNING,
+            bg=C.SUCCESS_LT if avail else C.WARNING_LT,
+        )
+        self._d_comment.configure(text=book.comment)
+        self._act_btn.configure(
+            text="借阅此书" if avail else "归还此书",
+            bg=C.SUCCESS if avail else C.WARNING,
+        )
+
+    def _reselect(self, bid: int):
+        self.refresh()
+        sid = str(bid)
+        if self.tree.exists(sid):
+            self.tree.selection_set(sid)
+            self.tree.focus(sid)
+            self._on_select()
+
+    def _toggle_state(self):
+        book = self._selected()
+        if not book:
+            self.app.toast.show("请先选择一本书", "warning")
+            return
+        if book.state == "未借出":
+            self.db.set_state(book.id, "已借出")
+            self.app.toast.show(
+                f"《{book.title}》借阅成功，借了不看会变胖噢～", "success",
+            )
+        else:
+            self.db.set_state(book.id, "未借出")
+            self.app.toast.show(
+                f"《{book.title}》已归还，感谢分享！", "success",
+            )
+        self._reselect(book.id)
+
+    def delete_selected(self):
+        book = self._selected()
+        if not book:
+            self.app.toast.show("请先选择一本书", "warning")
+            return
+        if messagebox.askyesno(
+            "确认删除",
+            f"确定要将《{book.title}》移出图书馆吗？\n此操作不可撤销。",
+        ):
+            self.db.delete_book(book.id)
+            self.app.toast.show(f"《{book.title}》已移除", "info")
+            self.refresh()
+
+    def add_dialog(self):
+        self._book_dialog("添加图书")
+
+    def edit_dialog(self):
+        book = self._selected()
+        if not book:
+            self.app.toast.show("请先选择一本书", "warning")
+            return
+        self._book_dialog("编辑图书", book)
+
+    def _book_dialog(self, title: str, book: Book | None = None):
+        dlg = tk.Toplevel(self)
+        dlg.title(title)
+        dlg.transient(self.winfo_toplevel())
+        dlg.grab_set()
+        dlg.configure(bg=C.CARD)
+        dlg.resizable(False, False)
+
+        f = tk.Frame(dlg, bg=C.CARD, padx=24, pady=24)
+        f.pack(fill="both", expand=True)
+
+        tk.Label(
+            f, text=title, bg=C.CARD, fg=C.TEXT, font=F(14, bold=True),
+        ).grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 16))
+
+        vars_: dict[str, tk.StringVar] = {}
+        for label, row in [("书名", 1), ("作者", 3)]:
+            tk.Label(
+                f, text=label, bg=C.CARD, fg=C.TEXT2, font=F(9),
+            ).grid(row=row, column=0, columnspan=2, sticky="w", pady=(0, 2))
+            v = tk.StringVar()
+            tk.Entry(
+                f, textvariable=v, font=F(10), width=36, relief="solid",
+                bd=1, bg=C.CARD, insertbackground=C.TEXT,
+            ).grid(
+                row=row + 1, column=0, columnspan=2,
+                sticky="ew", pady=(0, 12), ipady=4,
+            )
+            vars_[label] = v
+
+        if book:
+            vars_["书名"].set(book.title)
+            vars_["作者"].set(book.author)
+
+        tk.Label(
+            f, text="推荐语", bg=C.CARD, fg=C.TEXT2, font=F(9),
+        ).grid(row=5, column=0, columnspan=2, sticky="w", pady=(0, 2))
+        ct = tk.Text(
+            f, font=F(10), width=36, height=4, relief="solid",
+            bd=1, bg=C.CARD, insertbackground=C.TEXT, wrap="word",
+        )
+        ct.grid(row=6, column=0, columnspan=2, sticky="ew", pady=(0, 16))
+        if book:
+            ct.insert("1.0", book.comment)
+
+        br = tk.Frame(f, bg=C.CARD)
+        br.grid(row=7, column=0, columnspan=2, sticky="e")
+
+        def confirm():
+            t = vars_["书名"].get().strip()
+            a = vars_["作者"].get().strip()
+            cm = ct.get("1.0", "end").strip() or "暂无推荐语。"
+            if not t or not a:
+                self.app.toast.show("书名和作者不能为空", "warning")
+                return
+            if book:
+                self.db.update_book(book.id, t, a, cm)
+                self.app.toast.show(f"《{t}》已更新", "success")
+                dlg.destroy()
+                self._reselect(book.id)
+            else:
+                self.db.add_book(t, a, cm)
+                self.app.toast.show(f"《{t}》已入馆，欢迎新朋友！", "success")
+                dlg.destroy()
+                self.refresh()
+
+        self._pill(br, "取消", C.BG, C.BORDER, dlg.destroy, fg=C.TEXT).pack(
+            side="right", padx=(8, 0),
+        )
+        self._pill(
+            br, "确认" if book else "添加",
+            C.PRIMARY, C.PRIMARY_HV, confirm,
+        ).pack(side="right")
+
+    def _show_ctx(self, ev):
+        iid = self.tree.identify_row(ev.y)
+        if iid:
+            self.tree.selection_set(iid)
+            self._on_select()
+            self._ctx.tk_popup(ev.x_root, ev.y_root)
+
+    def focus_search(self):
+        self._se.focus_set()
+        self._se.select_range(0, "end")
+
+
+# ── History View ─────────────────────────────────────────────────────
+
+class HistoryView(tk.Frame):
+
+    def __init__(self, parent, db: Database, app: "StrayLibrary") -> None:
+        super().__init__(parent, bg=C.BG)
+        self.db = db
+        self._build()
+
+    def _build(self):
+        hdr = tk.Frame(self, bg=C.BG)
+        hdr.pack(fill="x", padx=28, pady=(28, 0))
+        tk.Label(
+            hdr, text="借阅记录", bg=C.BG, fg=C.TEXT, font=F(18, bold=True),
+        ).pack(side="left")
+
+        card = tk.Frame(
+            self, bg=C.CARD,
+            highlightbackground=C.BORDER, highlightthickness=1,
+        )
+        card.pack(fill="both", expand=True, padx=28, pady=(16, 28))
+
+        cols = ("time", "book", "action")
+        self.tree = ttk.Treeview(
+            card, columns=cols, show="headings", selectmode="browse",
+        )
+        for cid, txt, w in [
+            ("time", "时间", 160),
+            ("book", "图书", 220),
+            ("action", "操作", 80),
+        ]:
+            self.tree.heading(cid, text=txt)
+            self.tree.column(
+                cid, width=w, anchor="center" if cid != "book" else "w",
+            )
+        self.tree.tag_configure("alt", background=C.ROW_ALT)
+
+        sb = ttk.Scrollbar(card, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=sb.set)
+        self.tree.pack(side="left", fill="both", expand=True)
+        sb.pack(side="right", fill="y")
+
+    def refresh(self):
+        self.tree.delete(*self.tree.get_children())
+        for i, e in enumerate(self.db.history(100)):
+            self.tree.insert(
+                "", "end",
+                values=(e.timestamp, e.book_title, e.action),
+                tags=("alt",) if i % 2 else (),
+            )
+
+
+# ── Application Shell ────────────────────────────────────────────────
 
 class StrayLibrary:
-    books = []
 
-    def __init__(self, init_window_name):
-        self.init_window_name = init_window_name
-        results = db.checkmysql()
-        for row in results:
-            name = row[0]
-            author = row[1]
-            comment = row[2]
-            state = row[3]
-            book1 = Book(name, author, comment, state)
-            self.books.append(book1)
+    def __init__(self, root: tk.Tk) -> None:
+        self.root = root
+        self.db = Database()
+        self._setup()
+        self._build()
+        self._shortcuts()
+        self.navigate("dashboard")
 
-    def set_init_window(self):  # 设置窗口
-        self.init_window_name.title("流浪图书馆(StrayLibrary)")  # 窗口名
-        self.init_window_name.geometry("450x260+10+10")
-        self.result_data_Text = Text(
-            self.init_window_name, width=35, height=15
-        )  # 处理结果展示
-        self.result_data_Text.grid(row=1, column=12, rowspan=7, columnspan=7)
+    def _setup(self):
+        w, h = 960, 580
+        x = (self.root.winfo_screenwidth() - w) // 2
+        y = (self.root.winfo_screenheight() - h) // 2
+        self.root.title("流浪图书馆  Stray Library")
+        self.root.geometry(f"{w}x{h}+{x}+{y}")
+        self.root.minsize(800, 500)
+        self.root.configure(bg=C.BG)
 
-        self.mianbutton1 = Button(
-            self.init_window_name,
-            text="查询(check)",
-            bg="DodgerBlue",
-            width=20,
-            command=self.show_all_book,
-        )  # 调用内部方法  加()为直接调用
-        self.mianbutton2 = Button(
-            self.init_window_name,
-            text="添加(add)",
-            bg="DodgerBlue",
-            width=20,
-            command=self.add_book,
-        )  # 调用内部方法  加()为直接调用
-        self.mianbutton3 = Button(
-            self.init_window_name,
-            text="借阅(lend)",
-            bg="DodgerBlue",
-            width=20,
-            command=self.lend_book,
-        )  # 调用内部方法  加()为直接调用
-        self.mianbutton4 = Button(
-            self.init_window_name,
-            text="归还(return)",
-            bg="DodgerBlue",
-            width=20,
-            command=self.return_book,
-        )  # 调用内部方法  加()为直接调用
-        self.mianbutton1.grid(row=1, column=11)
-        self.mianbutton2.grid(row=3, column=11)
-        self.mianbutton3.grid(row=5, column=11)
-        self.mianbutton4.grid(row=7, column=11)
-
-    # 功能函数
-    def show_all_book(self):
-        self.result_data_Text.delete(0.0, END)
-        for book in self.books:
-            self.result_data_Text.insert(1.0, book)
-
-    def add_book(self):
-        top = Tk()
-        top.title("添加(add)")
-        top.geometry("300x120+450+10")
-        self.L1 = Label(top, text="请输入书籍名称：")
-        self.E1 = Entry(top, bd=5)
-        self.L2 = Label(top, text="请输入作者名称：")
-        self.E2 = Entry(top, bd=5)
-        self.L3 = Label(top, text="请输入书籍推荐语：")
-        self.E3 = Entry(top, bd=5)
-        self.L1.place(x=0, y=0)
-        self.L2.place(x=0, y=30)
-        self.L3.place(x=0, y=60)
-        self.E1.place(x=120, y=0)
-        self.E2.place(x=120, y=30)
-        self.E3.place(x=120, y=60)
-        self.B = Button(top, text="输入完毕请点击确认,无需继续输入请关闭窗口", command=self.add_booking)
-        self.B.pack(side=BOTTOM)
-
-    def add_booking(self):
-        new_name = self.E1.get()
-        new_author = self.E2.get()
-        new_comment = self.E3.get()
-        self.result_data_Text.delete(0.0, END)
-        new_book = Book(new_name, new_author, new_comment, "未借出")
-        self.books.append(new_book)
-        db.addmysql(new_name, new_author, new_comment, "未借出")  # 写入数据库
-        self.result_data_Text.insert(1.0, new_name + "录入成功！\n")
-
-    def check_book(self, name):
-        for book in self.books:
-            if book.name == name:
-                return book
-        else:
-            return None
-
-    def lend_book(self):
-        toplend = Tk()
-        toplend.title("借阅(lend)")
-        toplend.geometry("330x50+450+30")
-        self.lendE1 = Entry(toplend, bd=5)
-        self.lendE1.pack(side=RIGHT)
-        self.lendB1 = Button(toplend, text="输入书名，输入完毕请点击", command=self.lend_booking)
-        self.lendB1.pack(side=LEFT)
-
-    def lend_booking(self):
-        name = self.lendE1.get()
-        res = self.check_book(name)
-        self.result_data_Text.delete(0.0, END)
-        if res != None:
-            if res.state == "已借出":
-                self.result_data_Text.insert(1.0, "你来晚了一步，这本书已经被借走了噢")
-            else:
-                res.state = "已借出"
-                db.changemysql("已借出", res.name)
-                self.result_data_Text.insert(1.0, "借阅成功，借了不看会变胖噢～")
-        else:
-            self.result_data_Text.insert(1.0, "这本书暂时没有收录在系统里呢")
-
-    def return_book(self):
-        topreturn = Tk()
-        topreturn.title("归还(return)")
-        topreturn.geometry("330x50+450+30")
-        self.returnE1 = Entry(topreturn, bd=5)
-        self.returnE1.pack(side=RIGHT)
-        self.returnB1 = Button(
-            topreturn, text="输入书名，完毕请点击", command=self.return_booking
+        s = ttk.Style(self.root)
+        if "clam" in s.theme_names():
+            s.theme_use("clam")
+        s.configure(
+            "Treeview", font=F(10), rowheight=32,
+            background=C.CARD, fieldbackground=C.CARD,
+            foreground=C.TEXT, borderwidth=0,
         )
-        self.returnB1.pack(side=LEFT)
+        s.configure(
+            "Treeview.Heading", font=F(9, bold=True),
+            background=C.BG, foreground=C.TEXT2,
+            borderwidth=0, relief="flat",
+        )
+        s.map(
+            "Treeview",
+            background=[("selected", C.PRIMARY)],
+            foreground=[("selected", C.WHITE)],
+        )
 
-    def return_booking(self):
-        name = self.returnE1.get()
-        res = self.check_book(name)  # 调用check_book方法，将返回值赋值给变量res
-        self.result_data_Text.delete(0.0, END)
-        if res == None:  # 如果返回的是空值，即这本书的书名不在系统里
-            self.result_data_Text.insert(1.0, "没有这本书噢，你恐怕输错了书名～")
-        else:  # 如果返回的是实例对象
-            if res.state == "未借出":  # 如果实例属性state等于0，即这本书的借阅状态为'未借出'
-                self.result_data_Text.insert(1.0, "这本书没有被借走，在等待有缘人的垂青呢！")
-            else:  # 如果实例属性state等于1，即状态为'已借出'
-                self.result_data_Text.insert(1.0, "归还成功！")
-                res.state = "未借出"  # 归还后书籍借阅状态为0，重置为'未借出'
-                db.changemysql("未借出", res.name)
+    def _build(self):
+        self.sidebar = Sidebar(self.root, self.navigate)
+        self.sidebar.pack(side="left", fill="y")
+
+        self._content = tk.Frame(self.root, bg=C.BG)
+        self._content.pack(side="left", fill="both", expand=True)
+
+        self.toast = Toast(self._content)
+        self.views: dict[str, tk.Frame] = {
+            "dashboard": DashboardView(self._content, self.db, self),
+            "library": LibraryView(self._content, self.db, self),
+            "history": HistoryView(self._content, self.db, self),
+        }
+
+    def _shortcuts(self):
+        def _add():
+            self.navigate("library")
+            self.views["library"].add_dialog()
+
+        def _search():
+            self.navigate("library")
+            self.views["library"].focus_search()
+
+        self.root.bind("<Control-n>", lambda _: _add())
+        self.root.bind("<Control-f>", lambda _: _search())
+        self.root.bind(
+            "<Delete>",
+            lambda _: (
+                self.views["library"].delete_selected()
+                if self._cur == "library" else None
+            ),
+        )
+
+    _cur = ""
+
+    def navigate(self, key: str):
+        if self._cur == key:
+            if hasattr(self.views[key], "refresh"):
+                self.views[key].refresh()
+            return
+        for v in self.views.values():
+            v.pack_forget()
+        self.views[key].pack(fill="both", expand=True)
+        if hasattr(self.views[key], "refresh"):
+            self.views[key].refresh()
+        self.sidebar.set_active(key)
+        self._cur = key
 
 
-def gui_start():
-    db.bulildmysql()
-    init_window = Tk()  # 实例化出一个父窗口
-    ZMJ_PORTAL = StrayLibrary(init_window)  # 设置根窗口默认属性
-    ZMJ_PORTAL.set_init_window()
-    init_window.mainloop()  # 父窗口进入事件循环，可以理解为保持窗口运行，否则界面不展示
+# ── Entry Point ──────────────────────────────────────────────────────
+
+def gui_start() -> None:
+    root = tk.Tk()
+    StrayLibrary(root)
+    root.mainloop()
 
 
-gui_start()
-
+if __name__ == "__main__":
+    gui_start()
 ```
