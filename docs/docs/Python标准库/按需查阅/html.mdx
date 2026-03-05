@@ -1,0 +1,179 @@
+---
+title: html
+---
+
+`html` 模块提供 HTML 转义/反转义工具函数，`html.parser` 子模块提供基于事件的 HTML 解析器。
+
+[html](https://docs.python.org/3/library/html.html) | [html.parser](https://docs.python.org/3/library/html.parser.html)
+
+## HTML 转义与反转义
+
+```python showLineNumbers
+import html
+
+# 转义：将特殊字符转为 HTML 实体
+text = '<script>alert("XSS")</script>'
+safe = html.escape(text)
+print(safe)
+# &lt;script&gt;alert(&quot;XSS&quot;)&lt;/script&gt;
+
+# 不转义引号
+safe2 = html.escape(text, quote=False)
+print(safe2)
+# &lt;script&gt;alert("XSS")&lt;/script&gt;
+
+# 反转义：将 HTML 实体还原为字符
+encoded = '&lt;p&gt;Hello &amp; World&lt;/p&gt;'
+print(html.unescape(encoded))
+# <p>Hello & World</p>
+
+# 也支持数字字符引用
+print(html.unescape('&#60;b&#62;粗体&#60;/b&#62;'))
+# <b>粗体</b>
+```
+
+:::tip
+在 Web 开发中，将用户输入通过 `html.escape()` 转义后再嵌入 HTML，是防止 XSS 攻击的基本手段。
+:::
+
+## HTMLParser 基本用法
+
+`html.parser.HTMLParser` 是基于事件驱动的解析器——继承它并重写 `handle_*` 方法来处理不同的 HTML 元素。
+
+```python showLineNumbers
+from html.parser import HTMLParser
+
+class MyParser(HTMLParser):
+    def handle_starttag(self, tag, attrs):
+        print(f"开始标签: <{tag}> 属性: {attrs}")
+
+    def handle_endtag(self, tag):
+        print(f"结束标签: </{tag}>")
+
+    def handle_data(self, data):
+        if data.strip():
+            print(f"文本内容: {data.strip()}")
+
+parser = MyParser()
+parser.feed("""
+<html>
+<body>
+    <h1 class="title">你好世界</h1>
+    <p>这是一个<a href="https://example.com">链接</a></p>
+</body>
+</html>
+""")
+# 开始标签: <html> 属性: []
+# 开始标签: <body> 属性: []
+# 开始标签: <h1> 属性: [('class', 'title')]
+# 文本内容: 你好世界
+# 结束标签: </h1>
+# ...
+```
+
+## 提取所有链接
+
+```python showLineNumbers
+from html.parser import HTMLParser
+
+class LinkExtractor(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.links = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag == 'a':
+            for name, value in attrs:
+                if name == 'href':
+                    self.links.append(value)
+
+html_content = """
+<nav>
+    <a href="https://python.org">Python</a>
+    <a href="https://docs.python.org">文档</a>
+    <a href="/about">关于</a>
+</nav>
+"""
+
+extractor = LinkExtractor()
+extractor.feed(html_content)
+print(extractor.links)
+# ['https://python.org', 'https://docs.python.org', '/about']
+```
+
+## 提取纯文本
+
+```python showLineNumbers
+from html.parser import HTMLParser
+
+class TextExtractor(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.text_parts = []
+        self._skip = False
+
+    def handle_starttag(self, tag, attrs):
+        if tag in ('script', 'style'):
+            self._skip = True
+
+    def handle_endtag(self, tag):
+        if tag in ('script', 'style'):
+            self._skip = False
+
+    def handle_data(self, data):
+        if not self._skip and data.strip():
+            self.text_parts.append(data.strip())
+
+    def get_text(self):
+        return ' '.join(self.text_parts)
+
+html_content = """
+<html>
+<head><style>body { color: red; }</style></head>
+<body>
+    <h1>标题</h1>
+    <p>段落内容</p>
+    <script>alert('ignored')</script>
+</body>
+</html>
+"""
+
+extractor = TextExtractor()
+extractor.feed(html_content)
+print(extractor.get_text())  # 标题 段落内容
+```
+
+## 处理注释和特殊声明
+
+```python showLineNumbers
+from html.parser import HTMLParser
+
+class FullParser(HTMLParser):
+    def handle_comment(self, data):
+        print(f"注释: {data.strip()}")
+
+    def handle_decl(self, decl):
+        print(f"声明: {decl}")
+
+    def handle_starttag(self, tag, attrs):
+        print(f"标签: <{tag}>")
+
+parser = FullParser()
+parser.feed('<!DOCTYPE html><!-- 页面注释 --><html><body></body></html>')
+# 声明: DOCTYPE html
+# 注释: 页面注释
+# 标签: <html>
+# 标签: <body>
+```
+
+:::info html.parser vs 第三方库
+| 特性 | html.parser | BeautifulSoup | lxml |
+|------|-------------|---------------|------|
+| 安装 | 标准库 | 第三方 | 第三方 |
+| API 风格 | 事件驱动（SAX 风格） | DOM 树操作 | DOM + XPath |
+| 容错性 | 良好 | 优秀 | 优秀 |
+| 性能 | 中等 | 较慢 | 最快 |
+| 适用场景 | 简单提取任务 | 通用爬虫/解析 | 高性能需求 |
+
+对于简单的 HTML 处理任务，`html.parser` 无需额外依赖即可胜任；复杂场景推荐 BeautifulSoup 或 lxml。
+:::

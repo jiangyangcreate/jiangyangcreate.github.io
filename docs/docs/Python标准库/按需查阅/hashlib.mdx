@@ -1,0 +1,156 @@
+---
+title: hashlib
+---
+
+`hashlib` 模块提供了常见的安全哈希算法接口，包括 SHA-256、SHA-3、MD5、BLAKE2 等，用于数据完整性校验和密码学场景。
+
+[hashlib](https://docs.python.org/3/library/hashlib.html)
+
+## 基本用法
+
+创建哈希对象，喂入数据，获取摘要值。
+
+```python showLineNumbers
+import hashlib
+
+# 计算字符串的 SHA-256 哈希
+m = hashlib.sha256()
+m.update(b"Hello, Python!")
+print(m.hexdigest())
+# 输出 64 位十六进制字符串
+
+# 简写形式：直接传入数据
+digest = hashlib.sha256(b"Hello, Python!").hexdigest()
+print(digest)
+```
+
+:::tip
+`update()` 可以多次调用，效果等同于拼接所有数据后一次性哈希：`m.update(a); m.update(b)` 等价于 `m.update(a + b)`。
+:::
+
+## 常用哈希算法
+
+```python showLineNumbers
+import hashlib
+
+data = b"The quick brown fox jumps over the lazy dog"
+
+# MD5（128 位，已不推荐用于安全场景）
+print("MD5:   ", hashlib.md5(data).hexdigest())
+
+# SHA-1（160 位，已不推荐用于安全场景）
+print("SHA-1: ", hashlib.sha1(data).hexdigest())
+
+# SHA-256（256 位，最常用）
+print("SHA-256:", hashlib.sha256(data).hexdigest())
+
+# SHA-512（512 位）
+print("SHA-512:", hashlib.sha512(data).hexdigest())
+
+# SHA3-256
+print("SHA3-256:", hashlib.sha3_256(data).hexdigest())
+```
+
+:::info
+MD5 和 SHA-1 存在已知碰撞攻击，不应用于安全相关场景。推荐至少使用 SHA-256。
+:::
+
+## 查看可用算法
+
+```python showLineNumbers
+import hashlib
+
+# 所有平台保证可用的算法
+print(hashlib.algorithms_guaranteed)
+
+# 当前解释器可用的算法（取决于 OpenSSL）
+print(hashlib.algorithms_available)
+```
+
+## 文件哈希校验
+
+用于验证文件完整性，例如校验下载文件的 SHA-256 值。
+
+```python showLineNumbers
+import hashlib
+
+def hash_file(filepath, algorithm="sha256"):
+    """计算文件的哈希值"""
+    h = hashlib.new(algorithm)
+    with open(filepath, "rb") as f:
+        while chunk := f.read(8192):
+            h.update(chunk)
+    return h.hexdigest()
+
+# 示例
+# print(hash_file("example.zip"))
+# print(hash_file("example.zip", "md5"))
+```
+
+Python 3.11+ 提供了更简洁的 `file_digest`：
+
+```python showLineNumbers
+import hashlib
+
+# Python 3.11+
+with open("example.txt", "rb") as f:
+    digest = hashlib.file_digest(f, "sha256")
+print(digest.hexdigest())
+```
+
+## 密码哈希：PBKDF2
+
+直接哈希密码容易被暴力破解。`pbkdf2_hmac` 通过加盐和多次迭代增加破解难度。
+
+```python showLineNumbers
+import hashlib
+import os
+
+password = b"my_secret_password"
+salt = os.urandom(16)  # 随机盐值
+iterations = 600_000    # 迭代次数，越高越安全
+
+# 派生密钥
+dk = hashlib.pbkdf2_hmac("sha256", password, salt, iterations)
+print(dk.hex())
+
+# 验证密码时，使用相同的 salt 和 iterations 重新计算并比对
+```
+
+:::tip
+存储密码时需要同时保存 `salt` 和 `iterations`，验证时用同样的参数重新派生并比较。实际项目中也可以考虑使用 `scrypt` 或第三方库 `bcrypt`。
+:::
+
+## BLAKE2：高性能哈希
+
+BLAKE2 速度快于 MD5，安全性媲美 SHA-3，支持自定义摘要长度和密钥认证。
+
+```python showLineNumbers
+from hashlib import blake2b, blake2s
+
+# 基本使用
+h = blake2b(b"Hello, BLAKE2!")
+print(h.hexdigest())
+
+# 自定义摘要长度（字节数）
+h = blake2b(b"Hello", digest_size=20)
+print(h.hexdigest())  # 40 个十六进制字符
+
+# 带密钥的哈希（可替代 HMAC）
+h = blake2b(b"message", key=b"secret-key", digest_size=16)
+print(h.hexdigest())
+```
+
+## 哈希对象属性
+
+```python showLineNumbers
+import hashlib
+
+h = hashlib.sha256(b"data")
+
+print(h.name)         # 'sha256'
+print(h.digest_size)  # 32（字节）
+print(h.block_size)   # 64（字节）
+print(h.digest())     # 原始字节摘要
+print(h.hexdigest())  # 十六进制字符串摘要
+```

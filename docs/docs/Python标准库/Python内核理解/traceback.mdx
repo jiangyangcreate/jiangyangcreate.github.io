@@ -1,0 +1,149 @@
+---
+title: traceback
+---
+
+`traceback` 模块用于提取、格式化和打印 Python 程序的堆栈回溯信息。它与 `sys.exc_info()` 配合，提供了对异常链和调用栈的完整控制。
+
+[traceback](https://docs.python.org/3.14/library/traceback.html)
+
+## 打印异常信息
+
+```python showLineNumbers
+import traceback
+
+def func_a():
+    func_b()
+
+def func_b():
+    func_c()
+
+def func_c():
+    raise ValueError("something went wrong")
+
+try:
+    func_a()
+except:
+    traceback.print_exc()
+"""
+Traceback (most recent call last):
+  File "...", line 13, in <module>
+    func_a()
+  File "...", line 4, in func_a
+    func_b()
+  File "...", line 7, in func_b
+    func_c()
+  File "...", line 10, in func_c
+    raise ValueError("something went wrong")
+ValueError: something went wrong
+"""
+```
+
+## 捕获异常为字符串
+
+```python showLineNumbers
+import traceback
+
+def risky_operation():
+    return 1 / 0
+
+try:
+    risky_operation()
+except Exception:
+    error_msg = traceback.format_exc()
+    print(type(error_msg))  # <class 'str'>
+    # 可以写入日志、发送到监控系统等
+    print(error_msg)
+```
+
+## 提取结构化的堆栈信息
+
+```python showLineNumbers
+import traceback
+import sys
+
+def deep_call():
+    raise RuntimeError("deep error")
+
+def middle():
+    deep_call()
+
+def top():
+    middle()
+
+try:
+    top()
+except:
+    tb = traceback.extract_tb(sys.exc_info()[2])
+    for frame in tb:
+        print(f"{frame.filename}:{frame.lineno} in {frame.name}")
+        print(f"  -> {frame.line}")
+```
+
+## 打印当前调用栈（不抛异常）
+
+```python showLineNumbers
+import traceback
+
+def show_stack():
+    print("当前调用栈:")
+    traceback.print_stack()
+
+def caller():
+    show_stack()
+
+caller()
+```
+
+## 异常链（Exception Chaining）
+
+```python showLineNumbers
+import traceback
+
+def load_config():
+    try:
+        open("nonexistent.toml")
+    except FileNotFoundError as e:
+        raise RuntimeError("配置加载失败") from e
+
+try:
+    load_config()
+except RuntimeError:
+    traceback.print_exc()
+"""
+Traceback (most recent call last):
+  ...
+FileNotFoundError: [Errno 2] No such file or directory: 'nonexistent.toml'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  ...
+RuntimeError: 配置加载失败
+"""
+```
+
+## TracebackException 对象
+
+Python 3.5+ 提供了面向对象的 `TracebackException` 类，适合延迟格式化和序列化。
+
+```python showLineNumbers
+import traceback
+import sys
+
+try:
+    eval("1/0")
+except:
+    te = traceback.TracebackException(*sys.exc_info())
+    print("异常类型:", te.exc_type.__name__)
+    print("异常消息:", str(te))
+    print("格式化输出:")
+    for line in te.format():
+        print(line, end="")
+```
+
+:::tip 
+大型系统（训练框架、推理服务）中，精确的异常追踪至关重要。`traceback.format_exc()` 常被用于：
+- 将错误信息写入结构化日志
+- 在分布式训练中收集各节点的异常信息
+- 在 API 服务中返回有意义的错误响应
+:::

@@ -1,0 +1,163 @@
+---
+title: array
+---
+
+`array` 模块提供了紧凑的类型化数组，所有元素必须是同一基本类型。它是理解 `numpy.ndarray` 设计思想的原型——连续内存布局、类型约束、高效存储。
+
+[array](https://docs.python.org/3/library/array.html)
+
+## 基本使用
+
+```python showLineNumbers
+import array
+import sys
+
+# 创建整数数组（'i' = signed int）
+int_arr = array.array('i', [1, 2, 3, 4, 5])
+print(int_arr)          # array('i', [1, 2, 3, 4, 5])
+print(int_arr[0])       # 1
+print(int_arr[-1])      # 5
+
+# 对比内存占用
+py_list = list(range(10000))
+c_array = array.array('i', range(10000))
+print(f"list: {sys.getsizeof(py_list)} bytes")
+print(f"array: {sys.getsizeof(c_array)} bytes")
+# array 通常比 list 小很多，因为不存储 Python 对象指针
+```
+
+## 类型码
+
+```python showLineNumbers
+import array
+
+# 常用类型码
+# 'b' = signed char (1 byte)
+# 'B' = unsigned char (1 byte)
+# 'i' = signed int (2+ bytes)
+# 'I' = unsigned int (2+ bytes)
+# 'l' = signed long (4+ bytes)
+# 'f' = float (4 bytes)
+# 'd' = double (8 bytes)
+
+float_arr = array.array('f', [1.0, 2.5, 3.14])
+print(float_arr.itemsize)    # 4 (bytes per element)
+print(float_arr.typecode)    # 'f'
+
+double_arr = array.array('d', [1.0, 2.5, 3.14])
+print(double_arr.itemsize)   # 8
+
+byte_arr = array.array('B', [0, 127, 255])
+print(byte_arr.itemsize)     # 1
+
+# 类型约束：不能混合类型
+try:
+    array.array('i', [1, 2, "three"])
+except TypeError as e:
+    print(f"类型错误: {e}")
+```
+
+## 数组操作
+
+```python showLineNumbers
+import array
+
+arr = array.array('i', [1, 2, 3])
+
+# 添加元素
+arr.append(4)
+arr.extend([5, 6])
+arr.insert(0, 0)
+print(arr)  # array('i', [0, 1, 2, 3, 4, 5, 6])
+
+# 删除元素
+arr.pop()
+arr.remove(0)
+print(arr)  # array('i', [1, 2, 3, 4, 5])
+
+# 切片
+print(arr[1:3])  # array('i', [2, 3])
+
+# 反转
+arr.reverse()
+print(arr)  # array('i', [5, 4, 3, 2, 1])
+
+# 统计
+print(arr.count(3))  # 1
+print(arr.index(3))  # 2
+```
+
+## 与 bytes 的互转
+
+```python showLineNumbers
+import array
+
+arr = array.array('i', [1, 2, 3, 4])
+
+# 转为 bytes
+raw = arr.tobytes()
+print(f"bytes 长度: {len(raw)}, 值: {raw.hex()}")
+
+# 从 bytes 恢复
+arr2 = array.array('i')
+arr2.frombytes(raw)
+print(arr2)  # array('i', [1, 2, 3, 4])
+
+# 文件 I/O
+with open("data.bin", "wb") as f:
+    arr.tofile(f)
+
+arr3 = array.array('i')
+with open("data.bin", "rb") as f:
+    arr3.fromfile(f, 4)  # 读取4个元素
+print(arr3)  # array('i', [1, 2, 3, 4])
+
+import os
+os.remove("data.bin")
+```
+
+## 与 list 的互转
+
+```python showLineNumbers
+import array
+
+arr = array.array('d', [1.1, 2.2, 3.3])
+
+# 转为 list
+py_list = arr.tolist()
+print(py_list)  # [1.1, 2.2, 3.3]
+
+# 从 list 创建
+arr2 = array.array('d', py_list)
+```
+
+## buffer protocol 与 memoryview
+
+`array` 实现了 buffer protocol，可以与 `memoryview`、`struct`、`ctypes` 等配合使用，这也是 numpy 高效运作的基础机制。
+
+```python showLineNumbers
+import array
+
+arr = array.array('i', [10, 20, 30, 40, 50])
+
+# 通过 memoryview 零拷贝访问
+mv = memoryview(arr)
+print(mv[1])      # 20
+mv[1] = 99
+print(arr[1])     # 99 (原数组被修改)
+
+# 切片也是零拷贝
+sub = mv[2:4]
+print(list(sub))  # [30, 40]
+```
+
+:::tip array vs numpy.ndarray
+| 特性 | array.array | numpy.ndarray |
+|------|-------------|---------------|
+| 维度 | 仅一维 | 任意维度 |
+| 运算 | 无向量化运算 | 支持广播和向量化 |
+| 依赖 | 标准库 | 第三方库 |
+| 用途 | 轻量级类型化存储 | 科学计算 |
+
+`array` 的价值在于理解**连续内存布局**和 **buffer protocol** 的概念，这是 numpy、PyTorch tensor 高效运作的基石。
+:::

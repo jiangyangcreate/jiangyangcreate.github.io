@@ -1,0 +1,165 @@
+---
+title: tomllib
+---
+
+`tomllib` 模块用于解析 TOML 格式的配置文件（Python 3.11+ 内置，只读不写）。
+
+[tomllib](https://docs.python.org/3/library/tomllib.html)
+
+## 从文件读取
+
+```python showLineNumbers
+import tomllib
+
+# 必须以二进制模式 ("rb") 打开
+with open("pyproject.toml", "rb") as f:
+    data = tomllib.load(f)
+
+print(data)
+# {'project': {'name': 'myapp', 'version': '1.0.0', ...}}
+```
+
+:::tip
+`tomllib.load()` 要求文件以 **二进制模式** 打开（`"rb"`），而非文本模式。这是为了让模块自行处理 UTF-8 编码，避免平台差异。
+:::
+
+## 从字符串读取
+
+```python showLineNumbers
+import tomllib
+
+toml_str = """
+[project]
+name = "myapp"
+version = "1.0.0"
+description = "一个示例项目"
+requires-python = ">=3.11"
+
+[project.urls]
+homepage = "https://example.com"
+repository = "https://github.com/example/myapp"
+"""
+
+data = tomllib.loads(toml_str)
+print(data["project"]["name"])         # myapp
+print(data["project"]["urls"]["homepage"])  # https://example.com
+```
+
+## 解析 pyproject.toml
+
+`pyproject.toml` 是现代 Python 项目的标准配置文件，`tomllib` 最常见的用途就是读取它。
+
+```python showLineNumbers
+import tomllib
+
+with open("pyproject.toml", "rb") as f:
+    config = tomllib.load(f)
+
+# 读取项目元信息
+project = config.get("project", {})
+print(f"项目名: {project.get('name')}")
+print(f"版本号: {project.get('version')}")
+print(f"依赖: {project.get('dependencies', [])}")
+
+# 读取工具配置（如 ruff、pytest）
+tool = config.get("tool", {})
+if "ruff" in tool:
+    print(f"Ruff 配置: {tool['ruff']}")
+```
+
+## TOML 数据类型映射
+
+TOML 类型会自动映射为对应的 Python 类型：
+
+```python showLineNumbers
+import tomllib
+from datetime import datetime, date, time
+
+toml_str = """
+title = "TOML 类型演示"
+enabled = true
+score = 99.5
+count = 42
+
+# 日期时间
+created = 2024-01-15T10:30:00+08:00
+birthday = 2000-06-15
+alarm = 07:30:00
+
+# 数组和内联表
+tags = ["python", "config", "toml"]
+[database]
+host = "localhost"
+port = 5432
+"""
+
+data = tomllib.loads(toml_str)
+
+print(type(data["title"]))     # <class 'str'>
+print(type(data["enabled"]))   # <class 'bool'>
+print(type(data["score"]))     # <class 'float'>
+print(type(data["count"]))     # <class 'int'>
+print(type(data["created"]))   # <class 'datetime.datetime'>
+print(type(data["birthday"]))  # <class 'datetime.date'>
+print(type(data["alarm"]))     # <class 'datetime.time'>
+print(type(data["tags"]))      # <class 'list'>
+print(type(data["database"]))  # <class 'dict'>
+```
+
+:::info 完整类型对照表
+| TOML 类型 | Python 类型 |
+|-----------|-------------|
+| 字符串 | `str` |
+| 整数 | `int` |
+| 浮点数 | `float` |
+| 布尔值 | `bool` |
+| 带时区日期时间 | `datetime.datetime`（含 `tzinfo`） |
+| 本地日期时间 | `datetime.datetime`（`tzinfo=None`） |
+| 本地日期 | `datetime.date` |
+| 本地时间 | `datetime.time` |
+| 数组 | `list` |
+| 表 / 内联表 | `dict` |
+:::
+
+## 自定义浮点数解析
+
+```python showLineNumbers
+import tomllib
+from decimal import Decimal
+
+toml_str = """
+price = 19.99
+tax_rate = 0.08
+"""
+
+# 默认解析为 float
+data = tomllib.loads(toml_str)
+print(type(data["price"]))  # <class 'float'>
+
+# 使用 Decimal 解析，避免浮点精度问题
+data = tomllib.loads(toml_str, parse_float=Decimal)
+print(data["price"])         # 19.99
+print(type(data["price"]))  # <class 'decimal.Decimal'>
+```
+
+## 错误处理
+
+```python showLineNumbers
+import tomllib
+
+bad_toml = """
+[project
+name = "broken"
+"""
+
+try:
+    data = tomllib.loads(bad_toml)
+except tomllib.TOMLDecodeError as e:
+    print(f"TOML 解析错误: {e}")
+```
+
+:::tip 写入 TOML
+`tomllib` 只支持读取。如需写入 TOML 文件，可使用第三方库：
+- **tomli-w**：轻量写入库，与 `tomllib` 配套
+- **tomlkit**：保留格式和注释的读写库，适合编辑已有文件
+:::

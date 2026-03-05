@@ -1,0 +1,136 @@
+---
+title: venv
+---
+
+`venv` 用于创建轻量级的虚拟环境，使每个项目拥有独立的包依赖，互不干扰。
+
+[venv](https://docs.python.org/3/library/venv.html)
+
+## 创建虚拟环境
+
+```python showLineNumbers
+# 在项目目录下创建名为 .venv 的虚拟环境
+# python -m venv .venv
+
+# 同时创建多个虚拟环境
+# python -m venv env1 env2
+```
+
+创建后的目录结构（以 Linux/macOS 为例）：
+
+```
+.venv/
+├── bin/           # 可执行文件（Windows 上为 Scripts/）
+│   ├── python     # Python 解释器的符号链接
+│   ├── pip
+│   └── activate   # 激活脚本
+├── lib/           # 第三方包安装位置
+│   └── pythonX.Y/
+│       └── site-packages/
+└── pyvenv.cfg     # 虚拟环境配置文件
+```
+
+## 激活与退出
+
+不同系统和 Shell 的激活方式不同：
+
+```bash showLineNumbers
+# Linux / macOS (bash/zsh)
+source .venv/bin/activate
+
+# Windows CMD
+.venv\Scripts\activate.bat
+
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+
+# 退出虚拟环境（所有平台通用）
+deactivate
+```
+
+:::tip
+激活并非必须。你可以直接使用虚拟环境中的 Python 路径来运行脚本，例如 `.venv/bin/python script.py`。激活只是把虚拟环境的 `bin` 目录加到 `PATH` 前面，方便直接输入 `python` 和 `pip`。
+:::
+
+## 常用选项
+
+```bash showLineNumbers
+# 允许虚拟环境访问系统级第三方包
+python -m venv --system-site-packages .venv
+
+# 清空已有目录后重新创建
+python -m venv --clear .venv
+
+# Python 升级后，更新虚拟环境中的解释器链接
+python -m venv --upgrade .venv
+
+# 创建时不安装 pip（适合 CI 等精简场景）
+python -m venv --without-pip .venv
+
+# 自定义激活后的提示符前缀
+python -m venv --prompt myproject .venv
+
+# 将 pip 升级到 PyPI 上的最新版本
+python -m venv --upgrade-deps .venv
+```
+
+## 判断当前是否在虚拟环境中
+
+```python showLineNumbers
+import sys
+
+if sys.prefix != sys.base_prefix:
+    print("当前处于虚拟环境中")
+    print(f"虚拟环境路径: {sys.prefix}")
+    print(f"基础 Python 路径: {sys.base_prefix}")
+else:
+    print("当前未使用虚拟环境")
+```
+
+:::info
+`sys.prefix` 指向虚拟环境目录，`sys.base_prefix` 指向创建虚拟环境时所用的系统 Python。两者不同即说明处于虚拟环境中。
+:::
+
+## 使用 API 创建虚拟环境
+
+除了命令行，`venv` 也提供了 Python API，适合在脚本中动态创建环境。
+
+```python showLineNumbers
+import venv
+
+# 基本创建
+venv.create(".venv", with_pip=True)
+
+# 使用 EnvBuilder 进行更细致的控制
+builder = venv.EnvBuilder(
+    system_site_packages=False,
+    clear=True,
+    with_pip=True,
+    prompt="myproject",
+    upgrade_deps=True,
+)
+builder.create(".venv")
+```
+
+## 典型工作流
+
+```bash showLineNumbers
+# 1. 创建虚拟环境
+python -m venv .venv
+
+# 2. 激活
+source .venv/bin/activate
+
+# 3. 安装项目依赖
+pip install -r requirements.txt
+
+# 4. 开发完成后导出依赖
+pip freeze > requirements.txt
+
+# 5. 退出
+deactivate
+```
+
+:::tip
+虚拟环境目录（`.venv`）应加入 `.gitignore`，不要提交到版本控制。Python 3.13 起，`venv` 会自动在环境目录下生成 `.gitignore` 文件。
+:::

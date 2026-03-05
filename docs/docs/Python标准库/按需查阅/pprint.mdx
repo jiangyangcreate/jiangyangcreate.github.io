@@ -1,0 +1,155 @@
+---
+title: pprint
+---
+
+`pprint` 用于美化打印复杂的 Python 数据结构，让嵌套的字典、列表等以层次清晰的格式输出。
+
+[pprint](https://docs.python.org/3/library/pprint.html)
+
+## 基本使用
+
+```python showLineNumbers
+import pprint
+
+data = {
+    "name": "Python项目",
+    "config": {
+        "debug": True,
+        "database": {
+            "host": "localhost",
+            "credentials": {"user": "admin", "password": "***"},
+        },
+    },
+    "users": [
+        {"id": 1, "name": "张三", "email": "zhangsan@example.com"},
+        {"id": 2, "name": "李四", "email": "lisi@example.com"},
+    ],
+}
+
+# print 输出：单行显示，难以阅读
+print(data)
+
+# pprint.pp 输出：结构化显示，层次清晰
+pprint.pp(data)
+```
+
+## 核心函数
+
+```python showLineNumbers
+import pprint
+
+data = {"z": 1, "a": 2, "b": [1, 2, 3], "c": {"d": 4}}
+
+# pp() — 推荐使用，默认保持字典插入顺序
+pprint.pp(data,
+    width=40,         # 每行最多 40 字符
+    indent=4,         # 缩进 4 个空格
+    depth=2,          # 只显示 2 层嵌套
+    compact=True,     # 紧凑模式：同行尽量多放元素
+    sort_dicts=False,  # 保持字典插入顺序
+)
+
+# pformat() — 返回格式化字符串而非直接打印
+formatted = pprint.pformat(data, indent=4)
+with open("output.txt", "w") as f:
+    f.write(formatted)
+
+# pprint() — 与 pp() 类似，但默认按键排序
+pprint.pprint(data)  # 输出: {'a': 2, 'b': [...], 'c': {...}, 'z': 1}
+```
+
+:::info
+`pp()` 和 `pprint()` 的唯一区别是 `sort_dicts` 的默认值：`pp()` 默认 `False`（保持插入顺序），`pprint()` 默认 `True`（按键排序）。推荐使用 `pp()`。
+:::
+
+## 控制显示深度与宽度
+
+```python showLineNumbers
+import pprint
+
+deep_data = {"level1": {"level2": {"level3": {"level4": "太深了"}}}}
+
+# 限制深度为 2，更深的部分用 ... 代替
+pprint.pp(deep_data, depth=2)
+# {'level1': {'level2': {...}}}
+
+# 限制每行宽度为 40 字符
+pprint.pp(deep_data, width=40)
+```
+
+## 处理递归引用
+
+`pprint` 能安全地处理自引用数据结构，不会陷入无限递归。
+
+```python showLineNumbers
+import pprint
+
+# 自引用列表
+recursive_list = [1, 2, 3]
+recursive_list.append(recursive_list)
+
+pprint.pp(recursive_list)
+# [1, 2, 3, <Recursion on list with id=...>]
+
+# 辅助函数：检查是否可读 / 是否递归
+print(pprint.isreadable(recursive_list))   # False
+print(pprint.isrecursive(recursive_list))  # True
+```
+
+## PrettyPrinter 类
+
+重复使用相同配置时，创建实例避免每次传参。
+
+```python showLineNumbers
+import pprint
+
+pp = pprint.PrettyPrinter(indent=4, width=60, depth=3, compact=True)
+
+data1 = {"name": "Alice", "scores": [95, 87, 92]}
+data2 = {"name": "Bob", "scores": [88, 90, 85]}
+
+pp.pprint(data1)
+pp.pprint(data2)
+
+# 也可以获取字符串
+text = pp.pformat(data1)
+```
+
+## 实际应用
+
+### 调试 API 响应
+
+```python showLineNumbers
+import json
+import pprint
+from urllib.request import urlopen
+
+with urlopen("https://pypi.org/pypi/pip/json") as resp:
+    info = json.load(resp)["info"]
+
+# 限制深度避免输出过多
+pprint.pp(info, depth=1, width=72)
+```
+
+### 写入日志
+
+```python showLineNumbers
+import logging
+import pprint
+
+logging.basicConfig(level=logging.DEBUG)
+
+def process_order(order):
+    logging.debug("收到订单:\n%s", pprint.pformat(order, indent=2))
+
+order = {
+    "id": "12345",
+    "items": [{"name": "商品A", "price": 99.9, "qty": 2}],
+    "customer": {"name": "张三", "address": "北京市"},
+}
+process_order(order)
+```
+
+:::tip
+在生产环境中慎用 `pprint`，它主要面向调试和开发。对于高频日志输出或超大数据结构，`str()` 或 `json.dumps()` 更高效。
+:::

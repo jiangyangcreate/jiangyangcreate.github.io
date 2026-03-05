@@ -1,4 +1,305 @@
 ---
 sidebar_position: 1
-title: Pydantic🔨
+title: Pydantic
 ---
+
+Pydantic 是 Python 生态中最常用的**数据校验与序列化库**：用类型注解定义「数据长什么样」，在运行时对字典、JSON、环境变量等输入做解析与校验，并保证输出符合声明类型。它同时承担**配置/设置管理**（从环境变量、`.env` 加载），并与类型系统、IDE 友好集成。
+
+Pydantic 的出现与「类型注解 + 运行时校验」的需求直接相关：静态类型检查（mypy 等）只做静态分析，无法约束来自网络、配置文件或用户输入的数据；marshmallow、attrs 等方案要么基于 Schema 定义与类型注解分离，要么不强调校验与序列化的一体化。Pydantic 以 **BaseModel** 为核心：用类属性 + 类型注解声明字段，用 **Field** 描述约束与默认值，用 **validator**（field/model）扩展校验逻辑，支持从 **JSON 字符串/字典** 以及 **环境变量**（pydantic-settings）加载并校验，并可导出 **JSON Schema** 供 API 文档与契约使用。核心校验逻辑由 pydantic-core（Rust）实现，兼顾性能与可扩展性。
+
+## 安装
+
+```bash
+pip install pydantic
+```
+
+若需从环境变量、`.env` 加载配置，需额外安装：
+
+```bash
+pip install pydantic-settings
+```
+
+## BaseModel 与字段
+
+通过继承 `BaseModel` 并声明带类型注解的类属性即可定义模型；未带默认值的字段为必填，带默认值的为可选。实例化时传入字典或关键字参数，Pydantic 会进行解析、类型转换与校验。
+
+```python showLineNumbers
+from pydantic import BaseModel
+
+
+class User(BaseModel):
+    id: int
+    name: str = "Jane Doe"
+
+
+user = User(id="123")  # 字符串会被强制转为 int
+print(user.id, user.name)
+print(user.model_dump())
+# 输出：
+# """
+# 123 Jane Doe
+# {'id': 123, 'name': 'Jane Doe'}
+# """
+```
+
+从字典或已有对象校验时，可使用 `model_validate` 或 `model_validate_json`：
+
+```python showLineNumbers
+from pydantic import BaseModel
+
+class Item(BaseModel):
+    x: int
+    label: str = ""
+
+data = {"x": 1}
+item = Item.model_validate(data)
+print(item.model_dump())
+# 输出：
+# """
+# {'x': 1, 'label': ''}
+# """
+```
+
+## 类型与校验
+
+Pydantic 根据类型注解做解析与校验：常见标量（`int`、`float`、`str`、`bool`）、`datetime`、`list[T]`、`dict[K, V]`、嵌套 `BaseModel` 等均支持；输入会尽可能被强制转换为目标类型（如 `"42"` → `42`），校验失败时抛出 `ValidationError`。
+
+```python showLineNumbers
+from datetime import datetime
+from pydantic import BaseModel, ValidationError
+
+class Event(BaseModel):
+    ts: datetime
+    count: int
+    tags: list[str]
+
+e = Event(ts="2024-01-15T12:00:00", count=10, tags=["a", "b"])
+print(e.ts)
+
+try:
+    Event(ts="not-a-date", count=10, tags=[])
+except ValidationError as err:
+    print(err.error_count())
+# 输出：
+# """
+# 2024-01-15 12:00:00
+# 1
+# """
+```
+
+:::tip
+**JSON Schema / API 契约**：Pydantic 模型可通过 `model_json_schema()` 生成 JSON Schema（符合 JSON Schema Draft 2020-12 / OpenAPI 3.1），常用于 API 文档与契约；FastAPI 等框架会直接使用该 Schema 生成 OpenAPI。
+:::
+
+## Field 与默认值
+
+使用 `Field()` 为字段添加约束、说明、别名或默认值；`default` 与 `default_factory` 的用法与 dataclass 类似。可变默认值（如 `list`、`dict`）会由 Pydantic 深拷贝，避免跨实例共享。
+
+```python showLineNumbers
+from pydantic import BaseModel, Field
+
+class Product(BaseModel):
+    name: str = Field(min_length=1, max_length=100)
+    price: float = Field(gt=0, description="单价")
+    tags: list[str] = Field(default_factory=list)
+
+p = Product(name="Widget", price=9.99)
+print(p.model_dump())
+# 输出：
+# """
+# {'name': 'Widget', 'price': 9.99, 'tags': []}
+# """
+```
+
+仅校验时使用别名、序列化仍用字段名时，可用 `validation_alias` 与 `serialization_alias`；`alias` 同时作用于校验与序列化。
+
+```python showLineNumbers
+from pydantic import BaseModel, Field
+
+class Config(BaseModel):
+    api_key: str = Field(validation_alias="API_KEY")
+
+c = Config(API_KEY="secret")
+print(c.api_key)
+print(c.model_dump(by_alias=False))
+# 输出：
+# """
+# secret
+# {'api_key': 'secret'}
+# """
+```
+
+## Validator
+
+在类型与 `Field` 约束之外，可用 **field validator** 或 **model validator** 做更复杂校验或转换。
+
+- **field_validator**：按字段校验，`mode='after'` 在 Pydantic 内置校验之后执行（推荐，类型已确定）；`mode='before'` 在原始输入上执行，可做预处理。
+- **model_validator**：在整条数据上校验，例如「两个字段必须一致」。
+
+```python showLineNumbers
+from pydantic import BaseModel, field_validator, model_validator, ValidationError
+
+class UserCreate(BaseModel):
+    password: str
+    password_repeat: str
+    name: str
+
+    @field_validator("name")
+    @classmethod
+    def name_not_empty(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError("name must be non-empty")
+        return v.strip()
+
+    @model_validator(mode="after")
+    def passwords_match(self):
+        if self.password != self.password_repeat:
+            raise ValueError("passwords do not match")
+        return self
+
+UserCreate(password="ab", password_repeat="ab", name="  alice  ")
+# name 会变成 "alice"
+
+try:
+    UserCreate(password="ab", password_repeat="cd", name="alice")
+except ValidationError as e:
+    print(e.errors()[0]["msg"])
+# 输出：
+# """
+# passwords do not match
+# """
+```
+
+使用 `Annotated` + `AfterValidator` / `BeforeValidator` 可将校验逻辑复用到多个模型或类型上（annotated pattern），与 `field_validator` 装饰器二选一即可。
+
+## 与 FastAPI 集成
+
+FastAPI 的请求体、响应、依赖等均基于 Pydantic：将 `BaseModel` 用作 `Body()`、`Path()`、`Query()` 的类型注解即可自动做请求校验与响应序列化，并生成 OpenAPI Schema。
+
+```python showLineNumbers
+from fastapi import FastAPI
+from pydantic import BaseModel, Field
+
+app = FastAPI()
+
+class ItemIn(BaseModel):
+    name: str = Field(..., min_length=1)
+    price: float = Field(gt=0)
+
+class ItemOut(BaseModel):
+    id: int
+    name: str
+    price: float
+
+@app.post("/items", response_model=ItemOut)
+def create_item(item: ItemIn):
+    # item 已校验，可直接用
+    return ItemOut(id=1, name=item.name, price=item.price)
+```
+
+路由中的 `item: ItemIn` 会触发 Pydantic 校验；非法请求会得到 422 与错误明细；`response_model=ItemOut` 会将返回值按 `ItemOut` 序列化并写入 OpenAPI。
+
+## 设置管理与环境变量
+
+使用 **pydantic-settings** 时，让配置类继承 `BaseSettings` 而非 `BaseModel`，则未通过构造函数传入的字段会从**环境变量**（及可选的 `.env` 文件）中读取；字段名对应环境变量名（大小写不敏感），可用 `Field(validation_alias=...)` 或 `SettingsConfigDict(env_prefix='MY_APP_')` 做前缀与别名配置。
+
+- **为何用 BaseSettings**：应用配置（数据库 URL、端口、开关等）通常来自环境变量或 `.env`，`BaseSettings` 在实例化时自动从这些来源填充字段，无需手写 `os.getenv`。
+- **查找顺序**：构造函数传入值 > 环境变量 > `.env` 文件中的值 > 字段默认值。同一来源内，后加载的会覆盖先前的（例如环境变量会覆盖 `.env` 里的同名项）。
+- **命名对应**：默认用**字段名**作为环境变量名（大小写不敏感）。`env_prefix` 会为所有字段加统一前缀；`Field(validation_alias=...)` 可为单个字段指定备选名称（如同时认 `PORT` 和 `MY_APP_PORT`）。
+
+项目根目录下的 `.env` 示例（每行 `KEY=VALUE`，与上面 `env_prefix` 对应）：
+
+```bash title=".env"
+MY_APP_HOST=0.0.0.0
+MY_APP_PORT=9000
+MY_APP_DEBUG=true
+```
+
+Pydantic 会在加载 `Settings()` 时读取该文件（若存在），并与当前环境变量合并；环境变量优先于 `.env` 中的同名项。
+
+```python showLineNumbers
+from pydantic import AliasChoices, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(env_prefix="MY_APP_", env_file=".env")
+
+    host: str = "localhost"
+    port: int = Field(default=8000, validation_alias=AliasChoices("PORT", "MY_APP_PORT"))
+    debug: bool = False
+
+# 会读取 MY_APP_HOST, MY_APP_PORT 或 PORT, MY_APP_DEBUG 等
+settings = Settings()
+print(settings.host, settings.port)
+# 0.0.0.0 9000
+```
+
+**示例说明：**
+
+- `model_config`：`env_prefix="MY_APP_"` 表示环境变量名统一带前缀（如 `MY_APP_HOST`）；`env_file=".env"` 表示从项目根目录加载 `.env`。
+- `host`：会读 `MY_APP_HOST`（前缀 + 字段名），若未设置则用默认值 `"localhost"`。
+- `port`：`validation_alias=AliasChoices("PORT", "MY_APP_PORT")` 表示按顺序尝试读取 `PORT`、`MY_APP_PORT`，先找到的生效；若都未设置则用默认值 `8000`。适合兼容只暴露 `PORT` 的部署环境。
+- `debug`：会读 `MY_APP_DEBUG`；环境变量为字符串，Pydantic 会自动把 `"true"`/`"1"` 等转为 `True`。
+- 实例化 `Settings()` 时无需传参，所有值来自环境/`.env`/默认值；若某字段既无环境值也无默认值，会抛出验证错误。
+
+复杂类型（如 `list`、`dict`、嵌套 `BaseModel`）可从环境变量中的 **JSON 字符串** 解析；若需用自定义格式（如逗号分隔），可为该字段写 `mode='before'` 的 validator 自行解析。
+
+:::tip
+**环境变量与 .env**：`env_file='.env'` 会从当前工作目录加载；环境变量优先级高于 `.env` 文件。Windows 下 `os.environ` 大小写不敏感，`case_sensitive` 配置无效。
+:::
+
+## JSON Schema 与序列化
+
+`model_json_schema()` 返回该模型的 JSON Schema 字典，可用于文档或代码生成；`model_dump()` / `model_dump_json()` 用于将实例序列化为字典或 JSON 字符串。
+
+```python showLineNumbers
+from pydantic import BaseModel, Field
+import json
+
+class Foo(BaseModel):
+    a: int = Field(gt=0)
+    b: str = ""
+
+schema = Foo.model_json_schema()
+print(json.dumps(schema, indent=2))
+
+obj = Foo(a=1)
+print(obj.model_dump())
+print(obj.model_dump_json())
+# 输出（节选）：
+# """
+# {
+#   "properties": {
+#     "a": {"minimum": 0, "title": "A", ...},
+#     "b": {"default": "", "title": "B", ...}
+#   },
+#   ...
+# }
+# {'a': 1, 'b': ''}
+# '{"a":1,"b":""}'
+# """
+```
+
+## 错误处理
+
+校验失败时抛出 `pydantic.ValidationError`，可通过 `.errors()` 获取错误列表（含 `loc`、`msg`、`type` 等），便于返回给调用方或日志记录。
+
+```python showLineNumbers
+from pydantic import BaseModel, ValidationError
+
+class M(BaseModel):
+    x: int
+    y: str
+
+try:
+    M(x="not_int", y=123)
+except ValidationError as e:
+    for err in e.errors():
+        print(err["loc"], err["msg"])
+# 输出：
+# """
+# ('x',) Input should be a valid integer
+# ('y',) Input should be a valid string
+# """
+```

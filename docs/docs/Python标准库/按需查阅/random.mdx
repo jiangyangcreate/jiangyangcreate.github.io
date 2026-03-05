@@ -1,0 +1,150 @@
+---
+title: random
+---
+
+`random` 模块提供伪随机数生成器，支持整数、浮点数、序列操作以及多种概率分布，基于 Mersenne Twister 算法实现。
+
+[random](https://docs.python.org/3/library/random.html)
+
+## 随机整数
+
+```python showLineNumbers
+import random
+
+# 随机整数：a <= N <= b（两端都包含）
+print(random.randint(1, 10))
+
+# randrange：等价于 choice(range(...))
+print(random.randrange(10))        # 0~9
+print(random.randrange(1, 100, 2)) # 1~99 的奇数
+
+# 随机比特
+print(random.getrandbits(8))  # 0~255 的随机整数
+```
+
+## 随机浮点数
+
+```python showLineNumbers
+import random
+
+# 0.0 <= x < 1.0
+print(random.random())
+
+# a <= x <= b 均匀分布
+print(random.uniform(1.5, 10.5))
+
+# 三角分布（low, high, mode）
+print(random.triangular(0, 10, 3))
+```
+
+## 序列随机操作
+
+```python showLineNumbers
+import random
+
+colors = ["红", "橙", "黄", "绿", "蓝", "靛", "紫"]
+
+# 随机选一个
+print(random.choice(colors))
+
+# 有放回抽样（可带权重）
+print(random.choices(colors, k=3))
+print(random.choices(
+    ["A", "B", "C"],
+    weights=[70, 20, 10],  # A 被选中的概率最高
+    k=5
+))
+
+# 无放回抽样
+print(random.sample(colors, k=3))
+
+# 原地打乱
+deck = list(range(1, 14))
+random.shuffle(deck)
+print(deck)
+```
+
+:::tip choice vs choices vs sample
+| 函数 | 放回 | 返回值 | 典型用途 |
+|------|------|--------|---------|
+| `choice` | — | 单个元素 | 随机选一个 |
+| `choices` | 有放回 | 列表（可重复） | 模拟抽奖、加权选择 |
+| `sample` | 无放回 | 列表（不重复） | 随机分组、抽样调查 |
+:::
+
+## 随机种子与可复现性
+
+```python showLineNumbers
+import random
+
+# 设置种子后，每次运行产生相同序列
+random.seed(42)
+print(random.random())     # 0.6394267984578837
+print(random.randint(1, 100))  # 74
+
+# 再次设置相同种子，结果一致
+random.seed(42)
+print(random.random())     # 0.6394267984578837
+print(random.randint(1, 100))  # 74
+
+# 保存和恢复状态
+state = random.getstate()
+print(random.random())
+random.setstate(state)
+print(random.random())  # 与上一行结果相同
+```
+
+:::info 可复现性的应用
+在机器学习实验、单元测试、模拟仿真中，固定随机种子可以确保结果可复现，方便调试和对比。
+:::
+
+## 常见分布
+
+```python showLineNumbers
+import random
+
+# 正态分布（高斯分布）：mu=均值, sigma=标准差
+print(random.gauss(mu=0, sigma=1))
+
+# 指数分布：lambd=1/期望间隔
+print(random.expovariate(lambd=0.5))
+
+# 二项分布：n 次试验中成功的次数
+print(random.binomialvariate(n=10, p=0.3))
+
+# Beta 分布
+print(random.betavariate(alpha=2, beta=5))
+```
+
+## 实用示例
+
+```python showLineNumbers
+import random
+from collections import Counter
+
+# 模拟掷骰子 10000 次，统计频率
+random.seed(0)
+results = [random.randint(1, 6) for _ in range(10000)]
+freq = Counter(results)
+for face in sorted(freq):
+    pct = freq[face] / len(results) * 100
+    print(f"面 {face}: {pct:.1f}%")
+
+# 简单的密码生成器
+import string
+chars = string.ascii_letters + string.digits + "!@#$%"
+password = ''.join(random.choices(chars, k=16))
+print(f"随机密码: {password}")
+
+# 加权随机：模拟一个不公平的硬币
+flips = random.choices(
+    ["正面", "反面"],
+    weights=[60, 40],
+    k=1000
+)
+print(Counter(flips))
+```
+
+:::info random vs secrets
+`random` 模块**不适用于安全场景**（如生成令牌、密码哈希盐值）。安全相关的随机数请使用 [`secrets`](https://docs.python.org/3/library/secrets.html) 模块。
+:::

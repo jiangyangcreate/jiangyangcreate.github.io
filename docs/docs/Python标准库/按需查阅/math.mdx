@@ -1,0 +1,166 @@
+---
+title: math
+---
+
+`math` 模块提供了常用的数学函数和常量，涵盖取整、数论、幂运算、对数、三角函数等，底层由 C 数学库实现，运算高效。
+
+[math](https://docs.python.org/3/library/math.html)
+
+## 常量
+
+```python showLineNumbers
+import math
+
+print(math.pi)    # 3.141592653589793
+print(math.e)     # 2.718281828459045
+print(math.tau)   # 6.283185307179586 (2π)
+print(math.inf)   # inf（正无穷）
+print(math.nan)   # nan（非数字）
+
+# inf 和 nan 的判断
+print(math.isinf(math.inf))   # True
+print(math.isnan(math.nan))   # True
+print(math.isfinite(100.0))   # True
+print(math.isfinite(math.inf))  # False
+```
+
+## 取整与绝对值
+
+```python showLineNumbers
+import math
+
+# 向上取整、向下取整、截断
+print(math.ceil(2.3))    # 3
+print(math.floor(2.7))   # 2
+print(math.trunc(-2.7))  # -2（向零截断）
+
+# 绝对值（返回 float）
+print(math.fabs(-3.14))  # 3.14
+
+# 分离整数部分和小数部分
+frac, integer = math.modf(3.75)
+print(f"小数: {frac}, 整数: {integer}")  # 小数: 0.75, 整数: 3.0
+```
+
+:::tip ceil / floor / trunc 对负数的区别
+| 函数 | -2.3 的结果 | 方向 |
+|------|-----------|------|
+| `ceil` | -2 | 向正无穷 |
+| `floor` | -3 | 向负无穷 |
+| `trunc` | -2 | 向零 |
+:::
+
+## 数论函数
+
+```python showLineNumbers
+import math
+
+# 阶乘
+print(math.factorial(5))    # 120
+
+# 最大公约数 / 最小公倍数
+print(math.gcd(12, 18))      # 6
+print(math.gcd(12, 18, 24))  # 6（支持多参数）
+print(math.lcm(4, 6))        # 12
+print(math.lcm(4, 6, 10))    # 60
+
+# 组合数与排列数
+print(math.comb(10, 3))  # 120  C(10,3)
+print(math.perm(10, 3))  # 720  P(10,3)
+
+# 整数平方根
+print(math.isqrt(10))  # 3（不超过 √10 的最大整数）
+```
+
+## 幂、指数与对数
+
+```python showLineNumbers
+import math
+
+# 平方根、立方根
+print(math.sqrt(16))    # 4.0
+print(math.cbrt(27))    # 3.0
+
+# 幂运算（结果为 float）
+print(math.pow(2, 10))  # 1024.0
+
+# 指数函数
+print(math.exp(1))      # 2.718281828459045
+print(math.exp2(10))    # 1024.0
+print(math.expm1(1e-15))  # 1e-15（小值时比 exp(x)-1 更精确）
+
+# 对数函数
+print(math.log(math.e))     # 1.0（自然对数）
+print(math.log(100, 10))    # 2.0（指定底数）
+print(math.log2(1024))      # 10.0
+print(math.log10(1000))     # 3.0
+```
+
+## 三角函数
+
+```python showLineNumbers
+import math
+
+# 角度与弧度互转
+print(math.radians(180))  # 3.141592653589793
+print(math.degrees(math.pi))  # 180.0
+
+# 基本三角函数（参数为弧度）
+print(math.sin(math.pi / 6))   # 0.4999...（≈0.5）
+print(math.cos(math.pi / 3))   # 0.5000...
+print(math.tan(math.pi / 4))   # 0.9999...（≈1.0）
+
+# 反三角函数（返回弧度）
+print(math.asin(0.5))    # 0.5235...（π/6）
+print(math.acos(0.5))    # 1.0471...（π/3）
+print(math.atan(1))      # 0.7853...（π/4）
+
+# atan2：根据 x, y 坐标计算角度，能正确判断象限
+print(math.atan2(1, 1))    # π/4
+print(math.atan2(-1, -1))  # -3π/4
+```
+
+## 求和与距离
+
+```python showLineNumbers
+import math
+
+# 高精度浮点求和（避免精度丢失）
+vals = [0.1] * 10
+print(sum(vals))         # 0.9999999999999999
+print(math.fsum(vals))   # 1.0
+
+# 连乘
+print(math.prod([1, 2, 3, 4, 5]))  # 120
+
+# 向量点积求和
+print(math.sumprod([1, 2, 3], [4, 5, 6]))  # 1*4 + 2*5 + 3*6 = 32
+
+# 欧氏距离
+print(math.dist([0, 0], [3, 4]))        # 5.0
+print(math.dist([0, 0, 0], [1, 2, 2]))  # 3.0
+
+# 向量范数（勾股定理推广）
+print(math.hypot(3, 4))       # 5.0
+print(math.hypot(1, 2, 2))   # 3.0
+```
+
+## 浮点数比较
+
+```python showLineNumbers
+import math
+
+# 浮点数近似相等判断
+a = 0.1 + 0.2
+b = 0.3
+print(a == b)                    # False
+print(math.isclose(a, b))       # True（默认相对容差 1e-9）
+
+# 自定义容差
+print(math.isclose(1.0, 1.01, rel_tol=0.02))  # True（2% 相对容差）
+print(math.isclose(0.0, 0.001, abs_tol=0.01)) # True（绝对容差）
+```
+
+:::info math vs cmath
+`math` 不支持复数运算。如需处理复数，请使用 [`cmath`](https://docs.python.org/3/library/cmath.html) 模块，它提供了同名函数的复数版本。
+:::

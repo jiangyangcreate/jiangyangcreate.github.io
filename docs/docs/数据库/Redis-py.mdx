@@ -1,0 +1,299 @@
+---
+sidebar_position: 6
+title: Redis-py
+---
+
+Redis-py 是 Redis 的官方 Python 客户端，支持同步与异步，提供字符串、哈希、列表、集合、有序集合及连接池、Pipeline、Pub/Sub 等。重点讲 **Redis 与 Python 的类型对应与转换**、序列化选择、连接与事务语义。详见 [redis-py 官方文档](https://redis.readthedocs.io/en/latest/)。
+
+## 安装与连接
+
+```bash
+pip install redis
+# 可选：C 解析器，多数场景零代码改动即可加速
+pip install "redis[hiredis]"
+```
+
+连接本地默认 6379：
+
+```python showLineNumbers
+import redis
+
+r = redis.Redis(host='localhost', port=6379, db=0)
+r.ping()
+```
+
+用 URL：
+
+```python showLineNumbers
+r = redis.from_url('redis://localhost:6379/0')
+```
+
+:::info
+**返回类型**：默认返回值都是 **bytes**。要直接得到 **str** 可设 `decode_responses=True`：  
+`redis.Redis(host='localhost', port=6379, decode_responses=True)`。下文按这两种情形分别说明。
+:::
+
+---
+
+## Redis 存的是字符串
+
+Redis 底层只有一种值的存储形式：二进制安全的字符串（字节序列）。String / Hash / List / Set / Sorted Set 是**键对应的数据结构**，但每个元素在存储和网络里都是**字节串**。因此：
+
+- **写**：Python 的 `str`、`int`、`float` 等会被 redis-py 转成 Redis 能存的格式（转成字节/字符串再发出去）。
+- **读**：Redis 返回字节串，redis-py 默认给你 `bytes`；设了 `decode_responses=True` 则解码成 `str`。数值、列表、字典等复杂类型不会自动还原，要在 Python 里反序列化（JSON、int/float 等）。
+
+这样就不会出现“取出来是字符串却当数字用”“存了 dict 取出来却是 str”的问题。
+
+---
+
+## 类型对应与转换
+
+### 写入（Python → Redis）
+
+| Python 类型 | redis-py 行为 | Redis 里实际存的 |
+|-------------|----------------|------------------|
+| `str` | 按 UTF-8 编码成 bytes 发送 | 字符串（UTF-8 字节） |
+| `bytes` | 直接发送 | 同上 |
+| `int` | 转成十进制字符串再编码 | 如 `"42"` |
+| `float` | 转成字符串再编码 | 如 `"3.14"` |
+| `bool` | 不会自动转 0/1，会变成 `"True"`/`"False"` | 可显式 `str(1)`/`str(0)` 或统一用 JSON |
+
+Redis 不区分 int/float/str，只存字符串/字节。业务上若要“取回是 int”，就在**读的时候**在 Python 里转，例如 `int(r.get('key'))`。
+
+### 读出（Redis → Python）
+
+| 命令 / 返回值 | decode_responses=False（默认） | decode_responses=True |
+|---------------|--------------------------------|------------------------|
+| `get(key)` | `bytes` 或 `None` | `str` 或 `None` |
+| `hget(key, field)` | `bytes` 或 `None` | `str` 或 `None` |
+| `hgetall(key)` | `{bytes: bytes, ...}` | `{str: str, ...}` |
+| `lrange(key, 0, -1)` | `[bytes, ...]` | `[str, ...]` |
+| `smembers(key)` | `{bytes, ...}` | `{str, ...}` |
+| `zrange(..., withscores=True)` | `[(bytes, float), ...]` | `[(str, float), ...]` |
+
+- **Sorted Set 的 score**：协议里是数字，redis-py 转成 **float**。
+- **不存在的 key**：多数读命令返回 `None` 或空 list/set，要先判空再转换类型。
+
+### 数值读写示例
+
+```python showLineNumbers
+# 存“数字”：Redis 里是字符串 "100"
+r.set("count", 100)
+# 取回：默认 bytes → 需解码再转 int
+v = r.get("count")  # b'100'
+n = int(v.decode()) if v else 0
+
+# 若 decode_responses=True
+r2 = redis.Redis(host='localhost', port=6379, decode_responses=True)
+r2.set("count", 100)
+v = r2.get("count")  # '100'
+n = int(v) if v else 0
+```
+
+### 何时要序列化
+
+- **简单标量**：数字、短字符串，按上面方式存取；取回后 `int()`/`float()`/`.decode()` 按需转换。
+- **复杂结构**：dict、list、自定义对象，Redis 不保存结构，需要：
+  - 写前：序列化成字符串或字节（`json.dumps(obj)`、`pickle.dumps(obj)`）；
+  - 读后：反序列化（`json.loads(s)`、`pickle.loads(b)`）。
+
+---
+
+## 存对象：JSON / pickle / msgpack
+
+| 方式 | 优点 | 缺点 | 适用 |
+|------|------|------|------|
+| **JSON** | 可读、跨语言、安全 | 不能直接存 bytes/自定义类 | 配置、API 响应、简单 dict/list |
+| **pickle** | 可存任意可序列化 Python 对象 | 仅 Python、有安全风险 | 仅本机、可信数据 |
+| **msgpack** | 二进制、省空间、多语言 | 需额外依赖 | 高性能、跨语言二进制 |
+
+一般用 JSON；要存 bytes 或复杂对象且仅 Python 内部用时再考虑 pickle；追求性能和二进制时用 msgpack。
+
+```python showLineNumbers
+import json
+
+# 写
+data = {"name": "Alice", "score": 100}
+r.set("user:1000", json.dumps(data))
+
+# 读（默认 bytes）
+raw = r.get("user:1000")
+obj = json.loads(raw.decode()) if raw else {}
+
+# 读（decode_responses=True 时 raw 已是 str）
+# obj = json.loads(raw) if raw else {}
+```
+
+---
+
+## String
+
+最基础的键值：
+
+```python showLineNumbers
+r.set("foo", "bar")
+r.get("foo")  # b'bar'
+
+r.setex("cache:key1", 3600, "value")  # 键、秒数、值
+r.get("cache:key1")
+r.ttl("cache:key1")  # 剩余秒数
+```
+
+- **set 的 ex 参数**：`r.set("k", "v", ex=3600)` 等价于 setex。
+- **ms 级过期**：`pexpire`、或 `set(..., px=3600000)`。
+
+---
+
+## Hash
+
+适合“一个 key 对应多个字段”的扁平结构（如用户属性）：
+
+```python showLineNumbers
+r.hset("user:1000", mapping={"name": "Alice", "age": "30"})
+r.hget("user:1000", "name")    # 单字段
+r.hgetall("user:1000")         # 全部：dict，key/value 均为 bytes 或 str（由 decode_responses 决定）
+r.hdel("user:1000", "age")
+```
+
+- **类型**：`hgetall` 的 value 在 Redis 里都是字符串；存的是数字字符串时，取回后要 `int(v)` 等。
+- **嵌套**：Hash 不能嵌套，复杂结构用 JSON 存成 String，或拆成多个 Hash key。
+
+---
+
+## List
+
+队列、时间线、最新 N 条等：
+
+```python showLineNumbers
+r.lpush("queue:tasks", "task1", "task2")
+r.rpush("queue:tasks", "task3")
+r.lpop("queue:tasks")
+r.lrange("queue:tasks", 0, -1)
+r.llen("queue:tasks")
+```
+
+- 元素仍是“字符串/字节”；存的是 JSON 字符串时，取回后要 `json.loads(...)` 再当对象用。
+
+---
+
+## Set
+
+去重集合、标签、共同好友等：
+
+```python showLineNumbers
+r.sadd("tags:article:1", "python", "redis", "db")
+r.smembers("tags:article:1")
+r.sinter("set1", "set2")
+r.sunion("set1", "set2")
+```
+
+---
+
+## Sorted Set
+
+按分数排序，适合排行榜、延时队列（分数为时间戳）等：
+
+```python showLineNumbers
+r.zadd("leaderboard", {"alice": 100, "bob": 200, "carol": 150})
+r.zrange("leaderboard", 0, -1, withscores=True)   # 升序
+r.zrevrange("leaderboard", 0, 2, withscores=True) # 前 3 名降序
+r.zrank("leaderboard", "bob")   # 排名 0-based
+r.zscore("leaderboard", "bob")  # 分数，返回 float
+```
+
+- **score**：Redis 里是双精度浮点，redis-py 返回 **float**；存的是整数时，需要再 `int(score)`。
+
+---
+
+## 过期与 key 操作
+
+```python showLineNumbers
+r.expire("cache:key1", 3600)
+r.ttl("cache:key1")    # -1 永不过期，-2 键不存在
+r.exists("cache:key1")
+r.delete("key1", "key2")
+r.keys("cache:*")      # 线上慎用 keys，用 scan_iter
+```
+
+- **scan_iter**：替代 `keys()` 做模糊遍历，不阻塞。
+
+```python showLineNumbers
+for key in r.scan_iter("cache:*"):
+    print(key)
+```
+
+---
+
+## 连接池与超时
+
+默认每个 `Redis()` 实例自带连接池；也可显式建池供多客户端共享：
+
+```python showLineNumbers
+pool = redis.ConnectionPool(host='localhost', port=6379, db=0)
+r = redis.Redis(connection_pool=pool)
+```
+
+- **超时**：`socket_connect_timeout`、`socket_timeout` 等，防止挂死。
+- **健康检查**：启动或定时 `r.ping()` 确认连接可用。
+
+---
+
+## Pipeline
+
+**Pipeline** 把多条命令打包成一批发出去，减少网络往返；默认会包成 **MULTI/EXEC**（要么都执行要么都不执行）：
+
+```python showLineNumbers
+pipe = r.pipeline()
+pipe.set("foo", 1)
+pipe.set("bar", 2)
+pipe.get("foo")
+results = pipe.execute()  # [True, True, b'1']
+```
+
+- 不需要原子性时用 `r.pipeline(transaction=False)`，只批处理、不 MULTI/EXEC。
+- **类型**：`execute()` 返回的列表顺序与命令一致，每个元素仍是 bytes/str（由连接配置决定），要 int/float 自己转。
+
+---
+
+## 和 Redis 概念的对应
+
+- **单线程**：Redis 单线程处理命令，一条大命令会阻塞其它；少用 `keys *`、大 list/hash 一次全取。
+- **持久化**：RDB 快照 vs AOF 日志，由服务端配置；客户端只发命令。
+- **内存与淘汰**：键过多或内存满时依赖 maxmemory 与淘汰策略（如 volatile-lru）；设计 key、TTL 时要考虑，避免无限增长。
+
+---
+
+## 注意事项
+
+1. **类型**：取到的是 bytes/str，直接当 int 用会报错；先判空再 `int(...)`/`float(...)`/`json.loads(...)`。
+2. **decode_responses**：同一应用里连接配置统一，否则有的返回 str 有的返回 bytes，容易写错。
+3. **键命名**：可用 `业务:实体:id`（如 `cache:user:1000`），便于统计和 scan。
+4. **TTL**：缓存类 key 尽量设过期；热点 key 可设长 TTL 或配合本地缓存。
+5. **Pipeline**：只想要批处理不想要原子性时用 `transaction=False`；要“要么全成功要么全失败”时用默认 Pipeline 或 WATCH/MULTI/EXEC（见官方文档）。
+6. **连接**：用连接池，不要每次请求新建 `Redis()`；Web 应用里通常全局一个连接池或每进程一个实例。
+
+---
+
+## 小结
+
+| 主题 | 要点 |
+|------|------|
+| **Redis 底层** | 值都是字符串/字节；Python 类型在读写两侧自己做转换或序列化。 |
+| **decode_responses** | True 返回 str，False 返回 bytes；数值、JSON 在 Python 里再转。 |
+| **存对象** | 一般用 JSON；仅 Python 且可信可用 pickle；高性能二进制用 msgpack。 |
+| **数值** | 存进去会变成字符串；取回后 `int()`/`float()`。 |
+| **Hash/List/Set 元素** | 仍是字符串/字节，复杂结构用 JSON 序列化后存。 |
+| **Pipeline** | 批量减少 RTT；默认带 MULTI/EXEC，不需要时设 transaction=False。 |
+| **keys / scan_iter** | 线上用 scan_iter 替代 keys，避免阻塞。 |
+
+### 类型转换速查
+
+| Redis 类型 | 写入（Python→Redis） | 读出（Redis→Python） | 常用转换 |
+|------------|----------------------|------------------------|----------|
+| String | 任意可转成 str/bytes | `bytes` 或 `str` | `int(x)` / `float(x)` / `json.loads(x)` |
+| Hash 字段值 | 同上 | 同上 | 同上；hgetall 得 dict |
+| List 元素 | 同上 | list of bytes/str | 逐项解码或 json.loads |
+| Set 成员 | 同上 | set of bytes/str | 同上 |
+| Sorted Set member | 同上 | 同上；score 为 float | `int(score)` 如需整数 |
+
+更多：异步客户端、集群、Pub/Sub、锁、Lua 脚本等见 [官方文档](https://redis.readthedocs.io/en/latest/) 与 [Redis 命令参考](https://redis.io/commands)。

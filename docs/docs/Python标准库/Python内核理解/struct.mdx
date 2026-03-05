@@ -1,0 +1,192 @@
+---
+title: struct
+---
+
+`struct` 模块用于在 Python 值与「按 C 结构体方式打包的二进制数据」之间转换：通过**格式字符串**描述如何把多个值打包成一段 `bytes`，或从一段 `bytes` 中按同样格式解包出多个值。典型用途包括与 C 代码或外部协议（文件格式、网络报文）交换数据：例如解析二进制文件头、实现网络协议、或与使用相同编译器的 C 结构体内存布局一一对应。
+
+Python 不直接暴露「按字节排列的 C 类型」；与 C/网络/文件打交道时，必须约定**字节序**、**各类型占用的字节数**以及可选的**对齐与填充**。`struct` 通过格式字符和可选的**字节序前缀**（如 `'<'` 小端、`'>'` 大端、`'!'` 网络序）明确这些约定，避免依赖本机实现。与 `ctypes` 的边界在于：`ctypes` 侧重「调用 C 动态库、定义 C 结构体类型并在 Python 里操作」；`struct` 则侧重「把 Python 值 ↔ 一段字节序列」的序列化/反序列化，不涉及调用 C 函数。设计上，格式字符串由可选的**字节序与对齐前缀**（`@`、`=`、`<`、`>`、`!`）和若干**格式字符**（如 `i`、`f`、`10s`）组成；`pack`/`unpack`/`pack_into`/`unpack_from` 负责按格式打包与解包，`calcsize` 返回该格式对应的字节长度，便于分配缓冲区或校验数据。
+
+[struct — 官方文档](https://docs.python.org/zh-cn/3/library/struct.html)
+
+## 格式字符
+
+格式字符串由**格式字符**组成，每个字符表示一个要打包/解包的类型；前面可加**重复次数**（如 `4h` 表示 4 个 `short`）。常用格式字符如下（「标准大小」指在非原生模式下、即使用 `'<'`/`'>'`/`'!'`/`'='` 时的固定字节数）：
+
+| 格式 | C 类型       | Python 类型 | 标准大小 |
+|------|--------------|-------------|----------|
+| `x`  | 填充字节     | 无          | 1        |
+| `c`  | char         | 1 字节 bytes | 1      |
+| `b`  | signed char  | int         | 1        |
+| `B`  | unsigned char| int         | 1        |
+| `?`  | _Bool        | bool        | 1        |
+| `h`  | short        | int         | 2        |
+| `H`  | unsigned short | int       | 2        |
+| `i`  | int          | int         | 4        |
+| `I`  | unsigned int | int         | 4        |
+| `l`  | long         | int         | 4        |
+| `q`  | long long    | int         | 8        |
+| `Q`  | unsigned long long | int | 8   |
+| `f`  | float        | float       | 4        |
+| `d`  | double       | float       | 8        |
+| `s`  | char[]       | bytes       | 由 count 定 |
+| `p`  | Pascal 串    | bytes       | count 定  |
+
+- `s` 前的数字表示**该字符串的字节长度**（如 `10s` 表示 10 字节的 bytes），不是重复次数；`c` 前的数字才是重复次数（如 `5c` 表示 5 个单字节）。
+- `p` 表示「Pascal 风格」：先 1 字节长度，再内容，总占 count 字节。
+
+```python showLineNumbers title="格式字符示例"
+import struct
+
+# 整数与浮点
+buf = struct.pack(">bhl", 1, 2, 3)   # 大端: 1 字节有符号 + 2 字节 short + 4 字节 long
+print(buf)   # b'\x01\x00\x02\x00\x00\x00\x03'
+print(struct.unpack(">bhl", buf))     # (1, 2, 3)
+print(struct.calcsize(">bhl"))       # 7
+
+# 's' 与 'c' 的区别：'10s' 是「一个 10 字节的 bytes」，'3c' 是「3 个单字节」
+print(struct.pack("@3c", b"1", b"2", b"3"))  # b'123'
+print(struct.pack("@3s", b"123"))            # b'123'
+```
+
+## pack 与 unpack
+
+- **`struct.pack(format, v1, v2, ...)`**：按格式字符串把 `v1, v2, ...` 打包成 `bytes`，参数个数和类型必须与格式一致。
+- **`struct.unpack(format, buffer)`**：从 `buffer` 中按格式解包，返回元组；`buffer` 长度必须等于 `calcsize(format)`。
+- **`struct.calcsize(format)`**：返回该格式对应的字节数，用于分配缓冲区或校验。
+
+```python showLineNumbers title="pack / unpack / calcsize"
+import struct
+
+# 打包与解包
+data = struct.pack(">hH", -100, 500)
+print(data)   # b'\xff\x9c\x01\xf4'
+a, b = struct.unpack(">hH", data)
+print(a, b)   # -100 500
+
+# 解包为命名元组，便于阅读
+from collections import namedtuple
+Record = namedtuple("Record", "name serial school grade")
+raw = b"raymond   \x32\x12\x08\x01\x08"
+r = Record._make(struct.unpack("<10sHHb", raw))
+print(r.name, r.serial)  # b'raymond   ' 4658
+```
+
+若同一格式会多次使用，可先编译成 `Struct` 对象，避免重复解析格式字符串：
+
+```python showLineNumbers title="Struct 对象（推荐重复使用同一格式时）"
+import struct
+
+s = struct.Struct(">i4s")
+print(s.pack(42, b"ab"))       # b'\x00\x00\x00*ab\x00\x00'
+print(s.unpack(s.pack(42, b"ab")))  # (42, b'ab\x00\x00')
+print(s.size)                  # 8
+```
+
+## 字节序（大端 / 小端）
+
+格式字符串的**第一个字符**可以是字节序与对齐前缀，用于指定多字节整数/浮点数在内存中的排列顺序。
+
+:::tip 大端与小端（Endianness）
+多字节整数在内存中可按「高位字节在前」或「低位字节在前」存放：**大端（Big-endian）** 是高位字节在低地址（如 `0x1234` 存成 `12 34`），**小端（Little-endian）** 是低位字节在低地址（存成 `34 12`）。网络协议通常规定使用大端（网络字节序）；x86/AMD64/ARM 常见为小端。不指定时，`struct` 使用**本机字节序**，不同机器结果可能不同，跨机或跨协议时应用前缀明确指定。
+:::
+
+| 前缀 | 含义           | 对齐/填充   |
+|------|----------------|-------------|
+| `@`  | 本机字节序与对齐 | 有（原生） |
+| `=`  | 本机字节序，标准大小 | 无   |
+| `<`  | 小端，标准大小 | 无         |
+| `>`  | 大端，标准大小 | 无         |
+| `!`  | 网络字节序（大端），标准大小 | 无 |
+
+```python showLineNumbers title="字节序示例"
+import struct
+
+# 1023 的 2 字节表示
+print(struct.pack(">h", 1023))  # 大端: b'\x03\xff'
+print(struct.pack("<h", 1023))  # 小端: b'\xff\x03'
+
+# 本机字节序（不写前缀时默认为 '@'）
+import sys
+print(sys.byteorder)  # 'little' 或 'big'
+```
+
+## 网络字节序
+
+:::tip 网络字节序（Network Byte Order）
+IETF 规定网络传输中多字节整数使用**大端**（RFC 1700）。`struct` 中前缀 `'!'` 即表示「网络字节序」，与 `'>'` 在大端机上等价，但语义上明确用于网络协议。
+:::
+
+```python showLineNumbers title="网络序打包"
+import struct
+
+# 协议中常见：先长度再数据，用 ! 表示网络序
+length = 256
+payload = b"hello"
+packet = struct.pack("!H", length) + payload
+print(struct.unpack("!H", packet[:2])[0])  # 256
+```
+
+## 对齐与填充
+
+在**原生模式**（`@` 或无前缀）下，`struct` 会按 C 编译器规则在成员之间插入**填充字节**，使各类型按对齐要求存放；打包结果与同平台 C 结构体的内存布局一致。在**标准模式**（`<`、`>`、`=`、`!`）下**不会**自动填充，需要自己用 `x` 或重复数为 0 的格式来对齐。
+
+:::tip 内存对齐（Alignment）
+许多 CPU 要求多字节类型（如 4 字节 int）的地址是 2/4/8 的倍数，否则可能变慢或报错。C 结构体会在成员之间插入「填充字节」以满足对齐；`struct` 的 `@` 模式会复现这一行为。跨平台或网络数据则通常用标准大小 + 显式 `x` 填充，不依赖本机对齐。
+:::
+
+```python showLineNumbers title="对齐：@ 与显式填充"
+import struct
+
+# 原生模式：@ci 会在 'c' 后插入 3 字节填充，使后面的 int 对齐到 4 字节
+# 结果总长为 8（1 + 3 填充 + 4）
+fmt_ci = "@ci"
+fmt_ic = "@ic"
+print(struct.calcsize(fmt_ci))  # 8
+print(struct.calcsize(fmt_ic))  # 5
+
+# 标准模式无自动填充，需自己加 'x'
+# 例如两个 long long 和一个 short，末尾对齐到 8 字节：用 '6x' 补 6 字节
+fmt_std = "<qqh6x"
+print(struct.calcsize(fmt_std))  # 24
+```
+
+## pack_into 与 unpack_from
+
+当数据在**大缓冲区**的某一偏移处时，可用 `pack_into` 写入、`unpack_from` 从指定偏移开始解包，避免切片复制。
+
+```python showLineNumbers title="pack_into / unpack_from"
+import struct
+
+buf = bytearray(16)
+struct.pack_into(">HH", buf, 0, 100, 200)
+struct.pack_into(">HH", buf, 4, 300, 400)
+print(struct.unpack_from(">HH", buf, 0))   # (100, 200)
+print(struct.unpack_from(">HH", buf, 4))   # (300, 400)
+```
+
+## iter_unpack
+
+当缓冲区由**多段相同格式**的数据连续组成时，可用 `iter_unpack` 按格式逐段解包，返回迭代器。
+
+```python showLineNumbers title="iter_unpack"
+import struct
+
+# 每 4 字节一个无符号整数
+buf = struct.pack(">IIII", 1, 2, 3, 4)
+for t in struct.iter_unpack(">I", buf):
+    print(t)  # (1,) (2,) (3,) (4,)
+```
+
+## 异常与边界
+
+- 打包时若整数值超出格式范围（如用 `h` 打包 99999），会抛出 **`struct.error`**。
+- 解包时若 `buffer` 长度不等于 `calcsize(format)`，也会抛出 `struct.error`。
+
+```python showLineNumbers title="struct.error"
+import struct
+
+try:
+    struct.pack(">h", 99999)
+except struct.error as e:
+    print(e)  # 'h' format requires -32768 <= number <= 32767
+```

@@ -1,0 +1,54 @@
+---
+title: pickle
+---
+
+pickle 模块用于将 Python 对象序列化为字节流，以及从字节流反序列化回对象。适合在可信环境中保存和恢复复杂对象（如类实例、函数等），与基于文本的 JSON 不同，pickle 生成的是二进制数据。
+
+[pickle 官方文档](https://docs.python.org/zh-cn/3/library/pickle.html)
+
+
+:::warning
+**不要对不可信数据使用 `pickle.load` / `pickle.loads`。**  
+反序列化会执行 pickle 字节流中编码的代码，恶意构造的数据可能导致任意代码执行。仅对完全由你自己或可信来源生成的数据使用 pickle。详见 [官方文档：pickle 的安全说明](https://docs.python.org/zh-cn/3/library/pickle.html#module-pickle)。
+:::
+
+
+## dump 与 load
+
+`pickle.dump(obj, file)` 将对象写入已打开的二进制文件；`pickle.load(file)` 从文件中读回对象。文件需以二进制模式 `'wb'`（写）或 `'rb'`（读）打开。
+
+```python showLineNumbers
+import pickle
+
+data = {"name": "张三", "scores": [90, 85, 88], "active": True}
+
+# 序列化并写入文件
+with open("data.pkl", "wb") as f:
+    pickle.dump(data, f)
+
+# 从文件反序列化
+with open("data.pkl", "rb") as f:
+    loaded = pickle.load(f)
+
+print(loaded)  # {'name': '张三', 'scores': [90, 85, 88], 'active': True}
+```
+
+## dumps 与 loads
+
+`pickle.dumps(obj)` 将对象序列化为内存中的 `bytes`；`pickle.loads(bytes_object)` 从字节反序列化。适用于网络传输、进程间传递或存入数据库等场景。
+
+```python showLineNumbers
+import pickle
+
+obj = [1, 2, {"a": None}, (3, 4)]
+
+# 序列化为字节
+raw = pickle.dumps(obj)
+print(type(raw))   # <class 'bytes'>
+print(len(raw))    # 字节长度
+
+# 从字节反序列化
+restored = pickle.loads(raw)
+print(restored)    # [1, 2, {'a': None}, (3, 4)]
+assert restored == obj
+```

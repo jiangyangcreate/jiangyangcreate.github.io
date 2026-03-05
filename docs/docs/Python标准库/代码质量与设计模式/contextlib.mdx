@@ -1,0 +1,115 @@
+---
+title: contextlib
+---
+
+`contextlib` 为 `with` 语句提供实用工具，用于定义上下文管理器、组合多个上下文、重定向标准流以及编写异步上下文管理器。参见 [PEP 343](https://peps.python.org/pep-343/)（"with" 语句）。
+
+[contextlib](https://docs.python.org/zh-cn/3/library/contextlib.html)
+
+## @contextmanager 用生成器写上下文管理器
+
+用 `@contextmanager` 装饰一个**只 yield 一次**的生成器函数，即可得到上下文管理器：yield 之前相当于 `__enter__`，之后相当于 `__exit__`（含异常处理）。无需手写类与 `__enter__`/`__exit__`。
+
+```python showLineNumbers
+from contextlib import contextmanager
+
+@contextmanager
+def managed_resource(name):
+    print(f"获取资源: {name}")
+    resource = name
+    try:
+        yield resource
+    finally:
+        print(f"释放资源: {name}")
+
+with managed_resource("db") as r:
+    print(f"使用 {r}")
+# 获取资源: db
+# 使用 db
+# 释放资源: db
+```
+
+## closing、suppress、nullcontext
+
+- **closing(thing)**：在退出 with 时调用 `thing.close()`，适用于有 `close()` 但未实现上下文协议的对象。
+- **suppress(*exceptions)**：在 with 块内抑制指定异常，等价于 try/except/pass。
+- **nullcontext(enter_result=None)**：不做什么的上下文管理器，进入时返回 `enter_result`，用于“可选上下文”或占位。
+
+```python showLineNumbers
+from contextlib import closing, suppress, nullcontext
+import os
+
+with closing(open("/tmp/out.txt", "w")) as f:
+    f.write("hello\n")
+
+with suppress(FileNotFoundError):
+    os.remove("maybe_missing.tmp")
+
+def process(file_or_path):
+    cm = open(file_or_path) if isinstance(file_or_path, str) else nullcontext(file_or_path)
+    with cm as f:
+        print(f.read() if hasattr(f, "read") else "no read")
+```
+
+## redirect_stdout、redirect_stderr
+
+临时将 `sys.stdout` 或 `sys.stderr` 重定向到文件或类文件对象，常用于捕获 `print`/`help()` 等输出。注意会修改全局状态，不适合多线程或库代码中的通用用法。
+
+```python showLineNumbers
+from contextlib import redirect_stdout, redirect_stderr
+import io
+
+buf = io.StringIO()
+with redirect_stdout(buf):
+    print("hidden")
+    help(abs)
+s = buf.getvalue()
+print("captured:", "hidden" in s)
+```
+
+## ExitStack、enter_context、callback
+
+`ExitStack` 用于在**同一条 with** 里动态组合多个上下文管理器和清理回调：用 `enter_context(cm)` 进入一个上下文并加入栈，用 `callback(func, *args, **kwargs)` 注册退出时调用的函数。退出时按**后进先出**顺序执行，便于“可选资源”或数量由输入决定的场景。
+
+```python showLineNumbers
+from contextlib import ExitStack
+
+filenames = ["a.txt", "b.txt"]
+with ExitStack() as stack:
+    files = [stack.enter_context(open(f)) for f in filenames]
+    stack.callback(print, "cleanup done")
+    for f in files:
+        print(f.read())
+# 退出时先执行 callback，再依次关闭 files
+```
+
+## asynccontextmanager、aclosing
+
+- **@asynccontextmanager**：装饰**异步生成器**，得到可在 `async with` 中使用的异步上下文管理器；yield 前/后对应 `__aenter__`/`__aexit__`。
+- **aclosing(thing)**：在退出时调用 `await thing.aclose()`，常用于确保异步生成器在提前 break 或异常时也能被正确关闭。
+
+```python showLineNumbers
+from contextlib import asynccontextmanager, aclosing
+
+@asynccontextmanager
+async def get_connection():
+    conn = "fake_conn"
+    try:
+        yield conn
+    finally:
+        print("release conn")
+
+async def main():
+    async with get_connection() as conn:
+        print(conn)
+    async with aclosing(some_async_generator()) as agen:
+        async for x in agen:
+            if x == 42:
+                break
+```
+
+:::tip 一次性 / 可重入 / 可重用
+- **一次性**：如 `@contextmanager` 生成的、文件对象等，同一实例只能在一条 with 中用一次，第二次用会报错或行为异常。
+- **可重入**：同一实例可在多条 with 中复用，且可嵌套（如 `suppress`、`redirect_stdout`）。
+- **可重用但不可重入**：如 `threading.Lock`、`ExitStack`，可在多条 with 中分别使用，但不宜在一条 with 里嵌套同一个实例。按需选择并查阅具体类型的文档。
+:::

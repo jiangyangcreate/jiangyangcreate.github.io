@@ -1,0 +1,127 @@
+---
+title: multiprocessing
+---
+
+进程是系统独立安排和分配系统资源（CPU、内存）的基本单位，操作系统以进程为单位分配存储空间，操作系统管理所有进程的执行，为它们合理的分配资源。
+
+一个进程就是 macOS 中的"活动监视器"、Windows 中的"任务管理器"的一个执行程序。
+
+进程之间是相互独立的，Python 中的进程通信一般由进程对 Queue 完成。
+
+进程绕过了全局解释器锁。因此，多进程模块允许程序员充分利用特定机器上的多个处理器。它在 Unix 和 Windows 上都能运行。
+
+进程的数量等于 CPU 核心的数量，这是最有效的。如果核数太多，就不能充分利用核数。如果太少，会造成进程切换，增加程序的运行时间。
+
+[multiprocessing](https://docs.python.org/zh-cn/3.14/library/multiprocessing.html?highlight=multiprocessing#module-multiprocessing):Multiprocessing Module Code Documentation
+
+## 工作原理 
+
+```python showLineNumbers
+print("程序启动")
+from multiprocessing import Pool
+
+def f(x):
+    # 3.14中，会将其设为__mp_main__
+    print(__name__) # __mp_main__
+    return x*x
+
+if __name__ == '__main__': # 如果不加，则新创建的子进程会自上而下执行所有代码，尝试创新的池
+    print(__name__) # __main__
+    # 创建子进程的过程，在不同操作系统上底层不一样。spawn、fork、forkserver。
+    # Windows是spawn。
+    # 1. 为每个子进程启动一个独立的Python解释器
+    # 2. 然后将主进程的所有资源（代码）序列化，发送
+    # 3. 子进程接收，反序列化，在自己的内存空间和Python解释器下，自上而下的运行代码
+    with Pool(3) as p:
+        print(p.map(f, [1, 2]))
+else:
+    print('我是子进程')
+
+"""
+程序启动
+__main__
+程序启动
+我是子进程
+程序启动
+我是子进程
+程序启动
+我是子进程
+__mp_main__
+__mp_main__
+[1, 4]
+"""
+```
+
+创建子进程时，会从主进程中拷贝一份当前系统状态给子进程。因此，子进程和主进程有相同的系统状态，但是是独立的，互不干扰。
+
+## Pool
+
+通常来说，Pool 中的 Worker 进程的生命周期和进程池的工作队列一样长。
+
+```python showLineNumbers
+from multiprocessing import Pool
+
+def f(vaule):
+    x = vaule[0]
+    y = vaule[1]
+    return x*y
+
+if __name__ == '__main__':
+    p = Pool(16) # new 16 process pools ， because i have 16 cpu
+    print(p.map(f, [(1,1), (2,2), (3,3)])) # take in data
+    p.close() # close pool
+
+# [1, 4, 9]
+```
+
+## 守护与阻塞
+
+| 守护状态 (Daemon) | 调用 join() | 运行行为 (结果) | 逻辑说明 |
+| --- | --- | --- | --- |
+| **False** (非守护) | **是** (阻塞) | **等待** | join 显式要求同步，主程序必须等待。 |
+| **False** (非守护) | **否** (非阻塞) | **不等待但会后台运行完** | 主程序运行完即止，但子任务会在后台继续跑完。 |
+| **True** (守护) | **是** (阻塞) | **等待** | 即使是守护状态，join 的优先级也更高。 |
+| **True** (守护) | **否** (非阻塞) | **直接结束** | 随主程序一同自杀，主程序不会等它。 |
+
+```python showLineNumbers
+from multiprocessing import Process
+import time
+
+def f(name):
+    time.sleep(1)
+    print('hello', name) 
+
+if __name__ == '__main__':
+    p = Process(target=f, args=('bob',))
+    # True表示让子进程对象p成为主进程对象的守护者，类似游戏中被契约的宠物。
+    # 一旦主人（主进程）死亡，契约的宠物(子进程)也会跟着死亡。
+    # 陪葬的情况仅在主进程先完成，子进程后完成时会发生。
+    p.daemon = False
+    p.start() # 创建进程后必须start启动才可以
+    p.join() # 让主进程停顿，等待子进程完成，结束阻塞
+    print(3)
+```
+
+
+主进程创建子进程时，会把当前系统状态，拷贝一份给子进程。此后，各自在独立的内存空间中，互不影响。
+
+```python showLineNumbers
+from multiprocessing import Process
+import time
+
+a = 1
+
+def f(name):
+    time.sleep(1)
+    print(a)
+
+if __name__ == '__main__':
+    p = Process(target=f, args=('bob',))
+    p.start() 
+    a = 2
+    print(3)
+"""
+3
+1
+"""
+```

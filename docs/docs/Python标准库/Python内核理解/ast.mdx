@@ -1,0 +1,211 @@
+---
+title: ast
+---
+
+`ast` 模块帮助 Python 程序处理「Python 抽象语法」对应的树形结构：将源码解析为抽象语法树（AST）、遍历或修改 AST、以及基于 AST 做安全求值。它是理解 CPython 编译流程与做元编程、静态分析的核心工具。
+
+在编译流程中，AST 处于承上启下的位置。CPython 的典型管线是：**源码 → 词法/语法分析 → 解析树（parse tree）→ AST → 符号表/控制流图 → 字节码（code object）→ 执行**；自 2.5 起采用「解析树 → AST → 控制流图 → 字节码」这一套（参见 PEP 339 等）。`ast` 模块把「生成与操作 AST」暴露给用户：用 `ast.parse()` 从源码得到 AST，用 `ast.dump()` 查看结构，用 `NodeVisitor`/`NodeTransformer` 做只读遍历或改写，用 `ast.literal_eval()` 安全求值字面量，再用内置 `compile()` 把 AST 编译成可执行字节码。设计上围绕「解析—查看—遍历/修改—求值/编译」这条主线展开。
+
+[ast](https://docs.python.org/3.14/library/ast.html)
+
+## 解析与查看 AST
+
+`ast.parse()` 将字符串源码解析为 AST 根节点（默认 `Module`）；`ast.dump()` 把整棵树转成可读的文本形式，便于调试和理解节点类型与子节点。
+
+```python showLineNumbers
+import ast
+
+source = """
+def add(a, b):
+    return a + b
+"""
+
+tree = ast.parse(source)
+print(ast.dump(tree, indent=2))
+"""
+Module(
+  body=[
+    FunctionDef(
+      name='add',
+      args=arguments(
+        posonlyargs=[],
+        args=[
+          arg(arg='a'),
+          arg(arg='b')],
+        kwonlyargs=[],
+        kw_defaults=[],
+        defaults=[]),
+      body=[
+        Return(
+          value=BinOp(
+            left=Name(id='a', ctx=Load()),
+            op=Add(),
+            right=Name(id='b', ctx=Load())))],
+      decorator_list=[])],
+  type_ignores=[])
+"""
+```
+
+:::tip 编译 pipeline 与 AST 节点
+上文的管线中，语法分析先产生**解析树**（parse tree），再转换为 AST；AST 之后经符号表、控制流图等步骤生成字节码。AST 节点类型由 CPython 的 `Parser/Python.asdl` 定义，所有节点继承自 `ast.AST`，如 `FunctionDef`、`BinOp`、`Name` 等对应语法构造，节点有 `_fields` 列出子节点名，多数还带 `lineno`、`col_offset` 等位置信息。
+:::
+
+## 遍历 AST 节点
+
+只读遍历用 `ast.NodeVisitor`：为每种节点类型实现 `visit_<NodeType>`，在需要时调用 `self.generic_visit(node)` 继续递归子节点。需要修改树时使用 `ast.NodeTransformer`，在访问方法中返回新节点或原节点即可。
+
+```python showLineNumbers
+import ast
+
+source = """
+x = 1
+y = x + 2
+print(y)
+z = x * y + 3
+"""
+
+class NameCollector(ast.NodeVisitor):
+    """收集所有变量名"""
+    def __init__(self):
+        self.names = set()
+
+    def visit_Name(self, node):
+        self.names.add(node.id)
+        self.generic_visit(node)
+
+tree = ast.parse(source)
+collector = NameCollector()
+collector.visit(tree)
+print(collector.names)
+# {'x', 'y', 'print', 'z'}
+```
+
+## 修改 AST
+
+使用 `ast.NodeTransformer` 时，若增删或替换了节点，通常需调用 `ast.fix_missing_locations(tree)` 补全 `lineno`/`col_offset`，以便编译或调试时能正确对应源码位置。
+
+```python showLineNumbers
+import ast
+
+class ConstantDoubler(ast.NodeTransformer):
+    """将所有整数字面量翻倍"""
+    def visit_Constant(self, node):
+        if isinstance(node.value, int):
+            node.value *= 2
+        return node
+
+source = "result = 1 + 2 + 3"
+tree = ast.parse(source)
+tree = ConstantDoubler().visit(tree)
+ast.fix_missing_locations(tree)
+
+code = compile(tree, "<string>", "exec")
+namespace = {}
+exec(code, namespace)
+print(namespace["result"])  # 12 (= 2 + 4 + 6)
+```
+
+## 安全地求值表达式
+
+`ast.literal_eval(node_or_string)` 只允许求值「字面量」：数字、字符串、字节串、元组、列表、字典、集合、`True`/`False`/`None` 等，不允许函数调用、属性访问、运算符（除字面量构造外）等，因此无法执行任意代码，适合解析来自不可信输入的配置或数据。
+
+:::tip 安全与 eval
+`eval()` 会执行传入字符串中的任意 Python 表达式，若字符串来自用户或网络，可能执行 `__import__('os').system(...)` 等危险代码。`literal_eval` 在 AST 层面限制为仅字面量节点，从而在保持「把字符串当 Python 字面量解析」的便利性的同时避免代码执行风险。
+:::
+
+```python showLineNumbers
+import ast
+
+print(ast.literal_eval("[1, 2, 3]"))        # [1, 2, 3]
+print(ast.literal_eval("{'a': 1, 'b': 2}")) # {'a': 1, 'b': 2}
+print(ast.literal_eval("(True, None, 3.14)")) # (True, None, 3.14)
+
+try:
+    ast.literal_eval("__import__('os').system('echo hacked')")
+except (ValueError, SyntaxError) as e:
+    print(f"被拒绝: {e}")
+```
+
+## 代码分析：函数复杂度统计
+
+下面用 `NodeVisitor` 统计每个函数内的分支与循环数量，作为圈复杂度的一种简化度量，演示 AST 在静态分析中的用法。
+
+```python showLineNumbers
+import ast
+
+source = """
+def simple():
+    return 1
+
+def complex_func(x):
+    if x > 0:
+        for i in range(x):
+            if i % 2 == 0:
+                yield i
+    elif x < 0:
+        raise ValueError("negative")
+    else:
+        return 0
+"""
+
+class ComplexityAnalyzer(ast.NodeVisitor):
+    """统计函数中的分支与循环数量"""
+    def __init__(self):
+        self.results = {}
+        self._current_func = None
+        self._complexity = 0
+
+    def visit_FunctionDef(self, node):
+        old_func, old_complexity = self._current_func, self._complexity
+        self._current_func = node.name
+        self._complexity = 1
+        self.generic_visit(node)
+        self.results[node.name] = self._complexity
+        self._current_func, self._complexity = old_func, old_complexity
+
+    def visit_If(self, node):
+        self._complexity += 1
+        self.generic_visit(node)
+
+    def visit_For(self, node):
+        self._complexity += 1
+        self.generic_visit(node)
+
+    visit_While = visit_For
+
+analyzer = ComplexityAnalyzer()
+analyzer.visit(ast.parse(source))
+for name, score in analyzer.results.items():
+    print(f"{name}: 圈复杂度 = {score}")
+# simple: 圈复杂度 = 1
+# complex_func: 圈复杂度 = 4
+```
+
+## 编译与执行
+
+`ast.parse()` 的 `mode` 可选 `"exec"`（模块/多语句）、`"eval"`（单表达式）、`"single"`（交互式单条语句）等；得到的 AST 用内置 `compile()` 编译为字节码后，可用 `exec()` 或 `eval()` 执行。
+
+:::tip 从 AST 到字节码
+内置函数 `compile(source, filename, mode)` 可直接接受字符串 `source`；若传入 AST 根节点，则相当于跳过了「源码 → AST」一步，直接做「AST → 字节码」。这对「先修改 AST 再执行」的元编程场景很有用；CPython 内部也是先得到 AST 再调用编译器生成字节码。
+:::
+
+```python showLineNumbers
+import ast
+
+source = "print('Hello from AST!')"
+tree = ast.parse(source, mode="exec")
+code = compile(tree, filename="<ast>", mode="exec")
+exec(code)
+# Hello from AST!
+
+expr_tree = ast.parse("2 ** 10", mode="eval")
+result = eval(compile(expr_tree, "<ast>", "eval"))
+print(result)  # 1024
+```
+
+:::tip AST 的实际应用
+- **代码格式化工具**（如 Black）基于 AST 确保格式化不改变语义
+- **静态分析工具**（如 Pylint、mypy）使用 AST 检查代码问题
+- **AI 代码生成**：分析/验证 LLM 生成代码的语法正确性
+- **CPython 贡献**：理解 AST 是参与编译器优化的前提
+:::

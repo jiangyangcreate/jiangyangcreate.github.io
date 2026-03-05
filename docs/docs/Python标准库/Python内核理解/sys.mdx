@@ -1,0 +1,98 @@
+---
+title: sys
+---
+
+`sys` 是 Python 标准库中与**解释器及运行时**直接打交道的模块：它提供由解释器使用或维护的变量，以及强依赖解释器行为的函数，在任意环境中都可用（always available）。典型用途包括获取命令行参数、模块搜索路径、解释器版本与平台、递归深度限制、标准输入/输出/错误流，以及主动退出进程等。
+
+之所以需要单独的 `sys` 模块，是因为解释器在启动和运行过程中会维护一批“全局状态”（如 `argv`、`path`、递归上限、标准流），这些状态既不属于某几个内置类型，也不适合塞进 `os`（`os` 偏重操作系统接口）。把与解释器强相关的变量和函数集中放在 `sys` 里，既方便脚本查询和有限度地调整运行时行为，又便于实现与文档约定“除非标明可写，否则只读”的设计思路。因此 `sys` 的设计以**只读为主**：多数属性仅用于查询；与**平台**相关的（如 `sys.platform`、`sys.executable`）、与**递归深度**相关的（如 `getrecursionlimit`）、与**标准流**相关的（`stdin`/`stdout`/`stderr`）等，都体现了“解释器控制的资源，通过 sys 暴露给用户”的思路。
+
+[sys](https://docs.python.org/zh-cn/3/library/sys.html)
+
+## 命令行与参数
+
+- **sys.argv** — 传递给脚本的命令行参数列表，`argv[0]` 为脚本名（或 `'-c'` 等）。
+- **sys.orig_argv** — 解释器启动时的原始命令行参数（含解释器路径与 `-c` 等），不随 `argv` 被程序修改而改变。
+
+```python showLineNumbers
+import sys
+
+# python script.py a b c  => argv[0]=script.py, argv[1]=a, ...
+print(sys.argv)
+print(sys.orig_argv)
+```
+
+:::tip 平台与编码
+在 Unix 上，命令行参数由操作系统以字节形式传入，Python 使用文件系统编码与 `surrogateescape` 解码为字符串。若需要原始字节，可用 `[os.fsencode(arg) for arg in sys.argv]` 获取。
+:::
+
+## 模块与路径
+
+- **sys.modules** — 已导入模块的字典，键为模块名，值为模块对象。
+- **sys.path** — 模块搜索路径列表，可修改以影响 `import` 查找位置。
+
+```python showLineNumbers
+import sys
+
+print("os" in sys.modules)
+print(sys.path[:2])  # 前几条搜索路径
+```
+
+## 退出与流
+
+- **sys.exit([arg])** — 引发 `SystemExit` 退出解释器；整数表示退出码，0 表示成功。
+- **sys.stdout / sys.stderr / sys.stdin** — 标准输出、标准错误、标准输入的流对象，可重定向或替换。
+
+```python showLineNumbers
+import sys
+
+# 退出码
+# sys.exit(0)   # 正常
+# sys.exit(1)   # 错误
+
+# 重定向输出
+sys.stdout.write("hello\n")
+# 恢复时可保存原引用: old_stdout = sys.stdout
+```
+
+:::tip 标准流是什么
+`stdin`/`stdout`/`stderr` 是进程与外界通信的“标准流”，由操作系统在启动进程时绑定（通常对应终端或管道）。Python 通过 `sys` 暴露这三个流对象，便于重定向、捕获输出或替换成自定义 IO。
+:::
+
+## 解释器信息
+
+- **sys.version_info** — 版本号元组，如 `(3, 12, 0)`，便于做版本判断。
+- **sys.executable** — 当前 Python 解释器可执行文件的路径。
+- **sys.platform** — 平台标识，如 `'linux'`、`'win32'`、`'darwin'`。
+
+```python showLineNumbers
+import sys
+
+print(sys.version_info.major, sys.version_info.minor)
+print(sys.executable)
+print(sys.platform)
+```
+
+:::tip 平台标识
+`sys.platform` 来自编译/运行时的操作系统标识，常用于条件分支（如区分 Windows 与 Unix）。注意其值为小写字符串（如 `'win32'`、`'linux'`），与 `os.name` 等可能不同，以官方文档为准。
+:::
+
+## 递归与对象大小
+
+- **sys.getrecursionlimit()** / **sys.setrecursionlimit(n)** — 获取/设置递归深度上限。
+- **sys.getsizeof(obj[, default])** — 返回对象自身占用的字节数（不含所引用对象）。
+
+```python showLineNumbers
+import sys
+
+print(sys.getrecursionlimit())
+print(sys.getsizeof([]))
+print(sys.getsizeof("hello"))
+```
+
+:::tip 递归限制
+解释器对调用栈深度设限，防止无限递归导致栈溢出。默认约 1000 层，可用 `setrecursionlimit` 提高，但过大可能触发 C 栈溢出；若需深层“递归”逻辑，更推荐用循环或显式栈替代。
+:::
+
+:::info
+多数 `sys` 属性为只读，随意修改可能破坏解释器行为。**sys.excepthook** 在未捕获异常时被调用；**sys.breakpointhook()** 由内置函数 `breakpoint()` 调用，详见官方文档。
+:::

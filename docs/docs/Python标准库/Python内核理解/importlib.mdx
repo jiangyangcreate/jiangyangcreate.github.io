@@ -1,0 +1,138 @@
+---
+title: importlib
+---
+
+**importlib** 是 Python 标准库中实现 `import` 语句的包，同时提供一套编程接口：你可以按**字符串**动态导入模块、**重载**已加载模块、**查找模块规格**（ModuleSpec）、以及**使查找器缓存失效**，从而在运行时发现新创建或安装的模块。它自 Python 3.1 起作为可移植的纯 Python 实现存在，并暴露了导入系统的各个组件，便于编写自定义的查找器（finder）与加载器（loader）参与导入过程。
+
+其设计源于 **PEP 302**（New Import Hooks）引入的「元路径查找器 + 加载器」协议与 `sys.meta_path`，以及 **PEP 451**（A ModuleSpec Type for the Import System）引入的 **ModuleSpec**：前者解决了仅靠重写 `__import__` 难以细粒度扩展导入、且易与 `sys.modules` 等语义冲突的问题；后者在查找器与加载器之间增加了「规格」这一层，把模块的 name、loader、origin、submodule_search_locations 等集中在一个对象里，便于在未真正加载模块前就能获取元信息，并统一了重载等流程。因此，程序式导入应优先使用 **importlib.import_module()**，而不是内建 **__import__()**：前者直接返回被请求的包或模块（如 `pkg.mod`），语义更清晰，且与当前基于 finder/loader/ModuleSpec 的导入机制一致；后者返回的是顶层包或模块，且官方明确建议用 `import_module()` 做程序化导入。
+
+[importlib 官方文档](https://docs.python.org/zh-cn/3/library/importlib.html)
+
+## 主要 API
+
+### import_module — 按名称导入模块
+
+按**绝对或相对**模块名导入，是程序式导入的推荐入口。相对导入时需传入 `package` 作为解析锚点。
+
+```python showLineNumbers
+import importlib
+
+# 绝对导入
+mod = importlib.import_module("json")
+print(mod.__name__)  # json
+
+# 相对导入：在 pkg 包内导入 pkg.subpkg 中的 ..other
+# importlib.import_module("..other", "pkg.subpkg")  # 得到 pkg.other
+```
+
+:::tip **为何推荐 import_module 而非 __import__**
+`__import__` 是 `import` 语句的底层实现，但返回的是「顶层」包或模块；而 `import_module(name)` 返回的正是 `name` 对应的包或模块，更符合「按名字拿模块」的直觉，且与基于 finder/loader 的导入机制一致。
+:::
+
+### reload — 重载已导入的模块
+
+对**已成功导入**的模块对象调用，会重新执行该模块的代码并更新其命名空间，常用于开发时改完源码不想重启解释器的场景。
+
+```python showLineNumbers
+import importlib
+import sys
+
+# 假设已 import some_module，修改源码后：
+# mod = importlib.reload(some_module)
+# 注意：其他模块里已用 from some_module import X 的引用不会自动更新，需重新执行 from 或使用 module.X
+```
+
+:::tip **reload 与 ModuleSpec**
+从 Python 3.7 起，若被重载的模块没有 `ModuleSpec`（例如缺少 `__spec__`），会抛出 `ModuleNotFoundError`。reload 内部会通过 `find_spec(name, target=module)` 获取规格再执行加载。
+:::
+
+### find_spec — 查找模块规格（不加载模块）
+
+返回模块的 **ModuleSpec**（若找到），便于在未加载模块前获取 name、loader、origin、submodule_search_locations 等元信息。
+
+```python showLineNumbers
+import importlib
+
+spec = importlib.find_spec("json")
+if spec is not None:
+    print(spec.name)       # json
+    print(spec.origin)     # built-in
+    print(spec.loader)     # <class '_frozen_importlib.BuiltinImporter'>
+    print(spec.submodule_search_locations)  # None（非包）
+```
+
+:::tip **ModuleSpec 与查找器/加载器**
+**Finder** 负责「找到」模块并给出 **Loader**；**Loader** 负责「执行」模块（如 `exec_module`）。PEP 451 引入的 **ModuleSpec** 把 name、loader、origin、cached、submodule_search_locations 等绑在一起，成为查找器与加载器之间的桥梁，并统一了重载和模块 repr 等行为。
+:::
+
+### invalidate_caches — 使查找器缓存失效
+
+在程序运行期间若**新增或安装了模块**（例如新写了文件或安装了包），应调用一次，以便所有使用缓存的 **meta_path 查找器**能发现新模块。
+
+```python showLineNumbers
+import importlib
+
+# 在动态创建/安装模块后调用，保证后续 import 能发现
+importlib.invalidate_caches()
+```
+
+:::tip **sys.meta_path 与查找器**
+**sys.meta_path** 是一个「元路径查找器」列表。导入时，解释器会先依次调用这些 finder 的 `find_spec(name, path, target)`；若都返回 None，再走 sys.path 等路径查找。invalidate_caches() 会调用列表中每个 finder 的 invalidate_caches()（若存在）。
+:::
+
+## 导入机制相关概念速览
+
+| 概念 | 说明 |
+|------|------|
+| **sys.meta_path** | 元路径查找器列表，在 sys.path 之前被遍历，用于自定义「谁可以找到模块」。 |
+| **Finder** | 实现 `find_spec(name, path=None, target=None)`，返回 ModuleSpec 或 None。 |
+| **Loader** | 实现 `exec_module(module)`（及可选的 `create_module(spec)`），负责执行模块代码。 |
+| **ModuleSpec** | 封装 name、loader、origin、cached、submodule_search_locations 等，见 `importlib.machinery.ModuleSpec`。 |
+
+## 典型用法示例
+
+### 按字符串动态导入并调用
+
+```python showLineNumbers
+import importlib
+
+name = "json"  # 可从配置、命令行等读取
+mod = importlib.import_module(name)
+# 使用 mod 的 API
+data = mod.loads('{"a": 1}')
+print(data)
+```
+
+### 开发时重载当前包下的子模块
+
+```python showLineNumbers
+import importlib
+import pkg.submod as submod
+
+# 修改 pkg/submod.py 后
+submod = importlib.reload(submod)
+```
+
+### 仅检查模块是否可被找到（不加载）
+
+```python showLineNumbers
+import importlib
+
+def can_import(name):
+    return importlib.find_spec(name) is not None
+
+print(can_import("sys"))    # True
+print(can_import("nonesuch"))  # False
+```
+
+### 运行时新增模块后刷新缓存
+
+```python showLineNumbers
+import importlib
+import sys
+
+# 若在运行中向 sys.path 添加目录并放入新 .py 文件，或安装了新包：
+sys.path.insert(0, "/some/new/dir")
+importlib.invalidate_caches()
+# 之后 import 新模块才能被 meta_path 上的 finder 发现
+```

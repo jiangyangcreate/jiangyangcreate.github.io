@@ -1,0 +1,293 @@
+---
+title: sqlite3
+---
+
+`sqlite3` 模块提供了轻量级的 SQLite 嵌入式数据库接口，遵循 DB-API 2.0 规范，无需安装独立数据库服务器。
+
+[sqlite3](https://docs.python.org/3/library/sqlite3.html)
+
+## 连接与基本操作
+
+```python showLineNumbers
+import sqlite3
+
+# 连接到磁盘数据库（不存在则自动创建）
+conn = sqlite3.connect('example.db')
+
+# 连接到内存数据库（适合测试和临时数据）
+conn = sqlite3.connect(':memory:')
+
+# 推荐：使用上下文管理器自动管理事务
+with sqlite3.connect(':memory:') as conn:
+    cursor = conn.cursor()
+
+    # 创建表
+    cursor.execute('''
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            age INTEGER,
+            email TEXT UNIQUE
+        )
+    ''')
+
+    # 参数化查询插入数据（? 占位符防止 SQL 注入）
+    cursor.execute(
+        "INSERT INTO users (name, age, email) VALUES (?, ?, ?)",
+        ('张三', 25, 'zhangsan@example.com')
+    )
+
+    # 命名参数形式
+    cursor.execute(
+        "INSERT INTO users (name, age, email) VALUES (:name, :age, :email)",
+        {'name': '李四', 'age': 30, 'email': 'lisi@example.com'}
+    )
+```
+
+:::tip
+永远不要用 f-string 或字符串拼接构建 SQL，始终使用 `?` 占位符或命名参数 `:name` 来防止 SQL 注入。
+:::
+
+## 批量插入
+
+```python showLineNumbers
+import sqlite3
+
+with sqlite3.connect(':memory:') as conn:
+    conn.execute('CREATE TABLE users (name TEXT, age INTEGER)')
+
+    # executemany 批量插入
+    users = [('王五', 28), ('赵六', 35), ('孙七', 22)]
+    conn.executemany("INSERT INTO users VALUES (?, ?)", users)
+    print(f"插入了 {conn.total_changes} 行")
+
+    # executescript 执行多条 SQL（自动提交，无法参数化）
+    conn.executescript('''
+        INSERT INTO users VALUES ('钱八', 40);
+        INSERT INTO users VALUES ('周九', 18);
+    ''')
+```
+
+## 查询数据
+
+```python showLineNumbers
+import sqlite3
+
+with sqlite3.connect(':memory:') as conn:
+    conn.execute('CREATE TABLE scores (name TEXT, score INTEGER)')
+    conn.executemany('INSERT INTO scores VALUES (?, ?)',
+                     [('Alice', 90), ('Bob', 85), ('Carol', 92), ('Dave', 78)])
+
+    cur = conn.execute("SELECT * FROM scores WHERE score > ?", (80,))
+
+    # fetchone：获取一行
+    row = cur.fetchone()
+    print(row)  # ('Alice', 90)
+
+    # fetchmany：获取指定行数
+    rows = cur.fetchmany(2)
+    print(rows)  # [('Bob', 85), ('Carol', 92)]
+
+    # fetchall：获取所有剩余行（注意：前面已取走的不会重复）
+    rest = cur.fetchall()
+    print(rest)  # []
+
+    # 也可以直接迭代游标
+    for name, score in conn.execute("SELECT * FROM scores ORDER BY score DESC"):
+        print(f"{name}: {score}")
+```
+
+:::info
+`fetchall()` 会将全部结果加载到内存。大数据量时建议用 `fetchmany()` 分批处理或直接迭代游标。
+:::
+
+## Row 工厂
+
+默认查询结果是元组，设置 `row_factory` 可通过列名访问。
+
+```python showLineNumbers
+import sqlite3
+
+with sqlite3.connect(':memory:') as conn:
+    conn.row_factory = sqlite3.Row
+    conn.execute('CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)')
+    conn.execute('INSERT INTO users (name, age) VALUES (?, ?)', ('张三', 25))
+
+    row = conn.execute('SELECT * FROM users').fetchone()
+
+    print(row['name'])     # 通过列名访问
+    print(row[1])          # 通过索引访问
+    print(dict(row))       # 转为字典：{'id': 1, 'name': '张三', 'age': 25}
+    print(row.keys())      # 获取所有列名
+```
+
+## 事务管理
+
+```python showLineNumbers
+import sqlite3
+
+# 手动管理事务
+conn = sqlite3.connect(':memory:')
+cur = conn.cursor()
+cur.execute('CREATE TABLE accounts (name TEXT, balance REAL)')
+cur.execute('INSERT INTO accounts VALUES (?, ?)', ('Alice', 1000))
+cur.execute('INSERT INTO accounts VALUES (?, ?)', ('Bob', 500))
+conn.commit()
+
+try:
+    cur.execute('UPDATE accounts SET balance = balance - 200 WHERE name = ?', ('Alice',))
+    cur.execute('UPDATE accounts SET balance = balance + 200 WHERE name = ?', ('Bob',))
+    conn.commit()
+except sqlite3.Error as e:
+    conn.rollback()
+    print(f"事务回滚: {e}")
+finally:
+    conn.close()
+
+# 推荐：上下文管理器自动提交/回滚
+with sqlite3.connect(':memory:') as conn:
+    conn.execute('CREATE TABLE t (x INTEGER)')
+    conn.execute('INSERT INTO t VALUES (?)', (42,))
+    # 正常退出时自动 commit，异常时自动 rollback
+```
+
+:::tip
+`isolation_level` 参数控制事务行为：`"DEFERRED"`（默认）、`"IMMEDIATE"`、`"EXCLUSIVE"`，或 `None`（自动提交）。
+:::
+
+## 数据类型映射
+
+| Python 类型 | SQLite 类型 | 说明 |
+|------------|------------|------|
+| `None` | `NULL` | 空值 |
+| `int` | `INTEGER` | 整数 |
+| `float` | `REAL` | 浮点数 |
+| `str` | `TEXT` | 文本 |
+| `bytes` | `BLOB` | 二进制数据 |
+
+### 自定义类型适配
+
+SQLite 没有原生日期类型，可通过适配器/转换器处理自定义类型。
+
+```python showLineNumbers
+import sqlite3
+from datetime import datetime, date
+
+# 注册适配器：Python 类型 -> SQLite 存储格式
+sqlite3.register_adapter(datetime, lambda val: val.isoformat())
+sqlite3.register_adapter(date, lambda val: val.isoformat())
+
+# 注册转换器：SQLite 存储格式 -> Python 类型
+sqlite3.register_converter("timestamp", lambda val: datetime.fromisoformat(val.decode()))
+sqlite3.register_converter("date", lambda val: date.fromisoformat(val.decode()))
+
+# 连接时启用 detect_types
+with sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES) as conn:
+    conn.execute('CREATE TABLE events (title TEXT, day date, ts timestamp)')
+    conn.execute('INSERT INTO events VALUES (?, ?, ?)',
+                 ('会议', date.today(), datetime.now()))
+
+    row = conn.execute('SELECT * FROM events').fetchone()
+    print(type(row[1]), row[1])  # <class 'datetime.date'> 2026-03-06
+    print(type(row[2]), row[2])  # <class 'datetime.datetime'> ...
+```
+
+## 自定义 SQL 函数
+
+```python showLineNumbers
+import sqlite3
+import hashlib
+
+with sqlite3.connect(':memory:') as conn:
+    # 注册标量函数：参数为（函数名, 参数个数, Python 函数）
+    conn.create_function("md5", 1, lambda t: hashlib.md5(t).hexdigest())
+    conn.create_function("is_even", 1, lambda x: x % 2 == 0)
+
+    result = conn.execute("SELECT md5(?)", (b"hello",)).fetchone()
+    print(result[0])  # 5d41402abc4b2a76b9719d911017c592
+
+    conn.execute('CREATE TABLE nums (n INTEGER)')
+    conn.executemany('INSERT INTO nums VALUES (?)', [(i,) for i in range(6)])
+    evens = conn.execute('SELECT n FROM nums WHERE is_even(n)').fetchall()
+    print(evens)  # [(0,), (2,), (4,)]
+```
+
+## 实用技巧
+
+```python showLineNumbers
+import sqlite3
+
+with sqlite3.connect(':memory:') as conn:
+    conn.execute('CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)')
+
+    # 获取自增 ID
+    cur = conn.execute('INSERT INTO users (name) VALUES (?)', ('测试',))
+    print(f"新 ID: {cur.lastrowid}")
+
+    # 检查表是否存在
+    exists = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name=?", ('users',)
+    ).fetchone()
+    print(f"表存在: {exists is not None}")
+
+    # 获取表结构
+    for col in conn.execute("PRAGMA table_info(users)"):
+        cid, name, col_type, notnull, default, pk = col
+        print(f"  {name}: {col_type} {'[PK]' if pk else ''}")
+
+    # 获取所有表名
+    tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+    print(f"所有表: {[t[0] for t in tables]}")
+```
+
+## 性能优化
+
+```python showLineNumbers
+import sqlite3
+
+conn = sqlite3.connect('example.db')
+
+# 启用 WAL 模式：支持读写并发，显著提升性能
+conn.execute("PRAGMA journal_mode=WAL")
+conn.execute("PRAGMA synchronous=NORMAL")
+conn.execute("PRAGMA cache_size=-64000")  # 64MB 缓存
+
+# 创建索引加速查询
+conn.execute("CREATE INDEX IF NOT EXISTS idx_email ON users(email)")
+
+# 查看查询计划
+plan = conn.execute("EXPLAIN QUERY PLAN SELECT * FROM users WHERE email=?",
+                     ('test@example.com',)).fetchall()
+print(plan)
+
+conn.close()
+```
+
+:::tip
+批量插入时用 `executemany` 比循环调用 `execute` 快数十倍。关键在于减少事务提交次数——将多条插入放在同一事务内一次性提交。
+:::
+
+## 数据库备份
+
+```python showLineNumbers
+import sqlite3
+
+# 使用内置 backup API
+source = sqlite3.connect('example.db')
+target = sqlite3.connect('backup.db')
+source.backup(target)
+source.close()
+target.close()
+
+# 也可以备份到内存数据库进行快速分析
+with sqlite3.connect('example.db') as disk_conn:
+    mem_conn = sqlite3.connect(':memory:')
+    disk_conn.backup(mem_conn)
+    rows = mem_conn.execute('SELECT count(*) FROM users').fetchone()
+    print(f"用户数: {rows[0]}")
+    mem_conn.close()
+```
+
+:::info
+SQLite 适合嵌入式和中小规模应用。如果需要高并发写入、网络访问或细粒度权限管理，建议迁移到 PostgreSQL 或 MySQL。
+:::

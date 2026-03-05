@@ -1,0 +1,73 @@
+---
+title: pdb
+---
+
+`pdb` 是 Python 自带的交互式源码调试器，支持设置（条件）断点、单步执行、查看栈帧、列出源码以及在任意栈帧上下文中求值表达式。
+
+[pdb](https://docs.python.org/zh-cn/3/library/pdb.html)
+
+## 启动方式
+
+- **python -m pdb script.py [args...]** — 以调试模式运行脚本，在首行前暂停。
+- **breakpoint()** — 在代码中调用，进入调试器（3.7+，会调用 `sys.breakpointhook()`，默认进入 pdb）。
+- **pdb.set_trace()** — 在调用处进入调试器，适合在固定位置硬编码断点。
+
+```python showLineNumbers
+# 方式一：命令行
+
+# 方式二：在代码中（推荐 3.7+）
+def foo(x):
+    breakpoint()
+    return x * 2
+
+# 方式三：传统写法
+import pdb
+def bar():
+    pdb.set_trace()
+    pass
+```
+
+## 常用命令
+
+调试器提示符为 `(Pdb)`，常用单字母命令如下：
+
+| 命令 | 全称 | 说明 |
+|------|------|------|
+| **n** | next | 执行到当前函数的下一行（不进入子函数） |
+| **s** | step | 单步执行，可进入子函数 |
+| **c** | continue | 继续运行，直到下一个断点 |
+| **r** | return | 运行直到当前函数返回 |
+| **b** | break | 设置断点（见下节） |
+| **l** | list | 列出当前行附近源码 |
+| **p** | print | 对表达式求值并打印 |
+| **w** | where | 打印调用栈（当前帧在底部） |
+
+```python showLineNumbers
+# 在 (Pdb) 下示例
+# (Pdb) n        # 下一行
+# (Pdb) s        # 步入
+# (Pdb) p x      # 打印变量 x
+# (Pdb) w        # 查看栈
+# (Pdb) c        # 继续运行
+```
+
+## 断点管理
+
+- **b [位置] [, condition]** — 设置断点。位置可为行号 `b 10`、`b file.py:10`，或函数名 `b myfunc`。可加条件表达式，仅当条件为真时断点才生效。
+- **condition bpnumber [expr]** — 为已有断点设置或清除条件。
+- **cl(ear) [bpnumber \| filename:lineno]** — 清除指定断点或某行上的断点；无参数时清除全部（会确认）。
+- **disable bpnumber** / **enable bpnumber** — 禁用或重新启用断点，断点仍保留在列表中。
+
+```python showLineNumbers
+# (Pdb) b 15              # 当前文件第 15 行
+# (Pdb) b foo             # 函数 foo 入口
+# (Pdb) b 20, x > 0       # 第 20 行，仅当 x > 0 时停
+# (Pdb) condition 2 x < 0 # 将 2 号断点条件改为 x < 0
+# (Pdb) clear 2           # 清除 2 号断点
+# (Pdb) disable 1         # 禁用 1 号断点
+# (Pdb) enable 1          # 重新启用
+```
+
+:::tip
+通过环境变量 **PYTHONBREAKPOINT** 可改变 `breakpoint()` 的行为：设为 `0` 则断点不生效；设为 `module.func` 可指定其它调试入口。在 IDE 中调试时通常使用 IDE 自带的断点与变量窗口，pdb 更适合命令行、远程或无图形环境下的调试。
+:::
