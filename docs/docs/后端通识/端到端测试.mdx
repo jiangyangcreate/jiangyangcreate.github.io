@@ -1,0 +1,710 @@
+---
+sidebar_position: 9
+title: 端到端测试
+---
+
+本章节的内容适用于自动化测试。模拟真实用户路径，保障复杂业务流程的最终一致性。亦可用于自动化办公、小规模爬虫等场景。
+
+## 自动化框架
+
+从我们访问一个网址开始，到在浏览器看到漂亮的界面，这个过程经历了许多步骤。然后当你断开网络会发现，页面内容依然没有消失，他们在哪里呢？
+
+我们知道网页分为三部分，互相协作：
+
+- HTML 定义了网页的内容
+- CSS 描述了网页的布局
+- JavaScript 控制了网页的行为
+
+其实还可以加上一项
+
+- 资源(多媒体)在合适的时候被调用
+
+我们通过查询谷歌浏览器开发者协议（Chrome DevTools Protocol）可以找到这条命令，其实所有浏览器开发者协议都可以，这里只是以谷歌为例。
+
+那接着我们要做的事情就是：通过浏览器工具，获取完整的浏览器缓存，接着读取缓存就能找到对应的数据了，你可以抓取浏览器中的流数据，并根据流数据类型做分类保存；对下载好的页面做修改并截图实现高亮部分文字的效果；下载多媒体等。当你做到这一步时，你的爬虫认知就从定向爬虫转变为了通用型爬虫了。
+
+现在市面上常见的模拟浏览器工具有以下几种，我建议熟读其中 Playwright 的开发文档，再阅读其他框架的文档时，会发现大部分都是相通的。
+
+Selenium：老牌模拟浏览器，仅同步
+
+Pyppeteer：Puppeteer 的 Python 实现，仅支持谷歌浏览器，异步
+
+Playwright：支持三种不同浏览器，异步，微软月更
+
+接下来我们通过一个自动搜寻验证码图片并解析的例子来熟悉下整个流程。代码中所有路径部分请替换为你自己的地址，过程中会有极少的数据提取操作，可以参见后续数据提取教程。
+
+### Selenium
+
+如果你使用的是 Selenium，可以参考这段代码
+
+[Selenium 代码官方文档](https://www.selenium.dev/selenium/docs/api/py/api.html)
+
+```python showLineNumbers
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+import time
+import json
+import base64
+from PIL import Image
+from urllib.parse import urlparse
+from io import BytesIO
+
+options = webdriver.ChromeOptions()
+proxy = False # 代理设置：关闭
+if proxy:
+    options.add_argument('--proxy-server={}'.format(proxy))
+
+
+d = DesiredCapabilities.CHROME
+d['loggingPrefs'] = {'performance': 'ALL'}
+options.add_experimental_option('w3c', False) # 实验室选项，w3c协议 关闭
+
+'''你应该经历过有部分网站证书过期,会跳出是否继续访问。这里我们忽视这些错误'''
+options.add_argument('--ignore-certificate-errors') # 忽略证书错误
+options.add_argument('--ignore-ssl-errors') #忽略ssl错误
+options.add_argument('--headless') # 选择无头模式，加载更快
+options.binary_location = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
+
+driver = webdriver.Chrome('D:\\MyProgram File\\python\\chromedriver.exe',
+                options=options,
+                desired_capabilities=d)
+
+driver.execute_cdp_cmd("Network.enable", {}) # 启用网络跟踪，网络事件现在将传递给客户端。
+
+driver.get('https://id.qq.com/vc.html')  # 打开一个网址
+time.sleep(2)
+
+for f in driver.find_elements_by_tag_name("form"): # 找到所有表单类信息
+    urls = [i.get_attribute("src") for i in f.find_elements_by_tag_name("img")] #找到表单内所有的图片（大概率只有一个，且是验证码）
+
+
+    for log in driver.get_log("performance"):
+        log = json.loads(log["message"]) # 减小我们的检索范围
+        if log["message"]["method"] == "Network.responseReceived": # 精准检索收到的数据
+
+            for url in urls:
+                url = urlparse(url).path #避免网页内的url中的https的有无导致匹配不上
+
+                if url in log['message']['params']['response']['url']: # 特征匹配
+                    request_id = log['message']['params']['requestId'] # 获取requestid
+                    data = driver.execute_cdp_cmd("Network.getResponseBody", {"requestId": request_id})['body'] # 提取id对应的数据
+                    data = base64.b64decode(data) # 从cdp开发文档可以得知返回的是base64编码的数据，我们他把转回二进制
+                    source_img =Image.open(BytesIO(data))# 接着读取二进制数据
+                    source_img.show()  #打开看看，获取部分到这里就结束了。
+```
+
+如果你遇到 Selenium 元素无法点击，可以推测下原因：
+
+- 窗口没有最大化导致目标元素不可见
+- 没有等待页面渲染完成
+- 没有等待 AJAX 异步加载完成
+- 元素在框架内，没有跳转到框架中
+
+### Pyppeteer
+
+Pyppeteer 对流抓取支持的不是很好，但是对 JavaScript 定位与执行做的非常不错，所以这段代码稍短一些。
+
+[Pyppeteer 代码官方文档](https://pyppeteer.github.io/pyppeteer/)
+
+```python showLineNumbers
+import asyncio
+from pyppeteer import launch
+from urllib import request
+
+class Get_pic(): ## 自动获取验证码图片
+    async def get_refer(self): # 定义主函数
+        browser = await launch(headless=False)
+        page = await browser.newPage()
+        await page.goto('https://id.qq.com/vc.html')          # 打开网址
+        image_src = await page.Jeval('#img', 'el => el.src') # 锁定图片，获取网络对象
+        # 第一个参数代表定位方式【.】代表属性【#】代表id 【>】表示下属
+        # 第二个参数代表要执行的js代码，  => 表示匿名函数，输出 src路径
+        request.urlretrieve(image_src, 'image.png') # 把网络对象复制到本地
+        await browser.close() # 关闭浏览器
+
+new = Get_pic() #实例化
+asyncio.run(new.get_refer()) # 调用方法
+```
+
+### Playwright
+
+如果你使用的 Playwright，可以参考下方的代码。我使用了 2 种方法来实现：
+
+Playwright 的监听器整合了 CDP 协议中的接口，因此代码更加简洁。
+Playwright 通用支持选中元素之后执行 JavaScript 语法。
+
+[Playwright 代码文档](https://playwright.dev/python/docs/intro)
+
+```python showLineNumbers
+from PIL import Image
+from urllib.parse import urlparse
+from io import BytesIO
+import asyncio
+from urllib import request
+from playwright.async_api import async_playwright
+
+class Get_pic(): ## 自动获取验证码图片
+    async def get_refer(self): # 定义主函数
+        async with async_playwright() as p:  # 创建一个playwright对象
+            browser =await p.chromium.launch(headless=False)  # 启动浏览器，配置一下无头模式
+            context = await browser.new_context(ignore_https_errors = True,bypass_csp=True) # 切换绕过页面的 Content-Security-Policy
+            page = await context.new_page() # 创建页面
+            self.img_data = {}
+            page.on("response", self.on_response) # 注册一个监听器，读取已加载内容，并把读取到的response传递给on_response方法
+            await page.goto('https://id.qq.com/vc.html')          # 打开网址
+            image_src = await page.eval_on_selector('#img','el => el.src')
+            request.urlretrieve(image_src, 'image.png') # 把网络对象复制到本地
+            image = page.locator("img")
+            url = await image.get_attribute("src") # 获取页面内的img标签的src属性
+            self.urls = urlparse(url).query #避免网页内的url中的https的有无导致匹配不上
+            for u in self.img_data:
+                if  self.urls in u:
+                    source_img =Image.open(BytesIO(self.img_data[u]))
+                    source_img.show()
+            await browser.close() # 关闭浏览器
+
+    async def on_response(self,response):
+        '''
+        response 为playwright 的 response对象
+        '''
+        self.img_data[response.url] = await response.body()
+
+new = Get_pic() #实例化
+asyncio.run(new.get_refer()) # 调用方法
+```
+
+## 数据提取
+
+通过之前的学习，我们已经可以通过多种方式获取到数据了，可能是直接可以使用的 HTML，也可能是 JavaScript、CSS 代码、多媒体资源等。
+
+接着我们需要从中提取出对我们有价值的数据，这一步是文本预处理。提取的方式有根据网页节点结构、JavaScript 语法、标签属性、纯文本规律等。
+
+正则表达式：根据文字规律，解析最快（不同语言的正则表达式语法略有不同，Python 的正则表达式主要通过 re 模块实现）
+
+XPath：根据网页节点路径，解析较快
+
+CSS：根据网页的 CSS 项，可读性更强
+
+BeautifulSoup：根据属性、节点、CSS，解析最慢
+
+parsel：根据正则、网页节点路径、属性、节点、CSS 提取，解析较快
+
+数据除了藏在网页之中，也有可能藏在 JSON 中。
+
+execjs：兼容性最好，并且支持转换后执行 JavaScript，但是速度较慢。
+
+### XPath
+
+XPath 的基本语法
+
+更多实例可以查看菜鸟教程的 [XPath 实例](https://www.runoob.com/xpath/xpath-syntax.html)
+
+| 表达式        | 描述                                                                   |
+| ------------- | ---------------------------------------------------------------------- |
+| nodename      | 选取此节点的所有子节点                                                 |
+| /             | 从根节点选取（取子节点）                                               |
+| //            | 从匹配选择的当前节点选择文档中的节点，而不考虑它们的位置（取子孙节点） |
+| .             | 选取当前节点                                                           |
+| ..            | 选取当前节点的父节点                                                   |
+| @             | 选取属性                                                               |
+| \*            | 匹配任何元素节点                                                       |
+| @\*           | 匹配任何属性节点                                                       |
+| node()        | 匹配任何类型的节点                                                     |
+| /bookstore/\* | 选取 bookstore 元素的所有子元素                                        |
+| //\*          | 选取文档中的所有元素                                                   |
+| //title[@*]   | 选取所有带有属性的 title 元素                                          |
+| text()        | 提取文本信息                                                           |
+
+下面是一些具体的例子，另外 通过在路径表达式中使用"|"运算符，您可以选取若干个路径。譬如：
+
+```bash showLineNumbers
+//title | //price 选取文档中的所有 title 和 price 元素。
+```
+
+| 表达式                              | 描述                                                                                    |
+| ----------------------------------- | --------------------------------------------------------------------------------------- |
+| /bookstore/book[1]                  | 选取属于 bookstore 子元素的第一个 book 元素                                             |
+| /bookstore/book[last()]             | 选取属于 bookstore 子元素的最后一个 book 元素                                           |
+| /bookstore/book[last()-1]           | 选取属于 bookstore 子元素的倒数第二个 book 元素                                         |
+| /bookstore/book[position()< 3]      | 选取最前面的两个属于 bookstore 元素的子元素的 book 元素                                 |
+| //title[@lang]                      | 选取所有拥有名为 lang 的属性的 title 元素                                               |
+| //title[@lang='eng']                | 选取所有 title 元素，且这些元素拥有值为 eng 的 lang 属性                                |
+| /bookstore/book[price>35.00]        | 选取 bookstore 元素的所有 book 元素，且其中的 price 元素的值须大于 35.00                |
+| /bookstore/book[price>35.00]//title | 选取 bookstore 元素中的 book 元素的所有 title 元素，且其中的 price 元素的值须大于 35.00 |
+
+### CSS
+
+CSS 的基本语法
+
+更多实例可以查看[CSS 选择器参考手册](https://www.w3school.com.cn/cssref/css_selectors.asp)
+
+| 选择器               | 例子                  | 例子描述                                          |
+| -------------------- | --------------------- | ------------------------------------------------- |
+| .class               | .intro                | 选择 class="intro" 的所有元素                     |
+| .class1.class2       | .name1.name2          | 选择 class 属性中同时有 name1 和 name2 的所有元素 |
+| .class1 .class2      | .name1 .name2         | 选择作为类名 name1 元素后代的所有类名 name2 元素  |
+| #id                  | #firstname            | 选择 id="firstname" 的元素                        |
+| \*                   | \*                    | 选择所有元素                                      |
+| element              | p                     | 选择所有 p 元素                                   |
+| element.class        | p.intro               | 选择 class="intro" 的所有 p 元素                  |
+| element,element      | div, p                | 选择所有 div 元素和所有 p 元素                    |
+| element element      | div p                 | 选择 div 元素内的所有 p 元素                      |
+| element>element      | div > p               | 选择父元素是 div 的所有 p 元素                    |
+| element+element      | div + p               | 选择紧跟 div 元素的首个 p 元素                    |
+| element1~element2    | p ~ ul                | 选择前面有 p 元素的每个 ul 元素                   |
+| [attribute]          | [target]              | 选择带有 target 属性的所有元素                    |
+| [attribute=value]    | [target=_blank]       | 选择带有 target="\_blank" 属性的所有元素          |
+| [attribute~=value]   | [title~=flower]       | 选择 title 属性包含单词 "flower" 的所有元素       |
+| [attribute\|=value]  | [lang\|=en]           | 选择 lang 属性值以 "en" 开头的所有元素。          |
+| [attribute^=value]   | a[href^="https"]      | 选择其 src 属性值以 "https" 开头的每个 a 元素     |
+| [attribute$=value]   | a[href$=".pdf"]       | 选择其 src 属性以 ".pdf" 结尾的所有 a 元素        |     |
+| [attribute*=value]   | a[href*="w3schools"]  | 选择其 href 属性值中包含 "abc" 子串的每个 a 元素  |
+| :active              | a:active              | 选择活动链接                                      |
+| ::after              | p::after              | 在每个 p 的内容之后插入内容                       |
+| ::before             | p::before             | 在每个 p 的内容之前插入内容                       |
+| :checked             | input:checked         | 选择每个被选中的 input 元素                       |
+| :default             | input:default         | 选择默认的 input 元素                             |
+| :disabled            | input:disabled        | 选择每个被禁用的 input 元素                       |
+| :empty               | p:empty               | 选择没有子元素的每个 p 元素（包括文本节点）       |
+| :enabled             | input:enabled         | 选择每个启用的 input 元素                         |
+| :first-child         | p:first-child         | 选择属于父元素的第一个子元素的每个 p 元素         |
+| ::first-letter       | p::first-letter       | 选择每个 p 元素的首字母                           |
+| ::first-line         | p::first-line         | 选择每个 p 元素的首行                             |
+| :first-of-type       | p:first-of-type       | 选择属于其父元素的首个 p 元素的每个 p 元素        |
+| :focus               | input:focus           | 选择获得焦点的 input 元素                         |
+| :fullscreen          | :fullscreen           | 选择处于全屏模式的元素                            |
+| :hover               | a:hover               | 选择鼠标指针位于其上的链接                        |
+| :in-range            | input:in-range        | 选择其值在指定范围内的 input 元素                 |
+| :indeterminate       | input:indeterminate   | 选择处于不确定状态的 input 元素                   |
+| :invalid             | input:invalid         | 选择具有无效值的所有 input 元素                   |
+| :lang(language)      | p:lang(it)            | 选择 lang 属性等于 "it"（意大利）的每个 p 元素    |
+| :last-child          | p:last-child          | 选择属于其父元素最后一个子元素每个 p 元素         |
+| :last-of-type        | p:last-of-type        | 选择属于其父元素的最后 p 元素的每个 p 元素        |
+| :link                | a:link                | 选择所有未访问过的链接                            |
+| :not(selector)       | :not(p)               | 选择非 p 元素的每个元素                           |
+| :nth-child(n)        | p:nth-child(2)        | 选择属于其父元素的第二个子元素的每个 p 元素       |
+| :nth-last-child(n)   | p:nth-last-child(2)   | 同上，从最后一个子元素开始计数                    |
+| :nth-of-type(n)      | p:nth-of-type(2)      | 选择属于其父元素第二个 p 元素的每个 p 元素        |
+| :nth-last-of-type(n) | p:nth-last-of-type(2) | 同上，但是从最后一个子元素开始计数                |
+| :only-of-type        | p:only-of-type        | 选择属于其父元素唯一的 p 元素的每个 p 元素        |
+| :only-child          | p:only-child          | 选择属于其父元素的唯一子元素的每个 p 元素         |
+| :optional            | input:optional        | 选择不带 "required" 属性的 input 元素             |
+| :out-of-range        | input:out-of-range    | 选择值超出指定范围的 input 元素                   |
+| ::placeholder        | input::placeholder    | 选择已规定 "placeholder" 属性的 input 元素        |
+| :read-only           | input:read-only       | 选择已规定 "readonly" 属性的 input 元素           |
+| :read-write          | input:read-write      | 选择未规定 "readonly" 属性的 input 元素           |
+| :required            | input:required        | 选择已规定 "required" 属性的 input 元素           |
+| :root                | :root                 | 选择文档的根元素                                  |
+| ::selection          | ::selection           | 选择用户已选取的元素部分                          |
+| :target              | #news:target          | 选择当前活动的 #news 元素                         |
+| :valid               | input:valid           | 选择带有有效值的所有 input 元素                   |
+| :visited             | a:visited             | 选择所有已访问的链接                              |
+
+### BeautifulSoup
+
+[BS4 解析库用法详解](http://c.biancheng.net/python_spider/bs4.html)
+
+#### BeautifulSoup 解析器
+
+这个模块属于模块名与下载名不一致，安装时需要注意。另外需要安装几个网页解析器，推荐使用 lxml 作为解析器，因为效率更高
+
+```python showLineNumbers
+pip install beautifulsoup4
+pip install lxml
+pip install html5lib
+```
+
+安装完成之后可以通过如下方式解析网页数据
+
+```python showLineNumbers
+html_doc = """
+<html><head><title>"c语言中文网"</title></head>
+<body>
+<p class="title"><b>c.biancheng.net</b></p>
+<p class="website">一个学习编程的网站
+<a href="http://c.biancheng.net/python/" id="link1">python教程</a>
+<a href="http://c.biancheng.net/c/" id="link2">c语言教程</a>
+"""
+from bs4 import BeautifulSoup
+soup = BeautifulSoup(html_doc, 'lxml')
+
+print(soup.prettify()) #prettify()用于格式化输出html/xml文档
+```
+
+#### BeautifulSoup 对象
+
+文档树中的每个节点都是 Python 对象，这些对象大致分为四类
+
+- Tag：标签类，HTML 文档中所有的标签都可以看做 Tag 对象。
+- NavigableString：字符串类，指的是标签中的文本内容，使用 text、string、strings 来获取文本内容。
+- BeautifulSoup：表示一个 HTML 文档的全部内容，您可以把它当作一个特殊的 Tag 对象。
+- Comment：表示 HTML 文档中的注释内容以及特殊字符串，它是一个特殊的 NavigableString。
+
+```python showLineNumbers
+from bs4 import BeautifulSoup
+soup = BeautifulSoup('<p class="Web site url"><b>c.biancheng.net</b></p>', 'html.parser')
+#获取整个p标签的html代码
+print(soup.p)
+#获取b标签
+print(soup.p.b)
+#获取p标签内容，使用NavigableString类中的string、text、get_text()
+print(soup.p.text)
+#返回一个字典，里面是多有属性和值
+print(soup.p.attrs)
+#查看返回的数据类型
+print(type(soup.p))
+#根据属性，获取标签的属性值，返回值为列表
+print(soup.p['class'])
+#给class属性赋值,此时属性值由列表转换为字符串
+soup.p['class']=['Web','Site']
+print(soup.p)
+```
+
+#### Beatifulsoup 节点
+
+Tag 对象提供了许多遍历 tag 节点的属性，比如 contents、children 用来遍历子节点；parent 与 parents 用来遍历父节点；而 next_sibling 与 previous_sibling 则用来遍历兄弟节点 。
+
+```python showLineNumbers
+#coding:utf8
+from bs4 import BeautifulSoup
+html_doc = """
+<html><head><title>"c语言中文网"</title></head>
+<body>
+<p class="title"><b>c.biancheng.net</b></p>
+<p class="website">一个学习编程的网站</p>
+<a href="http://c.biancheng.net/python/" id="link1">python教程</a>,
+<a href="http://c.biancheng.net/c/" id="link2">c语言教程</a> and
+"""
+soup = BeautifulSoup(html_doc, 'html.parser')
+body_tag=soup.body
+print(body_tag)
+#以列表的形式输出，所有子节点
+print(body_tag.contents)
+```
+
+#### find_all()与 find()
+
+find_all() 方法用来搜索当前 tag 的所有子节点，并判断这些节点是否符合过滤条件，最后以列表形式将符合条件的内容返回，语法格式如下：
+
+```bash showLineNumbers
+find_all( name , attrs , recursive , text , limit )
+```
+
+参数说明：
+name：查找所有名字为 name 的 tag 标签，字符串对象会被自动忽略。
+attrs：按照属性名和属性值搜索 tag 标签，注意由于 class 是 Python 的关键字吗，所以要使用 "class\_"。
+recursive：find_all() 会搜索 tag 的所有子孙节点，设置 recursive=False 可以只搜索 tag 的直接子节点。
+text：用来搜文档中的字符串内容，该参数可以接受字符串 、正则表达式 、列表、True。
+limit：由于 find_all() 会返回所有的搜索结果，这样会影响执行效率，通过 limit 参数可以限制返回结果的数量。
+
+find() 方法与 find_all() 类似，不同之处在于 find_all() 会将文档中所有符合条件的结果返回，而 find() 仅返回一个符合条件的结果，所以 find() 方法没有 limit 参数。
+
+使用 find() 时，如果没有找到查询标签会返回 None，而 find_all() 方法返回空列表。
+
+```python showLineNumbers
+from bs4 import BeautifulSoup
+import re
+html_doc = """
+<html><head><title>"c语言中文网"</title></head>
+<body>
+<p class="title"><b>c.biancheng.net</b></p>
+<p class="website">一个学习编程的网站</p>
+<a href="http://c.biancheng.net/python/" id="link1">python教程</a>
+<a href="http://c.biancheng.net/c/" id="link2">c语言教程</a>
+<a href="http://c.biancheng.net/django/" id="link3">django教程</a>
+<p class="vip">加入我们阅读所有教程</p>
+<a href="http://vip.biancheng.net/?from=index" id="link4">成为vip</a>
+"""
+#创建soup解析对象
+soup = BeautifulSoup(html_doc, 'html.parser')
+
+# find_all 语法
+#查找所有a标签并返回
+print(soup.find_all("a"))
+#查找前两条a标签并返回
+print(soup.find_all("a",limit=2))
+#按照标签属性以及属性值查找 HTML 文档
+print(soup.find_all("p",class_="website"))
+print(soup.find_all(id="link4"))
+#列表行书查找tag标签
+print(soup.find_all(['b','a']))
+#正则表达式匹配id属性值
+print(soup.find_all('a',id=re.compile(r'.\d')))
+print(soup.find_all(id=True))
+#True可以匹配任何值，下面代码会查找所有tag，并返回相应的tag名称
+for tag in soup.find_all(True):
+    print(tag.name,end=" ")
+#输出所有以b开始的tag标签
+for tag in soup.find_all(re.compile("^b")):
+    print(tag.name)
+
+# find 语法
+#查找所有a标签并返回
+print(soup.find("a"))
+#查找前两条a标签并返回
+print(soup.find("a",limit=2))
+#按照标签属性以及属性值查找 HTML 文档
+print(soup.find("p",class_="website"))
+print(soup.find(id="link4"))
+#列表行书查找tag标签
+print(soup.find(['b','a']))
+#正则表达式匹配id属性值
+print(soup.find('a',id=re.compile(r'.\d')))
+print(soup.find(id=True))
+#True可以匹配任何值，下面代码会查找所有tag，并返回相应的tag名称
+for tag in soup.find(True):
+    print(tag.name,end=" ")
+#输出所有以b开始的tag标签
+for tag in soup.find(re.compile("^b")):
+    print(tag.name)
+```
+
+#### CSS 选择器
+
+BS4 支持大部分的 CSS 选择器，比如常见的标签选择器、类选择器、id 选择器，以及层级选择器。Beautiful Soup 提供了一个 select() 方法，通过向该方法中添加选择器，就可以在 HTML 文档中搜索到与之对应的内容。
+
+```python showLineNumbers
+html_doc = """
+<html><head><title>"c语言中文网"</title></head>
+<body>
+<p class="title"><b>c.biancheng.net</b></p>
+<p class="website">一个学习编程的网站</p>
+<a href="http://c.biancheng.net/python/" id="link1">python教程</a>
+<a href="http://c.biancheng.net/c/" id="link2">c语言教程</a>
+<a href="http://c.biancheng.net/django/" id="link3">django教程</a>
+<p class="vip">加入我们阅读所有教程</p>
+<a href="http://vip.biancheng.net/?from=index" id="link4">成为vip</a>
+<p class="introduce">介绍:
+<a href="http://c.biancheng.net/view/8066.html" id="link5">关于网站</a>
+<a href="http://c.biancheng.net/view/8092.html" id="link6">关于站长</a>
+</p>
+"""
+from bs4 import BeautifulSoup
+soup = BeautifulSoup(html_doc, 'html.parser')
+#根据元素标签查找
+print(soup.select('title'))
+#根据属性选择器查找
+print(soup.select('a[href]'))
+#根据类查找
+print(soup.select('.vip'))
+#后代节点查找
+print(soup.select('html head title'))
+#查找兄弟节点
+print(soup.select('p + a'))
+#根据id选择p标签的兄弟节点
+print(soup.select('p ~ #link3'))
+#nth-of-type(n)选择器，用于匹配同类型中的第n个同级兄弟元素
+print(soup.select('p ~ a:nth-of-type(1)'))
+#查找子节点
+print(soup.select('p > a'))
+print(soup.select('.introduce > #link5'))
+```
+
+### parsel
+
+parsel 相当于 Beatifulsoup 的升级版，速度更快，而且后期可以无缝对接 Scrapy，因为经常需要结合 css 和 xpath 两种语法来提取，所以可以查看这个[对比](https://en.wikibooks.org/wiki/XPath/CSS_Equivalents)
+
+#### 基本用法
+
+```python showLineNumbers
+from parsel import Selector
+
+html = '''
+<div>
+    <ul>
+         <li class="item-0">first item</li>
+         <li class="item-1"><a href="link2.html">second item</a></li>
+         <li class="item-0 active"><a href="link3.html"><span class="bold">third item</span></a></li>
+         <li class="item-1 active"><a href="link4.html">fourth item</a></li>
+         <li class="item-0"><a href="link5.html">fifth item</a></li>
+     </ul>
+ </div>
+'''
+# 基本用法
+selector = Selector(text=html)
+items = selector.css('.item-0')
+items2 = selector.xpath('//li[contains(@class, "item-0")]')
+
+## 提取文本
+for item in selector.css('.item-0'):
+    text = item.xpath('.//text()') # // 是所有子孙节点，text()是提取文本
+    print(text.get())# get 方法的作用是从 SelectorList 里面提取第一个 Selector 对象，然后输出其中的结果。
+    print(text.getall())# getall 方法的作用是从 SelectorList 里面提取所有 Selector 对象，然后输出其中的结果。
+
+## 提取属性
+'''
+用 css 和 xpath 方法实现。我们根据同时包含 item-0 和 active 这两个 class
+来选取第三个 li 节点，然后进一步选取了里面的 a 节点
+'''
+result = selector.css('.item-0.active a::attr(href)').get() # ::attr()
+print(result) # link3.html
+result = selector.xpath('//li[contains(@class, "item-0") and contains(@class, "active")]/a/@href').get() # /@
+print(result) # link3.html
+
+## 正则提取
+result = selector.css('.item-0').re('link.*') # 匹配包含 link 的所有结果。
+print(result)
+# ['link3.html"><span class="bold">third item</span></a></li>', 'link5.html">fifth item</a></li>']
+```
+
+#### parsel 命名空间
+
+多个相同的 XML 文档被加载时，计算机不能正确区分。所以需要给不同的 XML 加上命名空间来区分。
+
+命名空间是在元素的开始标签的 xmlns 属性中定义的。命名空间声明的语法是
+
+```bash showLineNumbers
+xmlns:前缀="URI"
+xmlns:gd="http://schemas.google.com/g/2005"
+```
+
+命名空间 URI 不会被解析器用于查找信息。如果像想要提取命名空间的 url，需要先移除命名空间。
+
+```python showLineNumbers
+import requests
+from parsel import Selector
+text = requests.get('https://feeds.feedburner.com/PythonInsider').text
+sel = Selector(text=text, type='xml') # 使用xml解析器
+
+# 我们可以尝试选择所有对象，然后看到它不起作用 （因为 Atom XML 命名空间混淆了这些节点）
+sel.xpath("//link") # []
+
+# 但是一旦我们调用Selector.remove_namespaces方法，就可以访问所有节点 直接通过他们的名字
+sel.remove_namespaces()  # 移除命名空间
+sel.xpath("//link")
+# [<Selector xpath='//link' data='<link rel="alternate" type="text/html...'>,
+#<Selector xpath='//link' data='<link rel="next" type="application/at...'>,
+# ...]
+
+
+# 为什么默认情况下不始终调用命名空间删除过程?
+# 删除命名空间需要迭代和修改 文档，默认情况下执行的操作成本相当高 对于所有文档。
+# 在某些情况下，实际上可能需要使用命名空间，在 某些元素名称在命名空间之间发生冲突的情况。虽然这些情况非常罕见
+
+## 如果存在命名空间，也可以通过命名空间来选取对应的数据
+sel.xpath("//a:entry/a:author/g:image/@src", namespaces={"a": "http://www.w3.org/2005/Atom","g": "http://schemas.google.com/g/2005"}).getall()
+```
+
+#### parsel 将 CSS 转换为 XPath
+
+```python showLineNumbers
+from parsel import css2xpath
+css2xpath('h1.title')
+"descendant-or-self::h1[@class and contains(concat(' ', normalize-space(@class), ' '), ' title ')]"
+css2xpath('.profile-data') + '//h2'
+"descendant-or-self::*[@class and contains(concat(' ', normalize-space(@class), ' '), ' profile-data ')]//h2"
+```
+
+#### parsel 使用技巧
+
+包括错误的 XPath 语法、XPath 和 css 组合使用
+
+```python showLineNumbers
+from scrapy import Selector
+sel = Selector(text='<a href="#">Click here to go to the <strong>Next Page</strong></a>')
+xp = lambda x: sel.xpath(x).extract() # let's type this only once
+xp('//a//text()') # take a peek at the node-set
+  # [u'Click here to go to the ', u'Next Page']
+xp('string(//a//text())')  # convert it to a string
+  # [u'Click here to go to the ']
+
+
+xp('//a[1]') # selects the first a node
+[u'<a href="#">Click here to go to the <strong>Next Page</strong></a>']
+xp('string(//a[1])') # converts it to string
+[u'Click here to go to the Next Page']
+
+xp("//a[contains(., 'Next Page')]//text()") # good
+#['Click here to go to the ', 'Next Page']
+xp("//a[contains(.//text(), 'Next Page')]") # bad
+# []
+
+xp("substring-after(//a, 'Next ')")# good
+# [u'Page']
+xp("substring-after(//a//text(), 'Next ')")# bad
+# [u'']
+
+## 组合使用
+sel = Selector(text='<p class="content-author">Someone</p><p class="content text-wrap">Some content</p>')
+xp = lambda x: sel.xpath(x).getall()
+sel.css('.content').xpath('@class').getall()
+# ['content text-wrap']
+```
+
+#### parsel 对比 bs4
+
+对比项包括：标签+class 属性、标签+多个 class 属性、标签+非 class 的属性键值、提取指定属性、选取指定节点。
+
+可以看到能用 bs4 实现的，parsel 都可以实现，并且速度更快。
+bs4 代码更多，但是可读性较好。parsel 语法更简洁，但是可读性较差。
+
+```python showLineNumbers
+from parsel import Selector
+from bs4 import BeautifulSoup
+from timeit import timeit
+
+ # https://www.kickstarter.com/projects/cloverpress/pixiv-presents-artists-in-taiwan-and-korea?ref=section-homepage-featured-project
+with open('1.html','r')as f:
+    html = f.read()
+
+def test1():
+    sel = Selector(text=html)
+    Title = sel.css('h2.project-name').xpath('.//text()').get()
+    First_Page_Picture = sel.css('img.aspect-ratio--object::attr(src)').get()
+    Pledged_Amount = sel.css('span.money')[4].xpath('.//text()').get()
+    Due_Time = sel.css('span[data-test-id=deadline-exists]').xpath('.//text()').get()
+    Time_Left = sel.css('span.block.type-16.type-28-md.bold.dark-grey-500')[1].xpath('.//text()').get()
+    return Due_Time ,Time_Left,Pledged_Amount,Title,First_Page_Picture
+
+
+def test2():
+    newSoup = BeautifulSoup(html, "html.parser")
+    Title = newSoup.find('h2',class_ = 'project-name').text
+    First_Page_Picture = newSoup.find('img',class_ = 'aspect-ratio--object')["src"]
+    Pledged_Amount = newSoup.find_all('span',class_ = 'money')[4].text
+    Due_Time = newSoup.find('span',{'data-test-id': 'deadline-exists'}).text
+    Time_Left = newSoup.find_all('span',class_= 'block type-16 type-28-md bold dark-grey-500')[1].text
+    return Due_Time ,Time_Left,Pledged_Amount,Title,First_Page_Picture
+
+print(test1() == test2()) # True
+
+t1 = timeit('test1()', 'from __main__ import test1', number=10)
+print(t1) # 0.3
+
+t2 = timeit('test2()', 'from __main__ import test2', number=10)
+print(t2) # 2
+```
+
+### execjs
+
+execjs 可以使用 execjs.eval(data)的形式把数据转化为真正的 json 对象，并通过 call()方法执行这段 js 代码。
+
+```python showLineNumbers
+import execjs
+
+data = """{
+    "Name": "Jennifer Smith",
+    "Contact Number": 7867567898,
+    "Email": "jen123@gmail.com",
+    "Hobbies":["Reading", "Sketching", "Horse Riding"]
+    }"""
+
+res_p = execjs.eval(data)
+print(type(res_p)) #dict
+
+
+res_j = execjs.compile(res_p)
+print(type(res_j._source)) #dict
+
+execjs.eval("'red yellow blue'.split(' ')")
+#['red', 'yellow', 'blue']
+
+ctx = execjs.compile("""
+    function add(x, y) {
+        return x + y;
+    }
+""")
+ctx.call("add", 1, 2)
+#3
+
+```

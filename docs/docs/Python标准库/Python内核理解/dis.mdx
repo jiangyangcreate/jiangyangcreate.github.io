@@ -1,0 +1,199 @@
+---
+title: dis
+---
+
+`dis` 模块用于**反汇编 Python 字节码**，将 CPython 在**基于栈的虚拟机**上执行的指令以可读形式展示。CPython 的编译流程是：源码 → **字节码**（bytecode）→ 解释器按指令逐条执行；字节码是实现细节，不同 Python 版本可能增删改指令，`dis` 让我们在需要时看清「这段 Python 代码实际对应哪些底层操作」，便于调试、性能分析和理解语法编译结果。设计上，该模块面向**调试**（如配合 traceback 定位异常指令）、**性能分析**（对比不同写法的指令数与类型）以及**语法理解**（如 `match`/`case`、列表推导、`with`、装饰器等如何被编译成字节码），以官方文档和 `Include/opcode.h` 中的定义为准。
+
+[dis](https://docs.python.org/zh-cn/3/library/dis.html)
+
+:::tip 字节码与栈机
+**字节码**是 CPython 将源码编译后得到的中间表示，每条指令对应一个操作码（及可选参数）。Python 解释器本质上是一台**栈式虚拟机**：多数指令从栈顶取操作数、把结果压回栈顶（例如 `BINARY_OP` 弹出两个值、做运算、再压入结果）。采用栈式设计可以简化指令集、便于跨平台，`dis` 展示的正是这些栈机指令序列。
+:::
+
+## 主要 API
+
+### dis.dis
+
+**dis.dis(x=None, \*, file=None, depth=None, show_caches=False, adaptive=False, show_offsets=False, show_positions=False)** — 反汇编 `x`（函数、方法、类、模块、代码对象或源码字符串）；未传 `x` 时反汇编上一次跟踪的代码。`file` 指定输出流（默认 `sys.stdout`），`depth` 可限制递归反汇编的深度（如嵌套函数、生成器表达式）。
+
+```python showLineNumbers
+import dis
+
+def m():
+    x = [123, 456]
+    match x:
+        case y:
+            pass
+
+dis.dis(m)
+# 输出中可见 RESUME、LOAD_CONST、BUILD_LIST、STORE_FAST、LOAD_FAST、RETURN_CONST 等指令
+```
+
+```python showLineNumbers
+import dis
+
+# 反汇编 lambda，查看简单表达式对应的字节码
+dis.dis(lambda x: x + 1)
+# 典型序列：LOAD_FAST(x)、LOAD_CONST(1)、BINARY_OP(+)、RETURN_VALUE
+```
+
+```python showLineNumbers
+import dis
+
+# 限制递归深度，只看到顶层函数
+def outer():
+    def inner():
+        return 1
+    return inner()
+
+dis.dis(outer, depth=0)   # 仅 outer 本体
+dis.dis(outer, depth=1)   # 含 inner
+```
+
+### dis.disassemble / disco
+
+**dis.disassemble(code, lasti=-1, \*, file=None, ...)**（别名 **dis.disco**）— 反汇编一个**代码对象**（如 `m.__code__`）。`lasti` 可标出「最后一条执行的指令」的索引，便于在调试时看到异常或断点所在的指令（输出中会显示 `-->`）。
+
+```python showLineNumbers
+import dis
+
+def bad():
+    return 1 / 0
+
+co = bad.__code__
+dis.disassemble(co)
+# 若在异常时已知 lasti，可传入以标出出错指令：
+# dis.disassemble(co, lasti=2)
+```
+
+:::tip 代码对象
+函数、模块等编译后会产生 **code object**（`__code__` 属性），其中包含字节码序列、常量、变量名等。`dis.dis()` 内部也会先取得代码对象再反汇编；直接对 `code` 使用 `disassemble` 可在调试时配合 `lasti` 精确定位。
+:::
+
+### dis.get_instructions
+
+**dis.get_instructions(x, \*, first_line=None, show_caches=False, adaptive=False)** — 返回对 `x` 反汇编得到的**指令迭代器**，每条为 `Instruction` 具名元组（含 `opname`、`arg`、`argval`、`offset`、`starts_line` 等），适合程序化分析字节码（统计指令、检测模式等）。
+
+```python showLineNumbers
+import dis
+
+# 程序化遍历指令
+for instr in dis.get_instructions(lambda x: x + 1):
+    print(instr.offset, instr.opname, instr.argrepr)
+
+# 示例：统计某函数的 LOAD_* 指令数
+def sample():
+    a = 1
+    b = 2
+    return a + b
+
+load_count = sum(1 for i in dis.get_instructions(sample) if i.opname.startswith("LOAD_"))
+print("LOAD_* 条数:", load_count)
+```
+
+### dis.Bytecode
+
+**dis.Bytecode(x, \*, first_line=None, current_offset=None, show_caches=False, ...)** — 将代码包装为 `Bytecode` 对象，迭代时产生 `Instruction`，并可调用 `.dis()` 得到格式化的多行字符串、`.info()` 得到代码对象详情。**Bytecode.from_traceback(tb)** 可从 traceback 构建，并自动把 `current_offset` 设为异常所在指令。
+
+```python showLineNumbers
+import dis
+
+def myfunc(alist):
+    return len(alist)
+
+bc = dis.Bytecode(myfunc)
+for instr in bc:
+    print(instr.opname)
+# RESUME, LOAD_GLOBAL, LOAD_FAST 等
+
+# 格式化输出（与 dis.dis 一致）
+print(bc.dis())
+print(bc.info())
+```
+
+### dis.code_info / show_code
+
+**dis.code_info(x)** — 返回代码对象的详细信息的格式化字符串。**dis.show_code(x, \*, file=None)** — 将上述信息打印到 `file`（默认 `sys.stdout`），便于在交互环境快速查看。
+
+```python showLineNumbers
+import dis
+
+def f(a, b=1, *args, **kwargs):
+    """示例函数"""
+    return a + b
+
+print(dis.code_info(f))
+dis.show_code(f)
+```
+
+### dis.distb
+
+**dis.distb(tb=None, \*, file=None, ...)** — 反汇编 traceback 栈顶函数，并标出引发异常的指令。未传 `tb` 时使用当前最后一个 traceback。
+
+```python showLineNumbers
+import dis
+
+def failing():
+    x = 1
+    y = 0
+    return x / y
+
+try:
+    failing()
+except Exception:
+    dis.distb()
+# 输出中会标出导致异常的指令位置
+```
+
+### dis.findlinestarts / findlabels
+
+**dis.findlinestarts(code)** — 返回 `(offset, lineno)` 的迭代器，表示字节码中「某行源码」对应的起始偏移（基于代码对象的 `co_lines()`，参见 PEP 626）。**dis.findlabels(code)** — 返回字节码中所有作为跳转目标的偏移列表。
+
+```python showLineNumbers
+import dis
+
+def example():
+    a = 1
+    b = 2
+    return a + b
+
+co = example.__code__
+print("行起始:", list(dis.findlinestarts(co)))
+print("跳转目标:", dis.findlabels(co.co_code))
+```
+
+### dis.stack_effect
+
+**dis.stack_effect(opcode, oparg=None, \*, jump=None)** — 计算给定操作码（及参数）的**栈效应**（会弹出/压入几个栈元素）。`jump` 为 `True`/`False` 时分别表示「发生跳转」与「不跳转」时的栈效应；默认 `None` 返回两者中较大的那个。用于静态分析或验证字节码。
+
+```python showLineNumbers
+import dis
+
+# BINARY_OP 弹出 2，压入 1，栈效应为 -1
+eff = dis.stack_effect(dis.opmap["BINARY_OP"], 0)
+print("BINARY_OP stack effect:", eff)
+```
+
+:::tip 栈效应
+每条字节码会改变虚拟机栈的高度：例如 `LOAD_CONST` 压入 1 个（+1），`BINARY_OP` 弹出 2 个再压入 1 个（-1）。`stack_effect()` 用于工具或分析器校验字节码是否在任意路径下栈深度一致，避免栈不平衡导致崩溃。
+:::
+
+## 典型用途
+
+- **查看字节码**：确认某段代码对应的指令序列与执行路径。
+- **理解语法编译结果**：如 `match`/`case`、列表推导、`with`、装饰器等如何被编译成字节码。
+- **性能与调试**：对比不同写法（循环 vs 推导、不同数据结构）的指令数或类型，辅助优化；调试时用 `dis.distb()` 或 `disassemble(..., lasti=...)` 确认是否执行到预期分支。
+
+下面用 `dis.dis` 看一个简单 lambda，用 `dis.get_instructions` 做一次程序化遍历：
+
+```python showLineNumbers
+import dis
+
+# 简单表达式对应的字节码
+dis.dis(lambda x: x + 1)
+# 输出中可见 LOAD_FAST(x)、LOAD_CONST(1)、BINARY_OP(+)、RETURN_VALUE 等
+
+# 程序化遍历指令（仅打印名称）
+for instr in dis.get_instructions(lambda x: x + 1):
+    print(instr.offset, instr.opname, instr.argrepr)
+```

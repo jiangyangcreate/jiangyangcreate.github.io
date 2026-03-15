@@ -1,0 +1,150 @@
+---
+title: mmap
+---
+
+`mmap` 模块提供内存映射文件的支持，允许像操作内存一样操作文件内容，无需将整个文件读入内存。这是处理大文件的高效方式，也是 numpy、HuggingFace datasets 等库处理大规模数据的底层技术之一。
+
+[mmap](https://docs.python.org/3/library/mmap.html)
+
+## 基本读取
+
+```python showLineNumbers
+import mmap
+
+# 先创建测试文件
+with open("example.txt", "w") as f:
+    f.write("Hello, memory-mapped world!\nSecond line here.\nThird line.")
+
+with open("example.txt", "r+b") as f:
+    mm = mmap.mmap(f.fileno(), 0)
+
+    print(mm[:5])           # b'Hello'
+    print(mm.readline())    # b'Hello, memory-mapped world!\n'
+    print(mm.readline())    # b'Second line here.\n'
+
+    mm.close()
+```
+
+## 搜索与查找
+
+```python showLineNumbers
+import mmap
+
+with open("example.txt", "r+b") as f:
+    mm = mmap.mmap(f.fileno(), 0)
+
+    pos = mm.find(b"memory")
+    print(f"'memory' 位于偏移: {pos}")
+
+    pos2 = mm.find(b"line")
+    print(f"第一个 'line' 位于偏移: {pos2}")
+
+    pos3 = mm.find(b"line", pos2 + 1)
+    print(f"第二个 'line' 位于偏移: {pos3}")
+
+    mm.close()
+```
+
+## 修改文件内容
+
+```python showLineNumbers
+import mmap
+
+with open("example.txt", "r+b") as f:
+    mm = mmap.mmap(f.fileno(), 0)
+
+    # 原地替换（长度必须相同）
+    mm.seek(0)
+    content = mm[:]
+    print("修改前:", content)
+
+    mm[0:5] = b"HELLO"
+    mm.flush()  # 写入磁盘
+
+    mm.seek(0)
+    print("修改后:", mm[:5])  # b'HELLO'
+
+    mm.close()
+```
+
+## 处理大文件
+
+`mmap` 的核心优势在于处理 GB 级文件时不需要将其全部加载到内存。
+
+```python showLineNumbers
+import mmap
+import os
+
+large_file = "large_data.bin"
+file_size = 100 * 1024 * 1024  # 100MB
+
+# 创建大文件
+with open(large_file, "wb") as f:
+    f.seek(file_size - 1)
+    f.write(b"\0")
+
+with open(large_file, "r+b") as f:
+    mm = mmap.mmap(f.fileno(), 0)
+    print(f"映射大小: {len(mm) / 1024 / 1024:.0f} MB")
+
+    # 可以随机访问任意位置，OS 按需加载页面
+    mm[0] = 0xFF
+    mm[file_size // 2] = 0xAB
+    mm[-1] = 0xFE
+
+    print(f"首字节: {mm[0]:#x}")
+    print(f"中间字节: {mm[file_size // 2]:#x}")
+    print(f"末字节: {mm[-1]:#x}")
+
+    mm.close()
+
+os.remove(large_file)
+```
+
+## 匿名映射（进程间共享内存）
+
+```python showLineNumbers
+import mmap
+
+# 匿名映射：不关联文件，用于进程间通信
+# fileno=-1 表示不绑定文件，直接映射内存
+mm = mmap.mmap(-1, 1024)
+mm.write(b"shared data between processes")
+mm.seek(0)
+print(mm.readline())  # b'shared data between processes'
+mm.close()
+```
+
+:::info
+在 Windows 上可通过 `tagname` 参数为共享内存命名，使不同进程通过名称访问同一块内存。Unix 上通常结合 `os.fork()` 让父子进程共享匿名映射。
+:::
+
+## 与 numpy 配合
+
+```python showLineNumbers
+import mmap
+import numpy as np
+import os
+
+# 创建一个 numpy 数组并保存为原始二进制
+arr = np.arange(1000000, dtype=np.float64)
+arr.tofile("array.bin")
+
+# 用 mmap 加载，不占用额外内存
+with open("array.bin", "r+b") as f:
+    mm = mmap.mmap(f.fileno(), 0)
+    mapped_arr = np.frombuffer(mm, dtype=np.float64)
+    print(f"数组长度: {len(mapped_arr)}")
+    print(f"前5个: {mapped_arr[:5]}")
+    print(f"求和: {mapped_arr.sum()}")
+    mm.close()
+
+os.remove("array.bin")
+```
+
+:::tip 为什么 AI 开发者需要了解 mmap
+- **HuggingFace datasets** 使用 Apache Arrow 的 memory-mapped 格式，底层就是 mmap
+- **numpy.memmap** 本质上是对 `mmap` 的封装
+- **PyTorch DataLoader** 在多进程数据加载时，共享内存也依赖类似机制
+- 理解 mmap 能帮助你优化大规模数据集的加载性能
+:::

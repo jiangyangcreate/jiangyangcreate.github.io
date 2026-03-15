@@ -1,0 +1,138 @@
+---
+title: shutil
+---
+
+`shutil` 模块提供高级的文件和目录操作，补充了 `os` 和 `pathlib` 的不足。
+
+[shutil](https://docs.python.org/3/library/shutil.html)
+
+## 文件复制
+
+```python showLineNumbers
+import shutil
+import os
+
+os.makedirs("src_dir", exist_ok=True)
+with open("src_dir/data.txt", "w") as f:
+    f.write("important data")
+
+# 复制文件（保留元数据）
+shutil.copy2("src_dir/data.txt", "src_dir/data_backup.txt")
+
+# copy vs copy2
+# copy():  复制文件内容和权限
+# copy2(): 复制文件内容、权限和元数据（修改时间等）
+
+# 复制文件对象
+with open("src_dir/data.txt", "rb") as src:
+    with open("src_dir/data_copy.txt", "wb") as dst:
+        shutil.copyfileobj(src, dst)
+```
+
+## 目录操作
+
+```python showLineNumbers
+import shutil
+import os
+
+os.makedirs("project/src", exist_ok=True)
+with open("project/src/main.py", "w") as f:
+    f.write("print('hello')")
+with open("project/README.md", "w") as f:
+    f.write("# Project")
+
+# 复制整个目录树
+shutil.copytree("project", "project_backup")
+
+# 复制时忽略特定文件
+shutil.copytree(
+    "project", "project_clean",
+    ignore=shutil.ignore_patterns("*.pyc", "__pycache__", ".git"),
+    dirs_exist_ok=True  # Python 3.8+: 允许目标目录已存在
+)
+
+# 删除整个目录树
+shutil.rmtree("project_backup")
+shutil.rmtree("project_clean")
+```
+
+## 移动文件和目录
+
+```python showLineNumbers
+import shutil
+import os
+
+os.makedirs("old_location", exist_ok=True)
+with open("old_location/file.txt", "w") as f:
+    f.write("data")
+
+# 移动文件
+os.makedirs("new_location", exist_ok=True)
+shutil.move("old_location/file.txt", "new_location/file.txt")
+
+# 移动目录（重命名）
+shutil.move("old_location", "renamed_dir")
+```
+
+## 磁盘空间
+
+```python showLineNumbers
+import shutil
+
+usage = shutil.disk_usage("/")
+print(f"总空间: {usage.total / (1024**3):.1f} GB")
+print(f"已使用: {usage.used / (1024**3):.1f} GB")
+print(f"可用:   {usage.free / (1024**3):.1f} GB")
+print(f"使用率: {usage.used / usage.total * 100:.1f}%")
+```
+
+## 归档操作
+
+```python showLineNumbers
+import shutil
+import os
+
+os.makedirs("my_project/src", exist_ok=True)
+with open("my_project/src/app.py", "w") as f:
+    f.write("print('app')")
+
+# 创建归档
+shutil.make_archive("my_project_archive", "zip", ".", "my_project")
+# 支持格式: zip, tar, gztar, bztar, xztar
+
+# 解压归档
+shutil.unpack_archive("my_project_archive.zip", "unpacked")
+
+# 查看支持的格式
+print(shutil.get_archive_formats())
+print(shutil.get_unpack_formats())
+
+# 清理
+os.remove("my_project_archive.zip")
+shutil.rmtree("unpacked")
+shutil.rmtree("my_project")
+```
+
+## 查找可执行文件
+
+```python showLineNumbers
+import shutil
+
+python_path = shutil.which("python")
+print(f"Python: {python_path}")
+
+git_path = shutil.which("git")
+print(f"Git: {git_path}")
+
+# 不存在的命令返回 None
+result = shutil.which("nonexistent_command")
+print(f"不存在: {result}")  # None
+```
+
+:::tip
+`shutil` 在日常开发中的典型用法：
+- 数据集目录的批量复制和整理
+- 重要文件的备份与归档
+- 项目构建产物的打包
+- 检查磁盘空间是否充足
+:::

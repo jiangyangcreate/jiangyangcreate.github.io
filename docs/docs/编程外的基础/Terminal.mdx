@@ -1,0 +1,401 @@
+---
+sidebar_position: 4
+title: Terminal
+---
+
+终端（Terminal）也称为命令行或控制台，是通过文本命令操作计算机的方式。
+
+:::info
+面试中提到的命令行通常指类 Unix 系统（如 Ubuntu、Debian、CentOS、Fedora、Arch Linux 等）的终端命令，因为企业生产环境大多使用这些系统。
+
+需要注意的是，不同版本的系统之间存在差异。以 Ubuntu 为例，不仅大版本号重要，小版本号也同样重要。此外，在实际使用中，版本号和代号（如 Ubuntu 22.04 "Jammy Jellyfish"）经常会混用。
+:::
+
+[网道 bash 教程](https://wangdoc.com/bash/intro)是开源的 bash 文档，教科书式的篇章划分能帮助学习者系统的了解终端命令。
+
+[tldr](https://tldr.inbrowser.app/)是社区维护的命令行工具帮助页面合集，支持在线查询终端命令，有不同平台选择，支持不同语言显示
+
+## WSL
+
+如果你是 Windows 10 版本 2004 及更高版本（内部版本 19041 及更高版本）或 Windows 11 ，推荐使用 <HoverText text="WSL（Windows Subsystem for Linux）" explanation="可以在 Windows 上直接使用 Linux 应用程序、实用工具和 Bash 命令行工具（未经修改），无需传统虚拟机或双包设置的开销。"/>。
+
+详细内容请参考[WSL官方教程](https://learn.microsoft.com/zh-cn/windows/wsl/)。
+
+:::tip 提示
+- 某些版本的命令行需要使用 `wsl.exe` 而不是 `wsl`
+- `wsl --unregister` 会永久删除该发行版及其所有数据，无法恢复！
+:::
+
+### 安装
+
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 安装WSL和默认Ubuntu | `wsl --install` | `wsl --install` | - |
+| 安装指定发行版 | `wsl --install <DistributionName>` | `wsl --install Ubuntu-24.04` | - |
+| 列出可用发行版 | `wsl --list --online` | `wsl --list --online` | `wsl -l -o` |
+| 列出已安装发行版 | `wsl --list --verbose` | `wsl --list --verbose` | `wsl -l -v`|
+| 仅列出运行中的发行版 | `wsl --list --running` | `wsl --list --running` | `wsl -l --running` |
+| 列出所有发行版 | `wsl --list --all` | `wsl --list --all` | `wsl -l --all`/ `wsl -l` |
+
+### 网络与状态
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 获取Linux的IP地址 | `wsl hostname -I` | `wsl hostname -I` | - |
+| 获取Windows的IP地址 | `wsl ip route show` | `wsl ip route show` | - |
+| 查看WSL版本 | `wsl --version` | `wsl --version` | `wsl -v` |
+| 检查WSL状态 | `wsl --status` | `wsl --status` | - |
+| 获取帮助信息 | `wsl --help` | `wsl --help` | `wsl -h` |
+
+### 配置设置
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 设置默认发行版 | `wsl --set-default <DistributionName>` | `wsl --set-default Ubuntu-24.04` | `wsl -s Ubuntu-24.04` |
+| 设置WSL版本(1或2) | `wsl --set-version <DistributionName> <Version>` | `wsl --set-version Ubuntu-24.04 2` | - |
+| 设置默认WSL版本 | `wsl --set-default-version <Version>` | `wsl --set-default-version 2` | - |
+| 更改默认用户 | `<DistributionName> config --default-user <Username>` | `ubuntu config --default-user johndoe` | - |
+
+### 启动运行
+
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 启动默认发行版 | `wsl` | `wsl` | - |
+| 启动指定发行版 | `wsl --distribution <DistributionName>` | `wsl --distribution Ubuntu-24.04` | `wsl -d Ubuntu-24.04` |
+| 以指定用户启动 | `wsl --user <Username>` | `wsl --user root` | `wsl -u root` |
+| 指定发行版和用户 | `wsl -d <DistributionName> -u <Username>` | `wsl -d Ubuntu-24.04 -u root` | - |
+| 在用户主目录启动 | `wsl ~` | `wsl ~` | - |
+
+### 导入导出
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 导出发行版 | `wsl --export <DistributionName> <FileName>` | `wsl --export Ubuntu-24.04 ubuntu-backup.tar` | - |
+| 导出为VHD格式 | `wsl --export <DistributionName> <FileName> --vhd` | `wsl --export Ubuntu-24.04 ubuntu-backup.vhdx --vhd` | - |
+| 导入发行版 | `wsl --import <DistributionName> <InstallLocation> <FileName>` | `wsl --import Ubuntu-ROS2 C:\WSL_ROS2 ubuntu-backup.tar` | - |
+| 导入VHD格式 | `wsl --import <DistributionName> <InstallLocation> <FileName> --vhd` | `wsl --import Ubuntu-New C:\WSL_New backup.vhdx --vhd` | - |
+| 就地导入VHD | `wsl --import-in-place <DistributionName> <FileName>` | `wsl --import-in-place Ubuntu-New ubuntu.vhdx` | - |
+
+### 管理维护
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 终止指定发行版 | `wsl --terminate <DistributionName>` | `wsl --terminate Ubuntu-24.04` | `wsl -t Ubuntu-24.04` |
+| 关闭所有发行版 | `wsl --shutdown` | `wsl --shutdown` | - |
+| 注销并卸载发行版 | `wsl --unregister <DistributionName>` | `wsl --unregister Ubuntu-24.04` | - |
+| 更新WSL | `wsl --update` | `wsl --update` | - |
+| 从GitHub下载更新 | `wsl --update --web-download` | `wsl --update --web-download` | - |
+
+### 磁盘管理
+| 功能描述 | 命令模板 | 命令示例 | 简写 |
+|---------|---------|---------|------|
+| 挂载磁盘 | `wsl --mount <DiskPath>` | `wsl --mount \\.\PHYSICALDRIVE1` | - |
+| 挂载VHD | `wsl --mount <DiskPath> --vhd` | `wsl --mount C:\disk.vhdx --vhd` | - |
+| 挂载指定分区 | `wsl --mount <DiskPath> --partition <PartitionNumber>` | `wsl --mount \\.\PHYSICALDRIVE1 --partition 1` | - |
+| 挂载指定文件系统 | `wsl --mount <DiskPath> --type <Filesystem>` | `wsl --mount \\.\PHYSICALDRIVE1 --type ext4` | `wsl --mount <DiskPath> -t <Filesystem>` |
+| 卸载磁盘 | `wsl --unmount <DiskPath>` | `wsl --unmount \\.\PHYSICALDRIVE1` | - |
+| 卸载所有磁盘 | `wsl --unmount` | `wsl --unmount` | - |
+
+
+## 5分钟上手
+
+命令基本格式：`命令名 [选项] [参数]`
+
+示例：
+- `ls` - 列出当前目录文件
+- `ls -l` - 列出详细信息（`-l` 是短参数）
+- `ls --list /home` - 长参数写法，等同于短参数
+
+:::tip 参数写法
+- **短参数**：`-l`（一个字母，方便手动输入）
+- **长参数**：`--list`（完整单词，脚本中更清晰）
+- 两者通常等效：`ls -l` = `ls --list`
+:::
+
+### 命令组合技巧
+
+| 符号 | 含义 | 示例 | 说明 |
+|------|------|------|------|
+| `;` | 依次执行 | `cd /tmp; ls` | 先切换目录，再列出文件 |
+| `&&` | 成功才继续 | `mkdir test && cd test` | 创建成功才进入目录 |
+| `\|` | 管道传递 | `ls -l \| grep "txt"` | 列出文件后筛选包含txt的行 |
+
+**管道（`|`）解释**：将前一个命令的输出作为后一个命令的输入
+
+```bash
+# 例子：查找包含"python"的进程
+ps aux | grep python
+```
+
+### 权限管理必知
+
+很多命令需要管理员权限，这时要用 `sudo`（**su**per user **do**）：
+
+```bash
+sudo apt-get update      # 以管理员身份更新软件源
+sudo reboot              # 以管理员身份重启系统
+```
+
+**常用权限命令**：
+- `sudo 命令` - 以管理员身份执行单个命令
+- `sudo su` - 切换到root用户（管理员账户）
+- `exit` - 退出root用户
+
+## 快捷键
+
+这些快捷键能让你效率翻倍：
+
+| 快捷键 | 功能 | 使用频率 |
+|--------|------|----------|
+| `Tab` | 自动补全命令/路径 | ⭐⭐⭐⭐⭐ 最重要！ |
+| `Ctrl + C` | 停止当前命令 | ⭐⭐⭐⭐⭐ |
+| `Ctrl + L` | 清屏 | ⭐⭐⭐⭐ |
+| `↑` / `↓` | 查看历史命令 | ⭐⭐⭐⭐ |
+| `Ctrl + D` | 退出当前终端 | ⭐⭐⭐ |
+| `Ctrl + U` | 删除光标到行首 | ⭐⭐⭐ |
+| `Ctrl + W` | 删除前一个单词 | ⭐⭐ |
+
+:::tip Tab键的妙用
+- 输入 `cd /h` 按Tab → 自动补全为 `cd /home`
+- 按两次Tab → 显示所有可能的选项
+- **能用Tab就别手打！**
+:::
+
+## 文件管理
+
+### 日常必用命令
+
+| 命令 | 功能 | 示例 | 记忆技巧 |
+|------|------|------|----------|
+| `pwd` | 显示当前目录 | `pwd` | **p**rint **w**orking **d**irectory |
+| `ls` | 列出文件 | `ls` / `ls -la` | **l**i**s**t |
+| `cd` | 切换目录 | `cd /home` | **c**hange **d**irectory |
+| `mkdir` | 创建目录 | `mkdir test` | **m**a**k**e **dir**ectory |
+| `touch` | 创建文件 | `touch file.txt` | touch（触碰） |
+| `rm` | 删除文件 | `rm file.txt` | **r**e**m**ove |
+| `rm -r` | 删除目录 | `rm -r folder` | **r**e**m**ove **r**ecursive |
+| `cp` | 复制 | `cp a.txt b.txt` | **c**o**p**y |
+| `mv` | 移动/重命名 | `mv old.txt new.txt` | **m**o**v**e |
+| `cat` | 查看文件内容 | `cat readme.txt` | con**cat**enate |
+
+:::danger
+`rm -rf /` 会删除所有文件！**永远不要**执行这个命令！
+- `-r`：递归删除（包括子目录）
+- `-f`：强制删除（不询问）
+:::
+
+### 快速编辑文件
+
+**方法1：使用nano编辑器（推荐新手）**
+```bash
+nano file.txt          # 打开文件
+# Ctrl+O 保存
+# Ctrl+X 退出
+```
+
+**方法2：使用vim编辑器（进阶）**
+```bash
+vim file.txt           # 打开文件
+# 按 i 进入编辑模式
+# 按 Esc 退出编辑模式
+# 输入 :wq 保存并退出
+```
+
+### 文件权限
+
+Linux权限用3位数字表示，格式：`chmod 权限码 文件名`
+
+**权限码解读**：
+- **第1位**：所有者权限
+- **第2位**：同组用户权限
+- **第3位**：其他用户权限
+
+**每位数字含义**：
+- **4** = 读（**r**ead）
+- **2** = 写（**w**rite）  
+- **1** = 执行（e**x**ecute）
+- 组合相加即可：`7 = 4+2+1 = 读+写+执行`
+
+#### 常用权限速查
+
+| 权限码 | 含义 | 使用场景 | 示例 |
+|--------|------|----------|------|
+| `644` | 所有者读写，其他人只读 | 普通文件 | `chmod 644 readme.txt` |
+| `755` | 所有者全部权限，其他人读+执行 | 脚本/程序 | `chmod 755 script.sh` |
+| `600` | 仅所有者读写 | 密钥文件 | `chmod 600 ~/.ssh/id_rsa` |
+| `777` | 所有人全部权限 | ❌ 危险！不要用 | - |
+
+**查看权限**：
+```bash
+ls -l file.txt
+# 输出：-rw-r--r-- 1 user group 1024 Dec 15 10:30 file.txt
+#       ↑所有者 ↑组 ↑其他人
+#       rw-    r-- r--
+```
+
+:::warning 安全提示
+- **永远不要给关键文件777权限**（所有人可改）
+- SSH密钥必须用600权限，否则SSH会拒绝使用
+- 脚本文件要加执行权限才能运行：`chmod +x script.sh`
+:::
+
+## 实用进阶技能
+
+### 软件安装管理
+
+Ubuntu/Debian系统使用 `apt` 包管理器：
+
+```bash
+sudo apt update              # 更新软件源列表（安装前必做！）
+sudo apt install 软件名       # 安装软件
+sudo apt remove 软件名        # 卸载软件
+sudo apt upgrade             # 升级所有已安装软件
+```
+
+**示例**：
+```bash
+sudo apt update
+sudo apt install python3-pip    # 安装Python包管理器pip
+sudo apt install git            # 安装Git
+```
+
+### 系统监控命令
+
+| 命令 | 功能 | 使用技巧 |
+|------|------|----------|
+| `top` | 实时查看进程 | 按 `q` 退出 |
+| `htop` | 更友好的进程查看器 | 需先安装：`sudo apt install htop` |
+| `df -h` | 查看磁盘空间 | `-h` 表示人类可读格式 |
+| `free -h` | 查看内存使用 | `-h` 表示人类可读格式 |
+| `ps aux` | 查看所有进程 | 常配合 `grep` 筛选 |
+
+### 环境变量快速入门
+
+环境变量是系统存储配置信息的方式，比如程序安装路径、用户名等。
+
+**WSL中设置环境变量**：
+
+```bash
+# 临时设置（关闭终端后失效）
+export MY_VAR="hello"
+echo $MY_VAR              # 查看变量值
+
+# 永久设置（写入配置文件）
+echo 'export MY_VAR="hello"' >> ~/.bashrc
+source ~/.bashrc          # 重新加载配置
+```
+
+**常用环境变量**：
+
+| 变量名 | 含义 | 示例 |
+|--------|------|------|
+| `$HOME` | 用户主目录 | `/home/username` |
+| `$PATH` | 命令搜索路径 | 添加新路径：`export PATH=$PATH:/new/path` |
+| `$USER` | 当前用户名 | 你的用户名 |
+| `$PWD` | 当前工作目录 | 当前所在目录 |
+
+:::tip Windows PowerShell对比
+在Windows PowerShell中，环境变量语法不同：
+- 设置：`$env:MY_VAR = "hello"`
+- 查看：`echo $env:MY_VAR`
+:::
+
+### 端口管理（开发必备）
+
+开发时经常遇到"端口被占用"的问题，这些命令能帮你：
+
+```bash
+# 查看端口占用
+lsof -i:8080                          # 查看8080端口被谁占用
+netstat -tunlp | grep 8080            # 另一种查看方式
+
+# 杀掉占用端口的进程
+kill -9 $(lsof -i tcp:8080 -t)        # 强制终止8080端口进程
+
+# 后台运行程序
+nohup python3 app.py &                # 关闭终端后程序继续运行
+```
+
+### 远程连接（SSH）
+
+通过SSH连接到远程Linux服务器：
+
+```bash
+# 基本连接
+ssh username@192.168.1.100            # 连接到远程主机
+
+# 指定端口连接
+ssh -p 2222 username@example.com      # 使用非默认端口（默认22）
+
+# 文件传输（scp命令）
+scp local.txt user@host:~/            # 上传文件到远程
+scp user@host:~/remote.txt ./         # 下载远程文件
+scp -r folder/ user@host:~/           # 传输整个文件夹
+```
+
+:::tip SSH密钥登录（推荐）
+使用密钥代替密码更安全：
+```bash
+ssh-keygen                            # 生成SSH密钥对
+ssh-copy-id user@host                 # 将公钥复制到远程主机
+# 之后就可以免密码登录了
+```
+:::
+
+## Makefile
+
+Makefile 本质是自动化脚本，把常用的项目编译、测试、部署等重复性命令写进去，省得每次手动输入。熟练使用后能大幅提升开发效率。
+
+创建名为 `Makefile` 的文件（无扩展名）：
+
+```makefile showLineNumbers
+# 基本示例
+# 目标: 依赖（可选）
+#	命令（必须用Tab缩进，不能用空格）
+
+hello:
+	echo "Hello World"
+
+# 多个命令用分号或换行
+clean:
+	echo "clean1"
+	echo "clean2"
+	echo "clean3";echo "clean4"
+
+# all 依赖 build 和 test
+# make all 等价于 
+# 先 make build 
+# 再 make test 
+# 最后执行命令 echo "all"
+all: hello clean
+	echo "all"
+
+# 使用变量
+PYTHON = python3.12
+# 声明伪目标（如果当前文件夹中没有与目标同名的文件、文件夹，那么可以不用声明伪目标）
+.PHONY: build clean
+build:
+	$(PYTHON) -v
+```
+
+使用：`make hello` → `make clean` → `make all` → `make build`
+
+当 `make` 后面的参数会优先被解读为是：执行指定文件、切换目录。
+
+如果我们工作空间中有名为 `build` 的文件、文件夹，同时希望 `make build` 指向的不是文件，而是当前的 `Makefile` 中的 `build` 目标。
+
+那么可以通过 `.PHONY: 目标名1 目标名2` 来声明：请优先当前 `Makefile` 中的 `目标名1`、`目标名2`。
+
+
+### make 命令常用参数
+
+以下命令可以混合使用。
+
+| 参数 | 作用 | 示例 | 说明 |
+|------|------|------|------|
+| `make` | 执行默认目标 | `make` | 执行 Makefile 第一个目标 |
+| `make 目标名` | 执行指定目标 | `make hello` | 执行 hello 目标 |
+| `make -f 文件名` | 指定 Makefile | `make -f Makefile` | 使用自定义文件名 |
+| `make -C 目录` | 切换目录后再执行 | `make -C ./src` | 进入 src 目录后执行 |
+| `make -n` | 模拟执行（dry run） | `make -n build` | 只显示会执行的命令，不真实执行 |
+| `make -s` | 静默模式 | `make -s clean` | 不显示执行的命令 |
+| `make -j N` | 并行执行 | `make -j 4` | 用 4 个并行任务加速编译 |
+| `make -B` | 强制重新构建 | `make -B` | 忽略时间戳，全部重新执行 |
+| `make -k` | 遇错继续 | `make -k test` | 某个目标失败后继续执行其他目标 |
+| `make VAR=value` | 传递变量 | `make PORT=8080 run` | 覆盖 Makefile 中的变量 |

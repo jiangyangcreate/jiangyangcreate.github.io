@@ -1,0 +1,550 @@
+---
+title: sqlite3
+---
+
+`sqlite3` 模块提供了轻量级的 SQLite 嵌入式数据库接口，遵循 DB-API 2.0 规范，无需安装独立数据库服务器。
+
+[sqlite3](https://docs.python.org/3/library/sqlite3.html)
+
+
+## 快速入门SQL
+
+SQL（结构化查询语言）是操作关系型数据库的标准语言。不同数据库的SQL语法90%相同，学会一种即可触类旁通。
+
+**推荐学习资源**：
+- <Highlight color="g">[SQLBolt](https://sqlbolt.com/) - 交互式SQL教程（1-2小时快速入门）</Highlight>
+- [W3Schools SQL](https://www.w3schools.com/sql/) - 中文入门教程
+- [LeetCode数据库题](https://leetcode.com/problemset/database/) - 实战练习
+
+**常用SQL速查**：
+```sql
+-- 查询
+SELECT * FROM table WHERE condition ORDER BY column LIMIT 10;
+
+-- 插入
+INSERT INTO table (col1, col2) VALUES (val1, val2);
+
+-- 更新
+UPDATE table SET col1 = val1 WHERE condition;
+
+-- 删除
+DELETE FROM table WHERE condition;
+
+-- 连接查询
+SELECT * FROM table1 JOIN table2 ON table1.id = table2.id;
+```
+
+## 核心概念速查
+
+### ACID vs BASE
+
+**ACID**（关系型数据库）：
+- **A**tomicity：原子性 - 事务全部成功或全部失败
+- **C**onsistency：一致性 - 数据符合约束规则
+- **I**solation：隔离性 - 并发事务互不干扰
+- **D**urability：持久性 - 提交后永久保存
+
+**BASE**（NoSQL数据库）：
+- **B**asically Available：基本可用
+- **S**oft-state：软状态（允许短暂不一致）
+- **E**ventually Consistent：最终一致性
+
+### 事务隔离级别（从低到高）
+
+| 隔离级别 | 脏读 | 不可重复读 | 幻读 | 性能 |
+|---------|-----|-----------|------|-----|
+| Read Uncommitted | ✗ | ✗ | ✗ | 最快 |
+| Read Committed | ✓ | ✗ | ✗ | 快 |
+| Repeatable Read（MySQL默认） | ✓ | ✓ | ✗ | 中 |
+| Serializable | ✓ | ✓ | ✓ | 慢 |
+
+:::tip 实践建议
+- 大部分场景使用**Read Committed**即可
+- 需要强一致性时使用**Repeatable Read**
+- 高并发场景可以接受**最终一致性**，选NoSQL
+:::
+
+---
+
+## 连接与基本操作
+
+```python showLineNumbers
+import sqlite3
+
+# 连接到磁盘数据库（不存在则自动创建）
+conn = sqlite3.connect('example.db')
+
+# 连接到内存数据库（适合测试和临时数据）
+conn = sqlite3.connect(':memory:')
+
+# 推荐：使用上下文管理器自动管理事务
+with sqlite3.connect(':memory:') as conn:
+    cursor = conn.cursor()
+
+    # 创建表
+    cursor.execute('''
+        CREATE TABLE users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            age INTEGER,
+            email TEXT UNIQUE
+        )
+    ''')
+
+    # 参数化查询插入数据（? 占位符防止 SQL 注入）
+    cursor.execute(
+        "INSERT INTO users (name, age, email) VALUES (?, ?, ?)",
+        ('张三', 25, 'zhangsan@example.com')
+    )
+
+    # 命名参数形式
+    cursor.execute(
+        "INSERT INTO users (name, age, email) VALUES (:name, :age, :email)",
+        {'name': '李四', 'age': 30, 'email': 'lisi@example.com'}
+    )
+```
+
+:::tip
+永远不要用 f-string 或字符串拼接构建 SQL，始终使用 `?` 占位符或命名参数 `:name` 来防止 SQL 注入。
+:::
+
+## 批量插入
+
+```python showLineNumbers
+import sqlite3
+
+with sqlite3.connect(':memory:') as conn:
+    conn.execute('CREATE TABLE users (name TEXT, age INTEGER)')
+
+    # executemany 批量插入
+    users = [('王五', 28), ('赵六', 35), ('孙七', 22)]
+    conn.executemany("INSERT INTO users VALUES (?, ?)", users)
+    print(f"插入了 {conn.total_changes} 行")
+
+    # executescript 执行多条 SQL（自动提交，无法参数化）
+    conn.executescript('''
+        INSERT INTO users VALUES ('钱八', 40);
+        INSERT INTO users VALUES ('周九', 18);
+    ''')
+```
+
+## 查询数据
+
+```python showLineNumbers
+import sqlite3
+
+with sqlite3.connect(':memory:') as conn:
+    conn.execute('CREATE TABLE scores (name TEXT, score INTEGER)')
+    conn.executemany('INSERT INTO scores VALUES (?, ?)',
+                     [('Alice', 90), ('Bob', 85), ('Carol', 92), ('Dave', 78)])
+
+    cur = conn.execute("SELECT * FROM scores WHERE score > ?", (80,))
+
+    # fetchone：获取一行
+    row = cur.fetchone()
+    print(row)  # ('Alice', 90)
+
+    # fetchmany：获取指定行数
+    rows = cur.fetchmany(2)
+    print(rows)  # [('Bob', 85), ('Carol', 92)]
+
+    # fetchall：获取所有剩余行（注意：前面已取走的不会重复）
+    rest = cur.fetchall()
+    print(rest)  # []
+
+    # 也可以直接迭代游标
+    for name, score in conn.execute("SELECT * FROM scores ORDER BY score DESC"):
+        print(f"{name}: {score}")
+```
+
+:::info
+`fetchall()` 会将全部结果加载到内存。大数据量时建议用 `fetchmany()` 分批处理或直接迭代游标。
+:::
+
+## Row 工厂
+
+默认查询结果是元组，设置 `row_factory` 可通过列名访问。
+
+```python showLineNumbers
+import sqlite3
+
+with sqlite3.connect(':memory:') as conn:
+    conn.row_factory = sqlite3.Row
+    conn.execute('CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT, age INTEGER)')
+    conn.execute('INSERT INTO users (name, age) VALUES (?, ?)', ('张三', 25))
+
+    row = conn.execute('SELECT * FROM users').fetchone()
+
+    print(row['name'])     # 通过列名访问
+    print(row[1])          # 通过索引访问
+    print(dict(row))       # 转为字典：{'id': 1, 'name': '张三', 'age': 25}
+    print(row.keys())      # 获取所有列名
+```
+
+## 事务管理
+
+```python showLineNumbers
+import sqlite3
+
+# 手动管理事务
+conn = sqlite3.connect(':memory:')
+cur = conn.cursor()
+cur.execute('CREATE TABLE accounts (name TEXT, balance REAL)')
+cur.execute('INSERT INTO accounts VALUES (?, ?)', ('Alice', 1000))
+cur.execute('INSERT INTO accounts VALUES (?, ?)', ('Bob', 500))
+conn.commit()
+
+try:
+    cur.execute('UPDATE accounts SET balance = balance - 200 WHERE name = ?', ('Alice',))
+    cur.execute('UPDATE accounts SET balance = balance + 200 WHERE name = ?', ('Bob',))
+    conn.commit()
+except sqlite3.Error as e:
+    conn.rollback()
+    print(f"事务回滚: {e}")
+finally:
+    conn.close()
+
+# 推荐：上下文管理器自动提交/回滚
+with sqlite3.connect(':memory:') as conn:
+    conn.execute('CREATE TABLE t (x INTEGER)')
+    conn.execute('INSERT INTO t VALUES (?)', (42,))
+    # 正常退出时自动 commit，异常时自动 rollback
+```
+
+:::tip
+`isolation_level` 参数控制事务行为：`"DEFERRED"`（默认）、`"IMMEDIATE"`、`"EXCLUSIVE"`，或 `None`（自动提交）。
+:::
+
+## 数据类型映射
+
+| Python 类型 | SQLite 类型 | 说明 |
+|------------|------------|------|
+| `None` | `NULL` | 空值 |
+| `int` | `INTEGER` | 整数 |
+| `float` | `REAL` | 浮点数 |
+| `str` | `TEXT` | 文本 |
+| `bytes` | `BLOB` | 二进制数据 |
+
+### 自定义类型适配
+
+SQLite 没有原生日期类型，可通过适配器/转换器处理自定义类型。
+
+```python showLineNumbers
+import sqlite3
+from datetime import datetime, date
+
+# 注册适配器：Python 类型 -> SQLite 存储格式
+sqlite3.register_adapter(datetime, lambda val: val.isoformat())
+sqlite3.register_adapter(date, lambda val: val.isoformat())
+
+# 注册转换器：SQLite 存储格式 -> Python 类型
+sqlite3.register_converter("timestamp", lambda val: datetime.fromisoformat(val.decode()))
+sqlite3.register_converter("date", lambda val: date.fromisoformat(val.decode()))
+
+# 连接时启用 detect_types
+with sqlite3.connect(':memory:', detect_types=sqlite3.PARSE_DECLTYPES) as conn:
+    conn.execute('CREATE TABLE events (title TEXT, day date, ts timestamp)')
+    conn.execute('INSERT INTO events VALUES (?, ?, ?)',
+                 ('会议', date.today(), datetime.now()))
+
+    row = conn.execute('SELECT * FROM events').fetchone()
+    print(type(row[1]), row[1])  # <class 'datetime.date'> 2026-03-06
+    print(type(row[2]), row[2])  # <class 'datetime.datetime'> ...
+```
+
+## 自定义 SQL 函数
+
+```python showLineNumbers
+import sqlite3
+import hashlib
+
+with sqlite3.connect(':memory:') as conn:
+    # 注册标量函数：参数为（函数名, 参数个数, Python 函数）
+    conn.create_function("md5", 1, lambda t: hashlib.md5(t).hexdigest())
+    conn.create_function("is_even", 1, lambda x: x % 2 == 0)
+
+    result = conn.execute("SELECT md5(?)", (b"hello",)).fetchone()
+    print(result[0])  # 5d41402abc4b2a76b9719d911017c592
+
+    conn.execute('CREATE TABLE nums (n INTEGER)')
+    conn.executemany('INSERT INTO nums VALUES (?)', [(i,) for i in range(6)])
+    evens = conn.execute('SELECT n FROM nums WHERE is_even(n)').fetchall()
+    print(evens)  # [(0,), (2,), (4,)]
+```
+
+## 实用技巧
+
+```python showLineNumbers
+import sqlite3
+
+with sqlite3.connect(':memory:') as conn:
+    conn.execute('CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT)')
+
+    # 获取自增 ID
+    cur = conn.execute('INSERT INTO users (name) VALUES (?)', ('测试',))
+    print(f"新 ID: {cur.lastrowid}")
+
+    # 检查表是否存在
+    exists = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' AND name=?", ('users',)
+    ).fetchone()
+    print(f"表存在: {exists is not None}")
+
+    # 获取表结构
+    for col in conn.execute("PRAGMA table_info(users)"):
+        cid, name, col_type, notnull, default, pk = col
+        print(f"  {name}: {col_type} {'[PK]' if pk else ''}")
+
+    # 获取所有表名
+    tables = conn.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
+    print(f"所有表: {[t[0] for t in tables]}")
+```
+
+## 性能优化
+
+```python showLineNumbers
+import sqlite3
+
+conn = sqlite3.connect('example.db')
+
+# 启用 WAL 模式：支持读写并发，显著提升性能
+conn.execute("PRAGMA journal_mode=WAL")
+conn.execute("PRAGMA synchronous=NORMAL")
+conn.execute("PRAGMA cache_size=-64000")  # 64MB 缓存
+
+# 创建索引加速查询
+conn.execute("CREATE INDEX IF NOT EXISTS idx_email ON users(email)")
+
+# 查看查询计划
+plan = conn.execute("EXPLAIN QUERY PLAN SELECT * FROM users WHERE email=?",
+                     ('test@example.com',)).fetchall()
+print(plan)
+
+conn.close()
+```
+
+:::tip
+批量插入时用 `executemany` 比循环调用 `execute` 快数十倍。关键在于减少事务提交次数——将多条插入放在同一事务内一次性提交。
+:::
+
+## 数据库备份
+
+```python showLineNumbers
+import sqlite3
+
+# 使用内置 backup API
+source = sqlite3.connect('example.db')
+target = sqlite3.connect('backup.db')
+source.backup(target)
+source.close()
+target.close()
+
+# 也可以备份到内存数据库进行快速分析
+with sqlite3.connect('example.db') as disk_conn:
+    mem_conn = sqlite3.connect(':memory:')
+    disk_conn.backup(mem_conn)
+    rows = mem_conn.execute('SELECT count(*) FROM users').fetchone()
+    print(f"用户数: {rows[0]}")
+    mem_conn.close()
+```
+
+:::info
+SQLite 适合嵌入式和中小规模应用。如果需要高并发写入、网络访问或细粒度权限管理，建议迁移到 PostgreSQL 或 MySQL。
+:::
+
+
+## 常用数据库选择指南
+```
+开始
+  ↓
+需要向量搜索？
+  ├─ 是 → 数据量 < 100万？
+  │         ├─ 是 → pgvector（推荐）
+  │         └─ 否 → Milvus/Qdrant
+  │
+  └─ 否 → 数据结构化？
+            ├─ 是 → 需要事务？
+            │        ├─ 是 → PostgreSQL
+            │        └─ 否 → SQLite（小型）
+            │
+            └─ 否 → 需要缓存/高速读写？
+                     ├─ 是 → Redis
+                     └─ 否 → MongoDB
+```
+
+### 关系型数据库 - PostgreSQL
+
+<Highlight color="g">**推荐用于：结构化数据存储、复杂查询、向量检索（pgvector）**</Highlight>
+
+**核心特点**：
+- 支持JSON、数组等丰富数据类型
+- **pgvector扩展**：向量存储和相似度搜索
+- 完整的ACID事务支持
+- 性能稳定，适合复杂查询
+
+**快速上手**：
+```sql
+-- 安装pgvector扩展进行向量检索
+CREATE EXTENSION vector;
+
+-- 创建带向量字段的表
+CREATE TABLE embeddings (
+  id serial PRIMARY KEY,
+  text text,
+  embedding vector(1536)  -- OpenAI embedding维度
+);
+
+-- 查询最相似的向量
+SELECT text FROM embeddings 
+ORDER BY embedding <-> '[0.1,0.2,...]'::vector 
+LIMIT 5;
+```
+
+**参考资源**：
+- [PostgreSQL官方文档](https://www.postgresql.org/docs/)
+- [pgvector GitHub](https://github.com/pgvector/pgvector)
+
+---
+
+### 文档数据库 - MongoDB
+
+<Highlight color="g">**推荐用于：非结构化数据、日志存储、快速原型开发**</Highlight>
+
+**核心特点**：
+- 存储JSON格式文档，灵活的schema
+- 水平扩展能力强
+- 适合存储对话历史、用户画像等动态数据
+
+**典型应用场景**：
+- 聊天机器人对话记录
+- 用户行为日志
+- 配置文件和元数据
+
+**Python快速使用**：
+```python
+from pymongo import MongoClient
+
+client = MongoClient('mongodb://localhost:27017/')
+db = client['ai_app']
+
+# 存储对话历史
+db.conversations.insert_one({
+    'user_id': 'user123',
+    'messages': [
+        {'role': 'user', 'content': '你好'},
+        {'role': 'assistant', 'content': '你好！有什么可以帮助你的吗？'}
+    ],
+    'timestamp': '2024-01-01'
+})
+```
+
+---
+
+### 内存数据库 - Redis
+
+<Highlight color="g">**推荐用于：缓存、会话管理、实时排行榜**</Highlight>
+
+**核心特点**：
+- 微秒级响应速度（内存存储）
+- 支持多种数据结构：String、List、Set、Hash、Sorted Set
+- 适合做缓存、消息队列、API限流
+
+**常用数据类型**：
+| 类型 | 说明 | 典型场景 |
+|------|------|-----------|
+| String | 键值对 | 缓存数据、Token存储 |
+| Hash | 字典 | 用户会话信息 |
+| List | 队列 | 消息队列、任务列表 |
+| Sorted Set | 有序集合 | 排行榜、延时队列 |
+
+**Python示例**：
+```python
+import redis
+
+r = redis.Redis(host='localhost', port=6379)
+
+# 缓存数据
+r.setex('cache:key123', 3600, '缓存内容')  # 1小时过期
+
+# 获取缓存
+cached = r.get('cache:key123')
+```
+
+**持久化方式**：
+- **RDB**：定期快照（默认）
+- **AOF**：记录每次写操作（更安全但稍慢）
+
+---
+
+### 向量数据库
+
+<Highlight color="g">**推荐用于：Embedding存储、语义搜索、相似度检索**</Highlight>
+
+向量数据库专门用于存储和检索高维向量数据（如文本、图像的embedding），支持快速的相似度搜索。
+
+**核心能力**：
+- 存储高维向量（通常512-4096维）
+- 向量相似度搜索（余弦相似度、欧氏距离等）
+- 支持百万到亿级向量的快速检索
+
+#### 主流向量数据库对比
+
+| 数据库 | 类型 | 特点 | 推荐场景 |
+|-------|------|------|---------|
+| **pgvector** | PostgreSQL扩展 | 成熟稳定、与SQL无缝集成 | 中小规模、需要事务支持 |
+| **Pinecone** | 云服务 | 托管服务、开箱即用 | 快速原型、不想自己运维 |
+| **Milvus** | 专用向量库 | 高性能、支持大规模 | 大规模生产环境 |
+| **Chroma** | 轻量级 | 易用、适合开发测试 | 本地开发、小型项目 |
+| **Qdrant** | 专用向量库 | Rust开发、性能好 | 需要高性能的场景 |
+
+#### 快速示例：使用pgvector
+
+```python
+import psycopg2
+from openai import OpenAI
+
+# 连接数据库
+conn = psycopg2.connect("dbname=mydb user=myuser")
+cur = conn.cursor()
+
+# 获取文本的embedding
+client = OpenAI()
+text = "人工智能是什么？"
+response = client.embeddings.create(
+    model="text-embedding-3-small",
+    input=text
+)
+embedding = response.data[0].embedding
+
+# 存储向量
+cur.execute(
+    "INSERT INTO documents (content, embedding) VALUES (%s, %s)",
+    (text, embedding)
+)
+
+# 语义搜索：找到最相似的5条记录
+query_embedding = client.embeddings.create(
+    model="text-embedding-3-small",
+    input="AI的定义"
+).data[0].embedding
+
+cur.execute("""
+    SELECT content, embedding <-> %s::vector AS distance
+    FROM documents
+    ORDER BY distance
+    LIMIT 5
+""", (query_embedding,))
+
+results = cur.fetchall()
+for content, distance in results:
+    print(f"{content} (相似度: {1-distance:.3f})")
+```
+
+## 推荐资源
+
+- <Highlight color="g">[SQLBolt](https://sqlbolt.com/) - SQL快速入门</Highlight>
+- [PostgreSQL官方文档](https://www.postgresql.org/docs/)
+- [pgvector GitHub](https://github.com/pgvector/pgvector)
+- [Redis官方文档](https://redis.io/docs/)
+- [MongoDB University](https://university.mongodb.com/) - 免费课程
+- [Pinecone文档](https://docs.pinecone.io/) - 向量数据库入门

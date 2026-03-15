@@ -1,0 +1,261 @@
+---
+title: Agent开发
+sidebar_position: 4
+---
+
+Agent的三个核心板块：模型、工具、流程。
+
+如何做好Agent业界存在两条鲜明路线之争。
+
+**Big Model派**认为：关键是**把模型做强**。更强的推理、更好的指令遵循、更强的工具选择与规划能力，都来自模型本身；只要模型足够强，复杂任务自然能被“想清楚、做对”。因此重心应放在：用更大的规模、更好的数据、更优的算法去提升模型能力，Agent 层尽量薄，少写死逻辑，多交给模型决策。
+
+**Harness派**认为：关键是**把马儿（模型）的“挽具”做好**——即围绕模型的编排层、流程与约束。模型会犯错、会幻觉、会不稳定，不能把所有责任都压在“模型自己想明白”上；应当用状态机、流水线、显式记忆、human-in-the-loop、多智能体路由等工程手段，把任务拆解、约束和纠错做在系统里，让模型在明确边界内发挥能力。
+
+| 维度 | Big Model派 | Harness派 |
+|------|----------|--------|
+| 重心 | 模型能力（推理、规划、指令遵循） | 编排与流程（状态机、记忆、人机协同） |
+| 对模型的信任 | 高：相信模型能自主决策 | 审慎：用流程和约束兜底 |
+| 工程复杂度 | Agent 层偏薄，逻辑少 | 挽具层较厚，流程与规则多 |
+| 典型思路 | 上更好的模型、少 prompt 工程 | 多智能体、显式记忆、human-in-the-loop |
+
+实践中往往需要**两者结合**：既选能力足够的模型，也设计清晰的挽具（流程、工具、记忆、人审），在可控性与灵活性之间取得平衡。
+
+## Agent 设计理论
+
+大模型本身不具备执行能力，需要调用工具。
+
+调用方式都是换汤不换药，就是将可调用的工具（函数）作为提示词的一部分，传入给大模型。大模型做选择填空，并返回特定格式。
+
+- 选择：是否调用以及调用哪些
+- 填空：调用函数的参数填什么
+
+<Highlight>Agent中的大模型，第一核心能力是让“大模型做选择填空，并返回特定格式”的指令遵循能力</Highlight>。
+
+### Tool原理
+
+```python showLineNumbers
+import json
+from dataclasses import dataclass
+from typing import Any, Callable
+
+@dataclass
+class Tool:
+    """极简工具对象，仅保留名称、描述和同步调用入口。"""
+
+    name: str
+    description: str
+    func: Callable[..., Any]
+
+    def invoke(self, **kwargs: Any) -> Any:
+        """同步调用底层函数。"""
+        return self.func(**kwargs)
+
+
+def tool(
+    func: Callable[..., Any] | None = None,
+    *,
+    name: str | None = None,
+    description: str = "",
+) -> Tool | Callable[[Callable[..., Any]], Tool]:
+    """把被装饰的同步函数封装成 `Tool`，支持可选参数。"""
+
+    def decorator(fn: Callable[..., Any]) -> Tool:
+        tool_name = name or fn.__name__
+        tool_description = (description or fn.__doc__ or "").strip()
+        """
+        装饰器可以收集工具函数信息作为大模型的上下文。其实这里也可以让大模型自己将工具的描述信息二次加工或者直接通过源代码生成，即让大模型自己生成工具的描述信息。
+        
+        import inspect
+        tool_description =  大模型推理("请根据以下函数源码，生成工具的描述信息："+inspect.getsource(func))
+        """
+        return Tool(name=tool_name, description=tool_description, func=fn)
+
+    if func is None:
+        return decorator
+    return decorator(func)
+
+
+@tool
+def get_weather(city: str) -> str:
+    """
+    描述：根据城市名称返回天气。
+
+    参数：
+    - city: 城市名称 str
+
+    返回：
+    - 天气信息 str
+
+    """
+    fake_db = {
+        "北京": "晴天，12℃",
+        "上海": "多云，15℃",
+        "深圳": "小雨，24℃",
+    }
+    return fake_db.get(city, "暂无天气数据")
+
+
+class FakeChatModel:
+    """模拟选择工具的 LLM，如果检测到“天气”则调用 weather 工具。"""
+
+    def __init__(self, tools: list[Tool] = None) -> None:
+        if tools is not None:
+            self.bind_tools(tools)
+
+    def bind_tools(self, tools: list[Tool]) -> None:
+        self.tools = {tool.name: tool for tool in tools}
+
+    def run(self, user_input: str) -> str:
+        """模拟 LLM 的推理、构造工具调用 JSON，再执行工具。"""
+        prompt_template = """
+        你是一个乐于助人的助手，根据用户输入的提示词，完成任务。
+
+        你也许有一些工具可以选择，如果需要使用工具，请选择一个工具，并填入工具的参数。
+
+        这是用户输入的提示词：
+
+        {user_input}
+
+        这是工具列表：
+
+        {tools}
+
+        如果你需要使用工具，请按照以下格式返回：
+        [
+            {{"Tool": "工具名称", "ToolArgs": {{"工具参数1": "参数值1", "工具参数2": "参数值2"}}}}
+        ]
+
+        如果你不需要使用工具，请直接返回：
+        [
+            {{"Message": "回答内容"}}
+        ]
+        """
+
+        prompt = prompt_template.format(user_input=user_input, tools=self.tools)
+        print(prompt)
+
+        # 大模型做 选择填空题，选择一个工具，并填入工具的参数(示例)
+        result = """[
+            {"Tool":"get_weather","ToolArgs":{"city":"上海"}}
+        ]"""
+        result_json = json.loads(result)
+        if result_json[0].get("Tool", None):
+            tool_name = result_json[0]["Tool"]
+            tool_args = result_json[0]["ToolArgs"]
+            tools_result = self.tools[tool_name].invoke(**tool_args)
+            # self.run(tools_result) 可以将工具的结果作为用户输入，继续推理
+            return [{"Message": tools_result}]
+        else:
+            return [{"Message": result_json[0]["Message"]}]
+
+
+if __name__ == "__main__":
+    tools = [get_weather]  # 装饰器已经把函数变成 Tool
+    model = FakeChatModel()
+    model.bind_tools(tools)
+
+    question = "上海 天气"
+    print(f"用户: {question}")
+    result = model.run(question)
+    print(f"模型: {result}")
+
+"""
+用户: 上海 天气
+
+        你是一个乐于助人的助手，根据用户输入的提示词，完成任务。
+
+        你也许有一些工具可以选择，如果需要使用工具，请选择一个工具，并填入工具的参数。
+
+        这是用户输入的提示词：
+
+        上海 天气
+
+        这是工具列表：
+
+        {'get_weather': Tool(name='get_weather', description='描述：根据城市名称返回天气。\n\n    参数：\n    - city: 城市名称 str\n\n    返回：\n    - 天气信息 str', func=<function get_weather at 0x00000238DB82CD60>)}
+
+        如果你需要使用工具，请按照以下格式返回：
+        [
+            {"Tool": "工具名称", "ToolArgs": {"工具参数1": "参数值1", "工具参数2": "参数值2"}}
+        ]
+
+        如果你不需要使用工具，请直接返回：
+        [
+            {"Message": "回答内容"}
+        ]
+
+模型: [{'Message': '多云，15℃'}]
+"""
+```
+
+### function calling
+
+function calling 是 OpenAI 推出的一个功能，允许开发者将大模型的输出结果作为函数调用，并执行函数。一定程度上简化了代码。
+
+```python showLineNumbers
+import openai
+import json
+
+# 请设置你的 OpenAI API Key
+openai.api_key = "YOUR_API_KEY"
+
+# 定义实际业务函数：获取天气信息
+def get_current_weather(location):
+    # 模拟获取天气信息的逻辑
+    return f"{location}的当前天气是晴朗。"
+
+# 定义大模型可调用的函数描述（Function Schema）
+functions = [
+    {
+        "name": "get_current_weather",
+        "description": "获取指定城市的天气",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "location": {"type": "string", "description": "城市名称"}
+            },
+            "required": ["location"]
+        }
+    }
+]
+
+def large_model_integration(user_input):
+    """
+    模拟大模型处理用户输入，
+    若识别到需要调用天气查询函数，则使用函数调用功能。
+    """
+    # 调用大模型接口，启用函数调用
+    response = openai.ChatCompletion.create(
+        model="gpt-4-0613",  # 模型支持函数调用
+        messages=[{"role": "user", "content": user_input}],
+        functions=functions,
+        function_call="auto"  # 模型自动决定是否调用函数
+    )
+
+    message = response["choices"][0]["message"]
+
+    # 判断是否触发了函数调用
+    if message.get("function_call"):
+        func_name = message["function_call"]["name"]
+        arguments = message["function_call"]["arguments"]
+
+        # 解析函数参数
+        args = json.loads(arguments)
+
+        # 根据函数名称调用对应的函数
+        if func_name == "get_current_weather":
+            result = get_current_weather(**args)
+            return f"大模型调用函数 {func_name} 得到结果: {result}"
+        else:
+            return "大模型触发未知函数调用。"
+    else:
+        # 如果大模型没有调用函数，则直接返回回答
+        return message.get("content", "大模型未生成有效回复。")
+
+if __name__ == '__main__':
+    user_query = input("请输入查询内容: ")
+    result = large_model_integration(user_query)
+    print(result)
+
+```
+

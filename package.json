@@ -1,0 +1,65 @@
+{
+  "name": "jiangmiemie",
+  "version": "1.0.3",
+  "private": true,
+  "scripts": {
+    "docusaurus": "docusaurus",
+    "start": "docusaurus start",
+    "build": "docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "deploy": "docusaurus deploy",
+    "clear": "docusaurus clear",
+    "serve": "docusaurus serve",
+    "write-translations": "docusaurus write-translations",
+    "write-heading-ids": "docusaurus write-heading-ids"
+  },
+  "dependencies": {
+    "@docsearch/js": "^3.5.2",
+    "@docusaurus/core": "^3.9.1",
+    "@docusaurus/plugin-google-gtag": "^3.9.1",
+    "@docusaurus/plugin-pwa": "^3.9.1",
+    "@docusaurus/preset-classic": "^3.9.1",
+    "@docusaurus/theme-live-codeblock": "^3.9.1",
+    "@docusaurus/theme-mermaid": "^3.9.1",
+    "@emotion/react": "^11.10.4",
+    "@emotion/styled": "^11.10.4",
+    "@giscus/react": "^2.4.0",
+    "@infinum/docusaurus-theme": "^0.4.0",
+    "@mdx-js/react": "^3.0.0",
+    "@mui/material": "^5.15.1",
+    "clsx": "^1.2.1",
+    "d3": "^7.8.5",
+    "markmap-common": "^0.15.0",
+    "markmap-lib": "^0.15.2",
+    "markmap-toolbar": "^0.15.0",
+    "markmap-view": "^0.15.0",
+    "prism-react-renderer": "^2.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-photo-album": "^2.3.0",
+    "rehype-katex": "^7.0.0",
+    "remark-math": "^6.0.0",
+    "turndown": "^7.2.2",
+    "turndown-plugin-gfm": "^1.0.2",
+    "yet-another-react-lightbox": "^3.15.6"
+  },
+  "devDependencies": {
+    "@docusaurus/module-type-aliases": "^3.9.1",
+    "@docusaurus/types": "^3.9.1"
+  },
+  "browserslist": {
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0"
+  }
+}

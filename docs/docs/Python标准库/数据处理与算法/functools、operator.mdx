@@ -1,0 +1,127 @@
+---
+title: functools、operator
+---
+
+[functools](https://docs.python.org/zh-cn/3/library/functools.html) · [operator](https://docs.python.org/zh-cn/3/library/operator.html)
+
+## functools 模块
+
+`functools` 提供高阶函数与可调用对象工具，常用于偏函数、缓存与装饰器元数据保留。
+
+### reduce
+
+reduce() 对序列元素进行累积运算。
+
+reduce函数签名：`reduce(function, iterable[, initializer]) -> value`
+
+参数说明：
+- `function`：累积函数，接受两个参数
+- `iterable`：要累积的可迭代对象
+- `initializer`：可选的初始值
+
+返回值：
+- 返回累积的结果
+
+```python showLineNumbers
+from functools import reduce
+
+def add(x, y) :            # 两数相加
+    return x + y
+sum1 = reduce(add, [1,2,3,4,5])   # 计算列表和：1+2+3+4+5
+sum2 = reduce(lambda x, y: x+y, [1,2,3,4,5])  # 使用 lambda 匿名函数
+print(sum1)
+print(sum2)
+```
+
+### partial（偏函数）
+
+`partial(func, *args, **keywords)` 固定函数的部分参数，得到一个新可调用对象，调用时只需传入剩余参数。适合在需要「部分应用」的场景下简化代码。
+
+```python showLineNumbers
+from functools import partial
+
+def greet(greeting, name):
+    return f"{greeting}, {name}!"
+
+say_hi = partial(greet, "Hi")
+print(say_hi("Alice"))   # Hi, Alice!
+
+# 固定关键字参数
+base2 = partial(int, base=2)
+print(base2("1010"))     # 10
+```
+
+### lru_cache（缓存装饰器）
+
+`lru_cache(maxsize=128, typed=False)` 为函数结果做 LRU 缓存，相同参数直接返回缓存值。`maxsize` 为缓存条目上限，`None` 表示不限制；`typed=True` 时不同类型（如 `3` 与 `3.0`）分开缓存。
+
+```python showLineNumbers
+from functools import lru_cache
+
+@lru_cache(maxsize=32)
+def fib(n):
+    if n < 2:
+        return n
+    return fib(n - 1) + fib(n - 2)
+
+print(fib(30))   # 第一次计算并缓存
+print(fib(30))   # 直接命中缓存
+```
+
+### wraps（保留被装饰函数的元数据）
+
+装饰器会替换原函数，导致 `__name__`、`__doc__` 等元数据丢失。在装饰器内部用 `functools.wraps(wrapped)` 装饰「返回的新函数」，可把原函数的元数据复制过去。
+
+```python showLineNumbers
+from functools import wraps
+
+def my_decorator(f):
+    @wraps(f)
+    def wrapper(*args, **kwargs):
+        return f(*args, **kwargs)
+    return wrapper
+
+@my_decorator
+def say_hello():
+    """Say hello."""
+    print("Hello")
+
+print(say_hello.__name__)  # say_hello（不用 wraps 则为 wrapper）
+print(say_hello.__doc__)   # Say hello.
+```
+
+## operator 模块
+
+在函数式风格下，`operator` 提供与运算符对应的函数，可替代简单 lambda，便于与 `map`、`sorted`、`reduce` 等配合，且更高效。
+
+- **operator.add(a, b)**：等价于 `a + b`，常用于 `reduce` 或 `map`。
+- **operator.itemgetter(i)**：返回「取下标/键」的函数，适合按索引或键排序、取值。
+- **operator.attrgetter(name)**：返回「取属性」的函数，适合按对象属性排序或提取。
+- **operator.methodcaller(name, *args, **kwargs)**：返回「调用指定方法」的函数，适合统一调用某方法。
+
+```python showLineNumbers
+import operator
+from functools import reduce
+
+# add：替代 lambda x, y: x + y
+print(reduce(operator.add, [1, 2, 3, 4]))   # 10
+
+# itemgetter：按索引或键取值、排序
+get_second = operator.itemgetter(1)
+print(get_second([10, 20, 30]))             # 20
+pairs = [(1, "b"), (2, "a"), (1, "a")]
+pairs.sort(key=operator.itemgetter(1))       # 按第二个元素排序
+
+# attrgetter：按属性取值、排序
+from collections import namedtuple
+Point = namedtuple("Point", "x y")
+pts = [Point(1, 2), Point(0, 3)]
+pts.sort(key=operator.attrgetter("x"))       # 按 x 排序
+get_y = operator.attrgetter("y")
+print([get_y(p) for p in pts])              # [2, 3]
+
+# methodcaller：统一调用某方法
+join_with_dash = operator.methodcaller("join", ["a", "b", "c"])
+print(join_with_dash("-"))      # a-b-c
+```
+

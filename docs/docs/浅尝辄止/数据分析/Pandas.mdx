@@ -1,0 +1,1360 @@
+---
+sidebar_position: 3
+title: Pandas
+---
+
+[Pandas](https://pandas.pydata.org/docs) 是基于 NumPy 构建的数据分析库，提供了高效、灵活的数据结构，让数据处理和分析变得更加简单。
+
+推荐先在官方文档浏览API目录，可以快速这个这个框架的应用范围有个了解。再向下阅读常用的API使用方法。
+
+**Pandas 的核心数据结构：**
+- **Series**：一维数据结构，带标签的数组（类似于 Excel 的一列）
+- **DataFrame**：二维数据结构，带标签的表格（类似于 Excel 表格或 SQL 表）
+
+**Pandas 的核心优势：**
+- **灵活的数据结构**：轻松处理各种类型的数据
+- **强大的数据操作**：筛选、分组、合并、透视等
+- **时间序列支持**：内置日期时间处理功能
+- **缺失值处理**：方便的缺失数据处理方法
+- **数据IO**：支持 CSV、Excel、SQL、JSON 等格式
+
+:::tip
+**数据结构关系：**
+- Series = 一维数组 + 行索引
+- DataFrame = 多个 Series 组成的二维表 + 行索引 + 列索引
+- DataFrame 可以看作是 Series 的字典（共用行索引）
+
+```python
+# Series：一列数据
+s = pd.Series([1, 2, 3], index=['a', 'b', 'c'])
+
+# DataFrame：多列数据
+df = pd.DataFrame({
+    'col1': [1, 2, 3],
+    'col2': [4, 5, 6]
+}, index=['a', 'b', 'c'])
+```
+:::
+
+[Pandas 官方文档](https://pandas.pydata.org/docs/reference/index.html)
+
+##  数据结构
+
+###  Series
+
+Series 是带标签的一维数组，可以存储任何数据类型。
+
+```python showLineNumbers
+import pandas as pd
+import numpy as np
+
+# 从列表创建
+s = pd.Series([1, 2, 3, 4])
+print(s)
+# 0    1
+# 1    2
+# 2    3
+# 3    4
+# dtype: int64
+
+# 指定索引
+s = pd.Series([1, 2, 3, 4], index=['a', 'b', 'c', 'd'])
+print(s)
+# a    1
+# b    2
+# c    3
+# d    4
+# dtype: int64
+
+# 从字典创建
+data = {'Japan': 'Tokyo', 'Korea': 'Seoul', 'China': 'Beijing'}
+s = pd.Series(data)
+print(s)
+# Japan     Tokyo
+# Korea     Seoul
+# China   Beijing
+# dtype: object
+
+# 从标量创建
+s = pd.Series(5, index=['a', 'b', 'c'])
+print(s)
+# a    5
+# b    5
+# c    5
+# dtype: int64
+```
+
+**Series 的属性：**
+
+```python showLineNumbers
+import pandas as pd
+
+s = pd.Series([1, 2, 3, 4], index=['a', 'b', 'c', 'd'])
+
+# 查看值
+print(s.values)  # [1 2 3 4]
+
+# 查看索引
+print(s.index)   # Index(['a', 'b', 'c', 'd'], dtype='object')
+
+# 查看形状
+print(s.shape)   # (4,)
+
+# 查看大小
+print(s.size)    # 4
+
+# 查看数据类型
+print(s.dtype)   # int64
+
+# 设置名称
+s.name = "Numbers"
+s.index.name = "Letters"
+print(s)
+# Letters
+# a    1
+# b    2
+# c    3
+# d    4
+# Name: Numbers, dtype: int64
+```
+
+**Series 的索引：**
+
+```python showLineNumbers
+import pandas as pd
+
+s = pd.Series([10, 20, 30, 40], index=['a', 'b', 'c', 'd'])
+
+# 通过标签索引
+print(s['a'])      # 10
+print(s[['a', 'c']])  # 多个标签
+
+# 通过位置索引
+print(s[0])        # 10
+print(s[[0, 2]])   # 多个位置
+
+# 切片
+print(s['a':'c'])  # 标签切片（包含终点！）
+print(s[0:2])      # 位置切片（不包含终点）
+
+# 布尔索引
+print(s[s > 20])
+# c    30
+# d    40
+
+# 条件筛选
+print(s[(s > 15) & (s < 35)])
+# b    20
+# c    30
+```
+
+:::warning
+**标签切片 vs 位置切片：**
+```python
+s = pd.Series([10, 20, 30], index=['a', 'b', 'c'])
+
+s['a':'c']  # 包含 'c'，结果：a=10, b=20, c=30
+s[0:2]      # 不包含索引2，结果：a=10, b=20
+```
+:::
+
+**Series 的运算：**
+
+```python showLineNumbers
+import pandas as pd
+
+s = pd.Series([1, 2, 3, 4], index=['a', 'b', 'c', 'd'])
+
+# 向量化运算
+print(s + 10)       # 每个元素加10
+print(s * 2)        # 每个元素乘2
+print(s ** 2)       # 每个元素平方
+
+# Series 之间的运算
+s1 = pd.Series([1, 2, 3], index=['a', 'b', 'c'])
+s2 = pd.Series([4, 5, 6], index=['b', 'c', 'd'])
+print(s1 + s2)
+# a    NaN  # 只在 s1 中
+# b    6.0  # 2 + 4
+# c    8.0  # 3 + 5
+# d    NaN  # 只在 s2 中
+
+# 通用函数
+print(np.sqrt(s))   # 平方根
+print(np.exp(s))    # 指数
+
+# 统计函数
+print(s.sum())      # 10
+print(s.mean())     # 2.5
+print(s.max())      # 4
+print(s.min())      # 1
+print(s.std())      # 标准差
+print(s.describe()) # 统计描述
+```
+
+###  DataFrame
+
+DataFrame 是二维表格数据结构，有行索引和列索引。
+
+```python showLineNumbers
+import pandas as pd
+
+# 从字典创建（推荐）
+data = {
+    'name': ['Alice', 'Bob', 'Charlie'],
+    'age': [25, 30, 35],
+    'city': ['Beijing', 'Shanghai', 'Guangzhou']
+}
+df = pd.DataFrame(data)
+print(df)
+#       name  age       city
+# 0    Alice   25    Beijing
+# 1      Bob   30   Shanghai
+# 2  Charlie   35  Guangzhou
+
+# 指定索引
+df = pd.DataFrame(data, index=['row1', 'row2', 'row3'])
+print(df)
+
+# 指定列顺序
+df = pd.DataFrame(data, columns=['city', 'name', 'age'])
+print(df)
+
+# 从列表的列表创建
+data = [
+    ['Alice', 25, 'Beijing'],
+    ['Bob', 30, 'Shanghai'],
+    ['Charlie', 35, 'Guangzhou']
+]
+df = pd.DataFrame(data, columns=['name', 'age', 'city'])
+print(df)
+
+# 从 NumPy 数组创建
+data = np.array([['Japan', 'Tokyo', 4000],
+                 ['Korea', 'Seoul', 1300],
+                 ['China', 'Beijing', 9100]])
+df = pd.DataFrame(data, columns=['nation', 'capital', 'GDP'])
+print(df)
+
+# 从 Series 字典创建
+s1 = pd.Series([1, 2, 3])
+s2 = pd.Series([4, 5, 6])
+df = pd.DataFrame({'col1': s1, 'col2': s2})
+print(df)
+```
+
+**DataFrame 的属性：**
+
+```python showLineNumbers
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, 3],
+    'B': [4, 5, 6],
+    'C': [7, 8, 9]
+})
+
+# 查看形状
+print(df.shape)      # (3, 3) - 3行3列
+
+# 查看大小
+print(df.size)       # 9 - 总元素数
+
+# 查看维度
+print(df.ndim)       # 2
+
+# 查看列名
+print(df.columns)    # Index(['A', 'B', 'C'], dtype='object')
+
+# 查看行索引
+print(df.index)      # RangeIndex(start=0, stop=3, step=1)
+
+# 查看数据类型
+print(df.dtypes)
+# A    int64
+# B    int64
+# C    int64
+
+# 查看值（NumPy 数组）
+print(df.values)
+# [[1 4 7]
+#  [2 5 8]
+#  [3 6 9]]
+
+# 查看信息
+print(df.info())
+# <class 'pandas.core.frame.DataFrame'>
+# RangeIndex: 3 entries, 0 to 2
+# Data columns (total 3 columns):
+#  #   Column  Non-Null Count  Dtype
+# ---  ------  --------------  -----
+#  0   A       3 non-null      int64
+#  1   B       3 non-null      int64
+#  2   C       3 non-null      int64
+
+# 统计描述
+print(df.describe())
+#               A         B         C
+# count  3.000000  3.000000  3.000000
+# mean   2.000000  5.000000  8.000000
+# std    1.000000  1.000000  1.000000
+# min    1.000000  4.000000  7.000000
+# 25%    1.500000  4.500000  7.500000
+# 50%    2.000000  5.000000  8.000000
+# 75%    2.500000  5.500000  8.500000
+# max    3.000000  6.000000  9.000000
+```
+
+**查看数据：**
+
+```python showLineNumbers
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': range(10),
+    'B': range(10, 20),
+    'C': range(20, 30)
+})
+
+# 查看前几行
+print(df.head())     # 默认前5行
+print(df.head(3))    # 前3行
+
+# 查看后几行
+print(df.tail())     # 默认后5行
+print(df.tail(3))    # 后3行
+
+# 随机抽样
+print(df.sample(3))  # 随机3行
+print(df.sample(frac=0.5))  # 随机50%
+```
+
+:::tip
+**数据初探必备三件套：**
+```python
+df.head()        # 看前几行，了解数据结构
+df.info()        # 看列信息、类型、缺失值
+df.describe()    # 看统计摘要
+```
+:::
+
+###  Index
+
+Index 是 Pandas 的行索引或列索引对象。
+
+```python showLineNumbers
+import pandas as pd
+
+# 创建普通索引
+index = pd.Index(['a', 'b', 'c', 'd'])
+print(index)
+# Index(['a', 'b', 'c', 'd'], dtype='object')
+
+# 数值索引
+index = pd.Index([1, 2, 3, 4])
+print(index)
+# Index([1, 2, 3, 4], dtype='int64')
+
+# Index 是不可变的
+# index[0] = 'x'  # TypeError
+
+# Index 操作
+index1 = pd.Index(['A', 'B', 'C'])
+index2 = pd.Index(['C', 'D', 'E'])
+
+print(index1.union(index2))        # 并集
+print(index1.intersection(index2)) # 交集
+print(index1.difference(index2))   # 差集
+```
+
+**MultiIndex（多重索引）：**
+
+```python showLineNumbers
+import pandas as pd
+
+# 从元组列表创建
+index = pd.MultiIndex.from_tuples([
+    ('A', 1), ('A', 2), ('B', 1), ('B', 2)
+])
+print(index)
+
+# 从数组创建
+arrays = [
+    ['A', 'A', 'B', 'B'],
+    [1, 2, 1, 2]
+]
+index = pd.MultiIndex.from_arrays(arrays, names=['letter', 'number'])
+print(index)
+
+# 在 DataFrame 中使用
+df = pd.DataFrame({
+    'value': [10, 20, 30, 40]
+}, index=index)
+print(df)
+#                value
+# letter number       
+# A      1         10
+#        2         20
+# B      1         30
+#        2         40
+
+# 访问多重索引
+print(df.loc['A'])
+#        value
+# number      
+# 1         10
+# 2         20
+
+print(df.loc[('A', 1)])
+# value    10
+```
+
+**DatetimeIndex（时间索引）：**
+
+```python showLineNumbers
+import pandas as pd
+
+# 从日期字符串创建
+dates = pd.to_datetime(['2021-01-01', '2021-01-02', '2021-01-03'])
+print(dates)
+# DatetimeIndex(['2021-01-01', '2021-01-02', '2021-01-03'])
+
+# 生成日期范围
+dates = pd.date_range('2021-01-01', periods=10, freq='D')
+print(dates)
+# DatetimeIndex(['2021-01-01', '2021-01-02', ..., '2021-01-10'])
+
+# 不同频率
+dates_monthly = pd.date_range('2021-01', periods=12, freq='M')
+dates_hourly = pd.date_range('2021-01-01', periods=24, freq='H')
+dates_business = pd.date_range('2021-01-01', periods=10, freq='B')  # 工作日
+
+# 在 DataFrame 中使用
+df = pd.DataFrame({
+    'value': range(10)
+}, index=dates)
+print(df.head())
+
+# 时间索引的优势
+print(df['2021-01-01'])     # 按日期选择
+print(df['2021-01-01':'2021-01-03'])  # 日期范围
+print(df['2021-01'])        # 按月选择
+```
+
+:::tip
+**时间频率代码：**
+- `D`：日
+- `W`：周
+- `M`：月末
+- `MS`：月初
+- `Q`：季度末
+- `Y`：年末
+- `H`：小时
+- `T` 或 `min`：分钟
+- `S`：秒
+- `B`：工作日
+:::
+
+##  数据IO
+
+Pandas 支持多种数据格式的读写，让数据交换变得非常便捷。
+
+###  CSV/Excel 文件
+
+```python showLineNumbers
+import pandas as pd
+
+# 创建示例数据
+data = [['Google', 10], ['Runoob', 12], ['Wiki', 13]]
+df = pd.DataFrame(data, columns=['Site', 'Age'], dtype=float)
+
+# CSV 文件读写
+df.to_csv('file1.csv', index=False)     # 写入 CSV
+df = pd.read_csv('file1.csv')           # 读取 CSV
+
+# Excel 文件读写（.xlsx 格式）
+df.to_excel('file1.xlsx', index=False)  # 写入 Excel
+df = pd.read_excel('file1.xlsx')        # 读取 Excel
+
+# Excel 文件读写（.xls 格式）
+df.to_excel('file1.xls', index=False)
+df = pd.read_excel('file1.xls')
+
+print(df)
+#     Site   Age
+# 0  Google  10.0
+# 1  Runoob  12.0
+# 2    Wiki  13.0
+```
+
+:::tip
+**常用参数：**
+- `index=False`：不保存行索引
+- `header=None`：没有列名时使用
+- `encoding='utf-8'`：指定编码格式
+- `sep=','`：指定分隔符（CSV）
+- `sheet_name='Sheet1'`：指定 Excel 工作表
+
+```python
+# 读取 CSV 时的常用参数
+df = pd.read_csv('data.csv', 
+                 encoding='utf-8',    # 编码
+                 sep=',',             # 分隔符
+                 header=0,            # 第一行为列名
+                 index_col=0,         # 第一列为索引
+                 na_values=['NA', 'null'],  # 缺失值标记
+                 skiprows=1,          # 跳过第一行
+                 nrows=100)           # 只读100行
+
+# 读取 Excel 时的常用参数
+df = pd.read_excel('data.xlsx',
+                   sheet_name='Sheet1',  # 工作表名
+                   header=0,             # 第一行为列名
+                   usecols='A:C')        # 只读A到C列
+```
+:::
+
+###  JSON 文件
+
+```python showLineNumbers
+import pandas as pd
+
+# 准备 JSON 数据
+data = [
+    {
+        "id": "A001",
+        "name": "菜鸟教程",
+        "url": "www.runoob.com",
+        "likes": 61
+    },
+    {
+        "id": "A002",
+        "name": "Google",
+        "url": "www.google.com",
+        "likes": 124
+    },
+    {
+        "id": "A003",
+        "name": "淘宝",
+        "url": "www.taobao.com",
+        "likes": 45
+    }
+]
+
+# 创建 DataFrame
+df = pd.DataFrame(data)
+
+# JSON 文件读写
+df.to_json('sites.json')         # 写入 JSON
+df = pd.read_json('sites.json')  # 读取 JSON
+
+print(df.to_string())
+#      id    name             url  likes
+# 0  A001    菜鸟教程  www.runoob.com     61
+# 1  A002  Google  www.google.com    124
+# 2  A003      淘宝  www.taobao.com     45
+```
+
+:::tip
+**JSON 格式选项：**
+```python
+# 不同的 JSON 方向（orient 参数）
+df.to_json('data.json', orient='records')  # 记录列表格式
+df.to_json('data.json', orient='index')    # 以索引为键
+df.to_json('data.json', orient='columns')  # 以列名为键（默认）
+df.to_json('data.json', orient='values')   # 只保存值
+```
+:::
+
+###  JSONL 文件
+
+```python showLineNumbers
+import pandas as pd
+
+# 准备 JSONL 数据
+data = [
+    {"id": 1, "text": "你好\n我是第一行"},
+    {"id": 2, "text": "这是第二个对象"}
+]
+# 创建 DataFrame
+df = pd.DataFrame(data)
+# 写入 JSONL 文件  
+# orient='records'表示每条记录（每行）是一个独立的JSON对象（即列表中的字典形式）
+# lines=True 表示每行一个JSON对象
+df.to_json('data.jsonl', orient='records', lines=True)
+# 读取 JSONL 文件  lines=True 表示每行一个JSON对象
+df = pd.read_json('data.jsonl', lines=True)
+print(df)
+#      id    text
+# 0     1  你好\n我是第一行
+# 1     2  这是第二个对象
+```
+
+###  SQL 数据库
+
+```python showLineNumbers
+from sqlalchemy import create_engine, text
+import pandas as pd
+
+# 数据库连接配置
+MYSQL_HOST = 'localhost'
+MYSQL_PORT = 3306
+MYSQL_USER = 'employee_u'
+MYSQL_PASSWORD = 'employee_s'
+MYSQL_DB = 'employee'
+
+# 创建数据库引擎
+engine = create_engine(
+    f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DB}',
+    echo=False
+)
+
+# 准备数据
+dataset = pd.DataFrame({
+    'Names': ['Abhinav', 'Aryan', 'Manthan'],
+    'DOB': ['10/01/2009', '24/03/2009', '28/02/2009']
+})
+
+# 写入数据库
+dataset.to_sql('Employee_Data', con=engine, index=False, if_exists='replace')
+
+# 读取数据的多种方式
+with engine.connect() as conn:
+    # 方式1：读取整个表
+    df1 = pd.read_sql('Employee_Data', con=conn)
+    
+    # 方式2：使用 SQL 查询
+    df2 = pd.read_sql_query(text("SELECT * FROM Employee_Data"), con=conn)
+    
+    # 方式3：读取表（专用方法）
+    df3 = pd.read_sql_table("Employee_Data", conn)
+
+print(df2)
+```
+
+:::tip
+**if_exists 参数控制表存在时的行为：**
+- `'fail'`：如果表存在，报错（默认）
+- `'replace'`：删除原表，创建新表
+- `'append'`：在现有表中追加数据
+
+```python
+# 替换表
+df.to_sql('table_name', con=engine, if_exists='replace')
+
+# 追加数据
+df.to_sql('table_name', con=engine, if_exists='append')
+
+# 分批写入大量数据
+df.to_sql('table_name', con=engine, chunksize=1000)
+```
+:::
+
+:::warning
+**数据库操作注意事项：**
+1. 确保安装了相应的数据库驱动（如 `pymysql`、`psycopg2`）
+2. 大量数据写入时，考虑使用 `chunksize` 参数分批写入
+3. 使用参数化查询防止 SQL 注入
+4. 记得关闭数据库连接释放资源
+:::
+
+##  数据选择
+
+Pandas 提供了多种方式来选择和筛选数据。
+
+###  基本选择
+
+```python showLineNumbers
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, 3, 4],
+    'B': [5, 6, 7, 8],
+    'C': [9, 10, 11, 12]
+}, index=['row1', 'row2', 'row3', 'row4'])
+
+print(df)
+#       A  B   C
+# row1  1  5   9
+# row2  2  6  10
+# row3  3  7  11
+# row4  4  8  12
+
+# 选择列
+print(df['A'])          # 单列，返回 Series
+print(df[['A', 'C']])   # 多列，返回 DataFrame
+
+# 选择行（切片）
+print(df[0:2])          # 前两行
+print(df['row1':'row3']) # 标签切片（包含终点）
+
+# 列操作
+df['D'] = df['A'] + df['B']  # 新增列
+df['E'] = 100                 # 常量列
+del df['E']                   # 删除列
+```
+
+:::tip
+**列选择的两种方式：**
+```python
+df['A']      # 推荐：总是有效，支持特殊字符
+df.A         # 便捷：但列名不能与方法重名
+
+# 例如：
+df.count     # 这是方法，不是列
+df['count']  # 这才是选择名为'count'的列
+```
+:::
+
+###  loc 和 iloc
+
+```python showLineNumbers
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 2, 3, 4],
+    'B': [5, 6, 7, 8],
+    'C': [9, 10, 11, 12]
+}, index=['row1', 'row2', 'row3', 'row4'])
+
+# loc：基于标签的索引
+print(df.loc['row1'])           # 单行
+print(df.loc[['row1', 'row3']]) # 多行
+print(df.loc['row1', 'A'])      # 单个元素
+print(df.loc['row1':'row3', 'A':'B'])  # 行列切片
+
+# iloc：基于位置的索引
+print(df.iloc[0])         # 第一行
+print(df.iloc[[0, 2]])    # 第1和第3行
+print(df.iloc[0, 1])      # 第1行第2列
+print(df.iloc[0:2, 0:2])  # 行列位置切片
+
+# 布尔索引
+print(df.loc[df['A'] > 2])         # 筛选行
+print(df.loc[df['A'] > 2, ['A', 'C']])  # 筛选行和列
+
+# 赋值
+df.loc['row1', 'A'] = 100
+df.iloc[0, 0] = 200
+```
+
+:::tip
+**loc vs iloc vs []：**
+
+| 方式 | 索引类型 | 切片行为 | 用途 |
+|------|----------|----------|------|
+| `[]` | 列名/行位置 | 不包含终点 | 简单列选择、行切片 |
+| `.loc[]` | 标签 | 包含终点 | 灵活的标签索引 |
+| `.iloc[]` | 位置 | 不包含终点 | 位置索引 |
+
+```python
+# 选择列
+df['A']           # 简单
+df.loc[:, 'A']    # 明确
+
+# 选择行
+df[0:2]           # 位置切片
+df.loc['a':'c']   # 标签切片
+df.iloc[0:2]      # 位置切片
+
+# 行列组合
+df.loc['a', 'A']  # 标签
+df.iloc[0, 0]     # 位置
+```
+:::
+
+###  条件筛选
+
+```python showLineNumbers
+import pandas as pd
+
+df = pd.DataFrame({
+    'name': ['Alice', 'Bob', 'Charlie', 'David'],
+    'age': [25, 30, 35, 28],
+    'city': ['Beijing', 'Shanghai', 'Beijing', 'Guangzhou'],
+    'salary': [5000, 6000, 7000, 5500]
+})
+
+# 单条件筛选
+print(df[df['age'] > 28])
+
+# 多条件筛选（与）
+print(df[(df['age'] > 25) & (df['salary'] > 5500)])
+
+# 多条件筛选（或）
+print(df[(df['city'] == 'Beijing') | (df['salary'] > 6000)])
+
+# 使用 isin
+print(df[df['city'].isin(['Beijing', 'Shanghai'])])
+
+# 字符串包含
+print(df[df['name'].str.contains('a')])
+
+# 使用 query 方法（更易读）
+print(df.query('age > 28 and salary > 5500'))
+print(df.query('city == "Beijing" or salary > 6000'))
+
+# 筛选后选择列
+print(df.loc[df['age'] > 28, ['name', 'city']])
+```
+
+:::tip
+**条件筛选技巧：**
+```python
+# 使用 & | ~ 而不是 and or not
+df[(df['age'] > 25) & (df['salary'] > 5000)]  # 正确
+# df[(df['age'] > 25) and (df['salary'] > 5000)]  # 错误
+
+# 条件需要加括号
+df[(df['age'] > 25) & (df['salary'] > 5000)]  # 正确
+# df[df['age'] > 25 & df['salary'] > 5000]  # 错误
+
+# query 方法更清晰
+df.query('age > 25 and salary > 5000')  # 可以用 and/or
+```
+:::
+
+##  数据清洗
+
+###  缺失值处理
+
+```python showLineNumbers
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    'A': [1, 2, np.nan, 4],
+    'B': [5, np.nan, np.nan, 8],
+    'C': [9, 10, 11, 12]
+})
+
+print(df)
+#      A    B   C
+# 0  1.0  5.0   9
+# 1  2.0  NaN  10
+# 2  NaN  NaN  11
+# 3  4.0  8.0  12
+
+# 检测缺失值
+print(df.isna())        # 或 df.isnull()
+print(df.isna().sum())  # 每列缺失值数量
+
+# 检测非缺失值
+print(df.notna())       # 或 df.notnull()
+
+# 删除缺失值
+print(df.dropna())              # 删除含有缺失值的行
+print(df.dropna(axis=1))        # 删除含有缺失值的列
+print(df.dropna(how='all'))     # 删除全为缺失值的行
+print(df.dropna(thresh=2))      # 保留至少有2个非缺失值的行
+
+# 填充缺失值
+print(df.fillna(0))             # 填充为0
+print(df.fillna({'A': 0, 'B': 99}))  # 不同列填充不同值
+print(df.fillna(method='ffill'))  # 前向填充
+print(df.fillna(method='bfill'))  # 后向填充
+print(df.fillna(df.mean()))     # 用均值填充
+
+# 插值
+print(df.interpolate())         # 线性插值
+```
+
+:::tip
+**缺失值处理策略：**
+
+**删除：**
+- 缺失比例小（`<5%`）
+- 缺失是完全随机的
+- 数据量足够大
+
+**填充：**
+- 常数：0、-1、均值、中位数
+- 前后值：ffill、bfill
+- 插值：线性、多项式
+
+```python
+# 统计缺失值
+missing = df.isna().sum()
+missing_pct = df.isna().sum() / len(df) * 100
+print(pd.DataFrame({'count': missing, 'percentage': missing_pct}))
+
+# 只保留完整数据的列
+df_clean = df.dropna(axis=1)
+
+# 组合策略
+df_filled = df.copy()
+df_filled['A'].fillna(df_filled['A'].mean(), inplace=True)
+df_filled['B'].fillna(method='ffill', inplace=True)
+```
+:::
+
+###  重复值处理
+
+```python showLineNumbers
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': [1, 1, 2, 3, 3],
+    'B': [5, 5, 6, 7, 7],
+    'C': [9, 9, 10, 11, 11]
+})
+
+print(df)
+#    A  B   C
+# 0  1  5   9
+# 1  1  5   9
+# 2  2  6  10
+# 3  3  7  11
+# 4  3  7  11
+
+# 检测重复行
+print(df.duplicated())
+# 0    False
+# 1     True
+# 2    False
+# 3    False
+# 4     True
+
+# 统计重复
+print(df.duplicated().sum())  # 2
+
+# 删除重复行
+print(df.drop_duplicates())   # 保留第一次出现
+print(df.drop_duplicates(keep='last'))  # 保留最后一次出现
+print(df.drop_duplicates(keep=False))   # 删除所有重复
+
+# 基于特定列去重
+print(df.drop_duplicates(subset=['A']))
+print(df.drop_duplicates(subset=['A', 'B']))
+
+# 原地修改
+df.drop_duplicates(inplace=True)
+```
+
+###  数据类型转换
+
+```python showLineNumbers
+import pandas as pd
+
+df = pd.DataFrame({
+    'A': ['1', '2', '3'],
+    'B': [1.0, 2.0, 3.0],
+    'C': ['2021-01-01', '2021-01-02', '2021-01-03']
+})
+
+print(df.dtypes)
+# A    object
+# B   float64
+# C    object
+
+# 转换单列
+df['A'] = df['A'].astype(int)
+df['B'] = df['B'].astype(int)
+df['C'] = pd.to_datetime(df['C'])
+
+print(df.dtypes)
+# A             int64
+# B             int64
+# C    datetime64[ns]
+
+# 批量转换
+df = df.astype({'A': 'int32', 'B': 'float32'})
+
+# 尝试转换（失败时不报错）
+df['A'] = pd.to_numeric(df['A'], errors='coerce')  # 转换失败变NaN
+df['A'] = pd.to_numeric(df['A'], errors='ignore')  # 转换失败保持原样
+
+# 分类类型（节省内存）
+df['category'] = pd.Categorical(['A', 'B', 'A', 'C'])
+```
+
+:::tip
+**常用类型转换：**
+```python
+# 数值类型
+pd.to_numeric(df['col'])          # 转数值
+pd.to_numeric(df['col'], errors='coerce')  # 失败变NaN
+
+# 时间类型
+pd.to_datetime(df['col'])         # 转日期
+pd.to_datetime(df['col'], format='%Y-%m-%d')  # 指定格式
+
+# 字符串类型
+df['col'].astype(str)             # 转字符串
+
+# 分类类型（适合重复值多的列）
+df['col'] = df['col'].astype('category')
+```
+:::
+
+##  数据转换
+
+###  apply/map/applymap
+
+```python showLineNumbers
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    'name': ['alice', 'bob', 'charlie'],
+    'age': [25, 30, 35],
+    'salary': [5000, 6000, 7000]
+})
+
+# map：Series 级别的映射
+df['name_upper'] = df['name'].map(str.upper)
+df['age_group'] = df['age'].map(lambda x: '年轻' if x < 30 else '成熟')
+
+# 使用字典映射
+name_mapping = {'alice': 'Alice', 'bob': 'Bob', 'charlie': 'Charlie'}
+df['name_title'] = df['name'].map(name_mapping)
+
+print(df)
+
+# apply：DataFrame/Series 级别的应用
+# 对列操作（axis=0，默认）
+print(df[['age', 'salary']].apply(np.mean))
+
+# 对行操作（axis=1）
+df['total'] = df.apply(lambda row: row['age'] + row['salary'], axis=1)
+
+# 返回多个值
+def analyze(series):
+    return pd.Series({
+        'min': series.min(),
+        'max': series.max(),
+        'mean': series.mean()
+    })
+
+print(df[['age', 'salary']].apply(analyze))
+
+# applymap：DataFrame 所有元素的映射
+df_num = df[['age', 'salary']]
+df_doubled = df_num.applymap(lambda x: x * 2)
+print(df_doubled)
+```
+
+:::tip
+**map vs apply vs applymap：**
+
+| 方法 | 应用对象 | 作用 | 返回 |
+|------|----------|------|------|
+| `map` | Series | 元素级映射 | Series |
+| `apply` | Series/DataFrame | 函数应用 | Series/DataFrame |
+| `applymap` | DataFrame | 所有元素映射 | DataFrame |
+
+```python
+# map：一对一映射（最快）
+df['col'].map({'A': 1, 'B': 2})
+df['col'].map(lambda x: x * 2)
+
+# apply：灵活函数应用
+df['col'].apply(complex_function)
+df.apply(lambda row: row['A'] + row['B'], axis=1)
+
+# applymap：所有元素（已弃用，建议用map）
+df.applymap(lambda x: x * 2)
+df.map(lambda x: x * 2)  # 新版推荐
+```
+:::
+
+###  排序
+
+```python showLineNumbers
+import pandas as pd
+
+df = pd.DataFrame({
+    'name': ['Charlie', 'Alice', 'Bob'],
+    'age': [35, 25, 30],
+    'salary': [7000, 5000, 6000]
+})
+
+# 按值排序
+print(df.sort_values('age'))  # 按age升序
+print(df.sort_values('age', ascending=False))  # 降序
+
+# 多列排序
+print(df.sort_values(['age', 'salary']))
+print(df.sort_values(['age', 'salary'], ascending=[True, False]))
+
+# 按索引排序
+df_indexed = df.set_index('name')
+print(df_indexed.sort_index())  # 按行索引排序
+print(df_indexed.sort_index(axis=1))  # 按列名排序
+
+# 原地排序
+df.sort_values('age', inplace=True)
+
+# rank：计算排名
+df['age_rank'] = df['age'].rank()
+df['salary_rank'] = df['salary'].rank(ascending=False)
+df['age_rank_dense'] = df['age'].rank(method='dense')
+
+print(df)
+```
+
+:::tip
+**rank 方法的 method 参数：**
+- `average`：相同值取平均排名（默认）
+- `min`：相同值取最小排名
+- `max`：相同值取最大排名
+- `first`：按出现顺序排名
+- `dense`：紧密排名，无跳号
+
+```python
+s = pd.Series([1, 3, 3, 5])
+
+s.rank(method='average')  # [1.0, 2.5, 2.5, 4.0]
+s.rank(method='min')      # [1.0, 2.0, 2.0, 4.0]
+s.rank(method='max')      # [1.0, 3.0, 3.0, 4.0]
+s.rank(method='first')    # [1.0, 2.0, 3.0, 4.0]
+s.rank(method='dense')    # [1.0, 2.0, 2.0, 3.0]
+```
+:::
+
+###  数据合并
+
+```python showLineNumbers
+import pandas as pd
+
+df1 = pd.DataFrame({
+    'A': [1, 2, 3],
+    'B': [4, 5, 6]
+})
+
+df2 = pd.DataFrame({
+    'A': [7, 8, 9],
+    'B': [10, 11, 12]
+})
+
+# concat：垂直/水平拼接
+print(pd.concat([df1, df2]))  # 垂直拼接（默认axis=0）
+print(pd.concat([df1, df2], axis=1))  # 水平拼接
+print(pd.concat([df1, df2], ignore_index=True))  # 重置索引
+
+# merge：类SQL的合并
+left = pd.DataFrame({
+    'key': ['A', 'B', 'C'],
+    'value1': [1, 2, 3]
+})
+
+right = pd.DataFrame({
+    'key': ['A', 'B', 'D'],
+    'value2': [4, 5, 6]
+})
+
+# 内连接（默认）
+print(pd.merge(left, right, on='key'))
+#   key  value1  value2
+# 0   A       1       4
+# 1   B       2       5
+
+# 左连接
+print(pd.merge(left, right, on='key', how='left'))
+#   key  value1  value2
+# 0   A       1     4.0
+# 1   B       2     5.0
+# 2   C       3     NaN
+
+# 右连接
+print(pd.merge(left, right, on='key', how='right'))
+
+# 外连接
+print(pd.merge(left, right, on='key', how='outer'))
+#   key  value1  value2
+# 0   A     1.0     4.0
+# 1   B     2.0     5.0
+# 2   C     3.0     NaN
+# 3   D     NaN     6.0
+
+# 不同列名连接
+left = pd.DataFrame({'key_left': ['A', 'B'], 'value': [1, 2]})
+right = pd.DataFrame({'key_right': ['A', 'B'], 'value': [3, 4]})
+print(pd.merge(left, right, left_on='key_left', right_on='key_right'))
+
+# join：基于索引的合并
+df1 = pd.DataFrame({'A': [1, 2]}, index=['a', 'b'])
+df2 = pd.DataFrame({'B': [3, 4]}, index=['a', 'b'])
+print(df1.join(df2))
+```
+
+:::tip
+**merge 的 how 参数：**
+
+| 类型 | SQL等价 | 说明 |
+|------|---------|------|
+| `inner` | INNER JOIN | 保留两边都有的键 |
+| `left` | LEFT JOIN | 保留左边所有键 |
+| `right` | RIGHT JOIN | 保留右边所有键 |
+| `outer` | FULL OUTER JOIN | 保留所有键 |
+| `cross` | CROSS JOIN | 笛卡尔积 |
+
+```python
+# 多列连接
+pd.merge(df1, df2, on=['key1', 'key2'])
+
+# 解决重复列名
+pd.merge(df1, df2, on='key', suffixes=('_left', '_right'))
+
+# 指示器：显示数据来源
+pd.merge(df1, df2, on='key', how='outer', indicator=True)
+```
+:::
+
+##  数据分析
+
+###  分组聚合（GroupBy）
+
+```python showLineNumbers
+import pandas as pd
+import numpy as np
+
+df = pd.DataFrame({
+    'class': ['A', 'A', 'B', 'B', 'C', 'C'],
+    'name': ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank'],
+    'score': [85, 90, 75, 80, 95, 88]
+})
+
+# 基本分组
+grouped = df.groupby('class')
+
+# 聚合函数
+print(grouped['score'].mean())   # 每组平均分
+print(grouped['score'].sum())    # 每组总分
+print(grouped['score'].count())  # 每组人数
+print(grouped['score'].max())    # 每组最高分
+
+# 多个聚合函数
+print(grouped['score'].agg(['mean', 'sum', 'count', 'max', 'min']))
+
+# 不同列不同聚合
+print(grouped.agg({
+    'score': ['mean', 'max'],
+    'name': 'count'
+}))
+
+# 自定义聚合函数
+print(grouped['score'].agg(lambda x: x.max() - x.min()))
+
+# 多列分组
+df['semester'] = ['S1', 'S1', 'S1', 'S2', 'S2', 'S2']
+print(df.groupby(['class', 'semester'])['score'].mean())
+
+# 遍历分组
+for name, group in grouped:
+    print(f"\nClass {name}:")
+    print(group)
+
+# transform：保持原DataFrame形状
+df['score_mean'] = grouped['score'].transform('mean')
+df['score_normalized'] = grouped['score'].transform(lambda x: (x - x.mean()) / x.std())
+print(df)
+
+# filter：筛选分组
+print(grouped.filter(lambda x: x['score'].mean() > 85))
+```
+
+:::tip
+**GroupBy 三部曲：Split-Apply-Combine**
+
+1. **Split**：按条件分组
+2. **Apply**：对每组应用函数
+3. **Combine**：合并结果
+
+```python
+# 常用模式
+df.groupby('key').agg('mean')          # 聚合
+df.groupby('key').transform('mean')    # 转换（保持形状）
+df.groupby('key').filter(lambda x: len(x) > 2)  # 筛选分组
+df.groupby('key').apply(custom_function)  # 自定义函数
+```
+:::
+
+###  数据透视（Pivot）
+
+```python showLineNumbers
+import pandas as pd
+
+df = pd.DataFrame({
+    'date': ['2021-01', '2021-01', '2021-02', '2021-02'],
+    'city': ['Beijing', 'Shanghai', 'Beijing', 'Shanghai'],
+    'sales': [100, 150, 120, 160],
+    'profit': [20, 30, 25, 35]
+})
+
+# pivot_table：创建透视表
+pivot = pd.pivot_table(
+    df,
+    values='sales',          # 要聚合的值
+    index='date',            # 行索引
+    columns='city',          # 列索引
+    aggfunc='sum'            # 聚合函数
+)
+print(pivot)
+# city      Beijing  Shanghai
+# date                       
+# 2021-01       100       150
+# 2021-02       120       160
+
+# 多个聚合函数
+pivot = pd.pivot_table(
+    df,
+    values='sales',
+    index='date',
+    columns='city',
+    aggfunc=['sum', 'mean']
+)
+print(pivot)
+
+# 多个值列
+pivot = pd.pivot_table(
+    df,
+    values=['sales', 'profit'],
+    index='date',
+    columns='city',
+    aggfunc='sum'
+)
+print(pivot)
+
+# 添加小计
+pivot = pd.pivot_table(
+    df,
+    values='sales',
+    index='date',
+    columns='city',
+    aggfunc='sum',
+    margins=True,
+    margins_name='Total'
+)
+print(pivot)
+
+# stack/unstack：重塑数据
+df_indexed = df.set_index(['date', 'city'])
+print(df_indexed)
+
+# unstack：将行索引转为列索引
+print(df_indexed.unstack())
+
+# stack：将列索引转为行索引
+print(df_indexed.unstack().stack())
+```
+
+:::tip
+**Pivot vs Pivot_table：**
+
+- `pivot`：不聚合，要求索引/列组合唯一
+- `pivot_table`：可聚合，处理重复值
+
+```python
+# pivot：简单重塑
+df.pivot(index='date', columns='city', values='sales')
+
+# pivot_table：需要聚合
+df.pivot_table(
+    values='sales',
+    index='date',
+    columns='city',
+    aggfunc='sum'
+)
+```
+:::

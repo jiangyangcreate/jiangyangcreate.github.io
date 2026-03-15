@@ -1,0 +1,894 @@
+---
+sidebar_position: 0
+title: 基础语法
+---
+:::info
+优美优于丑陋，明了优于隐晦简单优于复杂，复杂优于繁杂
+
+扁平优于嵌套，稀疏优于稠密
+
+可读性很重要!
+
+特例亦不可违背原则，即使实用比纯粹更优。错误绝不能悄悄忽略，除非它明确需要如此
+
+面对不确定性，拒绝妄加猜测。
+
+任何问题应有一种，且最好只有一种，显而易见的解决方法。
+
+做优于不做，然而不假思索还不如不做。
+
+很难解释的，必然是坏方法。
+
+很好解释的，可能是好方法。
+
+[PEP 20 – The Zen of Python](https://peps.python.org/pep-0020/)
+
+中文翻译为Python之禅，可以理解为**Python语言的设计哲学**。
+:::
+
+## 缩进
+
+Python 最具特色的就是使用缩进来表示代码块。不需要使用大括号 {}。
+
+缩进的空格数是可变的，常见的有 2 个空格、4 个空格、8 个空格。但是同一个代码块的语句必须包含相同的缩进空格数。
+
+后来出台的代码规范 PEP 8，建议使用 4 个空格作为缩进。
+
+```python showLineNumbers {2,4} title="test.py"
+if True:
+    print ("True")
+else:
+    print ("False")
+```
+
+:::info
+PEP 由社区讨论、起草 PEP、社区公开评议和修改、指导委员会决策、开发者编码实现。
+
+查看 [官方 PEP 索引](https://www.python.org/dev/peps/)，你可以回到过去，了解当年开发者们的想法。
+
+[PEP 8](https://peps.python.org/pep-0008/) 即 Python Enhancement Proposal 8，直译是 Python 增强提案第 8 号，规定了 Python 代码的**编写规范**，是必读 PEP 之一。
+:::
+
+## 注释
+
+注释是代码中不会被 Python 解释器执行的文本。用于解释代码，方便阅读。
+
+Python 支持单行注释和多行注释。
+
+```python showLineNumbers title="test.py"
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+# 在过去，需要 py 文件编码声明 utf-8 才能正常显示中文，不过现在只有使用其他编码（如 GBK）时才需要声明。
+
+# 单行注释使用#号，可以单独一行写在代码上方 
+a = 1 
+
+b = 2 # 也可以写在代码后面
+
+"""
+多行注释使用三个双引号。
+通常写在代码文件的最上方，描述这个代码文件的用途。
+或者写在函数、方法内，描述这个函数、方法的用途。
+"""
+
+# 在函数、类、方法中，可以使用三个双引号添加注释，这样的注释称为文档字符串（docstring）。
+# 可以被正确解析为函数的属性。
+# 在 docstring 前后都没有空行。
+# 即便只有一行，也推荐这样写，这使得以后扩展它变得容易。
+# 单行文档字符串不应是重复函数/方法参数的“签名”，最好写一些有用的信息，例如功能、参数的含义、返回值的含义。
+
+def add_numbers(a,b):
+    """
+    实现一个求和的函数
+    :param a: 第一个数
+    :param b: 第二个数
+    :return: 两数之和
+    """
+    return a+b
+
+print(add_numbers.__doc__)
+
+# 输出：
+# 实现一个求和的函数
+# :param a: 第一个数
+# :param b: 第二个数
+# :return: 两数之和
+
+class Person:
+    """Person类，描述一个Person对象"""
+    def __init__(self, name, age):
+        """初始化一个Person对象"""
+        pass 
+print(Person.__doc__)
+# 输出：
+# Person类，描述一个Person对象
+print(Person.__init__.__doc__)
+# 输出：
+# 初始化一个Person对象
+```
+
+:::info
+如果你违反这些惯例，最坏的结果也不过是招来一些不友好的目光。
+
+但有些软件（如 PEP 256 和 PEP 258 的 Docutils 文档字符串处理系统）会知晓这些惯例，因此遵循它们将为你带来最佳效果。
+
+[PEP 257 – 文档字符串规范](https://peps.python.org/pep-00257/)
+:::
+
+## 丰富的内置内容
+
+Python 易于学习的另外一个原因，就是丰富的内置内容。所有的内置对象在代码编辑器中都会有<HoverText text="Code Highlight" explanation="代码高亮，在 VSCode 中，关键字（保留字）是紫色，模块和类是绿色，函数是黄色，变量是蓝色，不同主体或 IDE 的代码高亮规则有所不同"/>。
+
+### 关键字
+
+关键字是语言中预先定义的标识符。(在开发工具中会显示特殊颜色。)
+
+我们把它们用作标识符名称会引发错误或导致其功能失效。
+
+Python 的标准库提供了一个 keyword module，可以输出当前版本的所有保留字，后续我们会深入学习每一个保留字的作用。
+
+```python showLineNumbers
+import keyword 
+print(keyword.kwlist)
+
+# ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await', 'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except', 'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is', 'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return', 'try', 'while', 'with', 'yield']
+```
+
+某些标识符仅在特定上下文中被保留。它们被称为软关键字。
+
+- `match, case, _` 中 `case` 和 `_` 只有在 `match` 语句下才有特殊功能。
+
+- `type` 在语法这一部分中仅被解释为关键字。巧合的是：内置函数中也有名为 `type()` 的函数。
+
+软关键字虽然没有收录在 `keyword.kwlist` 中，但本文亦将其列出。
+
+<MarkmapHooks initialMarkdown={`
+
+## 关键字
+
+### 基础语法
+- False, None, True: 基本的常量值
+- and, or, not: 逻辑运算符
+- is, in: 身份和成员运算符
+
+### 变量
+- del: 删除对象
+
+### 控制流
+- if, elif, else: 条件判断
+- match, case, _: 模式匹配（软关键字）
+- for, while: 循环控制
+- break, continue: 循环控制
+- try, except, finally: 异常处理
+- raise: 抛出异常
+- pass: 空操作占位符
+- assert: 断言语句
+
+### 函数
+- def: 定义函数
+- return: 函数返回
+- yield: 生成器
+- lambda: 匿名函数
+
+### 类与对象
+- class: 定义类
+- type: 泛型声明（软关键字）
+
+### 装饰器和作用域
+- global: 全局变量声明
+- nonlocal: 非局部变量声明
+
+### 文件操作
+- with: 上下文管理器
+
+### 异步编程
+- async, await: 异步编程关键字
+
+### 模块
+- import, from: 模块导入
+- as: 别名
+
+`} />
+
+
+### 内置数据类型
+
+有部分教材会归纳为六类基础数据类型：数字、字符串、列表、元组、字典、集合。
+> 如果只追求学习 Python 基础语法，确实可以只学习这六类基础数据类型。
+
+事实上，Python3.14 内置有数据类型非常多。
+> 注意：Python 中，`bool` 是 `int` 的子类。
+
+而且 Python 中你自己创建一个新类，设置一下实例，就是一种新的数据类型。
+
+<MarkmapHooks initialMarkdown={`
+
+# Python3.14 内置数据类型
+
+## 基础数据类型
+### 数值类型
+- int: 整数类型，任意精度
+- float: 浮点数类型，双精度
+- complex: 复数类型，实部+虚部
+- bool: 布尔类型，True/False
+
+### 文本类型
+- str: 字符串类型，Unicode文本序列
+
+### 空值类型
+- type(None): None的类型，表示空值
+
+## 容器类型
+### 序列类型
+- list: 可变有序列表
+- tuple: 不可变有序元组
+- range: 数字序列生成器
+
+### 集合类型
+- set: 可变无序不重复集合
+- frozenset: 不可变无序不重复集合
+
+### 映射类型
+- dict: 可变键值对字典
+
+### 二进制序列
+- bytes: 不可变字节序列
+- bytearray: 可变字节数组
+- memoryview: 内存视图对象
+
+## 函数和类相关
+### 方法装饰器
+- classmethod: 类方法装饰器
+- staticmethod: 静态方法装饰器
+- property: 属性装饰器
+
+### 基础类型
+- object: 所有类的基类
+- type: 类型对象，用于创建类
+- super: 访问父类的代理对象
+
+## 迭代器和生成器
+### 迭代工具
+- enumerate: 枚举迭代器，返回索引和值
+- zip: 并行迭代多个序列
+- reversed: 反向迭代器
+- map: 映射迭代器，对序列应用函数
+- filter: 过滤迭代器，筛选满足条件的元素
+
+### 切片对象
+- slice: 切片对象，用于序列切片操作
+
+`} />
+
+
+### 内置异常
+
+异常是 Python 中用于处理错误和异常情况的关键机制。
+
+<MarkmapHooks initialMarkdown={`
+# Python异常继承体系
+
+## BaseException (所有异常的基类)
+### SystemExit
+- 系统退出异常
+
+### KeyboardInterrupt  
+- 键盘中断异常
+
+### GeneratorExit
+- 生成器退出异常
+
+### Exception (常规异常基类)
+#### ArithmeticError (算术错误基类)
+- FloatingPointError: 浮点运算错误
+- OverflowError: 数值溢出错误  
+- ZeroDivisionError: 除零错误
+
+#### LookupError (查找错误基类)
+- IndexError: 索引超出范围
+- KeyError: 字典键不存在
+
+#### EnvironmentError/OSError (系统错误基类)
+##### ConnectionError (连接错误基类)
+- ConnectionAbortedError: 连接中止
+- ConnectionRefusedError: 连接被拒绝
+- ConnectionResetError: 连接重置
+- BrokenPipeError: 管道中断
+
+##### OSError子类
+- BlockingIOError: 阻塞IO错误
+- ChildProcessError: 子进程错误
+- FileExistsError: 文件已存在
+- FileNotFoundError: 文件未找到
+- InterruptedError: 系统调用中断
+- IsADirectoryError: 是目录错误
+- NotADirectoryError: 不是目录错误
+- PermissionError: 权限错误
+- ProcessLookupError: 进程查找错误
+- TimeoutError: 超时错误
+- WindowsError: Windows系统错误
+
+#### ValueError (值错误)
+- 传入无效参数
+
+#### TypeError (类型错误)
+- 类型不匹配错误
+
+#### AttributeError (属性错误)
+- 对象没有指定属性
+
+#### NameError (名称错误)
+- UnboundLocalError: 局部变量未绑定
+
+#### SyntaxError (语法错误基类)
+- IndentationError: 缩进错误
+  - TabError: Tab和空格混用错误
+
+#### ImportError (导入错误基类)
+- ModuleNotFoundError: 模块未找到
+
+#### RuntimeError (运行时错误)
+- NotImplementedError: 未实现错误
+- RecursionError: 递归深度错误
+
+#### StopIteration (迭代停止)
+- 迭代器耗尽
+
+#### StopAsyncIteration (异步迭代停止)
+- 异步迭代器耗尽
+
+#### AssertionError (断言错误)
+- assert语句失败
+
+#### EOFError (文件结束错误)
+- 意外的文件结束
+
+#### MemoryError (内存错误)
+- 内存不足
+
+#### ReferenceError (引用错误)
+- 弱引用对象已被回收
+
+#### SystemError (系统错误)
+- Python解释器内部错误
+
+#### BufferError (缓冲区错误)
+- 缓冲区相关错误
+
+#### Warning (警告基类)
+##### DeprecationWarning
+- 废弃功能警告
+
+##### PendingDeprecationWarning  
+- 即将废弃警告
+
+##### RuntimeWarning
+- 运行时警告
+
+##### SyntaxWarning
+- 语法警告
+
+##### UserWarning
+- 用户警告
+
+##### FutureWarning
+- 未来变更警告
+
+##### ImportWarning
+- 导入警告
+
+##### UnicodeWarning
+- Unicode警告
+
+##### BytesWarning
+- 字节警告
+
+##### ResourceWarning
+- 资源警告
+
+##### EncodingWarning
+- 编码警告
+
+#### BaseExceptionGroup (异常组基类)
+- ExceptionGroup: 异常组
+
+## 已废弃异常
+- EnvironmentError: 已合并到OSError
+- IOError: 已合并到OSError
+`} />
+
+### 内置函数
+
+内置函数指的是Python解释器自带的函数，不需要导入模块、不需要定义就可以使用。
+
+<MarkmapHooks initialMarkdown={`
+## Python内置函数
+
+### 基本操作
+- help(): 显示帮助信息
+- input(): 用户输入
+- print(): 输出
+- hash(): 哈希值
+- id(): 对象标识
+
+### 数学操作
+- abs(): 绝对值
+- divmod(): 商和余数
+- max(): 最大值
+- min(): 最小值
+- pow(): 幂运算
+- round(): 四舍五入
+- sum(): 求和
+- int(): 转整数
+- float(): 转浮点数
+- complex(): 转复数
+- bool(): 转布尔值
+
+### 字符串操作
+- str(): 转字符串
+- format(): 格式化字符串
+- chr(): ASCII码转字符
+- ord(): 字符转ASCII码
+- bin(): 转二进制字符串
+- oct(): 转八进制字符串
+- hex(): 转十六进制字符串
+- bytearray(): 可变字节数组
+- bytes(): 不可变字节序列
+- ascii(): ASCII表示
+- repr(): 对象表示
+
+### 序列操作
+- list(): 列表
+- dict(): 字典
+- tuple(): 元组
+- set(): 集合
+- frozenset(): 不可变集合
+- len(): 长度
+- slice(): 切片对象
+- sorted(): 排序
+- reversed(): 反向生成迭代器
+- filter(): 过滤序列返回迭代器
+
+### 控制流
+- all(): 所有元素为真
+- any(): 任一元素为真
+- range(): 数字序列
+- enumerate(): 枚举索引和值
+- zip(): 并行迭代
+
+### 函数
+- map(): 映射
+
+### 类与对象
+- object(): 基础对象
+- super(): 父类引用
+- delattr(): 删除属性
+- hasattr(): 是否有属性
+- getattr(): 获取属性
+- setattr(): 设置属性
+- vars(): 对象属性字典
+- dir(): 对象属性列表
+- type(): 对象类型
+- isinstance(): 类型检查
+- issubclass(): 子类检查
+- property(): 属性装饰器
+- classmethod(): 类方法装饰器
+- staticmethod(): 静态方法装饰器
+
+### 迭代器
+- iter(): 创建迭代器
+- next(): 获取下一个元素
+
+### 装饰器与作用域
+- callable(): 是否可调用
+- globals(): 全局变量字典
+- locals(): 局部变量字典
+
+### 文件操作
+- open(): 打开文件
+- memoryview(): 内存视图
+
+### 异步编程
+- aiter(): 异步迭代器
+- anext(): 异步next
+
+### 代码执行与调试
+- breakpoint(): 调试断点
+- compile(): 编译代码
+- eval(): 执行表达式
+- exec(): 执行代码
+
+
+### 模块操作
+- __ import __(): 动态导入模块
+
+`} />
+
+
+### 内置常量
+
+Python3.14中，内置常量有：
+
+- `True`: 布尔值True。
+- `False`: 布尔值False。
+- `None`: 空值。
+- `__debug__`: 用于判断是否为开发模式(注意与调试模式区分)。
+- `Ellipsis`: 用于切片操作，等价于`...`。
+- `NotImplemented`: 用于在类中重载运算符，表示该运算符未实现。
+
+:::note
+注意 None 、 False 、 True 和 \_\_debug\_\_ 这些名称不能重新赋值（将它们作为属性名赋值也会引发 SyntaxError ），因此它们可以被认为是“真正的”常量。
+:::
+
+对于这些常量，我们倾向用`is`判断是否相等，而不是`==`。例如`变量 is None`。
+
+对于`Ellipsis`，我们实际使用中，一般使用`...`来代替。
+
+```python showLineNumbers
+import numpy as np
+
+a = np.array([[1,2,3,4,5],[6,7,8,9,10]])
+
+print(a[Ellipsis])  # 输出整个列表
+# 等价于
+print(a[...])
+# 判断...是否是Ellipsis
+print(... is Ellipsis) # 输出True
+```
+
+:::info
+`site`模块（在启动时自动导入，除非提供了 -S 命令行选项）会添加几个常量。它们对交互式解释器很有用，但不应在程序中使用。
+
+- `quit(code=None)`与`exit(code=None)`：名称不同而已，都是退出解释器。较为常用。
+- `help`：显示帮助信息。输入 `help(object)` 获取关于 `object` 的帮助。
+- `copyright`：显示Python的版权信息。
+- `credits`：显示Python的贡献者信息。
+- `license`：显示Python的许可证信息。
+:::
+
+
+### 标准库
+
+标准库就是内置的模块库，不需要安装，直接导入就可以使用。
+
+<MarkmapHooks initialMarkdown={`
+## Python 3.14 标准库
+
+### 文本处理服务
+- string: 常见的字符串操作
+- re: 正则表达式操作
+- difflib: 计算差异的辅助工具
+- textwrap: 文本自动换行与填充
+- unicodedata: Unicode 数据库
+- stringprep: 因特网字符串预处理
+- readline: GNU readline 接口
+- rlcompleter: 用于 GNU readline 的补全函数
+
+### 二进制数据服务
+- struct: 将字节串解读为打包的二进制数据
+- codecs: 编解码器注册和相关基类
+
+### 数据类型
+- datetime: 基本日期和时间类型
+- zoneinfo: IANA 时区支持
+- calendar: 通用日历相关函数
+- collections: 容器数据类型 (包括 .abc)
+- heapq: 堆队列算法
+- bisect: 数组二分算法
+- array: 高效的数字值数组
+- weakref: 弱引用
+- types: 动态类型创建和内置类型名称
+- copy: 浅层及深层拷贝操作
+- pprint: 数据美化输出
+- reprlib: 替代性 repr() 实现
+- enum: 对枚举的支持
+- graphlib: 操作类似图的结构的功能
+
+### 数字和数学模块
+- numbers: 数字抽象基类
+- math: 数学函数
+- cmath: 针对复数的数学函数
+- decimal: 十进制定点和浮点算术
+- fractions: 有理数
+- random: 生成伪随机数
+- statistics: 数字统计函数
+
+### 函数式编程模块
+- itertools: 为高效循环创建迭代器的函数
+- functools: 高阶函数，以及可调用对象上的操作
+- operator: 标准运算符对应函数
+
+### 文件和目录访问
+- pathlib: 面向对象的文件系统路径
+- os.path: 常用的路径操作
+- stat: 解释 stat() 的结果
+- filecmp: 文件和目录比较
+- tempfile: 生成临时文件和目录
+- glob: Unix 风格的路径名模式扩展
+- fnmatch: Unix 文件名模式匹配
+- linecache: 随机访问文本行
+- shutil: 高层级文件操作
+
+### 数据持久化
+- pickle: Python 对象序列化
+- copyreg: 注册 pickle 支持函数
+- shelve: Python 对象持久化
+- marshal: 内部 Python 对象序列化
+- dbm: Unix "数据库" 接口
+- sqlite3: SQLite 数据库的 DB-API 2.0 接口
+
+### 数据压缩和存档
+- compression: 包含 compression.zstd 的包
+- zlib: 与 gzip 兼容的压缩
+- gzip: 对 gzip 文件的支持
+- bz2: 对 bzip2 压缩算法的支持
+- lzma: 使用 LZMA 算法进行压缩
+- zipfile: 操作 ZIP 归档文件
+- tarfile: 读写 tar 归档文件
+
+### 文件格式
+- csv: CSV 文件读写
+- configparser: 配置文件解析器
+- tomllib: 解析 TOML 文件
+- netrc: netrc 文件处理
+- plistlib: 生成与解析 Apple .plist 文件
+
+### 加密服务
+- hashlib: 安全哈希与消息摘要
+- hmac: 用于消息验证的密钥哈希
+- secrets: 生成管理密码的安全随机数
+
+### 通用操作系统服务
+- os: 多种操作系统接口
+- io: 处理流的核心工具
+- time: 时间的访问和转换
+- logging: Python 的日志记录工具
+- platform: 访问底层平台标识数据
+- errno: 标准 errno 系统符号
+- ctypes: Python 外部函数库
+
+### 命令行接口库
+- argparse: 命令行选项、参数和子命令解析器
+- optparse: 命令行选项解析器
+- getpass: 便携式密码输入
+- fileinput: 迭代多个输入流的行
+- curses: 字符单元显示的终端处理及相关工具
+
+### 并发执行
+- threading: 基于线程的并行
+- multiprocessing: 基于进程的并行及共享内存
+- concurrent: 启动并行任务
+- subprocess: 子进程管理
+- sched: 事件调度器
+- queue: 同步队列类
+- contextvars: 上下文变量
+- _thread: 低级线程API
+
+### 网络和进程间通信
+- asyncio: 异步I/O
+- socket: 低级网络接口
+- ssl: socket对象的TLS/SSL包装
+- select: 等待I/O完成
+- selectors: 高级I/O多路复用
+- signal: 异步事件的信号处理器
+- mmap: 内存映射文件支持
+
+### 互联网数据处理
+- email: 电子邮件和MIME处理包
+- json: JSON编码器和解码器
+- mailbox: 操作各种格式的邮箱
+- mimetypes: 将文件名映射到MIME类型
+- base64: Base16、Base32、Base64、Base85数据编码
+- binascii: 二进制和ASCII之间的转换
+- quopri: 编码和解码MIME quoted-printable数据
+
+### 结构化标记处理工具
+- html: 超文本标记语言支持及其解析器和实体
+- xml: XML处理模块，包括ElementTree、DOM、SAX等
+
+### 互联网协议和支持
+- webbrowser: 方便的网络浏览器控制器
+- wsgiref: WSGI实用程序和参考实现
+- urllib: URL处理、打开、解析等
+- http: HTTP模块，包括客户端和服务器
+- ftplib: FTP协议客户端
+- poplib: POP3协议客户端
+- imaplib: IMAP4协议客户端
+- smtplib: SMTP协议客户端
+- uuid: RFC 4122 UUID对象
+- socketserver: 网络服务器框架
+- xmlrpc: XML-RPC服务器和客户端模块
+- ipaddress: IPv4/IPv6操作库
+
+### 多媒体服务
+- wave: 读写WAV文件
+- colorsys: 颜色系统间的转换
+
+### 国际化
+- gettext: 多语言国际化服务
+- locale: 国际化服务
+
+### 图形用户界面
+- tkinter: Tcl/Tk 的 Python 接口 (包括其子模块)
+- turtle: 海龟绘图
+
+### 开发工具
+- typing: 类型提示支持
+- pydoc: 文档生成器和在线帮助系统
+- doctest: 测试交互式的 Python 示例
+- unittest: 单元测试框架 (包括 mock 对象库)
+- test: Python 回归测试包 (包括其 support 工具)
+
+### 调试和分析
+- bdb: 调试器框架
+- faulthandler: 转储 Python 回溯信息
+- pdb: Python 的调试器
+- cProfile, profile: Python 分析器
+- timeit: 测量小代码片段的执行时间
+- trace: 跟踪或记录 Python 语句的执行
+- tracemalloc: 跟踪内存分配
+
+### 软件打包和分发
+- ensurepip: 初始设置 pip 安装器
+- venv: 虚拟环境的创建
+- zipapp: 管理可执行的 Python zip 归档文件
+
+### Python 运行时服务
+- sys: 系统相关的形参和函数
+- sysconfig: 提供对 Python 配置信息的访问
+- builtins: 内置对象
+- warnings: 警告信息控制
+- dataclasses: 数据类
+- contextlib: 为 with 语句上下文提供的工具
+- abc: 抽象基类
+- atexit: 退出处理器
+- traceback: 打印或读取栈回溯信息
+- __future__: Future 语句定义
+- gc: 垃圾回收器接口
+- inspect: 检查当前对象
+- annotationlib: 用于内省标记的功能
+- site: 站点专属的配置钩子
+
+### 自定义 Python 解释器
+- code: 解释器基类
+- codeop: 编译 Python 代码
+
+### 导入模块
+- zipimport: 从 Zip 归档导入模块
+- pkgutil: 包扩展工具
+- modulefinder: 查找脚本使用的模块
+- runpy: 查找并执行 Python 模块
+- importlib: import 的实现 (包括资源和元数据访问)
+
+### Python 语言服务
+- ast: 抽象语法树
+- symtable: 访问编译器的符号表
+- token: 用于 Python 解析树的常量
+- keyword: 检验 Python 关键字
+- tokenize: Python 源代码的分词器
+- tabnanny: 检测有歧义的缩进
+- pyclbr: Python 模块浏览器支持
+- py_compile: 编译 Python 源文件
+- compileall: 字节编译 Python 库
+- dis: Python 字节码反汇编器
+- pickletools: pickle 开发者工具
+
+### Windows 特定服务
+- msvcrt: 来自 MS VC++ 运行时的有用例程
+- winreg: Windows 注册表访问
+- winsound: 针对 Windows 的声音播放接口
+
+### Unix 特定服务
+- shlex: 简单词法分析
+- posix: 最常见的 POSIX 系统调用
+- pwd: 密码数据库
+- grp: 组数据库
+- termios: POSIX 风格的 tty 控制
+- tty: 终端控制函数
+- pty: 伪终端工具
+- fcntl: fcntl 和 ioctl 系统调用
+- resource: 资源使用信息
+- syslog: Unix syslog 库例程
+
+### 已弃用模块
+- getopt: C 风格的命令行选项解析器
+`} />
+
+## 运算符
+
+运算符和内置部分一样，可以直接使用。
+
+:::warning
+运算符当中，除了`=` `is` `not` `and` `or` 不能被重载，其他运算符都可以被重载。
+:::
+
+我们假设`a = 10`，`b = 20`。
+
+### 算术运算符
+
+| 运算符 | 描述                                            | 实例                                                     |
+| ------ | ----------------------------------------------- | -------------------------------------------------------- |
+| +      | 加 - 两个对象相加                               | a + b 输出结果 30                                        |
+| -      | 减 - 得到负数或是一个数减去另一个数             | a - b 输出结果 -10                                       |
+| *      | 乘 - 两个数相乘或是返回一个被重复若干次的字符串 | a * b 输出结果 200                                        |
+| /      | 除 - x 除以 y                                   | b / a 输出结果 2                                         |
+| //     | 整除 - 返回商的整数部分（地板除法，总是向负无穷方向取整。） | 9 // 2 输出结果 4                                        |
+| %      | 取模 - 返回除法的余数`（a=(a//b)×b+(a%b)）`       | b % a 输出结果 0                                         |
+| **     | 幂 - 返回 x 的 y 次幂                           | a**b 为 10 的 20 次方， 输出结果 100000000000000000000   |
+
+
+### 比较（关系）运算符
+
+| 运算符 | 描述                                                                                                                                  | 实例                                         |
+| ------ | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------- |
+| `==`     | 等于 - 比较对象是否相等                                                                                                               | (a == b) 返回 False。                        |
+| `!=`     | 不等于 - 比较两个对象是否不相等                                                                                                       | (a != b) 返回 True.                          |
+| `>`      | 大于 - 返回 x 是否大于 y                                                                                                              | (a > b) 返回 False。                         |
+| `<`  | 小于 - 返回 x 是否小于 y。返回True或False。 | (a `<` b) 返回 True。                      |
+| `>=`     | 大于等于 - 返回 x 是否大于等于 y。                                                                                                    | (a >= b) 返回 False。                        |
+| `<=` | 小于等于 - 返回 x 是否小于等于 y。                                                                                                    | (a `<=` b) 返回 True。                     |
+
+### 赋值运算符
+
+| 运算符 | 描述             | 实例                                  |
+| ------ | ---------------- | ------------------------------------- |
+| =      | 简单的赋值运算符 | c = a + b 将 a + b 的运算结果赋值为 c |
+| +=     | 加法赋值运算符   | c += a 等效于 c = c + a               |
+| -=     | 减法赋值运算符   | c -= a 等效于 c = c - a               |
+| *=     | 乘法赋值运算符   | c *= a 等效于 c = c * a                |
+| /=     | 除法赋值运算符   | c /= a 等效于 c = c / a               |
+| %=     | 取模赋值运算符   | c %= a 等效于 c = c % a               |
+| **=    | 幂赋值运算符     | c **= a 等效于 c = c ** a             |
+| //=    | 取整除赋值运算符 | c //= a 等效于 c = c // a             |
+
+### 位运算符
+
+| 运算符 | 描述           | 实例                                                                        |
+| ------ | -------------- | --------------------------------------------------------------------------- |
+| &      | 按位与运算符   | a & b 输出结果 0 ，转为二进制，如果两个位都是1，结果位才是1。否则，结果位是0。                                   |
+| \|     | 按位或运算符   | a \| b 输出结果 30 ，转为二进制，如果两个位中至少有一个是1，结果位就是1。否则，结果位是0。                                 |
+| ^      | 按位异或运算符 | a ^ b 输出结果 30 ，转为二进制，如果两个位<Highlight>不同</Highlight>，结果位就是1。否则，结果位是0。                                  |
+| ~      | 按位取反运算符 | ~a 输出结果 -11 ，转为二进制，~x 的计算公式是 -(x + 1)                  |
+| `<<`   | 左移动运算符   | a `<<` 2 输出结果 40 ，转为二进制，左移2位，空位补0。                              |
+| `>>`   | 右移动运算符   | a `>>` 2 输出结果 2 ，转为二进制，右移2位，空位补0。                               |
+
+### 成员运算符
+
+| 运算符 | 描述                                                    | 实例                                              |
+| ------ | ------------------------------------------------------- | ------------------------------------------------- |
+| in     | 如果在指定的序列中找到值返回 True，否则返回 False。     | x 在 y 序列中 , 如果 x 在 y 序列中返回 True。     |
+| not in | 如果在指定的序列中没有找到值返回 True，否则返回 False。 | x 不在 y 序列中 , 如果 x 不在 y 序列中返回 True。 |
+
+### 逻辑运算符
+
+| 运算符 | 逻辑表达式 | 描述                                                                    | 实例                    |
+| ------ | ---------- | ----------------------------------------------------------------------- | ----------------------- |
+| and    | x and y    | 布尔"与" - 该运算符返回的值不一定为布尔值，如果 x 为 False 或假值，返回 x 的值，否则它返回 y 的计算值。 | (a and b) 返回 20。     |
+| or     | x or y     | 布尔"或" - 该运算符返回的值不一定为布尔值，如果 x 为 True 或真值，它返回 x 的值，否则它返回 y 的计算值。 | (a or b) 返回 10。      |
+| not    | not x      | 布尔"非" - 该运算符返回的值为布尔值，如果 x 为 True，返回 False 。如果 x 为 False，它返回 True。  | not(a and b) 返回 False |
+
+### 身份运算符
+
+| 运算符 | 描述                                        | 实例                                                                                         |
+| ------ | ------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| is     | is 是判断两个标识符是不是引用自一个对象     | x is y, 类似 id(x) == id(y) , 如果引用的是同一个对象则返回 True，否则返回 False              |
+| is not | is not 是判断两个标识符是不是引用自不同对象 | x is not y ， 类似 id(a) != id(b)。如果引用的不是同一个对象则返回结果 True，否则返回 False。 |
+
+### 运算符优先级
+
+| 运算符                     | 描述                                                   |
+| -------------------------- | ------------------------------------------------------ |
+| **                         | 指数 (最高优先级)                                      |
+| ~ + -                      | 按位翻转, 一元加号和减号 (最后两个的方法名为 +@ 和 -@) |
+| * / % //                   | 乘，除，取模和取整除                                   |
+| + -                        | 加法减法                                               |
+| `>> <<`                  | 右移，左移运算符                                       |
+| &                          | 位 'AND'                                               |
+| ^\|                        | 位运算符                                               |
+| `<= < > >=`              | 比较运算符                                             |
+| `== !=`              | 等于运算符                                             |
+| `= %= /= //= -= += *= **=` | 赋值运算符                                             |
+| is is not                  | 身份运算符                                             |
+| in not in                  | 成员运算符                                             |
+| not or and                 | 逻辑运算符                                             |

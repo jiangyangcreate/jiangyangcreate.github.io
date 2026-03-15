@@ -1,0 +1,189 @@
+---
+title: gc
+---
+
+`gc` 模块提供与 Python 内置**可选垃圾回收器**的接口。回收器在 CPython 中默认启用，用于检测并回收**循环引用**；本模块让你可以**手动触发回收**、查看**回收统计**、**开关**自动回收、**判断对象是否被跟踪**，以及访问回收器发现但无法释放的对象（如放入 `gc.garbage` 的不可回收对象）。调试内存泄漏时可调用 `gc.set_debug(gc.DEBUG_LEAK)`。
+
+Python 的内存管理以**引用计数**为主：对象引用计数归零时立即释放。但若对象之间形成**环**（A→B→C→A），引用计数永不为零，单靠引用计数无法回收。因此 CPython 内置了**循环垃圾回收器**，定期扫描被跟踪的容器/用户对象，找出不可达的环并回收。只有在你能确定程序**不会产生循环引用**时，才适合用 `gc.disable()` 关闭自动回收以降低开销；多数情况下应保持开启。设计上采用**分代回收**：新对象进入青年代，熬过回收的进入老年代，优先回收青年代以减小每次扫描范围，提高效率。
+
+[gc](https://docs.python.org/zh-cn/3/library/gc.html)
+
+## gc.collect
+
+执行一次垃圾回收。可选参数 `generation` 指定回收哪一代（0、1、2）：`collect(0)` 只回收青年代，`collect(1)` 回收青年代并对老年代做增量回收，`collect(2)` 或 `collect()` 执行完整回收。返回本轮回收的对象数量（含不可回收）。
+
+:::tip 代（generation）
+回收器把对象按“存活时间”分为**青年代**（新分配）和**老年代**（经历过回收仍存活）。默认优先回收青年代，减少全量扫描，提高回收效率。
+:::
+
+```python showLineNumbers
+import gc
+
+# 完整回收
+n = gc.collect()
+print("回收对象数:", n)
+
+# 仅回收青年代
+gc.collect(0)
+```
+
+## get_count、get_threshold、get_stats
+
+- **get_count()**：返回当前三代计数的元组 `(count0, count1, count2)`，表示自上次回收以来各代的分配/回收情况，用于判断何时会触发自动回收。
+- **get_threshold()**：返回当前回收阈值元组 `(threshold0, threshold1, threshold2)`；当分配数减去回收数超过 `threshold0` 时会触发青年代回收。
+- **get_stats()**：返回三代的统计信息列表，每代一个字典，包含 `collections`、`collected`、`uncollectable` 等键。
+
+```python showLineNumbers
+import gc
+
+print("当前计数:", gc.get_count())
+print("当前阈值:", gc.get_threshold())
+print("统计信息:", gc.get_stats())
+```
+
+:::tip 阈值与触发时机
+当“分配数 − 回收数”超过 `threshold0` 时，回收器开始工作；先收青年代，再按比例扫描老年代（比例与 `threshold1` 有关）。一般无需修改阈值，除非在做性能调优或特殊部署。
+:::
+
+## get_objects（慎用）
+
+**get_objects(generation=None)**：返回被回收器**跟踪**的对象列表；`generation=None` 为全部，`0` 为青年代，`2` 为老年代（部分版本中 `1` 已移除）。**慎用**：列表可能很大，且仅应用于调试，不应在业务逻辑中依赖。
+
+```python showLineNumbers
+import gc
+
+# 仅调试时使用：查看被跟踪对象数量
+objs = gc.get_objects()
+print("被跟踪对象数:", len(objs))
+
+# 按代查看（例如仅青年代）
+young = gc.get_objects(generation=0)
+print("青年代对象数:", len(young))
+```
+
+:::tip 跟踪（tracking）
+只有“可能参与循环”的对象才会被回收器跟踪，如列表、字典、类实例等；原子类型（int、str 等）通常不跟踪。`is_tracked(obj)` 可查询某对象是否被跟踪。
+:::
+
+## disable / enable / isenabled
+
+- **gc.disable()**：关闭自动垃圾回收；引用计数仍然生效，只是不再做循环检测。
+- **gc.enable()**：重新开启自动回收。
+- **gc.isenabled()**：若自动回收已开启则返回 `True`。
+
+```python showLineNumbers
+import gc
+
+print("自动回收已开启:", gc.isenabled())
+gc.disable()
+print("自动回收已开启:", gc.isenabled())
+# 确定无循环引用时可关闭以降低开销
+gc.enable()
+```
+
+## is_tracked
+
+**gc.is_tracked(obj)**：若 `obj` 正被回收器跟踪则返回 `True`。原子类型（如 int、str）通常不被跟踪；容器、用户类实例一般会被跟踪；部分优化类型（如只含原子键值的空 dict）可能不跟踪。
+
+```python showLineNumbers
+import gc
+
+print(gc.is_tracked(0))           # False
+print(gc.is_tracked("a"))         # False
+print(gc.is_tracked([]))          # True
+print(gc.is_tracked({}))          # False
+print(gc.is_tracked({"a": 1}))    # True
+```
+
+## set_threshold / get_threshold
+
+**set_threshold(threshold0[, threshold1[, threshold2]])**：设置回收阈值；将 `threshold0` 设为 0 可禁用回收。详见官方文档中关于青年代/老年代触发条件的说明。
+
+```python showLineNumbers
+import gc
+
+# 查看当前阈值
+print(gc.get_threshold())
+# 可选：调高 threshold0 减少回收频率（仅作示例，一般不必改）
+# gc.set_threshold(1000, 15, 15)
+```
+
+## get_referrers / get_referents
+
+- **get_referrers(*objs)**：返回**直接引用**了任意 `objs` 的对象列表；仅包含支持 GC 的容器，扩展类型若不参与 GC 则不会出现。调试时先调用 `collect()` 再调用可减少“已断开的环”的干扰。
+- **get_referents(*objs)**：返回被 `objs` **直接引用**的对象列表（由 C 层 `tp_traverse` 决定，未必包含所有可达对象，且可能只包含可能参与环的对象）。
+
+:::tip 循环检测
+回收器通过遍历对象的“引用关系”找出从根不可达的子图；若该子图内存在环，则整块可被判定为循环垃圾并回收。`get_referrers`/`get_referents` 可帮助人工分析引用关系。
+:::
+
+```python showLineNumbers
+import gc
+
+a = []
+b = [a]
+# 谁引用了 a？
+refs = gc.get_referrers(a)
+print("引用 a 的对象:", refs)   # 例如 [b]
+# a 引用了谁？
+ents = gc.get_referents(a)
+print("a 引用的对象:", ents)   # 空列表时为 []
+```
+
+## set_debug / get_debug 与调试常量
+
+**set_debug(flags)**：设置回收器调试标志，调试信息写入 `sys.stderr`。**get_debug()** 返回当前标志。常用常量：`DEBUG_STATS`（打印统计）、`DEBUG_COLLECTABLE`/`DEBUG_UNCOLLECTABLE`（可回收/不可回收对象）、`DEBUG_SAVEALL`（不可达对象也放入 `gc.garbage`）、`DEBUG_LEAK`（上述组合，用于排查泄漏）。
+
+```python showLineNumbers
+import gc
+
+# 查看当前调试标志
+print(gc.get_debug())
+# 调试内存泄漏时使用（会向 stderr 输出大量信息）
+# gc.set_debug(gc.DEBUG_LEAK)
+```
+
+## is_finalized
+
+**gc.is_finalized(obj)**：若 `obj` 已被回收器**终结**（finalize）则返回 `True`，否则 `False`。适用于检测对象是否已执行过 `__del__` 等终结逻辑。
+
+```python showLineNumbers
+import gc
+
+resurrect = None
+
+class Lazarus:
+    def __del__(self):
+        global resurrect
+        resurrect = self  # 复活：让对象在 __del__ 后仍可被引用
+
+obj = Lazarus()
+print(gc.is_finalized(obj))   # False
+del obj
+gc.collect()                  # 触发回收并执行 __del__
+print(gc.is_finalized(resurrect))  # True：已执行过终结
+```
+
+## garbage 与 callbacks
+
+- **gc.garbage**：只读列表，存放回收器发现**不可达但无法释放**的对象（如带非 NULL `tp_del` 的 C 扩展类型）；自 PEP 442 起，带 `__del__` 的 Python 对象一般不再进入此处。设 `DEBUG_SAVEALL` 时，所有不可达对象都会放入此列表。
+- **gc.callbacks**：回调列表，回收开始/结束时被调用，参数为 `phase`（"start"/"stop"）和 `info` 字典（如 `generation`、`collected`、`uncollectable`），可用于统计或自定义清理。
+
+```python showLineNumbers
+import gc
+
+# 回收前后回调示例
+def on_gc(phase, info):
+    print(phase, info)
+
+gc.callbacks.append(on_gc)
+gc.collect()
+gc.callbacks.remove(on_gc)
+
+# 检查是否有无法释放的对象（正常程序多为空）
+print("gc.garbage 长度:", len(gc.garbage))
+```
+
+:::tip 一般无需主动调用
+日常开发中很少需要手动 `gc.collect()` 或改阈值；解释器会自动按代回收。在调试内存泄漏、测量回收影响或特殊部署场景时，再结合 `get_debug`/`set_debug`、`get_count`/`get_stats` 等深入使用。
+:::

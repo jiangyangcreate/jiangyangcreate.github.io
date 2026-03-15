@@ -1,0 +1,461 @@
+---
+sidebar_position: 10
+title: 函数
+---
+
+:::info
+API的行为在任何两个连续版本之间不得以不兼容的方式更改，除非它正在经历弃用过程。不能在任何两个连续版本之间在没有通知的情况下删除功能。
+
+[PEP 387 – 向后兼容性政策](https://peps.python.org/pep-0387/)
+:::
+
+## 函数
+
+为了减少重复，自定义函数登场。
+
+### def
+
+使用 def 关键字定义函数。参数为输入，return 返回输出。
+
+```python showLineNumbers
+def add(a, b):
+    """
+    add two nums
+    :param a: first num
+    :param b: second num
+    :return: None
+    """
+    print(a + b)
+```
+
+调用函数时传入具体参数值。
+
+```python showLineNumbers
+# Python并没有限定参数的类型，因此可以使用不同的参数类型：
+print(add(2, 3))
+
+print(add('foo', 'bar'))  # foobar
+```
+
+参数传递方式：位置参数和关键字参数。
+
+```python showLineNumbers
+add(a=2, b=3)
+
+add(b='morning', a='good')
+
+add(2, b=3)  # 5
+```
+
+### return
+
+return 语句返回值并终止函数执行。无 return 时返回 None。
+
+```python showLineNumbers
+def add(a, b):
+    return a + b
+
+def add_none(a, b):
+    a + b
+
+
+print(add(2, 3))  # 5
+print(add_none(2, 3))  # None
+```
+
+### yield
+
+:::info
+生成器让Python能够以内存高效的方式处理大量数据。它们实现了惰性求值，只在需要时计算值，体现了Python对性能和内存使用的关注。
+
+```python showLineNumbers
+def fibonacci():
+    a, b = 0, 1
+    while True:
+        yield a
+        a, b = b, a + b
+```
+
+[PEP 255 – 简单生成器](https://peps.python.org/pep-0255/)
+:::
+
+yield 暂停函数执行并返回值。使用 yield 的函数称为生成器函数，返回生成器对象。适用于逐个产生大量数据的场景。
+
+```python showLineNumbers
+def fibonacci(n):
+    a, b = 0, 1
+    for _ in range(n):
+        yield a
+        a, b = b, a + b
+```
+
+yield from 委派子生成器，建立双向通道。
+
+```python showLineNumbers
+def g1(x):
+   yield range(x, 0, -1)
+   yield range(x)
+print(list(g1(5)))
+#[range(5, 0, -1), range(0, 5)]
+
+def g2(x):
+   yield from range(x, 0, -1)
+   yield from range(x)
+print(list(g2(5)))
+#[5, 4, 3, 2, 1, 0, 1, 2, 3, 4]
+```
+
+:::tip
+生成器表达式：使用圆括号创建生成器对象，内存效率更高。
+
+```python showLineNumbers
+(expression for item in iterable)
+```
+
+示例：
+
+```python showLineNumbers
+# 创建生成器
+squares_gen = (x**2 for x in range(10))
+print(type(squares_gen))  # <class 'generator'>
+
+# 迭代生成器
+for square in squares_gen:
+    print(square, end=' ')  # 0 1 4 9 16 25 36 49 64 81
+```
+
+:::
+
+### lambda
+
+lambda 创建匿名函数，语法简洁。
+
+```python showLineNumbers
+def add(a, b):
+    return a + b
+# 等价于
+add = lambda a, b: a + b
+
+print(add(2, 3))  # 5
+```
+
+### 函数的参数类型
+
+#### 位置参数与默认参数
+
+**位置参数**：按顺序传递，必须提供。
+
+**默认参数**：有默认值，调用时可省略。
+
+```python showLineNumbers
+def quad(x, a=1, b=0, c=0):
+    """
+    二次函数计算器
+    :param x: 自变量
+    :param a: 二次项系数，默认为1
+    :param b: 一次项系数，默认为0  
+    :param c: 常数项，默认为0
+    :return: 计算结果
+    """
+    return a * x * x + b * x + c
+```
+
+**调用示例：**
+
+```python showLineNumbers
+# 只提供位置参数x，其他使用默认值
+quad(2.0)  # 结果: 4.0 (1*2*2 + 0*2 + 0)
+
+# 提供位置参数x和关键字参数b
+quad(2.0, b=3)  # 结果: 10.0 (1*2*2 + 3*2 + 0)
+
+# 提供位置参数x和a，其他使用默认值
+quad(2.0, 2)  # 结果: 8.0 (2*2*2 + 0*2 + 0)
+
+# 使用关键字参数，顺序可以改变
+quad(2.0, c=5, a=2)  # 结果: 13.0 (2*2*2 + 0*2 + 5)
+```
+
+:::tip 默认参数的重要陷阱
+**默认参数只计算一次！** 当默认值是可变对象（如列表、字典）时，所有函数调用会共享同一个对象，这通常不是我们想要的行为。
+
+```python showLineNumbers
+# ❌ 错误示例：默认参数使用可变对象
+def add_item(item, my_list=[]):
+    my_list.append(item)
+    return my_list
+
+print(add_item('a'))  # ['a']
+print(add_item('b'))  # ['a', 'b'] - 意外结果！
+
+# ✅ 正确做法：使用None作为默认值
+def add_item(item, my_list=None):
+    if my_list is None:
+        my_list = []
+    my_list.append(item)
+    return my_list
+
+print(add_item('a'))  # ['a']
+print(add_item('b'))  # ['b'] - 正确结果！
+```
+
+**原因**：Python在定义函数时计算默认参数值，而不是在每次调用时计算。对于不可变对象（如数字、字符串），这不是问题；但对于可变对象，所有调用会共享同一个对象。
+:::
+
+#### 不定长参数
+
+位置不定长参数：`*args`
+
+表示参数数目不定，可以看成一个元组
+
+使用如下方法，可以使函数接受不定数目的参数,把第一个参数后面的参数当作元组中的元素。
+
+```python showLineNumbers
+def add(x, *args):
+    total = x
+    for arg in args:
+        total += arg
+    return total
+
+print(add(1, 2, 3, 4, 5))  # 15
+print(add(1, 2))  # 3
+```
+
+关键字不定长参数：`**kwargs`
+
+表示参数数目不定，可以看成一个字典
+
+```python showLineNumbers
+def add(x, **kwargs):
+    total = x
+    for arg, val in kwargs.items():
+        print("adding ", arg)
+        total += val
+    return total
+
+add(1, a=2, b=3)  # 6
+```
+
+混合使用 `*args` 和 `**kwargs`：
+
+```python showLineNumbers
+# 可以接收任意数目的位置参数和键值对参数：
+def fun1(*args, **kwargs):
+    print(args, kwargs)
+
+fun1(2, 3, a="bar", b=10)  # (2, 3) {'a': u'bar', 'b': 10}
+```
+
+### 函数参数分隔符
+
+`/` - 位置专用参数分隔符
+
+作用：`/` 之前的参数只能通过位置传递，不能使用关键字。
+
+`*` - 关键字专用参数分隔符
+
+作用：`*` 之后的参数只能通过关键字传递，不能使用位置
+
+```python showLineNumbers
+def func1(a, b, /):
+    """a和b只能通过位置传递，防止将来参数名变更破坏兼容性。"""
+    return a + b
+
+# 正确调用
+print(func1(1, 2))        # ✅ 3
+
+# 错误调用
+# print(func1(a=1, b=2))  # ❌ TypeError: 只能位置传递
+
+def func2(*, x, y):
+    """x和y只能通过关键字传递，强制描述可以提高代码可读性和维护性。"""
+    return x * y
+
+# 正确调用
+print(func2(x=3, y=4))    # ✅ 12
+
+# 错误调用
+# print(func2(3, 4))      # ❌ TypeError: 只能关键字传递
+
+def func3(pos_only, /, *, kwd_only):
+    """
+    pos_only: 只能位置传递
+    kwd_only: 只能关键字传递
+    """
+    return f"{pos_only}-{kwd_only}"
+
+print(func3(1,  kwd_only=3))           # ✅ "1-3"
+# 其他调用都为错误调用
+```
+
+### 类型注解
+
+类型注解是可选的，用于描述函数参数和返回值的类型。如果需要更加复杂的类型注解，可以使用 typing 模块。
+
+```python showLineNumbers
+# 声名 T 可以是 int 或 str
+def add[T: (int, str)](a: T, b: T) -> T:
+    return a + b
+
+print(add(1, 2))  # 3
+print(add('foo', 'bar'))  # foobar
+```
+
+### 递归
+
+在函数中调用自身，称为递归。递归是一种解决问题的方法，它把一个问题分解为更小的子问题，直到子问题可以被直接解决。
+
+```python showLineNumbers
+def fact(n):
+    if n == 1:
+        return 1
+    return n * fact(n - 1)
+
+print(fact(5))  # 120
+```
+
+### 魔法变量
+
+魔法变量无处不在，从全局的`__name__`到函数的`__code__`以及类的`__dict__`，其大多是你无需定义自动赋值、自动执行的变量或方法。
+
+了解有哪些魔法变量可以理解Python工作原理，合理利用可以减少开发工作量。
+
+```python showLineNumbers
+from typing import Callable
+def func(a=0,/, b:int=9, *, c=None) -> Callable:
+    """
+    这是一个函数
+    / 前的参数只能通过位置传递
+    * 后的参数只能通过关键字传递
+    b 即可通过位置传递，也可通过关键字传递，也可以不传递
+    """
+    x = 1
+    y = 2
+    def inner():
+        nonlocal x # 声明x为非局部变量
+        print("inner")
+        return 100
+    return inner
+    
+
+# ----- 函数对象的魔法变量 -----
+
+# __code__.co_code：字节码（bytecode），即函数体编译后的指令序列，由解释器执行
+print(func.__code__.co_code)
+# b'^\x05\x95\x00S\x01m\x05S\x02n\x03[\x01\x00\x00\x00\x00\x00\x00\x00\x00S\x035\x01\x00\x00\x00\x00\x00\x00 \x00U\x054\x01S\x04\x1a\x00j\x08n\x04U\x04$\x00'
+
+# __code__.co_freevars：函数体中用到的所有“外部变量”的名字(freevars:自由变量，是指在一个函数中使用，但既不是在该函数内定义的，也不是作为参数传入的变量。)
+print(func.__code__.co_freevars) # ()
+print(func().__code__.co_freevars) # ('x',)
+
+# __code__.co_varnames：函数内使用的局部变量名元组（含参数名）
+print(func.__code__.co_varnames)  # ('a', 'b', 'c', 'y', 'inner')
+print(func().__code__.co_varnames)  # ()
+
+# __code__.co_cellvars：被内部函数引用的变量（在父级函数看来）
+print(func.__code__.co_cellvars) # ('x',)
+print(func().__code__.co_cellvars)  # ()
+
+
+# __code__.co_consts：函数体中用到的常量元组（含 docstring、字面量、None 等）
+print(func.__code__.co_consts)  #('\n这是一个函数\n/ 前的参数只能通过位置传递\n* 后的参数只能通过关键字传递\nb 即可通过位置传递，也可通过关键字 传递，也可以不传递\n', 1, 2, <code object inner at 0x000002232295CB70, file "c:\Users\jiang\Desktop\github\jiangyangcreate.github.io\test\new.py", line 11>)
+
+# __defaults__：存储可通过位置传递的参数的默认值
+print(func.__defaults__)  # (0, 9)
+
+# __kwdefaults__：仅关键字参数（* 之后的参数）的默认值字典；无则为 None
+print(func.__kwdefaults__)  # {'c': None}
+
+# __annotations__：参数与返回值的类型注解字典（PEP 484），未注解则为 {}
+print(func.__annotations__)  # {'b': <class 'int'>, 'return': typing.Callable}
+
+# __doc__：函数的文档字符串（即紧贴 def 下方的三引号字符串），未定义则为 None
+print(func.__doc__)  
+"""
+这是一个函数
+/ 前的参数只能通过位置传递
+* 后的参数只能通过关键字传递
+b 即可通过位置传递，也可通过关键字传递，也可以不传递
+"""
+# __name__：函数定义时的名字（字符串）
+print(func.__name__)  # func
+
+# __module__：函数所在模块的模块名；当前脚本直接运行时为 '__main__'，被 import 时为模块名
+print(func.__module__)  # __main__
+
+# __closure__：闭包中引用的外部变量（Cell 对象）元组；非闭包函数为 None
+print(func.__closure__)  # None
+
+inner_fn = func()  # 得到闭包函数
+print(inner_fn.__closure__)  # (<cell at 0x00000173EBE017E0: int object at 0x00007FFC7A6753A8>,)
+# 这是一个闭包函数，所以__closure__不为None，里面有一个Cell对象，里面存储了外层变量x的值，可通过迭代取出Cell对象的cell_contents属性
+
+# 用法：用 .cell_contents 读出每个 Cell 里“捕获”的当前值；顺序与 __code__.co_freevars 一致
+print(inner_fn.__code__.co_freevars)  # ('x',)  inner 引用的外层变量名
+
+for name, cell in zip(inner_fn.__code__.co_freevars, inner_fn.__closure__ or ()):
+    print(f"  {name} = {cell.cell_contents}")  # x = 1
+
+# __globals__：函数定义时所在的全局命名空间引用（即该模块的 __dict__）
+print(func.__globals__)
+"""
+{'__name__': '__main__', 
+'__doc__': None, 
+'__package__': None, 
+'__loader__': <_frozen_importlib_external.SourceFileLoader object at 0x0000010543B24C00>, 
+'__spec__': None, 
+'__annotations__': {}, 
+'__builtins__': <module 'builtins' (built-in)>, 
+'__file__': 'c:\\Users\\jiang\\Desktop\\github\\jiangyangcreate.github.io\\test\\new.py', 
+'__cached__': None, 
+'Callable': typing.Callable, 
+'func': <function func at 0x0000010543ADFE20>}
+"""
+```
+
+## 内置函数
+
+### map函数
+
+map() 对序列每个元素应用函数，返回映射结果。
+
+map函数签名：`map(function, iterable, ...) -> map object`
+
+参数说明：
+- `function`：要对每个元素执行的函数
+- `iterable`：要映射的可迭代对象
+- `...`：可以传入多个可迭代对象
+
+返回值：
+- 返回一个map对象（迭代器）
+
+```python showLineNumbers
+def sqr(x):
+    return x ** 2
+
+a = [2, 3, 4]
+result = map(sqr, a) 
+print(type(result))  # <class 'map'>
+
+# map返回的是个迭代器对象, 可以转化为list显示
+print(list(result)) # [4,9,16]
+```
+
+map() 支持多序列，对应元素作为函数参数：
+
+```python showLineNumbers
+def add(a, b):
+    return a + b
+
+a = (2, 3, 4)
+b = [10, 11, 15]
+list(map(add, a, b))  # [12, 14, 19]
+```
+
+## 标准库推荐
+
+- functools: 提供高阶函数和装饰器工具，例如 `wraps`、`lru_cache` 等。
+- itertools: 提供迭代器工具（排列组合、无限迭代器等）。
+- operator: 提供将运算符函数化的工具，便于与高阶函数搭配使用。
+- typing: 提供类型提示支持，让函数签名更清晰。
+- doctest: 支持在文档字符串中编写示例代码，并自动执行这些示例以验证函数行为，非常适合为函数写“可执行文档”和简单测试。 

@@ -1,0 +1,120 @@
+---
+title: dataclasses
+---
+
+`dataclasses` 通过装饰器和类型标注，为类自动生成 `__init__`、`__repr__`、`__eq__` 等特殊方法，减少样板代码。初始规范见 [PEP 557](https://peps.python.org/pep-0557/)。
+
+[dataclasses](https://docs.python.org/zh-cn/3/library/dataclasses.html)
+
+## 基本用法：@dataclass、默认值
+
+用 `@dataclass` 装饰类，带类型标注的类变量即字段；可直接写默认值。有默认值的字段必须排在无默认值字段之后。
+
+```python showLineNumbers
+from dataclasses import dataclass
+
+@dataclass
+class InventoryItem:
+    name: str
+    unit_price: float
+    quantity_on_hand: int = 0
+
+    def total_cost(self) -> float:
+        return self.unit_price * self.quantity_on_hand
+
+item = InventoryItem("widget", 3.0, 10)
+print(item)  # InventoryItem(name='widget', unit_price=3.0, quantity_on_hand=10)
+```
+
+## field()：default_factory、repr / compare / hash
+
+可变默认值必须用 `field(default_factory=...)`（如 `list`、`dict`）。`repr`、`compare`、`hash` 控制该字段是否参与生成 `__repr__`、比较和 `__hash__`；`init=False` 表示不从 `__init__` 传入，常配合 `__post_init__` 或 `default_factory` 使用。
+
+```python showLineNumbers
+from dataclasses import dataclass, field
+
+@dataclass
+class C:
+    x: int
+    items: list = field(default_factory=list)
+    internal: int = field(default=0, repr=False, compare=False)
+
+c1 = C(1)
+c2 = C(1)
+assert c1.items is not c2.items
+```
+
+## 常用参数：frozen、order、slots、kw_only
+
+- **frozen=True**：实例“冻结”，赋值/删属性会抛 `FrozenInstanceError`。
+- **order=True**：生成 `__lt__`、`__le__`、`__gt__`、`__ge__`（依赖 `eq`）。
+- **slots=True**：生成 `__slots__`，节省内存（返回新类）。
+- **kw_only=True**：所有字段均为仅限关键字参数；也可用 `field(kw_only=True)` 或 `KW_ONLY` 伪字段分隔。
+
+```python showLineNumbers
+from dataclasses import dataclass, KW_ONLY
+
+@dataclass(frozen=True, order=True)
+class Point:
+    x: float
+    y: float
+
+p = Point(1.0, 2.0)
+# p.x = 2  # FrozenInstanceError
+print(sorted([Point(2, 1), Point(1, 2)]))  # 按 (x, y) 排序
+
+@dataclass(kw_only=True)
+class Config:
+    host: str = "localhost"
+    port: int = 8080
+
+cfg = Config(host="0.0.0.0", port=80)
+```
+
+## __post_init__、InitVar
+
+`__post_init__` 在生成的 `__init__` 之后被调用，可用来根据其它字段初始化派生字段或调用基类初始化。用 `InitVar[T]` 标注的“仅初始化”变量会传入 `__init__` 和 `__post_init__`，但不会作为实例属性存在，也不会被 `fields()` 返回。
+
+```python showLineNumbers
+from dataclasses import dataclass, field, InitVar
+
+@dataclass
+class C:
+    a: float
+    b: float
+    c: float = field(init=False)
+    scale: InitVar[float] = 1.0
+
+    def __post_init__(self, scale: float):
+        self.c = (self.a + self.b) * scale
+
+o = C(1.0, 2.0, scale=2.0)
+print(o.c)  # 6.0
+```
+
+## 工具函数：fields、asdict、astuple、replace
+
+- **fields(class_or_instance)**：返回描述数据类字段的 `Field` 元组（不含 `ClassVar`、`InitVar`）。
+- **asdict(obj)**：递归转为字典；**astuple(obj)**：递归转为元组。
+- **replace(obj, **changes)**：创建新实例并替换指定字段，会调用 `__init__` 与 `__post_init__`。
+
+```python showLineNumbers
+from dataclasses import dataclass, fields, asdict, astuple, replace
+
+@dataclass
+class Point:
+    x: int
+    y: int
+
+p = Point(10, 20)
+print([f.name for f in fields(p)])  # ['x', 'y']
+print(asdict(p))                    # {'x': 10, 'y': 20}
+print(astuple(p))                   # (10, 20)
+p2 = replace(p, x=5)
+print(p2)                           # Point(x=5, y=20)
+```
+
+:::info 可变默认值、与 namedtuple 对比
+- 列表/字典等可变默认值不能直接写 `x: list = []`，必须用 `field(default_factory=list)`，否则会触发 ValueError（不可哈希默认值检测）。
+- 与 **namedtuple**：dataclass 支持继承、可变实例、默认值、可控 `__init__`/`__repr__`/比较；不与元组意外相等；不要求“可迭代解包”。需要“类 + 字段 + 少写样板”时优先考虑 dataclass。
+:::

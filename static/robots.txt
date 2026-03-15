@@ -1,0 +1,5 @@
+# Algolia-Crawler-Verif: EE358A7F464665BD
+
+User-agent: *
+Allow: /
+Sitemap:https://jiangmiemie.com/sitemap.xml

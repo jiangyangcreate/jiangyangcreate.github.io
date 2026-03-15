@@ -1,0 +1,38 @@
+name: Build HTML
+on: push
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 20
+      - run: |
+          npm install --legacy-peer-deps
+          npm run build
+      - uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          
+      - name: Deploy to server
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.IP }} >> ~/.ssh/known_hosts
+          rsync -avz --exclude='.user.ini' ./build/ root@${{ secrets.IP }}:/www/wwwroot/jiangmiemie.com
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          SERVER_IP: ${{ secrets.IP }}
+      - name: generate summary
+        run: |
+          curl -X POST "https://chat.jiangyang.fun/blog/update?key=${{ secrets.KEY }}"
+        env:
+          KEY: ${{ secrets.KEY }}

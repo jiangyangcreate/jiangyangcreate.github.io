@@ -1,0 +1,142 @@
+---
+title: abc
+---
+
+`abc` 模块提供在 Python 中定义**抽象基类-ABC**的组件，用于声明抽象方法、约束子类实现，并支持虚拟子类注册。详见 [PEP 3119](https://peps.python.org/pep-3119/)。
+
+[abc](https://docs.python.org/zh-cn/3/library/abc.html)
+
+## 定义抽象基类 ABC、@abstractmethod
+
+通过继承 `ABC`（或使用元类 `ABCMeta`）并给方法加上 `@abstractmethod` 装饰器，即可定义抽象基类。含有未实现的抽象方法的类不能实例化。
+
+```python showLineNumbers
+from abc import ABC, abstractmethod
+
+class Shape(ABC):
+    @abstractmethod
+    def area(self):
+        """子类必须实现"""
+        pass
+
+    @abstractmethod
+    def perimeter(self):
+        pass
+
+class Rectangle(Shape):
+    def __init__(self, w, h):
+        self.w, self.h = w, h
+
+    def area(self):
+        return self.w * self.h
+
+    def perimeter(self):
+        return 2 * (self.w + self.h)
+
+# Shape()   # TypeError: Can't instantiate abstract class Shape
+r = Rectangle(3, 4)
+print(r.area())  # 12
+```
+
+## 抽象方法与 classmethod / staticmethod / property 配合
+
+与 `classmethod`、`staticmethod`、`property` 一起用时，`@abstractmethod` 应放在**最内层**（最靠近函数定义）。
+
+```python showLineNumbers
+from abc import ABC, abstractmethod
+
+class C(ABC):
+    @abstractmethod
+    def my_abstract_method(self, arg1):
+        ...
+
+    @classmethod
+    @abstractmethod
+    def my_abstract_classmethod(cls, arg2):
+        ...
+
+    @staticmethod
+    @abstractmethod
+    def my_abstract_staticmethod(arg3):
+        ...
+
+    @property
+    @abstractmethod
+    def my_abstract_property(self):
+        ...
+
+    @my_abstract_property.setter
+    @abstractmethod
+    def my_abstract_property(self, val):
+        ...
+```
+
+抽象方法可以有实现，子类可通过 `super()` 调用；未实现的抽象方法必须在具体子类中被重写才能实例化。
+
+## 虚拟子类 register、\_\_subclasshook\_\_
+
+不通过继承也可让某个类“算作”某 ABC 的子类：用 `register(subclass)` 注册为**虚拟子类**，或在该 ABC 上实现 `__subclasshook__(cls, subclass)` 自定义 `issubclass` / `isinstance` 的判定逻辑。
+
+```python showLineNumbers
+from abc import ABC, abstractmethod
+
+class MyABC(ABC):
+    pass
+
+# 将 tuple 注册为 MyABC 的虚拟子类（不改变 tuple 的 MRO）
+MyABC.register(tuple)
+
+assert issubclass(tuple, MyABC)
+assert isinstance((), MyABC)
+# 注意：虚拟子类不会出现在 MRO 中
+# print(tuple.__mro__) -> (tuple, object) 不包含MyABC
+```
+
+```python showLineNumbers
+class MyIterable(ABC):
+    @abstractmethod
+    def __iter__(self):
+        while False:
+            yield None
+
+    @classmethod
+    def __subclasshook__(cls, C):
+        """判断C是否是MyIterable的子类"""
+        if cls is MyIterable: 
+            """
+            避免子类继承该钩子后，将任何拥有 "__iter__" 方法的类都误判为自己的子类
+            """
+            if any("__iter__" in B.__dict__ for B in C.__mro__):
+                return True
+        return NotImplemented
+
+# 通过 __subclasshook__，任何在 MRO 里实现 __iter__ 的类都被视为 MyIterable
+# 检查 list 是不是 MyIterable 的子类。
+assert issubclass(list, MyIterable)
+
+"""
+当你调用 issubclass(Sub, MyABC) 时，Python 内部会按以下顺序查找：
+
+直接 MRO 检查：Python 首先检查 MyABC 是否直接出现在 Sub.__mro__ 中。如果是，直接返回 True。
+
+如果 MRO 没对上，Python 会转向 MyABC 的元类（通常是 ABCMeta），调用它的 __subclasscheck__(Sub) 方法。
+
+    在 __subclasscheck__ 内部，逻辑进一步细分：
+
+        检查 __subclasshook__：如果返回 True 或 False，直接以此为准。
+
+        检查虚拟子类表（Registry）：看 Sub 是否通过 MyABC.register(Sub) 被手动注册过。
+
+        检查 Sub 的 MRO 及其基类：如果前面的步骤都返回 NotImplemented，它会递归地检查 Sub 的父类们是否被注册或被钩子认可。
+"""
+
+# isinstance 检查 [] 对应的类型是不是 MyIterable，底层是 issubclass(type([]), MyIterable)
+assert isinstance([], MyIterable)
+```
+
+:::info 与 collections.abc、numbers
+- **collections.abc**：提供 `Iterable`、`Sequence`、`Mapping`、`Set` 等 ABC，用于类型检查和“协议”约定。
+- **numbers**：提供 `Number`、`Integral`、`Real`、`Complex` 等数值塔（见 [PEP 3141](https://peps.python.org/pep-3141/)）。
+
+需要做“是否为某类容器/数值”的检查时，可优先使用这两个模块中的 ABC，再结合 `abc` 自定义抽象基类。
+:::

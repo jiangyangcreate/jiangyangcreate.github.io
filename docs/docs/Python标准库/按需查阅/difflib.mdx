@@ -1,0 +1,153 @@
+---
+title: difflib
+---
+
+`difflib` 提供序列比较工具，可计算文本相似度、生成差异报告（diff）和 HTML 对比页面。
+
+[difflib](https://docs.python.org/3/library/difflib.html)
+
+## SequenceMatcher
+
+`SequenceMatcher` 可比较任意可哈希序列（最常用于字符串），支持计算相似度、提取匹配块等操作。
+
+### 计算相似度
+
+```python showLineNumbers
+from difflib import SequenceMatcher
+
+def similarity(a: str, b: str) -> float:
+    return SequenceMatcher(None, a.lower(), b.lower()).ratio()
+
+print(similarity("Python is good", "python is good!"))  # 0.9655
+print(similarity("今天天气很好", "今天天气非常好"))      # 0.9231
+```
+
+| 方法                 | 精度 | 速度 | 推荐场景               |
+|----------------------|------|------|------------------------|
+| `ratio()`            | 高   | 中等 | 最终相似度判定（最常用）|
+| `quick_ratio()`      | 中   | 快   | 海量数据初筛           |
+| `real_quick_ratio()`| 低   | 极快 | 亿级文本粗筛           |
+
+### 提取匹配块
+
+`get_matching_blocks()` 返回 `Match(a, b, size)` 三元组列表，描述两个序列中的连续匹配段。
+
+```python showLineNumbers
+from difflib import SequenceMatcher
+
+s1 = "ABCDE FFF GHIJK"
+s2 = "ABCDX FFF GHIJKMNOP"
+
+matcher = SequenceMatcher(None, s1, s2)
+for block in matcher.get_matching_blocks():
+    if block.size > 0:
+        print(f"匹配: '{s1[block.a:block.a+block.size]}' (长度 {block.size})")
+# 匹配: 'ABCD' (长度 4)
+# 匹配: ' FFF GHIJK' (长度 10)
+```
+
+:::tip 一行代码提取最长公共子串
+
+```python showLineNumbers
+def longest_common_substring(s1: str, s2: str) -> str:
+    match = max(
+        SequenceMatcher(None, s1, s2).get_matching_blocks(),
+        key=lambda m: m.size
+    )
+    return s1[match.a:match.a + match.size]
+```
+:::
+
+## get_close_matches
+
+从候选列表中返回与目标最相似的选项，适合拼写纠错和模糊匹配。
+
+```python showLineNumbers
+from difflib import get_close_matches
+
+# 拼写纠错
+print(get_close_matches("appel", ["apple", "apply", "ape", "banana"], n=3, cutoff=0.6))
+# ['apple', 'apply', 'ape']
+
+# 命令提示
+commands = ["commit", "checkout", "cherry-pick", "clone", "clean"]
+user_input = "comit"
+matches = get_close_matches(user_input, commands, n=1, cutoff=0.6)
+if matches:
+    print(f"你是不是想输入 '{matches[0]}'?")
+# 你是不是想输入 'commit'?
+```
+
+| 参数     | 说明             | 推荐值          |
+|----------|------------------|-----------------|
+| `n`      | 返回最多数量     | 1~5             |
+| `cutoff` | 相似度阈值（0~1）| 0.6~0.8（常用） |
+
+## Differ
+
+逐行比较文本差异，输出人类可读的 diff 格式。
+
+```python showLineNumbers
+from difflib import Differ
+
+old = ["第一行\n", "第二行\n", "第三行\n"]
+new = ["第一行\n", "第二行已修改\n", "第三行\n"]
+
+d = Differ()
+diff = list(d.compare(old, new))
+print("".join(diff))
+#   第一行
+# - 第二行
+# + 第二行已修改
+# ? +++
+#   第三行
+```
+
+前缀含义：`'  '` 两边相同、`'- '` 仅在旧文本、`'+ '` 仅在新文本、`'? '` 字符级差异标记。
+
+## unified_diff
+
+生成标准 unified diff 格式，适合 patch 文件和代码审查。
+
+```python showLineNumbers
+from difflib import unified_diff
+
+old = ["line1\n", "line2\n", "line3\n"]
+new = ["line1\n", "line2 modified\n", "line3\n"]
+
+diff = unified_diff(old, new, fromfile="old.txt", tofile="new.txt")
+print("".join(diff))
+# --- old.txt
+# +++ new.txt
+# @@ -1,3 +1,3 @@
+#  line1
+# -line2
+# +line2 modified
+#  line3
+```
+
+## HtmlDiff
+
+生成带行内字符高亮的 HTML 对比页面，适合配置变更审查。
+
+```python showLineNumbers
+from difflib import HtmlDiff
+
+old = ["第一行", "第二行", "第三行"]
+new = ["第一行", "第二行已修改", "第三行"]
+
+html = HtmlDiff().make_file(
+    old, new,
+    fromdesc="旧版本",
+    todesc="新版本",
+    context=True,
+    numlines=3
+)
+
+with open("diff.html", "w", encoding="utf-8") as f:
+    f.write(html)
+```
+
+:::info difflib vs filecmp
+`difflib` 关注内容差异的具体位置和细节；`filecmp` 只判断文件或目录是否相同，不提供差异内容。需要知道"哪里不同"时用 `difflib`，只需知道"是否相同"时用 `filecmp`。
+:::

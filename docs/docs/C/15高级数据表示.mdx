@@ -1,0 +1,626 @@
+---
+sidebar_position: 15
+title: 高级数据表示🔨
+---
+
+## 链表
+
+- 链表实现了，内存零碎数据的有效组织。比如，当我们用 malloc 来进行内存申请的时候，当内存足够，但是由于碎片太多，没有连续内存时，只能以申请失败而告终，而用链表这种数据结构来组织数据，就可以解决上类问题。
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/eba20792779d9d9a99e7d4ff0d23ef13.png)
+
+### 静态链表
+
+![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/44a5722c917071e937da435fe5695a26.png)
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+// 1.定义链表节点
+typedef struct node{
+    int data;
+    struct node *next;
+}Node;
+int main()
+{
+
+    // 2.创建链表节点
+    Node a;
+    Node b;
+    Node c;
+
+    // 3.初始化节点数据
+    a.data = 1;
+    b.data = 3;
+    c.data = 5;
+
+    // 4.链接节点
+    a.next = &b;
+    b.next = &c;
+    c.next = NULL;
+
+    // 5.创建链表头
+    Node *head = &a;
+
+    // 6.使用链表
+    while(head != NULL){
+        int currentData = head->data;
+        printf("currentData = %i\n", currentData);
+        head = head->next;
+    }
+    return 0;
+}
+```
+
+### 动态链表
+
+- 静态链表的意义不是很大，主要原因，数据存储在栈上，栈的存储空间有限，不能动态分配。所以链表要实现存储的自由，要动态的申请堆里的空间。
+- 有一个点要说清楚，我们的实现的链表是带头节点。至于，为什么带头节点，需等大家对链表有个整体的的认知以后，再来体会，会更有意义。
+
+- 空链表
+
+* 头指针带了一个空链表节点, 空链表节点中的 next 指向 NULL
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/21a038cfb75cce739e0f1d333126db74.png)
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+
+// 1.定义链表节点
+typedef struct node{
+    int data;
+    struct node *next;
+}Node;
+int main()
+{
+    Node *head = createList();
+    return 0;
+}
+// 创建空链表
+Node *createList(){
+    // 1.创建一个节点
+    Node *node = (Node *)malloc(sizeof(Node));
+    if(node == NULL){
+        exit(-1);
+    }
+    // 2.设置下一个节点为NULL
+    node->next = NULL;
+    // 3.返回创建好的节点
+    return node;
+}
+```
+
+- 非空链表
+
+* 头指针带了一个非空节点, 最后一个节点中的 next 指向 NULL
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/4f238221615ee2ef930526bd53cdc0ef.png)
+
+### 动态链表头插法
+
+- 1.让新节点的下一个节点等于头结点的下一个节点
+- 2.让头节点的下一个节点等于新节点
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+
+// 1.定义链表节点
+typedef struct node{
+    int data;
+    struct node *next;
+}Node;
+Node *createList();
+void printNodeList(Node *node);
+int main()
+{
+    Node *head = createList();
+    printNodeList(head);
+    return 0;
+}
+/**
+ * @brief createList 创建链表
+ * @return  创建好的链表
+ */
+Node *createList(){
+    // 1.创建头节点
+    Node *head = (Node *)malloc(sizeof(Node));
+    if(head == NULL){
+        return NULL;
+    }
+    head->next = NULL;
+
+    // 2.接收用户输入数据
+    int num = -1;
+    printf("请输入节点数据\n");
+    scanf("%i", &num);
+
+    // 3.通过循环创建其它节点
+    while(num != -1){
+        // 3.1创建一个新的节点
+        Node *cur = (Node *)malloc(sizeof(Node));
+        cur->data = num;
+
+        // 3.2让新节点的下一个节点指向头节点的下一个节点
+        cur->next = head->next;
+        // 3.3让头节点的下一个节点指向新节点
+        head->next = cur;
+
+        // 3.4再次接收用户输入数据
+        scanf("%i", &num);
+    }
+
+    // 3.返回创建好的节点
+    return head;
+}
+/**
+ * @brief printNodeList 遍历链表
+ * @param node 链表指针头
+ */
+void printNodeList(Node *node){
+    Node *head = node->next;
+    while(head != NULL){
+        int currentData = head->data;
+        printf("currentData = %i\n", currentData);
+        head = head->next;
+    }
+}
+```
+
+### 动态链表尾插法
+
+- 1.定义变量记录新节点的上一个节点
+- 2.将新节点添加到上一个节点后面
+- 3.让新节点成为下一个节点的上一个节点
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+
+// 1.定义链表节点
+typedef struct node{
+    int data;
+    struct node *next;
+}Node;
+Node *createList();
+void printNodeList(Node *node);
+int main()
+{
+    Node *head = createList();
+    printNodeList(head);
+    return 0;
+}
+/**
+ * @brief createList 创建链表
+ * @return  创建好的链表
+ */
+Node *createList(){
+    // 1.创建头节点
+    Node *head = (Node *)malloc(sizeof(Node));
+    if(head == NULL){
+        return NULL;
+    }
+    head->next = NULL;
+
+    // 2.接收用户输入数据
+    int num = -1;
+    printf("请输入节点数据\n");
+    scanf("%i", &num);
+
+    // 3.通过循环创建其它节点
+    // 定义变量记录上一个节点
+    Node *pre = head;
+    while(num != -1){
+        // 3.1创建一个新的节点
+        Node *cur = (Node *)malloc(sizeof(Node));
+        cur->data = num;
+
+        // 3.2让新节点链接到上一个节点后面
+        pre->next = cur;
+        // 3.3当前节点下一个节点等于NULL
+        cur->next = NULL;
+        // 3.4让当前节点编程下一个节点的上一个节点
+        pre = cur;
+
+        // 3.5再次接收用户输入数据
+        scanf("%i", &num);
+    }
+
+    // 3.返回创建好的节点
+    return head;
+}
+/**
+ * @brief printNodeList 遍历链表
+ * @param node 链表指针头
+ */
+void printNodeList(Node *node){
+    Node *head = node->next;
+    while(head != NULL){
+        int currentData = head->data;
+        printf("currentData = %i\n", currentData);
+        head = head->next;
+    }
+}
+```
+
+### 动态链优化
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+
+// 1.定义链表节点
+typedef struct node{
+    int data;
+    struct node *next;
+}Node;
+Node *createList();
+void printNodeList(Node *node);
+void insertNode1(Node *head, int data);
+void insertNode2(Node *head, int data);
+int main()
+{
+    // 1.创建一个空链表
+    Node *head = createList();
+    // 2.往空链表中插入数据
+    insertNode1(head, 1);
+    insertNode1(head, 3);
+    insertNode1(head, 5);
+    printNodeList(head);
+    return 0;
+}
+/**
+ * @brief createList 创建空链表
+ * @return  创建好的空链表
+ */
+Node *createList(){
+    // 1.创建头节点
+    Node *head = (Node *)malloc(sizeof(Node));
+    if(head == NULL){
+        return NULL;
+    }
+    head->next = NULL;
+    // 3.返回创建好的节点
+    return head;
+}
+/**
+ * @brief insertNode1 尾插法插入节点
+ * @param head 需要插入的头指针
+ * @param data 需要插入的数据
+ * @return  插入之后的链表
+ */
+void insertNode1(Node *head, int data){
+    // 1.定义变量记录最后一个节点
+    Node *pre = head;
+    while(pre != NULL && pre->next != NULL){
+        pre = pre->next;
+    }
+    // 2.创建一个新的节点
+    Node *cur = (Node *)malloc(sizeof(Node));
+    cur->data = data;
+
+    // 3.让新节点链接到上一个节点后面
+    pre->next = cur;
+    // 4.当前节点下一个节点等于NULL
+    cur->next = NULL;
+    // 5.让当前节点编程下一个节点的上一个节点
+    pre = cur;
+}
+/**
+ * @brief insertNode1 头插法插入节点
+ * @param head 需要插入的头指针
+ * @param data 需要插入的数据
+ * @return  插入之后的链表
+ */
+void insertNode2(Node *head, int data){
+    // 1.创建一个新的节点
+    Node *cur = (Node *)malloc(sizeof(Node));
+    cur->data = data;
+
+    // 2.让新节点的下一个节点指向头节点的下一个节点
+    cur->next = head->next;
+    // 3.让头节点的下一个节点指向新节点
+    head->next = cur;
+}
+/**
+ * @brief printNodeList 遍历链表
+ * @param node 链表指针头
+ */
+void printNodeList(Node *node){
+    Node *head = node->next;
+    while(head != NULL){
+        int currentData = head->data;
+        printf("currentData = %i\n", currentData);
+        head = head->next;
+    }
+}
+```
+
+### 链表销毁
+
+```c showLineNumbers
+/**
+ * @brief destroyList 销毁链表
+ * @param head 链表头指针
+ */
+void destroyList(Node *head){
+    Node *cur = NULL;
+    while(head != NULL){
+        cur = head->next;
+        free(head);
+        head = cur;
+    }
+}
+```
+
+### 链表长度计算
+
+```c showLineNumbers
+/**
+ * @brief listLength 计算链表长度
+ * @param head 链表头指针
+ * @return 链表长度
+ */
+int listLength(Node *head){
+    int count = 0;
+    head = head->next;
+    while(head){
+       count++;
+       head = head->next;
+    }
+    return count;
+}
+```
+
+### 链表查找
+
+```c showLineNumbers
+/**
+ * @brief searchList 查找指定节点
+ * @param head 链表头指针
+ * @param key 需要查找的值
+ * @return
+ */
+Node *searchList(Node *head, int key){
+    head = head->next;
+    while(head){
+        if(head->data == key){
+            break;
+        }else{
+            head = head->next;
+        }
+    }
+    return head;
+}
+```
+
+### 链表删除
+
+```c showLineNumbers
+void deleteNodeList(Node *head, Node *find){
+    while(head->next != find){
+        head = head->next;
+    }
+    head->next = find->next;
+    free(find);
+}
+```
+
+
+
+### 字符串的基本概念
+
+- 字符串是位于双引号中的字符序列
+
+* 在内存中以“\0”结束,所占字节比实际多一个例如："Hello"在内存中存储为："Hello\0"。
+
+### 字符串的初始化
+
+- 在 C 语言中没有专门的字符串变量,通常用一个字符数组来存放一个字符串。
+- 当把一个字符串存入一个数组时,会把结束符‘\0’存入数组,并以此作为该字符串是否结束的标志。
+- 有了‘\0’标志后,就不必再用字符数组 的长度来判断字符串的长度了
+- 初始化
+
+```c showLineNumbers
+    char name[9] = "lnj"; //在内存中以“\0”结束， \0ASCII码值是0
+    char name1[9] = {'l','n','j','\0'};
+    char name2[9] = {'l','n','j',0};
+    // 当数组元素个数大于存储字符内容时, 未被初始化的部分默认值是0, 所以下面也可以看做是一个字符串
+    char name3[9] = {'l','n','j'};
+```
+
+- 错误的初始化方式
+
+```c showLineNumbers
+    //省略元素个数时, 不能省略末尾的\n
+    // 不正确地写法，结尾没有\0 ，只是普通的字符数组
+    char name4[] = {'l','n','j'};
+
+     //   "中间不能包含\0", 因为\0是字符串的结束标志
+     //    \0的作用：字符串结束的标志
+    char name[] = "c\0ool";
+     printf("name = %s\n",name);
+输出结果: c
+```
+
+### 字符串输出
+
+- 如果字符数组中存储的是一个字符串, 那么字符数组的输入输出将变得简单方便。
+
+* 不必使用循环语句逐个地输入输出每个字符
+* 可以使用 printf 函数和 scanf 函数一次性输出输入一个字符数组中的字符串
+
+- 使用的格式字符串为“%s”,表示输入、输出的是一个字符串 字符串的输出
+- **输出**
+
+* %s 的本质就是根据传入的 name 的地址逐个去取数组中的元素然后输出，直到遇到\0 位置
+
+```c showLineNumbers
+char chs[] = "lnj";
+printf("%s\n", chs);
+```
+
+- 注意点:
+
+* \0 引发的脏读问题
+
+```c showLineNumbers
+char name[] = {'c', 'o', 'o', 'l' , '\0'};
+char name2[] = {'l', 'n', 'j'};
+printf("name2 = %s\n", name2); // 输出结果: lnjcool
+```
+- **输入**
+
+```c showLineNumbers
+char ch[10];
+scanf("%s",ch);
+```
+
+- 注意点:
+
+* 对一个字符串数组, 如果不做初始化赋值, 必须指定数组长度
+* ch 最多存放由 9 个字符构成的字符串，其中最后一个字符的位置要留给字符串的结尾标示‘\0’
+* 当用 scanf 函数输入字符串时,字符串中不能含有空格,否则将以空格作为串的结束符
+
+### 字符串常用方法
+
+- C 语言中供了丰富的字符串处理函数,大致可分为字符串的输入、输出、合并、修改、比较、转 换、复制、搜索几类。
+
+* 使用这些函数可大大减轻编程的负担。
+* 使用输入输出的字符串函数,在使用前应包含头文件"stdio.h"
+* 使用其它字符串函数则应包含头文件"string.h"
+- 字符串输出函数:puts
+- 格式: puts(字符数组名)
+- 功能:把字符数组中的字符串输出到显示器。即在屏幕上显示该字符串。
+- 优点:
+
+* 自动换行
+* 可以是数组的任意元素地址
+
+- 缺点
+
+* 不能自定义输出格式, 例如 puts("hello %i");
+
+```c showLineNumbers
+char ch[] = "lnj";
+puts(ch); //输出结果: lnj
+```
+
+> - puts 函数完全可以由 printf 函数取代。当需要按一定格式输出时,通常使用 printf 函数
+- 字符串输入函数:gets
+- 格式: gets (字符数组名)
+- 功能:从标准输入设备键盘上输入一个字符串。
+
+```c showLineNumbers
+char ch[30];
+gets(ch); // 输入:lnj
+puts(ch); // 输出:lnj
+```
+
+> - 可以看出当输入的字符串中含有空格时,输出仍为全部字符串。说明 gets 函数并不以空格作为字符串输入结束的标志,而只以回车作为输入结束。这是与 scanf 函数不同的。
+> - 注意 gets 很容易导致数组下标越界，是一个不安全的字符串操作函数
+- 字符串长度
+- 利用 sizeof 字符串长度
+
+* 因为字符串在内存中是逐个字符存储的,一个字符占用一个字节,所以字符串的结束符长度也是占用的内存单元的字节数。
+
+```c showLineNumbers
+    char name[] = "it666";
+    int size = sizeof(name);// 包含\0
+    printf("size = %d\n", size); //输出结果:6
+```
+- 利用系统函数
+
+* 格式: strlen(字符数组名)
+* 功能:测字符串的实际长度(不含字符串结束标志‘\0’)并作为函数返回值。
+
+```c showLineNumbers
+    char name[] = "it666";
+    size_t len = strlen(name2);
+    printf("len = %lu\n", len); //输出结果:5
+```
+- 以“\0”为字符串结束条件进行统计
+
+```c showLineNumbers
+/**
+ *  自定义方法计算字符串的长度
+ *  @param name 需要计算的字符串
+ *  @return 不包含\0的长度
+ */
+int myStrlen2(char str[])
+{
+    //    1.定义变量保存字符串的长度
+    int length = 0;
+    while (str[length] != '\0')
+    {
+        length++;//1 2 3 4
+    }
+    return length;
+}
+/**
+ *  自定义方法计算字符串的长度
+ *  @param name  需要计算的字符串
+ *  @param count 字符串的总长度
+ *  @return 不包含\0的长度
+ */
+int myStrlen(char str[], int count)
+{
+//    1.定义变量保存字符串的长度
+    int length = 0;
+//    2.通过遍历取出字符串中的所有字符逐个比较
+    for (int i = 0; i < count; i++) {
+//        3.判断是否是字符串结尾
+        if (str[i] == '\0') {
+            return length;
+        }
+        length++;
+    }
+    return length;
+}
+```
+- 字符串连接函数:strcat
+- 格式: strcat(字符数组名 1,字符数组名 2)
+- 功能:把字符数组 2 中的字符串连接到字符数组 1 中字符串的后面,并删去字符串 1 后的串标志 “\0”。本函数返回值是字符数组 1 的首地址。
+
+```c showLineNumbers
+char oldStr[100] = "welcome to";
+char newStr[20] = " lnj";
+strcat(oldStr, newStr);
+puts(oldStr); //输出: welcome to lnj"
+```
+
+> - 本程序把初始化赋值的字符数组与动态赋值的字符串连接起来。要注意的是,字符数组 1 应定义足 够的长度,否则不能全部装入被连接的字符串。
+- 字符串拷贝函数:strcpy
+  `- 格式: strcpy(字符数组名1,字符数组名2)
+`- 功能:把字符数组 2 中的字符串拷贝到字符数组 1 中。串结束标志“\0”也一同拷贝。字符数名 2, 也可以是一个字符串常量。这时相当于把一个字符串赋予一个字符数组。
+
+```c showLineNumbers
+char oldStr[100] = "welcome to";
+char newStr[50] = " lnj";
+strcpy(oldStr, newStr);
+puts(oldStr); // 输出结果:  lnj // 原有数据会被覆盖
+```
+
+> - 本函数要求字符数组 1 应有足够的长度,否则不能全部装入所拷贝的字符串。
+- 字符串比较函数:strcmp
+- 格式: strcmp(字符数组名 1,字符数组名 2)
+- 功能:按照 ASCII 码顺序比较两个数组中的字符串,并由函数返回值返回比较结果。
+
+* 字符串 1=字符串 2,返回值=0;
+* 字符串 1`>`字符串 2,返回值`>`0;
+* 字符串 1`<`字符串 2,返回值`<`0。
+
+```c showLineNumbers
+    char oldStr[100] = "0";
+    char newStr[50] = "1";
+    printf("%d", strcmp(oldStr, newStr)); //输出结果:-1
+    char oldStr[100] = "1";
+    char newStr[50] = "1";
+    printf("%d", strcmp(oldStr, newStr));  //输出结果:0
+    char oldStr[100] = "1";
+    char newStr[50] = "0";
+    printf("%d", strcmp(oldStr, newStr)); //输出结果:1
+```
+
+## 宏定义和条件编译
+

@@ -1,0 +1,75 @@
+---
+title: logging
+---
+
+`logging` 是 Python 标准库中用于记录日志的模块，可配置级别、输出目标和格式，适合从简单脚本到大型应用的各种场景。
+
+使用标准库提供的 logging API 最主要的好处是，所有的 Python 模块都可能参与日志输出，包括你自己的日志消息和第三方模块的日志消息。
+
+[logging](https://docs.python.org/zh-cn/3/library/logging.html)
+
+## 基本使用
+
+用 `logging.basicConfig()` 做一次性配置后，即可用 `logging.debug()`、`logging.info()`、`logging.warning()`、`logging.error()` 等按级别记录日志。级别从低到高为：**DEBUG**、**INFO**、**WARNING**、**ERROR**、**CRITICAL**；默认只输出 WARNING 及以上，可通过 `level` 调整。
+
+```python showLineNumbers
+import logging
+
+# 配置：输出到控制台，显示级别、时间、消息
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(levelname)s %(asctime)s - %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
+logging.debug("调试信息")
+logging.info("一般信息")
+logging.warning("警告")
+logging.error("错误")
+```
+
+## Handler 与 Formatter
+
+需要同时输出到控制台和文件、或自定义格式时，可显式创建 **Logger**，并为其添加 **Handler**（如 `StreamHandler` 输出到控制台、`FileHandler` 输出到文件）。每个 Handler 可绑定一个 **Formatter** 来定义日志行的格式。
+
+```python showLineNumbers
+import logging
+
+logger = logging.getLogger("my_app")
+logger.setLevel(logging.DEBUG)
+
+# 控制台：StreamHandler
+ch = logging.StreamHandler()
+ch.setLevel(logging.INFO)
+ch.setFormatter(logging.Formatter("%(levelname)s - %(message)s"))
+logger.addHandler(ch)
+
+# 文件：FileHandler
+fh = logging.FileHandler("app.log", encoding="utf-8")
+fh.setLevel(logging.DEBUG)
+fh.setFormatter(
+    logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+)
+logger.addHandler(fh)
+
+logger.info("这条会出现在控制台和文件")
+logger.debug("这条通常只出现在 app.log")
+```
+
+:::tip
+`basicConfig()` 适合快速上手；需要多输出目标或更细粒度控制时，使用 Logger + Handler + Formatter 更灵活。
+:::
+
+## loguru
+
+[loguru](https://github.com/Delgan/loguru) 是第三方日志库，API 更简单，无需配置即可使用，并支持自动轮转、彩色输出等。若项目允许引入依赖，可作为标准库 `logging` 的替代或补充。
+
+```python showLineNumbers
+from loguru import logger
+
+logger.debug("调试")
+logger.info("信息")
+logger.warning("警告")
+logger.error("错误")
+# 默认即带时间、级别、彩色输出，也可 add() 写入文件
+```

@@ -1,0 +1,330 @@
+---
+sidebar_position: 9
+title: Pytest
+---
+
+Pytest 是 Python 下用于编写和运行测试的框架，核心能力包括：**测试发现**（按约定收集 `test_*.py` / `*_test.py` 中的 `test_` 函数或方法）、**断言**（直接使用 `assert`，并借助断言重写输出详细失败信息）、**fixture**（依赖注入式的准备与清理）以及**插件体系**（如覆盖率、并行、与 CI 集成等）。它脱胎于 PyPy 生态，在替代早期基于 `unittest` 和 nose 的写法时，因「约定优于配置」、无需继承、语法简洁而成为事实标准；官方文档见 [pytest 官网](https://docs.pytest.org/)。
+
+设计上，Pytest 依赖几条主线：**约定优于配置**（`test_` 前缀、`conftest.py` 即插件）、**assert 重写**（在收集阶段改写测试模块中的 `assert`，失败时展示子表达式取值）、**conftest**（按目录层级共享 fixture 与本地钩子）、以及**标记与参数化**（`@pytest.mark`、`@pytest.mark.parametrize`）用于筛选用例与多组入参。理解这些有助于正确组织测试和排查行为。
+
+## 安装与运行
+
+安装：
+
+```bash
+pip install -U pytest
+```
+
+检查版本：
+
+```bash
+pytest --version
+```
+
+无参数时，pytest 从当前目录（或配置的 `testpaths`）递归收集 `test_*.py`、`*_test.py`，并运行其中以 `test_` 开头的函数，以及 `Test*` 类中以 `test_` 开头的方法。直接执行 `pytest` 即可跑完全部收集到的测试。
+
+```python showLineNumbers
+# 保存为 test_sample.py，在项目根执行: pytest
+def inc(x):
+    return x + 1
+
+def test_inc():
+    assert inc(3) == 4
+```
+
+常用命令行示例：
+
+```bash
+pytest                      # 默认当前目录
+pytest path/to/test_dir     # 指定目录
+pytest path/to/test_file.py # 指定文件
+pytest -v                   # 详细输出
+pytest -q                   # 精简输出
+pytest -x                   # 首个失败即停止
+pytest -k "test_inc"        # 按名称匹配用例
+```
+
+## 编写测试与断言
+
+测试函数只需使用普通 `assert`；断言失败时，pytest 会展示表达式中关键子表达式的值（依赖断言重写）。
+
+### 基本断言
+
+```python showLineNumbers
+def add(a, b):
+    return a + b
+
+def test_add():
+    assert add(1, 2) == 3
+    assert add(0, 0) == 0
+```
+
+### 断言异常：pytest.raises
+
+用 `pytest.raises` 断言某段代码会抛出指定异常：
+
+```python showLineNumbers
+import pytest
+
+def div(a, b):
+    if b == 0:
+        raise ValueError("division by zero")
+    return a / b
+
+def test_div_by_zero():
+    with pytest.raises(ValueError):
+        div(1, 0)
+
+def test_div_by_zero_message():
+    with pytest.raises(ValueError, match=r"division by zero"):
+        div(1, 0)
+```
+
+需要检查异常对象时，可用 `as excinfo` 拿到 `excinfo.type`、`excinfo.value` 等。
+
+### 浮点比较：pytest.approx
+
+浮点运算存在误差，可用 `pytest.approx` 做容差比较：
+
+```python showLineNumbers
+import pytest
+
+def test_float_sum():
+    assert (0.1 + 0.2) == pytest.approx(0.3)
+
+def test_approx_rel():
+    assert 100.0 == pytest.approx(99.0, rel=0.02)  # 相对容差 2%
+```
+
+### 用类组织测试
+
+可用 `Test` 开头的类分组，类内方法同样以 `test_` 开头即可被收集；无需继承 `unittest.TestCase`：
+
+```python showLineNumbers
+class TestMath:
+    def test_double(self):
+        assert 2 * 3 == 6
+
+    def test_power(self):
+        assert 2 ** 10 == 1024
+```
+
+注意：每个测试方法会得到**新的类实例**，不要依赖在方法间共享的实例属性做状态传递。
+
+## Fixture
+
+Fixture 用于为测试提供依赖和清理逻辑：在测试函数（或 fixture）的形参中声明同名 fixture，pytest 会在运行前解析依赖并注入返回值。
+
+### 声明与请求
+
+```python showLineNumbers
+import pytest
+
+@pytest.fixture
+def sample_list():
+    return [1, 2, 3]
+
+def test_len(sample_list):
+    assert len(sample_list) == 3
+
+def test_append(sample_list):
+    sample_list.append(4)
+    assert sample_list == [1, 2, 3, 4]
+```
+
+每个请求 `sample_list` 的测试都会得到**独立**的列表实例；fixture 默认按「函数」作用域执行，即每个测试函数执行一次。
+
+### Fixture 依赖 Fixture
+
+Fixture 的形参也可以是其他 fixture，形成依赖链：
+
+```python showLineNumbers
+import pytest
+
+@pytest.fixture
+def first():
+    return "a"
+
+@pytest.fixture
+def order(first):
+    return [first]
+
+def test_order(order):
+    order.append("b")
+    assert order == ["a", "b"]
+```
+
+### 作用域与 yield 清理
+
+通过 `scope` 可共享 fixture 实例（如 `function`、`class`、`module`、`session`）。需要清理时，用 `yield` 代替 `return`，yield 之后的代码在测试（及依赖该 fixture 的其他 fixture）结束后执行：
+
+```python showLineNumbers
+import pytest
+
+@pytest.fixture
+def resource():
+    obj = {"open": True}
+    yield obj
+    obj["open"] = False
+
+def test_with_resource(resource):
+    assert resource["open"] is True
+# 测试结束后会执行 yield 后的清理
+```
+
+### 内置 fixture：tmp_path
+
+`tmp_path` 为每个测试提供一个唯一的临时目录（`pathlib.Path`），测试结束后由 pytest 管理清理：
+
+```python showLineNumbers
+def test_create_file(tmp_path):
+    f = tmp_path / "hello.txt"
+    f.write_text("hello")
+    assert f.read_text() == "hello"
+```
+
+### autouse
+
+`autouse=True` 的 fixture 无需在测试参数中写出，只要在该 fixture 的作用域内就会自动执行：
+
+```python showLineNumbers
+import pytest
+
+@pytest.fixture(autouse=True)
+def reset_state():
+    yield
+    # 每个测试结束后执行
+
+def test_one():
+    pass  # reset_state 仍会运行
+```
+
+## conftest.py
+
+`conftest.py` 用于在**同一目录及子目录**下共享 fixture 和本地钩子。pytest 会自动加载该文件，无需 import。子目录中的 `conftest.py` 会叠加父目录的 fixture，本目录的 fixture 会覆盖同名父级 fixture。
+
+目录结构示例：
+
+```
+tests/
+  conftest.py      # 本目录及子目录的测试可见
+  test_a.py
+  sub/
+    conftest.py    # 仅 sub 及其子目录
+    test_b.py
+```
+
+```python showLineNumbers
+# tests/conftest.py
+import pytest
+
+@pytest.fixture
+def shared_db():
+    return {"users": []}
+```
+
+```python showLineNumbers
+# tests/test_a.py
+def test_with_db(shared_db):
+    assert "users" in shared_db
+```
+
+将共享 fixture、`pytest_addoption`、`pytest_generate_tests` 等钩子放在对应层级的 `conftest.py` 中，即可在不改测试代码的前提下扩展行为。
+
+## 参数化与标记
+
+### @pytest.mark.parametrize
+
+对多组「输入–期望」运行同一测试逻辑，使用 `@pytest.mark.parametrize`：
+
+```python showLineNumbers
+import pytest
+
+@pytest.mark.parametrize("a, b, expected", [
+    (1, 2, 3),
+    (0, 0, 0),
+    (-1, 1, 0),
+])
+def test_add_param(a, b, expected):
+    assert a + b == expected
+```
+
+会生成三条独立测试（如 `test_add_param[1-2-3]` 等），失败时能精确到某一组参数。
+
+可叠加多个 `parametrize`，结果为笛卡尔积；也可用 `pytest.param(..., marks=pytest.mark.xfail)` 标记某一组为预期失败。
+
+### 标记：skip、xfail、自定义
+
+内置标记示例：
+
+```python showLineNumbers
+import pytest
+import sys
+
+@pytest.mark.skip(reason="未实现")
+def test_not_implemented():
+    assert False
+
+@pytest.mark.skipif(sys.platform != "linux", reason="仅 Linux")
+def test_linux_only():
+    pass
+
+@pytest.mark.xfail(reason="已知 bug")
+def test_known_bug():
+    assert 1 == 2
+```
+
+自定义标记需在配置中注册，否则可能触发告警（或在使用 `strict_markers` 时报错）。在 `pyproject.toml` 或 `pytest.ini` 中：
+
+```toml
+[tool.pytest.ini_options]
+markers = [
+    "slow: 标记为慢速测试，可用 -m 'not slow' 排除",
+]
+```
+
+```python showLineNumbers
+@pytest.mark.slow
+def test_heavy():
+    ...
+```
+
+运行时可筛选：`pytest -m slow`、`pytest -m "not slow"`。
+
+## 插件与配置
+
+### 配置文件
+
+Pytest 支持在项目根目录使用 `pytest.ini`、`pyproject.toml`（`[tool.pytest.ini_options]`）或 `tox.ini` 的 `[pytest]` 段做配置。例如指定默认参数和路径：
+
+```toml
+# pyproject.toml
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"
+markers = ["slow: 慢速测试"]
+```
+
+```ini
+# pytest.ini 等价示例
+[pytest]
+testpaths = tests
+addopts = -v
+markers = slow: 慢速测试
+```
+
+### 常用插件
+
+- **pytest-cov**：生成覆盖率报告，`pytest --cov=src --cov-report=html`
+- **pytest-xdist**：多进程/多机并行，`pytest -n auto`
+- **pytest-asyncio**：运行 async 测试
+
+安装后通过 `addopts` 或命令行传入对应参数即可使用。
+
+:::tip
+测试金字塔中，单元测试占比最大、运行最快；集成/端到端测试数量较少。在 CI 中可先跑单元测试，再按需跑带 `-m "not slow"` 或指定目录的用例；覆盖率常用 `pytest-cov` 与 CI 集成，在 MR 中检查覆盖率变化。
+:::
+
+### 与 unittest 兼容
+
+Pytest 可直接运行基于 `unittest.TestCase` 的测试，无需改写；收集规则与原生 pytest 用例一致（如 `test_` 前缀）。若项目中原有大量 unittest，可逐步迁到 pytest 的 fixture 与断言风格。

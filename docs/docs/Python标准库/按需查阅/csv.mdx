@@ -1,0 +1,164 @@
+---
+title: csv
+---
+
+`csv` 模块用于读写 CSV（逗号分隔值）格式的表格数据，支持多种方言和自定义分隔符。
+
+[csv](https://docs.python.org/3/library/csv.html)
+
+## 读取 CSV 文件
+
+```python showLineNumbers
+import csv
+
+# 基本读取：每行返回一个字符串列表
+with open('data.csv', newline='', encoding='utf-8') as f:
+    reader = csv.reader(f)
+    for row in reader:
+        print(row)  # ['姓名', '年龄', '城市']
+
+# 指定分隔符和引号字符
+with open('data.tsv', newline='') as f:
+    reader = csv.reader(f, delimiter='\t')
+    for row in reader:
+        print(row)
+```
+
+:::tip
+打开 CSV 文件时应指定 `newline=''`，让 `csv` 模块自行处理换行符，避免空行问题。
+:::
+
+## 写入 CSV 文件
+
+```python showLineNumbers
+import csv
+
+headers = ['姓名', '年龄', '城市']
+rows = [
+    ['张三', 28, '北京'],
+    ['李四', 32, '上海'],
+    ['王五', 25, '广州'],
+]
+
+with open('output.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.writer(f)
+    writer.writerow(headers)   # 写入表头
+    writer.writerows(rows)     # 批量写入数据行
+```
+
+## 字典读写（DictReader / DictWriter）
+
+用字典形式操作 CSV 更直观，字段名作为 key 访问每列数据。
+
+```python showLineNumbers
+import csv
+
+# 读取为字典：第一行自动作为字段名
+with open('output.csv', newline='', encoding='utf-8') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        print(f"{row['姓名']} 来自 {row['城市']}")
+        # 张三 来自 北京
+        # 李四 来自 上海
+        # 王五 来自 广州
+
+# 写入字典
+fieldnames = ['姓名', '年龄', '城市']
+with open('dict_output.csv', 'w', newline='', encoding='utf-8') as f:
+    writer = csv.DictWriter(f, fieldnames=fieldnames)
+    writer.writeheader()
+    writer.writerow({'姓名': '赵六', '年龄': 30, '城市': '深圳'})
+```
+
+:::info DictReader vs reader
+- `csv.reader` 返回列表，按索引访问：`row[0]`
+- `csv.DictReader` 返回字典，按字段名访问：`row['姓名']`
+
+字段较多时推荐使用 `DictReader`，代码可读性更好。
+:::
+
+## 方言与格式参数
+
+```python showLineNumbers
+import csv
+
+# 查看内置方言
+print(csv.list_dialects())  # ['excel', 'excel-tab', 'unix']
+
+# 注册自定义方言
+csv.register_dialect('pipe', delimiter='|', quoting=csv.QUOTE_MINIMAL)
+
+data = [['name', 'score'], ['Alice', '95'], ['Bob', '87']]
+with open('pipe.csv', 'w', newline='') as f:
+    writer = csv.writer(f, dialect='pipe')
+    writer.writerows(data)
+# 输出：name|score\nAlice|95\nBob|87
+
+csv.unregister_dialect('pipe')
+```
+
+:::tip 常用格式参数
+| 参数 | 默认值 | 说明 |
+|------|--------|------|
+| `delimiter` | `','` | 字段分隔符 |
+| `quotechar` | `'"'` | 引号字符 |
+| `lineterminator` | `'\r\n'` | 行终止符 |
+| `quoting` | `QUOTE_MINIMAL` | 引号策略 |
+| `skipinitialspace` | `False` | 是否忽略分隔符后的空格 |
+:::
+
+## Sniffer 自动检测格式
+
+```python showLineNumbers
+import csv
+
+sample = '''name;age;city
+Alice;30;Beijing
+Bob;25;Shanghai
+'''
+
+dialect = csv.Sniffer().sniff(sample)
+print(dialect.delimiter)  # ';'
+
+has_header = csv.Sniffer().has_header(sample)
+print(has_header)  # True
+```
+
+## 解析字符串
+
+`csv.reader` 接受任何可迭代的字符串序列，不一定要文件对象。
+
+```python showLineNumbers
+import csv
+import io
+
+# 从字符串解析
+text = "Alice,30,Beijing\nBob,25,Shanghai"
+reader = csv.reader(io.StringIO(text))
+for row in reader:
+    print(row)
+# ['Alice', '30', 'Beijing']
+# ['Bob', '25', 'Shanghai']
+
+# 也可以直接传入列表
+for row in csv.reader(['one,two,three', 'a,b,c']):
+    print(row)
+```
+
+## 错误处理
+
+```python showLineNumbers
+import csv
+import sys
+
+filename = 'data.csv'
+try:
+    with open(filename, newline='', encoding='utf-8') as f:
+        reader = csv.reader(f)
+        for row in reader:
+            print(row)
+except csv.Error as e:
+    sys.exit(f'文件 {filename}, 第 {reader.line_num} 行: {e}')
+except FileNotFoundError:
+    sys.exit(f'文件 {filename} 不存在')
+```

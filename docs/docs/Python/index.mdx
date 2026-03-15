@@ -1,0 +1,678 @@
+---
+sidebar_position: 2
+title: Python基础
+---
+:::info
+Python 版本：3.14
+
+GCC 版本：13.3.0
+
+系统：Windows11 + WSL2（Ubuntu24.04）
+
+编辑器：VSCode/Cursor
+:::
+
+考虑到<HoverText text="AI编程的发展趋势" explanation="AI对绝大多数技术都能达到初级至中级工程师的水平"/>。当下的专业编程从业者应该对常用技术更加深入底层达到中高级水准。
+
+本教程涵盖所有内置函数、内置关键字、内置异常以及一半以上的Python标准库。
+
+正式学习编程语言之前，推荐先学习:<HoverText text="8小时计算机科学速成课" explanation="帮你快速认知计算机组成原理、计算机网络、操作系统、人工智能等计算机科学的基础知识。适合0基础认知计算机科学。"/>
+
+<div style={{position: 'relative', paddingBottom: '56.25%', height: 0, overflow: 'hidden', maxWidth: '100%'}}>
+  <iframe 
+    src="//player.bilibili.com/player.html?isOutside=true&aid=21376839&bvid=BV1EW411u7th&cid=38442945&p=1" 
+    scrolling="no" 
+    border="0" 
+    frameborder="no" 
+    framespacing="0" 
+    allowfullscreen="true"
+    style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
+  />
+</div>
+
+## 环境管理没有银弹
+
+### 结论在前
+
+Python环境管理工具经历了从简单到复杂，再到智能化的演进过程。每个工具都有其独特的优势和适用场景：
+
+#### 工具对比总览
+
+| 工具 | 优点 | 缺点 | 适用场景 | 学习成本 | 性能 |
+|------|------|------|----------|----------|------|
+| **pip + venv** | • 官方标准，稳定可靠<br/>• 轻量级，占用空间小<br/>• 学习成本低 | • 依赖冲突处理能力弱<br/>• 需要手动管理requirements.txt<br/>• 不支持多Python版本管理 | • Python初学者<br/>• 简单项目开发<br/>• 生产环境部署 | 低 | 一般 |
+| **Anaconda** | • 预装大量科学计算包<br/>• 支持多Python版本<br/>• GUI界面友好<br/>• 管理CUDA等外部依赖 | • 体积庞大（几GB）<br/>• 创建环境较慢<br/>• 商业使用需付费<br/>• 依赖解析不够智能 | • 机器学习/数据科学<br/>• 科研项目<br/>• 需要图形界面的用户 | 中等 | 慢 |
+| **Docker** | • 完全隔离的环境<br/>• 一次构建，到处运行<br/>• 解决所有环境问题<br/>• 支持微服务架构 | • 资源占用大<br/>• 100M代码变1G镜像<br/>• 不适合低配置设备<br/>• 增加了部署复杂度 | • 生产环境部署<br/>• 微服务架构<br/>• 团队协作开发<br/>• CI/CD流水线 | 高 | 中等 |
+| **UV** | • 速度极快（10-100倍提升）<br/>• 一体化工具箱<br/>• 智能依赖解析<br/>• 现代化项目管理 | • 相对较新，生态待完善<br/>• 社区支持有限<br/>• 某些边缘情况可能不稳定 | • 现代Python开发<br/>• 频繁创建项目<br/>• 注重开发效率<br/>• 个人和小团队项目 | 中等 | 极快 |
+
+#### 选择建议
+
+学习基础语法的Windows用户，推荐在官网安装`python`，使用 `pip` + `venv` 管理简单项目环境。
+
+接触生产开发后，在WSL2中通过`uv`管理Python和C环境，使用`uv`管理Python版本与项目依赖。项目调试完成后，使用`docker`打包便于生产部署。
+
+记住，没有银弹，选择最适合你当前需求和技术栈的工具才是最好的选择。随着项目复杂度的增加，你可能需要组合使用多种工具来解决不同场景下的问题。
+
+### pip 与 venv ：陪伴新手成长的标准库
+
+最早我学习Python是在网页上，主打随时随地学习编程，它提供了一个`Python 3.7`固定的环境，我只需要在线编写代码，点击运行就可以看到结果。它支持标准库外和`pandas`、`numpy`等常见的计算机科学库，我在这个网页上完成了Python的基础学习。
+
+它的缺点是不支持自定义下载第三方模块，例如`requests`，于是在学习爬虫的时候我开始学习创建本地环境。
+
+:::info
+在生活中,人们使用汉语、英语、法语、德语、日语等不同的语言跟不同国家的人进行交流。在使用计算机时，人们不能直接使用英语等人类的语言和计算机交流，而是使用编程语言(Programming Language)将人们的想法编写成程序，再通过执行程序控制计算机去解决各种问题。我们将这个编程语言与计算机之间的"翻译员"称为编程环境，简称"环境"。
+
+Python环境主要由2部分组成：解释器和<HoverText text="模块库" explanation="包括标准库和第三方库，也叫模块、包、库、框架、依赖。"/>。环境管理的重点就是如何管理这些依赖，如何保证不同的模块库之间的兼容性，如何保证不同的模块库之间的可复用性。
+:::
+
+在 Windows 下安装 Python 是一件非常简单的事情，[Python 官网下载网址](https://www.python.org/downloads/)提供了windows安装的可执行文件，安装过程<Highlight>全部勾选</Highlight>，一路点击下一步就可以了。
+
+安装模块也只需要使用`pip`下载安装包就可以了，如果遇到网络报错那就更换<HoverText text="镜像源" explanation="镜像源是pip下载包的地址的复制版，用于加速当地用户下载，国内有多个镜像源，例如清华镜像源、阿里云镜像源等，同步时间一般5分钟到30分钟不等。"/>，如果没有网络那就提前下载离线`wheel`，使用U盘安装。
+
+:::info
+如果我们安装了中文语言包，那么我们的系统就可以识别与显示中文。
+如果我们安装了 Python 语言包，那么我们的系统就可以识别与运行 Python 程序。
+
+windows 环境变量分为：系统变量(这台计算机的所有用户)、用户变量(当前用户)、临时变量(当前命令行窗口)。
+
+同个命名空间下，变量名不能重复。如果系统变量和用户变量同名，那么用户变量优先级更高。
+
+Path 环境变量是个特殊的值，它确定 `Windows PowerShell` 查找应用程序、实用工具和脚本的位置。当PATH 环境变量中有多个文件夹都包含可执行文件时（以python.exe为例）,系统找到第一个匹配的 python.exe 就会停止搜索并执行它。
+
+与 `Windows PowerShell` 不同，如果是 `cmd` 命令行，会额外先搜索当前工作目录。再接着搜索 --> 系统变量 PATH目录（从左到右） --> 用户变量 PATH目录（从左到右）
+
+`where` 命令可以查找可执行文件的路径。
+
+如果你下载的是python3.14，不同途径下载的解释器对应的名称不同，可能为：python.exe、python3.exe、python3.14.exe。
+
+可通过 `where python`、`where python3`、`where python3.14`查找可执行文件的路径。
+
+添加成功后根据解释器的名称，你可以在终端中使用 `python` 或 `python3` 或 `python3.14` 命令来使用解释器。
+
+pip 是python的包管理器（自身也是包），常与解释器一起被安装，名称可能为： pip.exe 或 pip3.exe。也可以添加到环境变量中，添加后可以直接使用`pip`或`pip3`命令，以`pip`为例：`pip install requests`。（安装名为`requests`的包）
+
+但现在流行只将解释器添加到环境变量中，如果解释器的名称为python.exe，则可使用`python -m pip`。例如：`python -m pip install requests`。（安装名为`requests`的包）
+:::
+
+但是随着我学习的内容越来越复杂，我安装的包出现了依赖项冲突。公司的项目中用到的一个包需要`requests`小于某个版本，而我正在学习的一个新框架需要`requests`大于某个版本。
+
+于是我使用`venv`专门为我学习的新框架创建了一个虚拟环境，这样就避免了依赖项冲突。一切看起来很好。
+
+当时我买的机械革命电脑系统经常蓝屏，于是我决定换一台新电脑，我使用`pip freeze > requirements.txt`导出所有包，然后把`requirements.txt`拷贝到新电脑上，切换到 requirements.txt 文件所在的目录下执行`pip install -r requirements.txt`安装所有包。
+
+理论上我这个操作应该可以直接顺畅的安装，但是居然报错了？这就是`pip`最被诟病的依赖项冲突问题。
+
+:::info
+依赖项冲突是指同一个包的不同版本要求不兼容，导致无法同时满足所有依赖的情况。
+:::
+
+这是因为`pip freeze`按字母顺序排列包，不考虑依赖关系。例如，包A依赖包B的1.0版本，但在安装时可能先安装了包B的2.0版本，导致依赖冲突。解决方案是根据报错手动把有冲突的包注释掉，单独安装。这并不智能。
+
+### Anaconda ：与机器学习互相成就
+
+`Anaconda`、`Miniconda`、`conda`是什么？
+
+- 最核心的是`conda`，它是一个包和环境管理器，可以创建和管理虚拟环境。它是开源免费的。
+- `Miniconda` =  `conda` + `Python` 
+- `Anaconda` = `Miniconda` + 1500+预装包 + GUI界面 + 账户登录配置云同步 
+
+我用的是完整版的`Anaconda`，它既预装了大量机器学习包免去重复安装，也可以创建<HoverText text="不同版本的 Python 解释器环境" explanation="老项目是3.10之前，新项目是3.10之后，个人体验nogil的3.14。"/>，还可以管理 CUDA 这样的外部包。而且在Linux环境下安装和管理多个原生Python不算方便，有了`conda`之后就方便很多了。
+
+可以说`Anaconda`推动了机器学习的发展，机器学习也让`Anaconda`广为人知。
+
+但 `conda` 创建环境真的很慢，而且体积很大，并且处理依赖冲突的时候也并不算智能。
+
+### Docker：以空间换时间
+
+Docker 是一个开源的容器化平台，它允许开发者将应用程序及其所有依赖打包成一个独立的容器，然后在任何有docker的地方运行。是开发者的终极梦想。
+
+上面这句话应该会招来硬件工程师的反馈，因为docker会占据相当的内存空间和硬盘空间。通常内存小于2G的设备或边缘设备，例如树莓派、一些轻量服务器，是不适合安装docker的。另外docker原理是把系统环境和项目一起打包成一个镜像，然后运行时再解包，这会占用更多空间，我们的不含模型的代码一般都在100M以内，如果使用docker，那么100M的代码会变成1G的镜像。
+
+docker是很典型的用空间换时间，它让开发者在任何地方都可以运行代码，而且不用担心环境问题。你可以节省1个运维工程师，只需要给你的电脑<HoverText text="升级一下配置" explanation="也许不升级也可以，非常划算。"/>。
+
+如果你的容器很多，可以使用docker-compose和K8s，可以说中大型公司软件开发，容器化是主流。
+
+### UV：整合多个工具的工具箱
+
+`docker`和`conda`解决了开发和部署问题，但是依赖项冲突问题依然需要一个更加聪明的解决方案，不能总是手动解决冲突。而且对于总是去陌生客户场地出差的人来说，总是需要先吃顿饭来等待`docker`和`conda`安装。有没有一个更加轻快的解决方案？
+
+有需求就有市场，`Poetry`、`pipx`、`Pixi`、`uv`等工具开始了他们的探索，总体方向是：更快、更集成、更智能。
+
+你可以选择任意一个工具箱或者都不选择，如果要选的话，我个人比较推荐`uv`，它吸取了各家之长，<HoverText text="目前看来是最好用的工具箱。" explanation="uv 基于 Rust 开发，速度很快，它的定位是一个工具替代多个工具，同时每个功能执行起来都非常快，比其他工具快 10 ~ 100 倍，一个命令等价于以前的多个命令！"/>
+
+:::info
+`uv` 的核心哲学是每个项目都应该有自己独立的、隔离的环境。
+
+有的开发者习惯有一个全局的常用环境，安装像 `PyTorch` 这样的大型库，选择主环境后，大包处处可用，项目冲突时才创建一个新的虚拟环境。
+
+在 `uv` 的设计理念中，并没有一个真正的“全局环境”来安装这些大型库，以便所有项目共享。虽然这看起来可能意味着你需要为每个项目都安装一次大包，但 `uv` 实际上已经通过其智能缓存机制解决了这个问题。
+
+当 `uv` 第一次下载并安装 `PyTorch` 或 `OpenCV` 时，它会把这些包的二进制文件和依赖项缓存在你的本地文件系统中。当你在另一个项目中需要安装同样的包时，`uv` 不会重新从网络下载，而是直接从本地缓存中拷贝过来，几乎是瞬间完成。
+
+对于专业的开发者来说，绝大部分时间我们都是在创建项目、发布项目、查看别人的项目并在本地复现，这些操作比较频繁。每周 `uv` 能为你节省 1 ~ 5 个小时，要知道我每周才工作 35 ~ 40 个小时！
+:::
+
+
+下面是基于[uv官方文档](https://docs.astral.sh/uv/getting-started/features)的 UV 代表性命令参考表（不含完整参数），按项目构建顺序整理，可以参考。
+
+```bash showLineNumbers
+# Linux/macOS安装uv
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# 一键安装多个python版本，支持多个来源
+uv python install 3.13 3.14
+
+# 锁定Python版本（设置默认的Python版本）
+uv python pin 3.14
+
+# 初始化项目时可以指定 Python 版本，自动添加README.md、.git与.gitignore文件
+uv init example --python 3.14
+
+# 进入项目
+cd example
+
+# 查看当前项目使用的Python版本
+uv python find
+
+# 添加包，添加时会自动创建venv环境，同时更新项目依赖文件pyproject.toml，无需python -m venv，无需反复pip freeze
+uv add ruff 
+# uv 的 pip 默认可用，但是不安装于 .venv 中，如果某些包（如 ipynb 内核）需要安装于 .venv 中且依赖 pip，可以使用 uv add pip 命令。
+uv add pip
+
+# 检查语法错误、代码风格（Linting）、未使用的变量、导入错误等。
+uv run ruff check
+# 检查类型一致性。确保你传给函数的参数类型是正确的。
+uv run ty check
+
+# 根据pyproject.toml安装项目依赖
+uv sync
+
+# 快速打包和发布项目
+uv build
+uv publish
+
+# 锁定关键项目依赖。锁文件的机制也许是源自npm，它让依赖冲突问题有了更智能的解决方案
+uv lock
+
+# 快速运行脚本，无需切换到虚拟环境
+uv run xx.py
+
+# 初始化一个 FastAPI 项目
+uv init --app
+
+# 快速启动项目
+uv run fastapi dev
+```
+
+`uv` 下有个`uvx`命令，是 `uv tool run` 的简写（别名），专门用于运行那些发布在 PyPI 上的 可执行工具。因此以下命令等价：
+- `uv tool run ty check`
+- `uvx ty check`
+
+如果是当前项目的虚拟环境中运行 `ty check`也可以使用
+- `uv run ty check` 
+
+### C开发环境搭建
+
+有时我们需要进一提升算法性能，可以使用C编写性能瓶颈的代码。
+
+:::info
+C 是一个面向过程的语言，是很多现代语言的基础。
+
+C++ 是在 C 的基础上发展起来的，引入了面向对象编程（OOP）的概念，可以看作是 C 的一个超集。
+:::
+
+```bash showLineNumbers
+# 首先更新包列表(需要网络畅通)
+sudo apt-get update
+
+# 安装编译和调试工具(需要网络畅通)
+sudo apt-get install build-essential gdb
+
+# 测试 GCC(如果安装成功，终端会显示 GCC 的版本信息)
+gcc --version
+
+# 测试 G++(如果安装成功，终端会显示 G++ 的版本信息)
+g++ --version
+
+# 测试 GDB(如果安装成功，会显示 GDB 的版本信息)
+gdb --version
+```
+
+- gcc/g++：编译器，它获取编写好的 C/C++ 代码（人类可读）并将其转换为计算机处理器可以理解和执行的语言。
+
+- gdb：调试器，它是一个工具，可逐步运行程序以查找和修复错误或“错误”。它对于查看程序运行时内部发生的情况非常有用。
+
+## 编辑器
+
+[Vscdoe 官网下载网址](https://code.visualstudio.com/download)
+
+- VSCode（Visual Studio Code）是一款通用跨平台的编辑器
+
+它不会运行程序，它需要安装相应的语言包才能运行程序。它可以编辑任何语言的程序，支持几乎所有主流的开发语言的语法高亮、智能代码补全等。安装过程全部勾选。
+
+- 注意与 Visual Studio 区别
+
+### 推荐扩展
+
+使用 VSCode 或 Cursor，安装以下扩展：
+
+| 扩展名称            | 功能描述                                                           |
+| ------------------- | ------------------------------------------------------------------ |
+| Remote - SSH        | 通过SSH连接远程服务器，在本地编辑远程文件                          |
+| C/C++               | 为 C/C++ 语言提供代码高亮、智能感知（自动补全）、代码格式化和调试等核心功能。|
+| Python              | 提供Python语言基础支持，包括语法高亮、代码补全和格式化             |
+| Pylance             | 高性能Python语言服务器，提供类型检查和智能提示                     |
+| Python Debugger     | 支持Python代码的断点调试、变量监控和单步执行                       |
+| Ruff Formatter      | 自动格式化Python代码，保持一致的代码风格                           |
+| Jupyter             | 提供Jupyter Notebook支持，支持在VSCode中编辑和运行Jupyter Notebook |
+| Error Lens          | 直接在代码行内展示错误和警告信息，无需悬停鼠标                     |
+| Office Viewer       | 在VSCode中直接预览Word、Excel等Office文档并附赠IDE主题                          |
+| Markmap             | 以思维导图的形式展示markdown结构                                   |
+| Markdown All in One | 提供Markdown编辑、预览、导出等功能                                 |
+| SQLite Viewer       | 提供SQLite数据库的可视化界面，支持数据浏览和查询                   |
+| Hex Editor          | 提供十六进制编辑器，支持编辑二进制文件                             |
+| Live Server         | 提供本地开发服务器，支持实时预览和自动刷新网页                     |
+| Git History         | 提供Git历史记录的可视化界面，支持查看文件的修改历史                |
+| Gitmoji             | 在VSCode中使用Gitmoji，支持在提交时使用Gitmoji                     |
+| Docker              | 管理Docker容器，支持创建、运行和调试容器化应用                     |
+
+### 易用性配置
+
+- 推荐颜色主题：Dark Modern
+- 推荐图标主题：office material
+- 推荐字体：Fira Code（可选连字符显示）
+- Cursor侧边栏方向修改：`workbench.activityBar.orientation`，改为`vertical`
+
+### 工作区的概念
+
+工作区是你项目文件的集合，可以包含一个或多个文件夹。
+
+| 操作类型 | 功能 | 快捷键/操作方式 |
+|----------|------|----------------|
+| **打开工作区** | 打开文件夹 | `Ctrl + K, Ctrl + O` 或 `文件 > 打开文件夹` |
+| | 打开工作区文件 | `Ctrl + K, Ctrl + W` 或双击 `.code-workspace` 文件 |
+| **管理工作区** | 添加文件夹到工作区 | `文件 > 将文件夹添加到工作区` |
+| | 保存工作区 | `文件 > 将工作区另存为` (生成 `.code-workspace` 文件) |
+| | 移除文件夹 | 右键文件夹 > `从工作区中删除文件夹` |
+| **工作区设置** | 独立设置 | 每个工作区可以有独立的设置 (`.vscode/settings.json`) |
+| | 扩展和主题 | 可以为不同项目配置不同的扩展和主题 |
+
+### 编辑器操作
+
+| 操作类型 | 功能 | 快捷键 |
+|----------|------|--------|
+| **视图控制** | 放大 | `Ctrl + +` 或 `Ctrl + 滚轮上` |
+| | 缩小 | `Ctrl + -` 或 `Ctrl + 滚轮下` |
+| | 重置缩放 | `Ctrl + 0` |
+| **快速导航** | 跳转到指定行 | `Ctrl + G` (输入行号) |
+| | 跳转到文件开头 | `Ctrl + Home` |
+| | 跳转到文件结尾 | `Ctrl + End` |
+| | 跳转到匹配的括号 | `Ctrl + Shift + \` |
+| **分屏操作** | 垂直分屏 | `Ctrl + \` |
+| | 关闭当前编辑器 | `Ctrl + W` |
+| | 切换编辑器组 | `Ctrl + 1/2/3` |
+| | 在组间移动文件 | `Ctrl + Alt + ←/→` |
+| **文件操作** | 新建文件 | `Ctrl + N` |
+| | 保存文件 | `Ctrl + S` |
+| | 保存所有文件 | `Ctrl + K, S` |
+| | 关闭文件 | `Ctrl + W` |
+| | 重新打开已关闭的文件 | `Ctrl + Shift + T` |
+
+### 命令框
+
+命令框是编辑器最强大的功能之一，按 `Ctrl + P` 打开。
+
+#### 搜索模式详解
+
+| 前缀   | 功能         | 快捷键             | 使用示例            |
+| ------ | ------------ | ------------------ | ------------------- |
+| 无前缀 | 文件搜索     | `Ctrl + P`         | `app.py` `*.js`     |
+| `>`    | 命令搜索     | `Ctrl + Shift + P` | `>Python: Run File` |
+| `@`    | 当前文件符号 | `Ctrl + Shift + O` | `@function_name`    |
+| `#`    | 工作区符号   | `Ctrl + T`         | `#ClassName`        |
+| `:`    | 跳转行号     | `Ctrl + G`         | `:25`               |
+| `?`    | 帮助信息     | 无                 | `?shortcuts`        |
+
+#### 实用技巧
+
+| 技巧 | 说明 | 操作方式 |
+|------|------|----------|
+| **模糊搜索** | 文件搜索支持模糊匹配 | 输入 `apy` 可以找到 `app.py` |
+| **模式切换** | 从命令模式切换到文件搜索 | 按 `Backspace` 删除 `>` 符号 |
+| **最近文件** | 查看最近打开的文件和文件夹 | `Ctrl + R` |
+| **符号搜索** | 在大文件中快速定位函数、类、变量 | 使用 `@` 和 `#` 前缀搜索 |
+
+### 搜索和替换
+
+| 操作类型 | 功能 | 快捷键 |
+|----------|------|--------|
+| **基本搜索** | 当前文件搜索 | `Ctrl + F` |
+| | 全局搜索 | `Ctrl + Shift + F` |
+| | 查找下一个 | `F3` 或 `Enter` |
+| | 查找上一个 | `Shift + F3` |
+| **替换操作** | 当前文件替换 | `Ctrl + H` |
+| | 全局替换 | `Ctrl + Shift + H` |
+| | 替换当前匹配 | `Ctrl + Shift + 1` |
+| | 替换所有匹配 | `Ctrl + Alt + Enter` |
+| **高级选项** | 区分大小写 | 点击 `Aa` 按钮或 `Alt + C` |
+| | 全词匹配 | 点击 `Ab` 按钮或 `Alt + W` |
+| | 正则表达式 | 点击 `.*` 按钮或 `Alt + R` |
+
+#### 正则表达式示例
+```regex
+\d+           ## 匹配数字
+[a-zA-Z]+     ## 匹配字母
+\w+\s*=\s*    ## 匹配变量赋值
+function\s+(\w+)  ## 匹配函数定义
+```
+
+#### 搜索技巧
+
+| 技巧 | 说明 | 示例 |
+|------|------|------|
+| **排除文件夹** | 在搜索框中添加排除规则 | `!node_modules` |
+| **指定文件类型** | 只搜索特定类型文件 | `*.py` 只搜索Python文件 |
+| **使用占位符** | 替换时引用正则分组 | 用 `$1` `$2` 引用正则分组 |
+
+### 调试功能
+
+| 操作类型 | 功能 | 快捷键/操作方式 |
+|----------|------|----------------|
+| **断点操作** | 设置/取消断点 | 点击行号左侧或 `F9` |
+| | 条件断点 | 右键行号 > `添加条件断点` |
+| | 日志断点 | 右键行号 > `添加记录点` |
+| | 禁用断点 | 右键断点 > `禁用断点` |
+| **调试控制** | 开始调试 | `F5` |
+| | 开始执行（不附加调试器） | `Ctrl + F5` |
+| | 停止调试 | `Shift + F5` |
+| | 重启调试 | `Ctrl + Shift + F5` |
+| | 继续执行 | `F5` |
+| | 单步跳过 | `F10` |
+| | 单步跳入 | `F11` |
+| | 单步跳出 | `Shift + F11` |
+| **调试面板** | 变量 | 查看当前作用域的变量值 |
+| | 监视 | 添加表达式进行实时监控 |
+| | 调用堆栈 | 查看函数调用链 |
+| | 断点 | 管理所有断点 |
+
+#### 调试控制台
+
+调试暂停时，可以在控制台中执行以下操作：
+
+| 操作 | 说明 | 示例 |
+|------|------|------|
+| **查看变量值** | 直接输入变量名 | `my_variable` |
+| **执行表达式** | 运行计算表达式 | `len(my_list)` |
+| **修改变量** | 动态修改变量值 | `my_var = new_value` |
+| **调用函数** | 执行函数调用 | `my_function()` |
+
+### 多光标编辑
+
+多光标功能大幅提升编辑效率。
+
+| 操作类型 | 功能 | 快捷键 |
+|----------|------|--------|
+| **创建多光标** | 按住Alt点击 | 在任意位置添加光标 |
+| | 在选中区域每行末尾添加光标 | `Alt + Shift + I` |
+| | 在选中区域每行开头添加光标 | `Alt + Shift + I , Home` |
+| | 选择下一个相同单词 | `Ctrl + D` |
+| | 选择所有相同单词 | `Ctrl + Shift + L` |
+| **列选择模式** | 矩形选择 | `Shift + Alt + 鼠标拖拽` |
+| | 向下/上扩展列选择 | `Ctrl + Shift + Alt + ↓/↑` |
+| | 向左/右扩展列选择 | `Ctrl + Shift + Alt + ←/→` |
+| **多光标技巧** | 撤销最后一个光标 | `Ctrl + U` |
+| | 跳过当前选择 | `Ctrl + K, Ctrl + D` |
+| | 选择所有匹配项 | `Ctrl + Shift + L` |
+
+#### 实用场景
+```python
+## 同时修改多个变量名
+old_name = 1
+old_name = 2  ## Ctrl+D选择所有old_name，直接输入new_name
+old_name = 3
+```
+
+### 代码格式化
+
+| 操作类型 | 功能 | 快捷键 |
+|----------|------|--------|
+| **注释操作** | 切换行注释 | `Ctrl + /` |
+| | 切换块注释 | `Shift + Alt + A` |
+| | 批量注释选中行 | 选中多行后 `Ctrl + /` |
+| **缩进操作** | 增加缩进 | `Tab` 或 `Ctrl + ]` |
+| | 减少缩进 | `Shift + Tab` 或 `Ctrl + [` |
+| | 自动调整缩进 | `Ctrl + Shift + I` |
+| **代码格式化** | 格式化整个文档 | `Shift + Alt + F` |
+| | 格式化选中代码 | `Ctrl + K, Ctrl + F` |
+| | 保存时自动格式化 | 设置中启用 `Format On Save` |
+| **代码折叠** | 折叠当前块 | `Ctrl + Shift + [` |
+| | 展开当前块 | `Ctrl + Shift + ]` |
+| | 折叠所有 | `Ctrl + K, Ctrl + 0` |
+| | 展开所有 | `Ctrl + K, Ctrl + J` |
+
+### 禅模式
+
+禅模式提供无干扰的编程环境，适合专注编码。
+
+| 操作类型 | 功能 | 操作方式 |
+|----------|------|----------|
+| **进入禅模式** | 快捷键 | `Ctrl + K, Z` |
+| | 菜单 | `查看 > 外观 > 禅模式` |
+| **退出禅模式** | 按键 | 按两次 `Esc` 键 |
+| | 快捷键 | 再次按 `Ctrl + K, Z` |
+
+#### 禅模式特点
+
+| 特点 | 说明 |
+|------|------|
+| **隐藏UI元素** | 隐藏所有UI元素（侧边栏、状态栏、面板） |
+| **全屏显示** | 全屏显示代码编辑器 |
+| **居中布局** | 居中显示代码内容 |
+| **可自定义** | 可自定义禅模式设置 |
+
+#### 禅模式设置
+
+在设置中搜索 `zen` 可以配置：
+
+| 设置项 | 功能 |
+|--------|------|
+| `zenMode.centerLayout` | 是否居中布局 |
+| `zenMode.fullScreen` | 是否全屏显示 |
+| `zenMode.hideLineNumbers` | 是否隐藏行号 |
+| `zenMode.hideTabs` | 是否隐藏标签页 |
+
+### 其他实用功能
+
+| 操作类型 | 功能 | 快捷键/操作方式 |
+|----------|------|----------------|
+| **快速操作** | 复制行 | `Shift + Alt + ↓/↑` |
+| | 移动行 | `Alt + ↓/↑` |
+| | 删除行 | `Ctrl + Shift + K` |
+| | 在上方插入行 | `Ctrl + Shift + Enter` |
+| | 在下方插入行 | `Ctrl + Enter` |
+| **选择操作** | 选择整行 | `Ctrl + L` |
+| | 扩展选择 | `Shift + Alt + →` |
+| | 收缩选择 | `Shift + Alt + ←` |
+| | 选择到行尾 | `Shift + End` |
+| | 选择到行首 | `Shift + Home` |
+| **面板管理** | 切换侧边栏 | `Ctrl + B` |
+| | 切换面板 | `Ctrl + J` |
+| | 切换终端 | `Ctrl + ~` |
+| | 切换输出面板 | `Ctrl + Shift + U` |
+| **文件浏览器** | 新建文件 | 点击文件夹右侧的 `+` 图标 |
+| | 新建文件夹 | `Ctrl + Shift + 新建文件夹` |
+| | 重命名 | `F2` 或右键选择重命名 |
+| | 删除 | `Delete` 键或右键删除 |
+
+### 小贴士
+
+| 功能 | 说明 | 操作方式 |
+|------|------|----------|
+| **自定义快捷键** | 修改或添加快捷键 | `文件 > 首选项 > 键盘快捷方式` |
+| **设置同步** | 同步设置、扩展、快捷键 | 登录账户后自动同步 |
+| **工作区推荐扩展** | 为项目配置推荐扩展 | 在 `.vscode/extensions.json` 中配置 |
+| **代码片段** | 创建自定义代码片段 | `Ctrl + Shift + P` 搜索 `snippet` |
+| **颜色主题** | 快速切换主题 | `Ctrl + K, Ctrl + T` |
+| **字体大小** | 调整字体大小 | `Ctrl + +/-` 临时调整，`settings.json` 中修改 `editor.fontSize` 永久设置 |
+
+### 终端补全
+
+终端中出现自动补全提示时，可以通过以下方式接受补全：右箭头键 (→) 或 Tab键  
+
+### 个性化设置
+
+| 设置项 | 说明 | 操作方式 |
+|--------|------|----------|
+| **主题颜色** | 选择喜欢的主题颜色 | 设置中点击主题颜色，推荐 `深色+` |
+| **保存时自动格式化** | 保存文件时自动格式化代码 | 设置中搜索 `format on save`，勾选即可 |
+
+
+### 运行代码
+
+测试：在 Vscode 中新建一个 xxx.py 文件，输入以下内容：
+
+```python
+print("hello world")
+```
+
+| 运行方式 | 操作方法 | 说明 |
+|----------|----------|------|
+| **方式1** | 点击右上角的三角形运行按钮 | GUI界面运行 |
+| **方式2** | 在终端输入 `python xxx.py` | 直接运行 |
+| **方式3** | 在终端输入 `python -m xxx.py` | 把模块当作脚本来启动 |
+
+可以看到输出结果为 `hello world`。
+
+#### 两种运行方式的区别
+
+| 运行方式 | 说明 | `__name__` 的值 |
+|----------|------|----------------|
+| `python xxx.py` | 直接运行 | `'__main__'` |
+| `python -m xxx.py` | 把模块当作脚本来启动 | `'__main__'` |
+
+
+### 代码调式
+
+#### 断点设置
+
+在IDE中点击行号左侧设置断点，程序执行到断点时会暂停，允许检查变量状态和程序流程。
+
+#### 调试控制命令
+
+| 命令 | 功能 | 使用场景 |
+|------|------|----------|
+| **Continue (F5)** | 继续执行到下一个断点或程序结束 | 跳过已检查的代码段 |
+| **Step Over (F10)** | 逐行执行，函数调用作为一步 | 关注主流程，不深入函数内部 |
+| **Step Into (F11)** | 逐行执行，进入函数内部 | 需要调试函数内部逻辑 |
+| **Step Out (Shift+F11)** | 执行完当前函数并返回调用处 | 快速退出函数调试 |
+
+
+#### 调试流程演示
+
+```python title="数据处理与单例模式调试示例"
+class DataProcessor:
+    _instance = None
+    _initialized = False
+    
+    def __new__(cls):  # 断点1: 观察单例创建
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+    
+    def __init__(self):
+        if not DataProcessor._initialized:
+            self.data = []  # 断点2: 确保初始化只执行一次
+            DataProcessor._initialized = True
+            print("DataProcessor initialized")
+    
+    def process_data(self, items):
+        """处理数据列表"""
+        results = []
+        for item in items:  # 断点3: 循环调试起点
+            processed = self._transform_item(item)
+            results.append(processed)
+            self._log_progress(len(results))  # 断点4: 观察进度
+        return results
+    
+    def _transform_item(self, item):
+        """转换单个数据项"""
+        return item * 2 + 1
+        
+    def _log_progress(self, count):  # 断点5: 内部方法调试
+        print(f"Processed {count} items")
+
+def main():
+    processor1 = DataProcessor()  # 断点6: 第一次实例化
+    processor2 = DataProcessor()  # 断点7: 验证单例模式
+    
+    print(f"Same instance: {processor1 is processor2}")
+    
+    test_data = [1, 2, 3, 4, 5]
+    result = processor1.process_data(test_data)
+    print(f"Results: {result}")
+
+if __name__ == "__main__":
+    main()
+```
+
+
+**在断点1处开始调试：**
+
+1. **Step Into (F11)**: 进入`__new__`方法内部，观察单例模式的实现逻辑
+2. **Step Over (F10)**: 在断点6处，将`DataProcessor()`作为一步执行，直接看到实例创建结果
+3. **Continue (F5)**: 从断点6直接跳转到断点7，验证单例模式
+4. **Step Into → Step Out**: 在断点3进入循环，然后在断点4使用Step Out快速完成`_log_progress`方法
+
+#### 条件断点设置
+
+条件断点只在满足特定条件时才会暂停程序执行，极大提高调试效率。
+
+- 右键点击断点（红色圆点）
+- 选择"Edit Breakpoint" 或 "Add Conditional Breakpoint"
+- 输入条件表达式（如 `item > 3` 或 `len(results) == 2`）
+
+
+```python title="条件断点应用场景" 
+def process_large_dataset(data):
+    results = []
+    error_count = 0
+    
+    for i, item in enumerate(data):
+        try:
+            # 条件断点1: i >= 100 (只在处理第100项后暂停)
+            processed = complex_calculation(item)
+            results.append(processed)
+            
+        except ValueError as e:
+            error_count += 1
+            # 条件断点2: error_count > 5 (错误超过5次时暂停)
+            log_error(f"Error processing item {i}: {e}")
+            
+        # 条件断点3: item['priority'] == 'high' (只调试高优先级项)
+        if item.get('priority') == 'high':
+            special_handling(item)
+    
+    return results
+
+def analyze_performance(metrics):
+    # 条件断点4: metrics['response_time'] > 1000 (响应时间过长时暂停)
+    if metrics['response_time'] > threshold:
+        optimize_query()
+```
+
+**常用条件表达式：**
+
+| 场景 | 条件表达式 | 说明 |
+|------|------------|------|
+| 循环特定位置 | `i == 50` | 在第50次迭代时暂停 |
+| 变量达到阈值 | `count > 100` | 计数器超过100时暂停 |
+| 字符串匹配 | `name == "admin"` | 特定用户名时暂停 |
+| 列表长度 | `len(items) >= 10` | 列表达到指定长度时暂停 |
+| 对象属性 | `user.role == "admin"` | 特定角色时暂停 |
+| 复合条件 | `age > 18 and status == "active"` | 多条件组合 |
+
+
+## 推荐阅读
+- [Python3官方文档](https://docs.python.org/zh-cn/3/library/index.html)
+- [流畅的Python](https://weread.qq.com/web/reader/b64322b0813ab8ee3g018675/)
+- [码农高天 不基础的python基础](https://space.bilibili.com/245645656/lists/346060?type=season)

@@ -1,0 +1,901 @@
+---
+sidebar_position: 5
+title: 控制流
+---
+:::info
+代码布局不仅影响可读性，更体现了对代码质量的态度。一致的缩进、适当的空行、合理的行长度，这些细节共同构成了优雅的 Python 代码。
+
+- 使用 4 个空格进行缩进
+- 每行不超过 79 个字符  
+- 用空行分隔顶级函数和类定义
+
+[PEP 8 – Python 代码风格指南](https://peps.python.org/pep-0008/)
+:::
+## 条件判断
+
+条件判断是编程中非常基础且重要的概念，它允许我们根据不同的条件执行不同的代码块。
+
+### if, elif, else
+
+```python showLineNumbers
+if condition:
+    # 当条件为真时执行的代码块
+elif condition:
+    # 当条件为假时执行的代码块
+else:
+    # 当条件都不满足时执行的代码块
+
+a = 62
+print("exam score check:")
+if a >= 60:
+    print("student pass")
+elif a == 0:
+    print("student 0: not pass")
+else:
+    print("student not pass")
+```
+
+一个例子
+
+```python showLineNumbers
+year = 1900
+if year % 400 == 0:
+    print("This is a leap year!")
+# 两个条件都满足才执行
+elif year % 4 == 0 and year % 100 != 0:
+    print("This is a leap year!")
+else:
+    print("This is not a leap year.")
+# This is not a leap year.
+
+my_list = [1, 2]
+# 判断一个列表是否为空。
+if len(my_list) > 0:
+    print("the first element is: ", my_list[0])
+else:
+    print("no element.")
+
+```
+:::info
+三元表达式是一种简洁的条件赋值方式，相当于简化版的 if-else 语句。一行语句实现一个条件赋值。非常 Pythonic。
+
+```python showLineNumbers
+expression1 if condition else expression2
+```
+其中 `expression1` 和 `expression2` 可以是任意表达式，`condition` 是任意条件表达式。
+
+当 `condition` 为 True 时，返回 `expression1`，否则返回 `expression2`。
+
+```python showLineNumbers
+# 下面通过括号（可省）将同个表达式的部分标注了出来，更加可读。
+x = -1
+y = ("A") if (x > 0) else ("B")
+print(y) # B
+y = (x + 1) if (x > 0) else (x - 1)
+print(y) # -2
+
+# 示例：将负数转为0，正数保持不变
+numbers = [-3, -1, 0, 2, 5]
+processed = [x if x >= 0 else 0 for x in numbers]
+print(processed)  # [0, 0, 0, 2, 5]
+
+# 根据条件设置不同的值
+scores = [85, 92, 78, 96, 73]
+grades = ['A' if score >= 90 else 'B' if score >= 80 else 'C' for score in scores]
+print(grades)  # ['B', 'A', 'C', 'A', 'C']
+```
+:::
+
+### pass 语句
+
+`pass` 是一个空操作语句，它什么都不做。当语法上需要一个语句（判断、循环、函数、类等语句中），但程序不需要任何操作时，可以使用 `pass`。
+
+完全是为了满足 Python 的语法要求，在开发时临时填充代码结构，或者在某些控制流中明确表示"不执行任何操作"。
+
+```python showLineNumbers
+# 条件语句中的占位符
+if 0 == 0:
+    pass  # 暂时不处理这种情况
+
+# 用作函数占位符
+def my_function():
+    pass  # 稍后实现
+```
+
+### assert 语句
+
+`assert` 语句用于调试时的断言检查。后面可以跟一个条件表达式和一个可选的错误信息。
+
+它会测试条件表达式，如果条件为 `False`，则抛出 `AssertionError` 异常，并显示可选的错误信息。
+
+```python showLineNumbers
+x = 1
+y = 0
+assert y != 0, "0 不能作为分母"
+print(x / y)
+'''
+输出：
+AssertionError: 0 不能作为分母
+'''
+```
+
+### match, case 语句
+
+:::info
+
+即便你从未学习过 match, case 语句，你也可以轻松的看懂 match, case 语句的用法。它是最具有可读性的条件判断语句。
+
+[PEP 636 – 结构匹配：教程](https://peps.python.org/pep-0636/)
+[PEP 635 - 结构匹配：动机和基本原理](https://peps.python.org/pep-0635/)
+[PEP 634 – 结构匹配：规范](https://peps.python.org/pep-0634/)
+:::
+
+如果需要对一个表达式进行多个条件的判断，可以使用 match, case 语句。
+
+match case 匹配语法更简洁、匹配时自动绑定变量、支持模式组合、支持通配符。尤其对 JSON 数据结构解析非常友好。
+
+当其满足多个条件时，会从上到下依次判断，直到匹配到第一个条件为止。
+
+#### 字面量、值、通配符模式
+
+最基本的模式匹配，直接匹配具体的值。
+
+```python showLineNumbers
+# 定义一个类，用于匹配具体的值
+# 任何带点的名称（即属性访问）应被解释为值模式
+class HTTPError:
+    # 值相等即可，所以300和300.0是可以匹配成功的。
+    E300 = 300.0
+
+# 在这个例子中，`match` 语句将 `status` 与每个模式进行比较，直到找到一个匹配的模式。
+def http_error(status):
+    match status:
+        # 代码形式上从 `if status == 400:` 变成了 `case 400:` ，更加简洁。
+        case 400:
+            return "Bad request"
+        case 404:
+            return "Not found"
+        # 任何带点的名称（即属性访问）应被解释为值模式（
+        # 如果我写case a:，那么a会被解释为捕获模式，而不是值模式
+        # 同时传入的是一个变量status，总是能与a匹配，那么这又是一个无法辩驳的表达式
+        case HTTPError.E300:
+            return "Redirection"
+        case _:
+            return "Something's wrong with the internet"
+
+
+for code in [400, 404, 300,  900]:
+    print(code, http_error(code))
+'''
+输出：
+400 Bad request
+404 Not found
+300 Redirection
+Something's wrong with the internet
+'''
+# 这里会报错，因为 _ 不绑定任何变量
+print(_) # NameError: name '_' is not defined
+```
+
+这种写成 _（称为通配符）的特殊模式总是匹配，但它<Highlight>不绑定任何变量</Highlight>。
+
+总是能成功匹配的表达式，我们称其为<Highlight>无可辩驳的</Highlight>。
+
+因此，只有将<Highlight>无可辩驳的表达式单独作为最后一个模式才有意义（为了防止错误，Python 会阻止您之前使用它）。</Highlight>
+
+如果把它放在其他 case 之前，那么后面的 case 块就永远没有机会被执行到，这会使得代码逻辑变得无效或产生问题。
+
+:::tip
+
+捕获多个元素可以使用`*变量名`，`*变量名`属于常见的捕获不定长的数据的写法。
+
+`*_` 在这里表示匹配多个任意元素并不绑定任何变量，所以这里改为`*anything`也是可以的。
+
+```python showLineNumbers
+def is_closed(sequence):
+    match sequence:
+        case [_]:               # any sequence with a single element
+            return True
+        # *_ 表示匹配多个元素，但不绑定任何变量
+        case [start, *_, end]:  # a sequence with at least two elements
+            return start == end
+        case _:                 # anything
+            return False
+
+print(is_closed([9]))      # True
+print(is_closed([9,10,9])) #True
+print(is_closed([9,10,10,9])) #True
+print(is_closed([9,10]))   # False
+```
+:::
+
+
+#### 类模式
+
+类模式检查给定的主题是否确实是一个特定类、或类的实例。
+
+- 它首先检查被匹配的对象是否是类 C 的实例（或者是其子类的实例）。
+
+- 如果匹配，它会进一步检查该实例是否拥有名称为 attr1、attr2 等的属性。
+
+- 最后，它会检查这些属性的值是否与模式中的 value1、value2 等字面量或模式匹配。
+
+```python showLineNumbers
+class Custom:
+    def __init__(self,x,y):
+        self.x = x
+        self.y = y
+
+def simplify(expr):
+    match expr:
+        case int():
+            return "int"
+        case str("1"):
+            return "str1"
+        case str():
+            return "str"
+        case Custom(x=0,y=0):
+            return "Custom"
+        # 一个浮点数经过float转换后等于自身
+        case float(expr):
+            return "float"
+
+print(simplify(1)) # int
+print(simplify("1")) # str_str_1
+print(simplify("2")) # str
+print(simplify(Custom(0,0))) # Custom
+print(simplify(10.1)) # float
+```
+
+#### OR 模式 与 组模式
+
+使用 `|` 符号可以匹配多个模式中的任意一个：
+
+```python showLineNumbers
+def simplify(expr):
+    match expr:
+        case 400|404|500:
+            return '网络错误'
+        case ('*'|'/', 0, _):
+            return 0
+        # 组模式允许用户显式指定分组，一个括号就代表一个组，组内元素可以使用 OR 模式
+        case ('+'|'-', x, 0) | ('+', 0, x):
+            return x
+    return expr
+
+print(simplify(400))  # 网络错误
+print(simplify(("*",0,9)))    # 0
+print(simplify(("+",0,9)))    # 9
+```
+
+#### 捕获模式
+
+捕获模式的形式为一个名称，它接受任何值并将其绑定到一个变量。
+
+```python showLineNumbers
+# 传入的是不定长参数元组
+def average(*args):
+    match args:
+        # 这里的 x,y 变量类似于函数的形参
+        case [x, y]:           # captures the two elements of a sequence
+            return (x + y) / 2
+        case [x]:              # captures the only element of a sequence
+            return x
+        case []:
+            return 0
+        case a:                # captures the entire sequence
+            print(a) 
+            return sum(a) / len(a)
+print(average())            # 0
+print(average(1, 2, 3, 4))  # 2.5
+```
+
+#### AS 模式
+
+AS 模式它们允许用户指定一个通用模式，同时将主题捕获到一个变量中。
+
+```python showLineNumbers
+# 为 AS 模式示例定义必要的类
+class UnaryOp:
+    def __init__(self, op, operand):
+        self.op = op
+        self.operand = operand
+    
+    def __repr__(self):
+        return f"UnaryOp({self.op}, {self.operand})"
+
+class Num:
+    def __init__(self, value):
+        self.value = value
+    
+    def __repr__(self):
+        return f"Num({self.value})"
+
+def simplify_expr(tokens):
+    match tokens:
+        case [('('|'[') as l, *expr, (')'|']') as r] if (l+r) in ('()', '[]'):
+            return simplify_expr(expr)
+        case [0, ('+'|'-') as op, right]:
+            return UnaryOp(op, right)
+        case [
+            (int() | float() as left) | Num(left), 
+            '+',
+            (int() | float() as right) |Num(right)
+            ]:
+            return Num(left + right)
+        case [(int() | float()) as value]:
+            return Num(value)
+
+print(simplify_expr(['(', 5, ')']))           # Num(5)
+print(simplify_expr([0, '+', 10]))            # UnaryOp(+, 10)
+print(simplify_expr([3, '+', 7]))             # Num(10)
+print(simplify_expr([5]))                     # Num(5)
+```
+
+#### 序列模式
+
+匹配列表、元组等序列类型，并可以解构赋值：
+
+```python showLineNumbers
+def sort(seq):  # 定义排序函数，参数为要排序的序列
+    match seq:      # 使用match语句对序列进行模式匹配
+        # 你可以使用 | （“ or ”）在一个模式中组合几个字面值或模式
+        # 匹配空列表或单元素列表的情况(注意：同个 | 语句中，绑定变量或不绑定变量要一致)
+        case [] | [_]:              
+        # 这里 _ 不绑定任何变量，因此可以匹配空列表或单元素列表
+        # 如果这里写成 [] | [x]，则会报错，因为 | 之前不绑定变量，所有后面的语句也不能绑定变量
+            return seq              # 空列表和单元素列表已经有序，直接返回
+        # 同样下面的2种写法也是不允许的，因为前者绑定了变量为x，后者不能绑定变量为非x（不论是否处于相同位置）
+        # case [0,x] | [0,y]: # 报错
+        # case [0,x] | [y,0]: # 报错
+        # 合法，因为前者后者都绑定同一个变量
+        # case [0,x] | [x,0]: 
+        #     pass
+        # 使用 if 表达式 结合 case ，匹配两个元素且已经升序排列的情况
+        case [x, y] if x <= y:      
+            return seq              # 已经有序，直接返回原序列
+        # 匹配两个元素但非升序的情况（因为前者已经匹配了升序的情况）
+        case [x, y]:                
+            return [y, x]           # 交换两个元素的位置并返回
+        # 使用 if 表达式 结合 case ，匹配三个元素且已经升序排列的情况
+        case [x, y, z] if x <= y <= z:  
+            return seq                  # 已经有序，直接返回原序列
+        # 使用 if 表达式 结合 case ，匹配三个元素且完全降序排列的情况
+        case [x, y, z] if x >= y >= z:  
+            return [z, y, x]            # 完全反转序列并返回
+        # 匹配包含多个元素的序列，p为第一个元素，rest为剩余元素
+        case [p, *rest]:                
+            a = sort([x for x in rest if x <= p])  # 递归排序小于等于pivot(p)的元素
+            b = sort([x for x in rest if p < x])   # 递归排序大于pivot(p)的元素
+            return a + [p] + b                     # 合并结果：小于等于p的元素 + p + 大于p的元素
+
+
+print(sort([])) 
+print(sort([3, 2]))      
+print(sort([10, 2, 3])) 
+
+"""
+[]
+[2, 3]
+[2, 3, 10]
+"""
+```
+
+#### 映射模式
+
+匹配字典类型，非常适合处理 JSON 数据：
+
+```python showLineNumbers
+def change_red_to_blue(json_obj):
+    match json_obj:
+        case { 'color': ('red' | '#FF0000') }:
+            json_obj['color'] = 'blue'
+        case { 'children': children }:
+            for child in children:
+                change_red_to_blue(child)
+    return json_obj
+ 
+print(change_red_to_blue({'color': 'red'})) # {'color': 'blue'}
+print(change_red_to_blue({'color': '#FF0000'})) # {'color': 'blue'}
+print(change_red_to_blue({'children': [{'color': 'red'}, {'color': '#FF0000'}]})) # {'children': [{'color': 'blue'}, {'color': 'blue'}]}
+```
+
+#### 守卫条件 (Guard)
+
+守卫通过任意表达式（这些表达式可能有副作用）以高度可控的方式增强 case 块。将整体功能分为静态结构和动态评估部分不仅有助于提高可读性，还可以为编译器优化引入巨大的潜力。
+
+为了保持这种清晰的分离，守卫仅在 case 子句级别得到支持，而不是针对单个模式。
+
+```python showLineNumbers
+def sort(seq):
+    match seq:
+        case [] | [_]:
+            return seq
+        case [x, y] if x <= y:
+            return seq
+        case [x, y]:
+            return [y, x]
+        case [x, y, z] if x <= y <= z:
+            return seq
+        case [x, y, z] if x >= y >= z:
+            return [z, y, x]
+        case [p, *rest]:
+            a = sort([x for x in rest if x <= p])
+            b = sort([x for x in rest if p < x])
+            return a + [p] + b
+```
+
+
+
+## 循环
+
+循环是编程中另一个重要的概念，它允许我们重复执行一段代码。
+
+
+### for 循环
+
+```python showLineNumbers
+# for 循环
+total = 0
+for i in range(100000):
+    total += i
+print(total)  # 4999950000
+```
+
+### while 循环
+
+```python showLineNumbers
+while <condition>:
+     <statesments>
+```
+
+Python 会循环执行**statesments**，直到**condition**不满足为止。
+
+```python showLineNumbers
+i = 0
+total = 0
+while i <= 100:
+    total += i
+    i += 1
+print(total)  # 5050
+```
+
+举个例子，通过 while 遍历集合：
+
+```python showLineNumbers
+# 空容器会被当成False，因此可以用while循环读取容器的所有元素
+plays = set(['Hamlet', 'Mac', 'King'])
+while plays:
+    play = plays.pop()
+    print('Perform', play)
+```
+
+### continue 语句
+
+遇到 continue 的时候，程序会返回到循环的最开始重新执行。
+
+```python showLineNumbers
+values = [7, 6, 4, 7, 19, 2, 1]
+for i in values:
+    if i % 2 != 0:
+        # 忽略奇数
+        continue
+    print(i)
+# 6
+# 4
+# 2
+```
+
+### break 语句
+
+遇到 break 的时候，程序会跳出循环，不管循环条件是不是满足
+
+```python showLineNumbers
+command_list = ['start',
+                '1',
+                '2',
+                '3',
+                '4',
+                'stop',
+                'restart',
+                '5',
+                '6']
+while command_list:
+    command = command_list.pop(0)
+    if command == 'stop':
+        break
+    print(command)
+# start
+# 1
+# 2
+# 3
+# 4
+
+```
+
+
+## 异常处理
+
+### try & except &finally
+
+`try`不能单独执行，可以分为以下几种情况：
+
+- `try`  + 大于等于1个`except` 
+- `try`  + 大于等于1个`except`  + `finally` 
+- `try`  + `finally` 
+:::tip
+在 标准 的 `try...except` 结构中，通常只会触发一个 `except` 块。
+
+一个`except`可以捕捉多个异常类型(写为元组格式，Python3.14版本之前需使用括号)。
+
+捕获到的异常可以被`as`别名捕获，便于使用（例如记录到日志等）。
+:::
+
+```python showLineNumbers
+for input_str in ['文字','0','1']:
+    try:
+        # 转换为数字并进行除法运算
+        num1 = num2 = float(input_str)
+        print(f"{num1} ÷ {num2} = {num1 / num2}")
+    except (ValueError,KeyboardInterrupt) as e:
+        print("没有输入有效的数字或程序被中断！",e)
+    except ZeroDivisionError:
+        print("除数不能为0！")
+
+"""
+没有输入有效的数字或程序被中断！ could not convert string to float: '文字'
+除数不能为0！
+1.0 ÷ 1.0 = 1.0
+"""
+```
+
+不管 `try` 块有没有异常， `finally` 块的内容总是会被执行，而且会在抛出异常前执行，因此可以用来作为安全保证，比如文件操作时，常在 `finally` 关闭文件。
+
+有时候你希望不捕获异常，让异常正常向上传播，但确保清理代码一定执行。可以结合 `try` 和 `finally` 来实现。
+
+```python showLineNumbers
+def process_file(filename):
+    f = open(filename, 'r')
+    try:
+        # 不管这里出现什么异常，都要关闭文件
+        data = f.read()
+        result = complex_processing(data)  # 可能抛出各种异常
+        return result
+    finally:
+        f.close()  # 确保文件被关闭
+        print("文件已关闭")
+    # 如果出现异常，会在finally执行后继续向上抛出
+```
+
+:::warning
+
+frame对except的影响
+
+以下代码在 Python3.14.0rc0 中依然存在。
+
+```python showLineNumbers
+e = 1
+try:
+    0/0 # 此处会抛出错误，因为0不能被0除
+except Exception as e:
+    # 此处会对覆盖e，并删除e
+    print(f'error info :{e}！')
+print(e)
+'''
+输出：
+error info :division by zero！
+Traceback (most recent call last):
+  File "c:\Users\jiang\Desktop\todo\1.py", line 7, in <module>
+    print(e)
+          ^
+NameError: name 'e' is not defined
+'''
+```
+
+下面的代码更有可能在生产环境中出现，原理相同，报错信息同样为：`NameError: name 'e' is not defined`
+
+```python showLineNumbers
+try:
+    e = eval(input("please input 0/0:"))
+except Exception as e:
+    pass
+finally:
+    print(e)
+```
+:::
+
+:::info
+由于 `finally` 的特性，目前3.14版本中`finally`块中`return`、`break`、`continue`语句都算语法错误。
+
+下面是一些危险的例子。
+
+```python showLineNumbers
+# 返回值被意外覆盖
+# 无论计算成功还是失败，最终都会返回-1
+def calculate_score(user_id):
+    try:
+        score = expensive_calculation(user_id)
+        return score  # 比如返回95分
+    except Exception as e:
+        logger.error(f"计算用户{user_id}分数时出错: {e}")
+        return 0  # 出错时返回0分
+    finally:
+        return -1  # 🚨 危险！总是返回-1，覆盖前面的返回值
+
+# 异常被意外吞噬
+# 这个示例中，内存错误没有被抛出，而是被吞噬了！
+def dangerous_file_operation():
+    try:
+        # 模拟一些可能出错的操作
+        raise ValueError("数据处理错误")
+    except ValueError as e:
+        print(f"数据处理错误: {e}")
+        # 想要将异常写入数据库，但是数据库报内存错误
+        raise MemoryError("内存错误")
+    finally:
+        print("finally")
+        return "default_value" 
+dangerous_file_operation()
+```
+:::
+
+
+### except* 与 ExceptionGroup
+
+当需要引发多个不相关的异常时，<Highlight>`ExceptionGroup`</Highlight>被使用。（后续表述中**异常组**与`ExceptionGroup`等价）
+
+`ExceptionGroup`是异常层次结构的一部分，是`Exception`异常的子类，因此可以像所有其他异常一样使用 `except` 进行处理。
+
+```python showLineNumbers
+try:
+    raise ExceptionGroup("test", [ValueError("test1"),ZeroDivisionError("test2")])
+except ExceptionGroup :
+    print('ExceptionGroup') # 处理ValueError异常
+"""
+ExceptionGroup
+"""
+```
+
+此外，它们被 `except*` 识别，该识别器根据所包含异常的类型匹配它们的子组。
+
+:::tip
+`except*` 和 `except` 不能同时使用。
+
+使用`except*`时，每个被`except*`捕获的1个或多个异常都会被抛出为一个新的异常组(包含被捕获的一个或多个异常)。剩下的异常作为一个异常组继续与`except*`匹配。
+
+直到匹配结束如果还有异常，则这些剩下异常会继续被抛出为一个`ExceptionGroup`。
+:::
+
+```python showLineNumbers
+try:
+    raise ExceptionGroup("test", [ValueError("test1"),ZeroDivisionError("test2"),MemoryError("test3"),SyntaxError("test4")])
+except* ValueError as e:
+    # 这里的 e 是一个新的 ExceptionGroup
+    print('ValueError:',e) # 处理ValueError异常
+except* ZeroDivisionError as e:
+    # 这里的 e 是一个新的 ExceptionGroup
+    print('ZeroDivisionError:', e)
+except* Exception as e:
+    print('Exception:',e) # 处理Exception异常
+"""
+ValueError: test (1 sub-exception)
+ZeroDivisionError: test (1 sub-exception)
+Exception: test (2 sub-exceptions)
+"""
+```
+
+捕获到异常组之后，可以对异常组做进一步拆分处理。以是所有`ExceptionGroup`的属性和方法。
+
+```python showLineNumbers
+try:
+    raise ExceptionGroup("test", [ValueError("test1"),ZeroDivisionError("test2"),MemoryError("test3"),SyntaxError("test4")])
+except* ValueError as e:
+    # 异常组.message 是该异常组的描述，即"test"
+    print(e.message) # test
+    # 异常组.exceptions 是该异常组的子异常元组
+    for exc in e.exceptions:
+        print(exc) # test1
+except* ZeroDivisionError as e:
+    # 异常组.subgroup(condition)返回一个仅包含当前组中与 condition 匹配的异常的异常组，如果结果为空，则返回 None 。
+    print(e.subgroup(EncodingWarning)) # None
+    print(e.subgroup(ZeroDivisionError)) # test (1 sub-exception)
+except* Exception as e:
+    # 异常组.split(condition)类似于 subgroup() ，但返回 (match, rest) 对，其中 match 是匹配部分， rest 是剩余的非匹配部分。
+    print(e.split(MemoryError)) 
+    # (ExceptionGroup('test', [MemoryError('test3')]), ExceptionGroup('test', [SyntaxError('test4')]))
+
+    """
+    异常组.derive(excs)返回一个与异常组具有相同 message 的异常组，但将异常包装在 excs 中。
+    此方法一般不直接调用，而是由之前的 subgroup() 和 split() 使用
+
+    new_error_Group = e.derive([EncodingWarning("test5"),SyntaxError("test6")])
+    几乎等价于，
+    new_error_Group = ExceptionGroup(e.message, [EncodingWarning("test5"),SyntaxError("test6")])
+    """
+
+"""
+test
+test1
+None
+test (1 sub-exception)
+(ExceptionGroup('test', [MemoryError('test3')]), ExceptionGroup('test', [SyntaxError('test4')]))
+"""
+```
+
+### raise 语句
+
+`raise` 语句用于主动抛出异常。它可以抛出内置异常或自定义异常，让程序的错误处理更加精确和可控。
+
+:::tip
+raise 语句的三种基本用法：
+1. `raise` - 重新抛出当前异常
+2. `raise Exception` - 抛出指定类型的异常
+3. `raise Exception("message")` - 抛出带有错误信息的异常
+:::
+
+```python showLineNumbers
+class CustomError(Exception):
+    """自定义异常类"""
+    pass
+
+def login(username, password):
+    if not username:
+        # 使用raise抛出内置异常
+        raise ValueError("用户名不能为空",1001)
+    if not password:
+        # 使用raise抛出自定义异常
+        raise CustomError("密码不能为空", 1002)
+    # 模拟登录逻辑
+    if username != "admin" or password != "123456":
+        raise CustomError("用户名或密码错误", 1003)
+    return "登录成功"
+
+# 使用示例
+try:
+    result = login("admin", "")
+except CustomError as e:
+    # args是异常的参数元组，是用户传入的参数
+    print(f"登录失败: {e.args[0]}, 错误代码: {e.args[1]}")
+except Exception as e:
+    print(f"登录失败: {e.args[0]}, 错误代码: {e.args[1]}")
+    # 登录失败: 用户名不能为空, 错误代码: 1001
+```
+
+
+:::tip
+
+异常链：`from`关键字的独特用法。
+
+```python showLineNumbers
+def parse_config(config_str):
+    try:
+        import json
+        config = json.loads(config_str)
+        return config
+    except json.JSONDecodeError as e:
+        # 可以只写raise，重新抛出当前异常，保持原始的错误信息和堆栈跟踪
+        # raise
+        # 更推荐使用 `from` 关键字：将底层异常包装为更高级的异常链
+        raise ValueError("0011配置文件格式错误") from e
+
+try:
+    parse_config("{invalid json}")
+except ValueError as e:
+    print(f"错误代码: {e}")
+    # 显示原始异常，__cause__专门用于存储异常链中的原始异常
+    print(f"原始报错: {e.__cause__}") 
+"""
+错误代码: 0011配置文件格式错误
+原始报错: Expecting property name enclosed in double quotes: line 1 column 2 (char 1)
+"""
+```
+:::
+
+## 内置函数
+
+以下内置函数大多为操作序列与控制流一起使用。
+
+### any函数、all函数
+
+any函数和all函数用于判断一个序列中的元素是否都为真或有一个为真。通常与if语句一起使用。
+
+any函数签名：`any(iterable) -> bool`
+
+all函数签名：`all(iterable) -> bool`
+
+参数说明：
+- `iterable`：要判断的序列
+
+返回值：
+- any函数返回一个布尔值，如果序列中有一个元素为真，则返回True，否则返回False
+- all函数返回一个布尔值，如果序列中所有元素都为真，则返回True，否则返回False
+
+
+```python showLineNumbers
+a = 10
+b = -5
+c = 0
+print(all([a,b,c])) # False,都为真时为真
+print(any([a,b,c])) # True,有一个为真时为真
+```
+
+### range函数
+
+range函数签名：`range(start, stop, step) -> range`
+
+参数说明：
+- `start`：起始值（可省略，默认为0）
+- `stop`：结束值
+- `step`：步长(可省略，默认为1，可正可负)
+
+返回值：
+- 返回一个range对象
+
+```python showLineNumbers
+for _ in range(10, 20, 2):
+    print(_) 
+# 10
+# 12
+# 14
+
+for _ in range(10,0,-2):
+    print(_) 
+# 8
+# 6
+# 4
+# 2
+# 0
+```
+
+### enumerate函数
+
+enumerate函数用于遍历序列，同时获取序列的序号和值。
+
+enumerate函数签名：`enumerate(iterable, start=0) -> enumerate`
+
+参数说明：
+- `iterable`：要遍历的序列
+- `start`：起始序号（可省略，默认为0）
+
+返回值：
+- 返回一个enumerate对象
+
+```python showLineNumbers
+for i, v in enumerate(['tic', 'tac', 'toe']):
+    print(i, v)
+# 0 tic
+# 1 tac
+# 2 toe
+
+for i, v in enumerate(['tic', 'tac', 'toe'], start=1):
+    print(i, v)
+# 1 tic
+# 2 tac
+# 3 toe
+```
+
+### zip函数
+
+zip函数用于将多个序列的元素一一配对，返回一个zip对象。
+
+zip函数签名：`zip(iterable1, iterable2, ...) -> zip`
+
+参数说明：
+- `iterable1, iterable2, ...`：要配对的序列
+
+返回值：
+- 返回一个zip对象
+
+```python showLineNumbers
+list_a = [1, 2, 3]
+list_b = [4, 5, 6]
+for a, b in zip(list_a, list_b):
+    print(a, b)
+# 1 4
+# 2 5
+# 3 6
+```
+
+## 标准库推荐
+
+- tkinter: Python 标准库内置的 GUI 工具包，用于快速构建桌面图形界面，例如表单、按钮、菜单、对话框等，适合做简单工具或教学演示。

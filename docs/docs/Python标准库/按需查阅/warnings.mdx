@@ -1,0 +1,153 @@
+---
+title: warnings
+---
+
+`warnings` 用于向开发者发出非致命性警告信息，常见于弃用通知、兼容性提醒等场景。
+
+[warnings](https://docs.python.org/3/library/warnings.html)
+
+## 发出警告
+
+```python showLineNumbers
+import warnings
+
+def old_api():
+    warnings.warn("old_api() 已弃用，请使用 new_api()", DeprecationWarning, stacklevel=2)
+    return "old result"
+
+def new_api():
+    return "new result"
+
+result = old_api()
+# <stdin>:1: DeprecationWarning: old_api() 已弃用，请使用 new_api()
+```
+
+:::tip stacklevel 参数
+`stacklevel=2` 让警告指向调用 `old_api()` 的那一行，而非 `warnings.warn()` 所在行。这是库开发中的标准做法。
+:::
+
+## 警告类别
+
+```python showLineNumbers
+import warnings
+
+# 内置警告类别
+warnings.warn("即将弃用", PendingDeprecationWarning)
+warnings.warn("已弃用", DeprecationWarning)
+warnings.warn("运行时问题", RuntimeWarning)
+warnings.warn("用户级别警告", UserWarning)       # 默认类别
+warnings.warn("资源未关闭", ResourceWarning)
+warnings.warn("未来行为变更", FutureWarning)
+
+# 自定义警告类别
+class APIChangedWarning(UserWarning):
+    pass
+
+warnings.warn("API 响应格式已变更", APIChangedWarning)
+```
+
+| 类别 | 说明 | 默认行为 |
+|------|------|----------|
+| `DeprecationWarning` | 面向开发者的弃用通知 | 仅 `__main__` 中显示 |
+| `FutureWarning` | 面向终端用户的弃用通知 | 始终显示 |
+| `PendingDeprecationWarning` | 未来将弃用 | 默认忽略 |
+| `RuntimeWarning` | 运行时可疑行为 | 始终显示 |
+| `UserWarning` | `warn()` 的默认类别 | 始终显示 |
+| `ResourceWarning` | 资源泄漏 | 默认忽略 |
+
+## 控制警告行为
+
+```python showLineNumbers
+import warnings
+
+# 将 DeprecationWarning 转为错误
+warnings.filterwarnings("error", category=DeprecationWarning)
+
+try:
+    warnings.warn("deprecated!", DeprecationWarning)
+except DeprecationWarning as e:
+    print(f"捕获到: {e}")
+
+# 忽略特定模块的警告
+warnings.filterwarnings("ignore", module="noisy_module")
+
+# 只显示一次
+warnings.filterwarnings("once", category=UserWarning)
+
+# 重置所有过滤器
+warnings.resetwarnings()
+```
+
+## 上下文管理器
+
+`catch_warnings` 可以临时修改警告行为，退出时自动恢复。
+
+```python showLineNumbers
+import warnings
+
+# 临时捕获警告
+with warnings.catch_warnings(record=True) as w:
+    warnings.simplefilter("always")
+    warnings.warn("test warning 1", UserWarning)
+    warnings.warn("test warning 2", DeprecationWarning)
+
+    print(f"捕获到 {len(w)} 个警告")
+    for warning in w:
+        print(f"  {warning.category.__name__}: {warning.message}")
+
+# 临时忽略警告
+with warnings.catch_warnings():
+    warnings.simplefilter("ignore")
+    warnings.warn("这不会显示")
+
+print("上下文外恢复原有行为")
+```
+
+## 弃用装饰器
+
+在库开发中，可以用装饰器统一处理函数弃用。
+
+```python showLineNumbers
+import warnings
+import functools
+
+def deprecated(replacement=None):
+    """通用弃用装饰器"""
+    def decorator(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            msg = f"{func.__name__}() 已弃用"
+            if replacement:
+                msg += f"，请使用 {replacement}()"
+            warnings.warn(msg, DeprecationWarning, stacklevel=2)
+            return func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+@deprecated(replacement="load_model_v2")
+def load_model(path):
+    return f"model from {path}"
+
+model = load_model("/tmp/model.pt")
+# DeprecationWarning: load_model() 已弃用，请使用 load_model_v2()
+```
+
+:::info Python 3.13+ 内置 @warnings.deprecated
+从 Python 3.13 开始，标准库提供了 `@warnings.deprecated` 装饰器（源自 PEP 702），可以直接装饰类、函数或重载，同时被静态类型检查器识别。
+:::
+
+## 命令行控制
+
+```bash
+# 将所有警告变为错误（适合 CI）
+python -W error script.py
+
+# 忽略弃用警告
+python -W ignore::DeprecationWarning script.py
+
+# 显示所有警告
+python -W all script.py
+
+# 环境变量方式
+PYTHONWARNINGS=error python script.py
+```

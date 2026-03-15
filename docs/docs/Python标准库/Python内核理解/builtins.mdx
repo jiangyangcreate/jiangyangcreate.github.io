@@ -1,0 +1,86 @@
+---
+title: builtins
+---
+
+`builtins` 是 Python 标准库中**内置名称所在的模块**：`len`、`print`、`open`、`str`、`int` 等所有内置函数、类型与常量都“挂”在这个模块的命名空间里。解释器在执行任意代码时，会把**内置作用域（built-in scope）**作为名字查找的最后一层——因此你写的每一段代码默认都在“能看到 builtins”的命名空间下运行，无需 `import` 即可使用这些名称。  
+之所以单独存在一个可被 `import builtins` 引用的模块，是为了在**需要与内置名同名的对象、同时又必须调用真正内置实现**的场景下，给程序一个稳定入口（例如在模块里定义自己的 `open` 函数，内部仍通过 `builtins.open` 打开文件）。作为实现细节，大多数模块的全局字典里会有一个 `__builtins__` 引用，其值通常是 `builtins` 模块本身或该模块的 `__dict__`；CPython 借此在名字解析时注入内置命名空间，但这是解释器内部行为，替代实现（如 PyPy、Jython）未必提供，因此业务代码应依赖 `import builtins` 而不是直接使用 `__builtins__`。理解 builtins 有助于在覆盖内置名时正确恢复、做内省或元编程。
+
+[builtins](https://docs.python.org/zh-cn/3/library/builtins.html)
+
+## 常见内置分类
+
+按用途可粗分为以下几类。
+
+### 基础类型与转换
+
+`str`、`int`、`float`、`bool` 等既为类型又可做转换函数；`repr` 返回对象的规范字符串表示，便于调试。
+
+### 容器与序列
+
+`list`、`dict`、`set`、`tuple` 为内置容器类型与构造函数；`len` 返回长度；`range` 生成整数序列，常用于循环；`open` 打开文件并返回文件对象。
+
+### 迭代与函数式
+
+`iter`、`next` 实现迭代器协议；`zip`、`map`、`filter` 组合或处理可迭代对象；`sum`、`min`、`max`、`sorted` 为常用聚合与排序。
+
+### 属性与类型检查
+
+`getattr`、`setattr`、`hasattr` 按名字访问或设置属性；`isinstance` 判断类型，常与抽象基类配合。
+
+### 输出
+
+`print` 输出到标准输出，可指定 `sep`、`end`、`file` 等。
+
+```python showLineNumbers
+# 基础类型与转换
+print(repr([1, 2]), str(42), int("3"), float("1.5"))
+
+# 容器与 len、range
+xs = list(range(5))
+d = dict(a=1, b=2)
+print(len(xs), len(d))
+
+# 迭代与函数式
+it = iter([1, 2, 3])
+print(next(it), next(it))
+print(list(zip([1, 2], ["a", "b"])))
+print(list(map(str, [1, 2, 3])))
+print(sum([1, 2, 3]), min([1, 2, 3]), max([1, 2, 3]))
+print(sorted([3, 1, 2]))
+
+# 属性与类型检查
+class C:
+    x = 10
+print(getattr(C, "x"), hasattr(C, "y"))
+setattr(C, "y", 20)
+print(isinstance(1, int), isinstance([], list))
+```
+
+## 访问与内省
+
+通过 `import builtins` 可显式访问内置模块；`dir(builtins)` 列出当前可见的内置名称。若在局部或某模块中覆盖了内置名（如自定义了 `open`），可用 `builtins.open` 恢复或包装真正的内置实现。
+
+```python showLineNumbers
+import builtins
+
+# 内省：查看内置名称
+print("open" in dir(builtins))
+print("len" in dir(builtins))
+
+# 局部覆盖 open 后，用 builtins.open 恢复
+def my_open(*args, **kwargs):
+    print("使用内置 open 打开")
+    return builtins.open(*args, **kwargs)
+
+f = my_open(__file__, "r")
+print(f.readline().strip())
+f.close()
+```
+
+:::tip
+在 CPython 中，模块的全局命名空间里通常有一个 `__builtins__` 键，其值为 `builtins` 模块或其 `__dict__`，解释器在名字解析时通过它注入内置作用域。这是实现细节，不建议在应用代码中依赖；需要内置名称时请使用 `import builtins`。
+:::
+
+:::info
+不要随意覆盖 `builtins` 中的名称；若已覆盖某内置名，需要时用 `builtins.xxx` 恢复或调用真正实现。
+:::

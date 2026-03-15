@@ -1,0 +1,146 @@
+---
+title: doctest
+---
+
+`doctest` 通过执行文档字符串中的交互式示例来验证代码行为，兼顾文档与测试。
+
+[doctest](https://docs.python.org/3/library/doctest.html)
+
+## 基本用法
+
+在函数的 docstring 中编写 `>>>` 开头的交互示例，`doctest` 会自动提取并执行它们。
+
+```python showLineNumbers
+def factorial(n):
+    """返回 n 的阶乘。
+
+    >>> factorial(5)
+    120
+    >>> factorial(0)
+    1
+    >>> factorial(-1)
+    Traceback (most recent call last):
+        ...
+    ValueError: n 必须 >= 0
+    """
+    if n < 0:
+        raise ValueError("n 必须 >= 0")
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+```
+
+没有输出表示所有示例都通过了。加 `-v` 参数可以看到详细结果：
+
+```bash
+python example.py -v
+```
+
+## 测试异常
+
+doctest 支持验证异常，只需在预期输出中包含 `Traceback` 头和异常类型。中间的堆栈信息用 `...` 省略即可。
+
+```python showLineNumbers
+def divide(a, b):
+    """安全除法。
+
+    >>> divide(10, 2)
+    5.0
+    >>> divide(1, 0)
+    Traceback (most recent call last):
+        ...
+    ZeroDivisionError: division by zero
+    """
+    return a / b
+```
+
+## 从文件运行测试
+
+doctest 也可以测试独立文本文件中的交互示例，适合教程文档。
+
+```python showLineNumbers
+import doctest
+
+# 测试文本文件中的交互示例
+results = doctest.testfile("tutorial.txt", verbose=True)
+print(f"通过 {results.attempted - results.failed}/{results.attempted} 个测试")
+```
+
+:::info tutorial.txt 的格式
+文件内容视为一个大的 docstring，只需包含 `>>>` 开头的交互示例：
+
+```
+使用 factorial 函数
+===================
+
+    >>> from example import factorial
+    >>> factorial(6)
+    720
+```
+:::
+
+## 指令控制
+
+通过注释指令可以微调单个示例的匹配行为。
+
+```python showLineNumbers
+def show_set():
+    """集合的输出顺序不确定，用 ELLIPSIS 匹配。
+
+    >>> show_set()  # doctest: +ELLIPSIS
+    {...}
+    """
+    print({1, 2, 3})
+
+def long_output():
+    """长输出可以用 NORMALIZE_WHITESPACE 忽略空白差异。
+
+    >>> long_output()  # doctest: +NORMALIZE_WHITESPACE
+    [0, 1, 2, 3, 4, 5, 6, 7, 8, 9,
+     10, 11, 12, 13, 14, 15, 16, 17, 18, 19]
+    """
+    print(list(range(20)))
+
+def skip_example():
+    """SKIP 可以跳过不需要执行的示例。
+
+    >>> skip_example()  # doctest: +SKIP
+    这个示例不会被执行
+    """
+    pass
+```
+
+## 与 unittest 集成
+
+doctest 可以转换为 `unittest.TestSuite`，方便纳入项目的测试体系。
+
+```python showLineNumbers
+import unittest
+import doctest
+import my_module
+
+# 将模块的 doctest 加入 unittest 测试套件
+def load_tests(loader, tests, ignore):
+    tests.addTests(doctest.DocTestSuite(my_module))
+    tests.addTests(doctest.DocFileSuite("tutorial.txt"))
+    return tests
+```
+
+## 命令行运行
+
+```bash
+# 测试模块中的 doctest
+python -m doctest -v example.py
+
+# 测试文本文件中的 doctest
+python -m doctest -v tutorial.txt
+```
+
+:::tip doctest vs unittest
+doctest 适合简单函数的快速验证和可执行文档；复杂的测试逻辑（mock、fixture、参数化）应该使用 `unittest` 或 `pytest`。两者可以共存。
+:::

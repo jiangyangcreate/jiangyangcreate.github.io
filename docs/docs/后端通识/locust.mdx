@@ -1,0 +1,239 @@
+---
+sidebar_position: 5
+title: locust
+---
+
+Locust 是一款开源的负载/压力测试工具，主要用于 HTTP 及多种协议。通过模拟大量并发用户向目标系统发请求，可在运行过程中实时查看吞吐量（RPS）、响应时间与错误统计，也可将结果导出供后续分析。许多同类工具依赖图形界面或冗长的配置文件来定义场景；Locust 诞生于对这种方式的反思，转而用 Python 代码描述“用户行为”，便于实现条件分支、循环和复杂流程，也便于版本管理与复用。其设计主线是：用继承自 `User` 的类表示一类虚拟用户，用 `@task` 标记的方法表示用户会反复执行的任务，把上述定义写在名为 locustfile 的 Python 模块中；运行时可选择带 Web 界面的交互式启动，或使用 `--headless` 在命令行/CI 中无界面运行。官方文档：[docs.locust.io](https://docs.locust.io/)。
+
+---
+
+## 安装与运行
+
+### 安装
+
+```bash showLineNumbers
+pip install locust
+```
+
+安装后可用 `locust -V` 校验。若需临时使用不写入环境，可用 `uvx locust -V`（需先安装 [uv](https://github.com/astral-sh/uv)）。
+
+### 运行方式
+
+默认从当前目录加载 `locustfile.py`，并启动 Web 界面（默认 `http://0.0.0.0:8089`）：
+
+```bash showLineNumbers
+locust
+```
+
+指定 locustfile、主机等：
+
+```bash showLineNumbers
+locust -f my_locustfile.py -H https://example.com
+```
+
+无 Web 界面、直接指定用户数与孵化速率（适合服务器或 CI）：
+
+```bash showLineNumbers
+locust -f my_locustfile.py --headless --users 10 --spawn-rate 1 -H http://your-server.com
+```
+
+`--users` 为并发用户数，`--spawn-rate` 为每秒启动的用户数。可加 `--run-time 5m` 限制运行时长，时间到后自动退出。
+
+:::tip
+**并发与 RPS**：并发用户数表示“同时存在的虚拟用户”数量；RPS（requests per second）是每秒完成的请求数，取决于用户数、每个任务的请求数和任务执行间隔。响应时间上升而 RPS 不再增长时，通常表示目标服务已接近饱和。
+:::
+
+---
+
+## 编写 locustfile
+
+locustfile 就是一个普通的 Python 模块，可被 Locust 导入并从中发现继承自 `User` 的类。文件名默认为 `locustfile.py`，也可用 `-f` 指定；模块内可正常 `import` 其他文件或包。
+
+要使文件成为有效的 locustfile，**至少需要定义一个继承自 `User` 的类**（常用子类 `HttpUser`）。下例给出最小可运行示例。
+
+---
+
+## User 与 task
+
+### HttpUser 与 client
+
+对 HTTP 服务压测时，一般使用 `HttpUser`。每个虚拟用户会得到一个 `client` 属性，类型为 Locust 的 `HttpSession`（基于 `requests.Session`），用于发请求并自动上报成功/失败、响应时间、响应长度等。`client` 会保持 cookie，可用来模拟登录后的会话。
+
+```python showLineNumbers
+from locust import HttpUser, task
+
+class HelloWorldUser(HttpUser):
+    @task
+    def hello_world(self):
+        self.client.get("/hello")
+        self.client.get("/world")
+```
+
+未设置 `host` 时，可在启动时通过 `-H` 或 Web 界面指定目标主机；也可在类上设置 `host = "https://example.com"`，请求路径即可写相对路径如 `"/hello"`。
+
+### @task 与任务权重
+
+用 `@task` 装饰的方法会被 Locust 当作“任务”：每个用户在一个 greenlet 中循环“选一个任务 → 执行 → 等待 wait_time → 再选任务”。只有带 `@task` 的方法会被选中，其余方法可作为内部辅助函数。
+
+`@task` 可带一个整数权重，表示被选中的相对概率。下例中 `view_items` 被选中的概率约为 `hello_world` 的 3 倍：
+
+```python showLineNumbers
+from locust import HttpUser, task, between
+
+class QuickstartUser(HttpUser):
+    wait_time = between(1, 5)
+
+    @task
+    def hello_world(self):
+        self.client.get("/hello")
+        self.client.get("/world")
+
+    @task(3)
+    def view_items(self):
+        for item_id in range(10):
+            self.client.get(f"/item?id={item_id}", name="/item")
+
+    def on_start(self):
+        self.client.post("/login", json={"username": "foo", "password": "bar"})
+```
+
+### on_start 与 on_stop
+
+`on_start` 会在该用户启动时调用一次，适合登录等准备动作；`on_stop` 在用户停止时调用。上面示例中用 `on_start` 发送登录请求，后续任务即可在“已登录”状态下访问接口。
+
+---
+
+## 等待时间（wait_time）
+
+`wait_time` 控制每个任务执行完后、再选下一个任务前的等待时间。不设置则任务会连续执行，不利于模拟真实用户间隔。
+
+常用内置方式：
+
+- `between(min, max)`：在 min～max 秒之间随机等待。
+- `constant(n)`：固定等待 n 秒。
+- `constant_throughput(t)`：使任务执行速率约等于每秒 t 次（按用户数分摊）。
+- `constant_pacing(t)`：使两次任务间隔约 t 秒（与 constant_throughput 互为倒数关系）。
+
+```python showLineNumbers
+from locust import User, task, between, constant
+
+class MyUser(User):
+    wait_time = between(0.5, 10)
+
+    @task
+    def my_task(self):
+        print("executing my_task")
+```
+
+:::tip
+`wait_time` 作用在**任务**上，不是单次请求。若一个任务里发 2 个请求，且 `wait_time = constant_throughput(2)`，则每个用户每秒约 2 个任务、4 个请求。
+:::
+
+---
+
+## 断言与失败
+
+默认情况下，HTTP 状态码小于 400 记为成功，≥ 400 记为失败。若要按响应体或响应时间再判断成功/失败，可使用 `catch_response=True`，并在 `with` 块内调用 `response.failure("原因")` 或 `response.success()`。
+
+```python showLineNumbers
+from locust import HttpUser, task
+
+class MyUser(HttpUser):
+    @task
+    def check_home(self):
+        with self.client.get("/", catch_response=True) as response:
+            if response.text != "Success":
+                response.failure("Got wrong response")
+            elif response.elapsed.total_seconds() > 0.5:
+                response.failure("Request took too long")
+
+    @task
+    def accept_404_as_ok(self):
+        with self.client.get("/does_not_exist/", catch_response=True) as response:
+            if response.status_code == 404:
+                response.success()
+```
+
+这样会在统计中正确计入成功/失败，并影响报表中的失败率与失败数。
+
+---
+
+## Web UI 与 headless
+
+**Web 界面**：执行 `locust` 不加重载参数时，会启动 Web 界面（默认 8089 端口）。在浏览器中打开后，可填写目标 host、并发用户数、孵化速率并启动测试，实时查看 RPS、响应时间、错误数等图表；也可在运行中动态增减用户数。
+
+**Headless**：在无图形环境的服务器或 CI 中，使用 `--headless` 并传入 `--users`、`--spawn-rate`、`-H` 等，不打开 Web 界面，结果在终端输出。例如：
+
+```bash showLineNumbers
+locust -f locustfile.py --headless --users 100 --spawn-rate 5 --run-time 1m -H https://example.com
+```
+
+通过 `events.quitting` 等钩子可根据失败率、平均响应时间等设置进程退出码，便于在 CI 中判定压测是否通过。
+
+---
+
+## 请求分组与统计
+
+统计按“请求名称”分组。若 URL 带动态参数（如 `/item?id=1`、`/item?id=2`），希望合并为一条统计项，可给请求方法传入 `name` 参数：
+
+```python showLineNumbers
+for item_id in range(10):
+    self.client.get(f"/item?id={item_id}", name="/item")
+```
+
+这样报表中会显示为 `/item` 的聚合数据，而不是 10 条不同 URL。也可使用 `self.client.rename_request("/item")` 作为上下文管理器，对块内多次请求统一命名。
+
+---
+
+## 数据与参数化
+
+locustfile 是普通 Python 模块，可直接用环境变量、命令行参数或读文件等方式做参数化。
+
+**环境变量**：在启动前设置，在 locustfile 中通过 `os.environ` 读取：
+
+```bash showLineNumbers
+MY_HOST=https://staging.example.com locust -f locustfile.py
+```
+
+```python showLineNumbers
+import os
+host = os.environ.get("MY_HOST", "http://localhost")
+```
+
+**自定义命令行参数**：通过 `events.init_command_line_parser` 为 Locust 增加参数，并在 Web 界面中展示（可做成下拉、多选等）。在任务中通过 `self.environment.parsed_options.xxx` 读取：
+
+```python showLineNumbers
+from locust import HttpUser, events, task
+
+@events.init_command_line_parser.add_listener
+def _(parser):
+    parser.add_argument("--env", choices=["dev", "staging", "prod"], default="dev", help="Environment")
+
+class WebsiteUser(HttpUser):
+    @task
+    def my_task(self):
+        env = self.environment.parsed_options.env
+        self.client.get(f"/api?env={env}")
+```
+
+测试数据（如账号列表、ID 池）可在模块加载或 `events.test_start` 时准备，在 User/task 中按需使用；多进程/分布式时可用 `events.init` 在各自进程内初始化。
+
+---
+
+## 事件钩子
+
+若需要在压测开始或结束、请求完成后执行逻辑，可使用事件钩子。例如在测试开始/结束时打印或初始化资源：
+
+```python showLineNumbers
+from locust import events
+
+@events.test_start.add_listener
+def on_test_start(environment, **kwargs):
+    print("Test is starting")
+
+@events.test_stop.add_listener
+def on_test_stop(environment, **kwargs):
+    print("Test is ending")
+```
+
+常用事件包括 `init`（进程启动）、`test_start` / `test_stop`（压测开始/结束）、`request`（单次请求完成）、`quitting`（进程退出前）等，详见官方 [Event hooks](https://docs.locust.io/en/stable/api.html#events) 与 [Extending Locust](https://docs.locust.io/en/stable/extending-locust.html)。

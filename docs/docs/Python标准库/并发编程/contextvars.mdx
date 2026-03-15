@@ -1,0 +1,81 @@
+---
+title: contextvars
+---
+
+`contextvars` 用于管理、存储和访问与“当前上下文”相关的状态，适用于 asyncio 和多线程场景，可替代 `threading.local()` 以避免状态意外泄露到其他代码。更多背景见 [PEP 567](https://peps.python.org/pep-0567/)。
+
+[contextvars](https://docs.python.org/zh-cn/3/library/contextvars.html)
+
+## ContextVar：get / set / reset、token 作上下文管理器
+
+`ContextVar(name, default=...)` 声明一个上下文变量。`get()` 返回当前上下文中的值，若无则使用 default 或抛出 `LookupError`。`set(value)` 设置当前上下文中的值并返回一个 `Token`；`reset(token)` 将变量恢复为 set 之前的状态。从 Python 3.14 起，token 可作为上下文管理器使用，退出时自动 reset。
+
+```python showLineNumbers
+import contextvars
+
+var = contextvars.ContextVar("var", default="default")
+
+# get / set / reset
+print(var.get())           # default
+token = var.set("new")
+print(var.get())           # new
+var.reset(token)
+print(var.get())           # default
+
+# token 作上下文管理器（3.14+）
+with var.set("scoped"):
+    print(var.get())       # scoped
+print(var.get())           # default
+```
+
+## 手动上下文：copy_context、Context.run
+
+`copy_context()` 返回当前上下文的拷贝（O(1)）。`Context.run(callable, *args, **kwargs)` 在该上下文中执行可调用对象，对 `ContextVar` 的修改仅体现在该 Context 内，退出后外部上下文不变。
+
+```python showLineNumbers
+import contextvars
+
+var = contextvars.ContextVar("var")
+var.set("outer")
+
+ctx = contextvars.copy_context()
+
+def inner():
+    print(var.get())   # outer（继承 copy 时的值）
+    var.set("inner")
+    print(var.get())   # inner
+
+ctx.run(inner)
+print(ctx[var])        # inner（ctx 内已修改）
+print(var.get())       # outer（当前上下文未变）
+```
+
+## asyncio 支持
+
+上下文变量在 asyncio 中原生支持，无需额外配置。每个 Task 拥有自己的上下文，可在处理请求时设置如“当前客户端地址”等变量，在深层调用中通过 `ContextVar.get()` 获取。
+
+```python showLineNumbers
+import asyncio
+import contextvars
+
+client_addr_var = contextvars.ContextVar("client_addr")
+
+async def handle(reader, writer):
+    addr = writer.get_extra_info("peername")
+    client_addr_var.set(addr)
+    # 后续任意 await 后的代码都可 client_addr_var.get() 得到 addr
+    data = await reader.read(100)
+    writer.write(f"Bye, {client_addr_var.get()}\r\n".encode())
+    writer.close()
+
+async def main():
+    server = await asyncio.start_server(handle, "127.0.0.1", 8080)
+    async with server:
+        await server.serve_forever()
+
+# asyncio.run(main())
+```
+
+:::tip 顶级模块创建
+应在模块顶层创建 `ContextVar`，不要在闭包中创建。`Context` 会强引用这些变量，闭包中创建可能导致无法被正确回收。
+:::
