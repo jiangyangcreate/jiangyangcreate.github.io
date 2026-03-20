@@ -1,0 +1,511 @@
+---
+title: Agent设计
+sidebar_position: 4
+---
+
+## loop
+
+模型的单次调用往往是无状态的，使用循环把每次对话的结果传入下一次对话，即可让模型产生记忆。
+
+```python showLineNumbers
+from openai import OpenAI
+
+client = OpenAI()
+
+
+def chat_loop() -> None:
+    # 会话历史是“应用层记忆”，每轮都完整传给模型
+    messages = [
+        {"role": "system", "content": "你是一个简洁、可靠的编程助手。"},
+    ]
+
+    while True:
+        user_input = input("你: ").strip()
+        if user_input.lower() in {"exit", "quit"}:
+            print("助手: 下次见。")
+            break
+
+        messages.append({"role": "user", "content": user_input})
+
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=messages,
+            temperature=0.2,
+        )
+
+        assistant_reply = response.choices[0].message.content or ""
+        print(f"助手: {assistant_reply}")
+
+        # 把本轮回答加入历史，下一轮即可“记住”上下文
+        messages.append({"role": "assistant", "content": assistant_reply})
+
+
+if __name__ == "__main__":
+    chat_loop()
+```
+
+## Tool
+
+大模型本身不具备执行能力，需要调用工具。
+
+调用方式都是换汤不换药，就是将可调用的工具（函数）作为提示词的一部分，传入给大模型。大模型做选择填空，并返回特定格式。
+
+- 选择：是否调用以及调用哪些
+- 填空：调用函数的参数填什么
+
+<Highlight>Agent中的大模型，第一核心能力是让“大模型做选择填空，并返回特定格式”的指令遵循能力</Highlight>。
+
+```python showLineNumbers
+import json
+from dataclasses import dataclass
+from typing import Any, Callable
+
+@dataclass
+class Tool:
+    """极简工具对象，仅保留名称、描述和同步调用入口。"""
+
+    name: str
+    description: str
+    func: Callable[..., Any]
+
+    def invoke(self, **kwargs: Any) -> Any:
+        """同步调用底层函数。"""
+        return self.func(**kwargs)
+
+
+def tool(
+    func: Callable[..., Any] | None = None,
+    *,
+    name: str | None = None,
+    description: str = "",
+) -> Tool | Callable[[Callable[..., Any]], Tool]:
+    """把被装饰的同步函数封装成 `Tool`，支持可选参数。"""
+
+    def decorator(fn: Callable[..., Any]) -> Tool:
+        tool_name = name or fn.__name__
+        tool_description = (description or fn.__doc__ or "").strip()
+        """
+        装饰器可以收集工具函数信息作为大模型的上下文。其实这里也可以让大模型自己将工具的描述信息二次加工或者直接通过源代码生成，即让大模型自己生成工具的描述信息。
+        
+        import inspect
+        tool_description =  大模型推理("请根据以下函数源码，生成工具的描述信息："+inspect.getsource(func))
+        """
+        return Tool(name=tool_name, description=tool_description, func=fn)
+
+    if func is None:
+        return decorator
+    return decorator(func)
+
+
+@tool
+def get_weather(city: str) -> str:
+    """
+    描述：根据城市名称返回天气。
+
+    参数：
+    - city: 城市名称 str
+
+    返回：
+    - 天气信息 str
+
+    """
+    fake_db = {
+        "北京": "晴天，12℃",
+        "上海": "多云，15℃",
+        "深圳": "小雨，24℃",
+    }
+    return fake_db.get(city, "暂无天气数据")
+
+
+class FakeChatModel:
+    """模拟选择工具的 LLM，如果检测到“天气”则调用 weather 工具。"""
+
+    def __init__(self, tools: list[Tool] = None) -> None:
+        if tools is not None:
+            self.bind_tools(tools)
+
+    def bind_tools(self, tools: list[Tool]) -> None:
+        self.tools = {tool.name: tool for tool in tools}
+
+    def run(self, user_input: str) -> str:
+        """模拟 LLM 的推理、构造工具调用 JSON，再执行工具。"""
+        prompt_template = """
+        你是一个乐于助人的助手，根据用户输入的提示词，完成任务。
+
+        你也许有一些工具可以选择，如果需要使用工具，请选择一个工具，并填入工具的参数。
+
+        这是用户输入的提示词：
+
+        {user_input}
+
+        这是工具列表：
+
+        {tools}
+
+        如果你需要使用工具，请按照以下格式返回：
+        [
+            {{"Tool": "工具名称", "ToolArgs": {{"工具参数1": "参数值1", "工具参数2": "参数值2"}}}}
+        ]
+
+        如果你不需要使用工具，请直接返回：
+        [
+            {{"Message": "回答内容"}}
+        ]
+        """
+
+        prompt = prompt_template.format(user_input=user_input, tools=self.tools)
+        print(prompt)
+
+        # 大模型做 选择填空题，选择一个工具，并填入工具的参数(示例)
+        result = """[
+            {"Tool":"get_weather","ToolArgs":{"city":"上海"}}
+        ]"""
+        result_json = json.loads(result)
+        if result_json[0].get("Tool", None):
+            tool_name = result_json[0]["Tool"]
+            tool_args = result_json[0]["ToolArgs"]
+            tools_result = self.tools[tool_name].invoke(**tool_args)
+            # self.run(tools_result) 可以将工具的结果作为用户输入，继续推理
+            return [{"Message": tools_result}]
+        else:
+            return [{"Message": result_json[0]["Message"]}]
+
+
+if __name__ == "__main__":
+    tools = [get_weather]  # 装饰器已经把函数变成 Tool
+    model = FakeChatModel()
+    model.bind_tools(tools)
+
+    question = "上海 天气"
+    print(f"用户: {question}")
+    result = model.run(question)
+    print(f"模型: {result}")
+
+"""
+用户: 上海 天气
+
+        你是一个乐于助人的助手，根据用户输入的提示词，完成任务。
+
+        你也许有一些工具可以选择，如果需要使用工具，请选择一个工具，并填入工具的参数。
+
+        这是用户输入的提示词：
+
+        上海 天气
+
+        这是工具列表：
+
+        {'get_weather': Tool(name='get_weather', description='描述：根据城市名称返回天气。\n\n    参数：\n    - city: 城市名称 str\n\n    返回：\n    - 天气信息 str', func=<function get_weather at 0x00000238DB82CD60>)}
+
+        如果你需要使用工具，请按照以下格式返回：
+        [
+            {"Tool": "工具名称", "ToolArgs": {"工具参数1": "参数值1", "工具参数2": "参数值2"}}
+        ]
+
+        如果你不需要使用工具，请直接返回：
+        [
+            {"Message": "回答内容"}
+        ]
+
+模型: [{'Message': '多云，15℃'}]
+"""
+```
+
+### function calling 
+
+function calling 是 OpenAI 推出的一个功能，允许开发者将大模型的输出结果作为函数调用，并执行函数。如果你的模型允许传入这个参数，推荐使用：
+
+- 一定程度上简化了代码：一次输出即可返回多个 tool_calls 对象，允许你并发执行这些函数，极大地提升了效率。
+- 保证了返回结果 100% 符合 JSON 语法：在模型生成 Token 的那一刻，后台会根据你提供的 Schema 限制 Token 的概率分布。
+- 权重更高：工具定义有预向量化或特殊编码处理，能更精准地捕捉参数类型
+
+### 通用工具
+
+现代主流的智能体一般配备如下通用工具：
+- 命令行执行
+- 联网搜索
+- 文件内容增删改查
+- todo
+- skill创建、读取
+- 记忆读写（短期会话记忆与长期工作记忆）
+- MCP 对接外部系统
+> 可以实现网页抓取与浏览器自动化（点击、输入、截图、提取）
+> 多模态理解与总结（文件、网页、图片、视频）
+
+工具并非越多越好，工具越多，模型需要处理的信息越多，Token使用量越大，也越容易出错。因此需要根据任务的复杂程度选择合适的工具。
+
+## 子智能体
+
+如果我们创建一个Loop循环可以称之为智能体，那么我自然在这个循环里继续嵌套。如果这个循环是个函数，那他就是一个简单的递归嵌套。
+
+当任务变复杂时，“一个大循环包打天下”往往不稳定。更常见的做法是主智能体负责拆解任务，把子任务分发给多个子智能体：
+
+- 主智能体：做任务规划、汇总结果、控制整体节奏。
+- 子智能体：只做单一职责（如搜索、编码、测试、文档整理）。
+
+这样做的好处：
+
+1. 上下文隔离：每个子智能体只看自己需要的信息，减少干扰。
+2. 并行执行：多个子任务可以同时进行，大幅缩短总耗时。
+3. 容错更好：某个子任务失败可以单独重试，不影响全局流程。
+
+```python showLineNumbers
+from openai import OpenAI
+import json
+
+client = OpenAI()
+
+# 先定义子智能体工具（不包含 task）
+CHILD_TOOLS = [
+    {
+        "type": "function",
+        "function": {
+            "name": "search",
+            "description": "搜索外部信息",
+            "parameters": {
+                "type": "object",
+                "properties": {"query": {"type": "string"}},
+                "required": ["query"],
+            },
+        },
+    },
+]
+
+# 再定义父智能体工具（在 CHILD_TOOLS 基础上增加 task）
+PARENT_TOOLS = CHILD_TOOLS + [
+    {
+        "type": "function",
+        "function": {
+            "name": "task",
+            "description": "创建子智能体执行子任务",
+            "parameters": {
+                "type": "object",
+                "properties": {"prompt": {"type": "string"}},
+                "required": ["prompt"],
+            },
+        },
+    },
+]
+
+
+def agent_loop(
+    messages: list[dict],
+    *,
+    model: str = "gpt-4o-mini",
+    max_iterations: int = 10, # 最大迭代次数
+    allow_deep: int = 1, # 允许的子智能体嵌套深度
+    agent_type: str = "parent",
+) -> str | None:
+    """OpenAI 风格的最小 Agent 循环，支持 tool_call 与子智能体。"""
+    iterations = 0
+    tools = PARENT_TOOLS if agent_type == "parent" else CHILD_TOOLS
+
+    while iterations < max_iterations:
+        iterations += 1
+        response = client.chat.completions.create(
+            model=model,
+            messages=messages,
+            tools=tools,
+            tool_choice="auto",
+            temperature=0.2,
+        )
+        assistant = response.choices[0].message
+        messages.append(assistant.model_dump())
+
+        # 没有工具调用：父智能体结束，子智能体返回文本结果
+        if not assistant.tool_calls:
+            content = assistant.content or ""
+            if agent_type == "child":
+                return content
+            print(f"助手: {content}")
+            return None
+
+        # 简化：演示处理单个 tool_call（多工具可循环处理）
+        tool_call = assistant.tool_calls[0]
+        func_name = tool_call.function.name
+        args = json.loads(tool_call.function.arguments or "{}")
+
+        if func_name == "task" and allow_deep > 0:
+            output = agent_loop(
+                messages=[{"role": "user", "content": args.get("prompt", "")}],
+                model=model,
+                max_iterations=6,
+                allow_deep=allow_deep - 1,
+                agent_type="child",
+            ) or ""
+        else:
+            output = run_tool(func_name, args) # 执行工具，这省略实现，具体可以参考上面的Tool示例
+
+        messages.append(
+            {
+                "role": "tool",
+                "tool_call_id": tool_call.id,
+                "content": output,
+            }
+        )
+
+    return "(no summary)"
+
+
+def main() -> None:
+    history = [{"role": "system", "content": "你是一个可靠的编程 Agent。"}]
+    while True:
+        query = input("你: ").strip()
+        if query.lower() in {"q", "quit", "exit", ""}:
+            break
+        history.append({"role": "user", "content": query})
+        agent_loop(history, max_iterations=12, allow_deep=1, agent_type="parent")
+
+
+if __name__ == "__main__":
+    main()
+```
+
+## 上下文压缩
+
+压缩的目的是保持模型的上下文在最佳性能区间。
+
+无损压缩的方式是将暂时无关的对话卸载到文件系统中，例如：Skill.md，这样模型在多次对话后能沉淀出属于你的办事技巧。
+
+有损的压缩方式就是让模型总结当前的对话，或者清空旧的工具调用的结果。
+
+主流编程 Agent普遍结合使用，采用“分层压缩”：
+1. 滑动窗口：保留最近对话与当前任务强相关消息。
+2. 有损摘要：把更早历史压成结构化摘要（目标/约束/已完成/待办/风险）。
+3. 无损外存：把完整过程写入文件系统（notes/skills/logs），主上下文只保留索引。
+4. 按需回填：需要细节时再检索外存，而不是长期携带全文。
+
+核心是：`近期原始上下文 + 结构化摘要 + 可检索归档`。
+
+```python showLineNumbers
+from openai import OpenAI
+from pathlib import Path
+import json
+from datetime import datetime
+
+client = OpenAI()
+THRESHOLD = 6000  # 示例阈值：接近模型窗口上限前触发压缩
+ARCHIVE_DIR = Path("memory_archive")
+ARCHIVE_DIR.mkdir(exist_ok=True)
+
+
+def estimate_tokens(messages: list[dict]) -> int:
+    # 简化估算：真实项目可替换为 tokenizer 精确计算
+    text = "".join(str(m.get("content", "")) for m in messages)
+    return max(1, len(text) // 4)
+
+
+def summarize_messages(messages: list[dict], model: str = "gpt-4o-mini") -> str:
+    prompt = (
+        "请将以下历史对话压缩为结构化摘要，输出五项："
+        "目标、约束、已完成、待办、风险。"
+    )
+    response = client.chat.completions.create(
+        model=model,
+        temperature=0,
+        messages=[
+            {"role": "system", "content": "你是上下文压缩器。"},
+            {"role": "user", "content": prompt},
+            {"role": "user", "content": str(messages)},
+        ],
+    )
+    return response.choices[0].message.content or ""
+
+
+def archive_messages(messages: list[dict], tag: str = "history") -> str:
+    """无损归档：把完整旧消息写入文件系统，返回文件路径。"""
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    path = ARCHIVE_DIR / f"{tag}_{ts}.json"
+    path.write_text(json.dumps(messages, ensure_ascii=False, indent=2), encoding="utf-8")
+    return str(path)
+
+
+def compact_context(
+    messages: list[dict],
+    *,
+    keep_last: int = 12,
+    threshold: int = THRESHOLD,
+    model: str = "gpt-4o-mini",
+) -> list[dict]:
+    """
+    分层压缩策略：
+    - token 未超阈值：仅做滑动窗口
+    - token 超阈值：对旧消息做结构化摘要，再拼接最近消息
+    """
+    if len(messages) <= keep_last:
+        return messages
+
+    recent = messages[-keep_last:]
+    if estimate_tokens(messages) <= threshold:
+        return recent
+
+    old = messages[:-keep_last]
+    archive_path = archive_messages(old, tag="chat")
+    summary = summarize_messages(old, model=model)
+    return [
+        {
+            "role": "system",
+            "content": f"[历史摘要]\n{summary}\n[归档文件]\n{archive_path}",
+        },
+        *recent,
+    ]
+
+
+def maybe_compact(messages: list[dict], model: str = "gpt-4o-mini") -> list[dict]:
+    """
+    显式分层策略（拆分 -> 压缩 -> 拼接）：
+    - 固定层：system 等长期指令
+    - 最近层：最近 keep_last 条高相关消息
+    - 中间层：可压缩历史（超阈值时摘要+归档）
+    """
+    keep_last = 12
+
+    # 1) 固定层：保留全部 system 指令
+    pinned = [m for m in messages if m.get("role") == "system"]
+
+    # 2) 最近层：保留最近12条相关消息
+    recent = messages[-keep_last:] if len(messages) > keep_last else messages[:]
+
+    # 3) 中间层：排除固定层与最近层后可被压缩的部分
+    pinned_ids = {id(m) for m in pinned}
+    recent_ids = {id(m) for m in recent}
+    middle = [m for m in messages if id(m) not in pinned_ids and id(m) not in recent_ids]
+
+    # 先拼接一版（不压缩）检查是否超阈值
+    layered = [*pinned, *middle, *recent]
+    if estimate_tokens(layered) <= THRESHOLD or not middle:
+        return layered
+
+    # 超阈值时仅压缩中间层，再与固定层、最近层拼接
+    archive_path = archive_messages(middle, tag="mid")
+    summary = summarize_messages(middle, model=model)
+    middle_summary = {
+        "role": "system",
+        "content": f"[中间层摘要]\n{summary}\n[归档文件]\n{archive_path}",
+    }
+    return [*pinned, middle_summary, *recent]
+
+
+def agent_loop(messages: list[dict], model: str = "gpt-4o-mini") -> str:
+    # 调用前先压缩上下文，这里可直接嵌入主循环
+    messages = maybe_compact(messages, model=model)
+
+    response = client.chat.completions.create(
+        model=model,
+        messages=messages,
+        temperature=0.2,
+    )
+    return response.choices[0].message.content or ""
+
+
+if __name__ == "__main__":
+    history = [{"role": "system", "content": "你是一个可靠的编程 Agent。"}]
+    while True:
+        query = input("你: ").strip()
+        if query.lower() in {"q", "quit", "exit", ""}:
+            break
+        history.append({"role": "user", "content": query})
+        reply = agent_loop(history, model="gpt-4o-mini")
+        print(f"助手: {reply}")
+        history.append({"role": "assistant", "content": reply})
+```
+
