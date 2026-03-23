@@ -29,9 +29,9 @@ function ShowcaseGrid() {
     },
     {
     image: useBaseUrl("pages/case/etool.webp"),
-    title: "eTool",
-    desc: "30 多种常用工具集合库，包含：进程定时监听；发送邮件；硬件测速（网络、硬盘、内存、显存）；PDF、excel、word、图片等常用处理；windows右键菜单管理等",
-    url: "https://github.com/jiangyangcreate/eTool/",
+    title: "etool",
+    desc: "30 多种常用工具集合库，包含：一行代码进程定时监听、发送邮件；PDF、excel、word、图片等常用处理等",
+    url: "https://github.com/jiangyangcreate/etool/",
     category: "维护中", 
     },
       {

@@ -186,6 +186,7 @@ module.exports = {
       theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
       defaultLanguage: "markdown",
+      additionalLanguages: ['toml','yaml','bash'],
     },
     // 告示条
     announcementBar: {

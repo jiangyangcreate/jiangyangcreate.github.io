@@ -1,0 +1,534 @@
+---
+sidebar_position: 39
+title: 包管理
+---
+
+:::tip
+Python 打包权威机构 (PyPA) 是一个工作组，负责维护 Python 打包中使用的核心软件项目集和Python打包标准。
+
+通过 PyPA 开发的软件用于打包、共享和安装 Python 软件，并与可下载 Python 软件的索引（例如 Python 包索引 PyPI） 进行交互。
+
+其维护软件包括：
+
+* **pip**: Python 官方发行版中默认包含的外部工具。是与 PyPI 交互最常用的软件。常被误认为标准库。
+* **pipx**: 在隔离环境中安装和运行 Python 应用的工具（防止污染全局环境）。
+* **pipenv**: 集成了 pip 和 virtualenv 的工作流工具，引入了 `Pipfile`。
+
+* **twine**: 将包安全上传到 PyPI 的唯一官方推荐工具。
+
+* **hatch**: 现代、可扩展的 Python 项目管理器（也是一个功能强大的构建后端）。
+* **setuptools**: 历史最悠久、最强大的构建系统（虽然现在推荐声明式配置，但它依然是支柱）。
+:::
+
+
+## pip
+
+默认情况下，我们下载的第三方库都来自于[PYPI](https://pypi.org/)。
+
+- [awesome-python](https://awesome-python.com/)中可以查看大众推荐的第三方库。
+
+- [pepy.tech](https://pepy.tech/)可以查看某个包的下载量来侧面了解某个包的受欢迎程度。
+
+### 安装
+
+这里第三方模块使用的基本流程以 OpenCV 为例
+
+- 下载 `pip install opencv-python`
+- 导入 `import cv2`
+- 使用 `模块名.方法名` 示例：`cv2.imread('cat.jpg')`
+
+这里需要注意的是：OpenCV 模块的下载名、导入名均不是 opencv，OpenCV 共有 4 种不同的下载名：`opencv-python`、`opencv-python-headless`、`opencv-contrib-python`、`opencv-contrib-python-headless`。
+
+事实上，模块名、下载名与导入名更多是开发者出于习惯会将名称统一，并非一种强制的规则。建议在下载模块之前先通过搜索引擎搜索。
+
+对于复杂的模块来说，使用 help() 方法、dir() 方法不能很好的满足我们的需求。需要搭配官方文档，查阅使用实例。
+
+:::info
+第三方模块与系统模块一样，都是自定义好的一系列模块，这些模块也自然存在一些版本差异。
+
+在使用的过程之中很可能因为版本的不匹配、方法的弃用导致示例的代码失效。
+
+我们可以通过升级至最新版本或安装指定的版本来解决：
+
+```bash showLineNumbers
+# 安装最新版
+python -m pip install SomePackage            # latest version
+
+# 安装指定版本
+python -m pip install 'SomePackage==1.0.4'   # specific version
+
+# 安装最小版本
+python -m pip install 'SomePackage>=1.0.4'   # minimum version
+
+# 交叉条件，安装版本不为2.4.0且最小版本为1.8.0
+python -m pip install 'SomePackage!=2.4.0,>=1.8.0'
+
+# 交叉条件，安装版本不为1.4且最小版本为1.1.0
+python -m pip install 'SomePackage<1.4,>=1.1.0'
+
+# 升级至最新版本
+python -m pip install --upgrade SomePackage
+```
+
+:::
+:::warning
+当你的版本条件里出现了 `<`、`>`、`<=`、`>=`、`!=` 这些特殊符号时必须加引号。
+
+因为在命令行中他们会被解释为重定向符号，所以必须加引号。
+:::
+
+
+此外，有些包作者会仅在 GitHub 提供源码，需要我们自己编译安装。
+
+两种方式都会搜索当前项目下的 `pyproject.toml` 和 `setup.py`。如果同时存在只会使用 `pyproject.toml`。
+
+```bash showLineNumbers
+# 安装当前目录下的包。并以 拷贝 的方式将其添加到 site-packages 中。
+`pip install .` 
+
+# 安装当前目录下的包，并以 符号链接 的方式将其添加到 site-packages 中。
+`pip install -e .`
+```
+
+:::info
+在开发过程中会频繁的修改代码并导入测试，传统的方式是每次修改代码后，都需要重新构建包、重新安装包。不优雅。
+
+符号链接（Symbolic Link）是一种文件系统对象，它指向另一个文件或目录的位置。当你访问符号链接时，操作系统会自动将符号链接解析为实际的目标文件或目录（软链接）。
+
+这让我们可以在实际的目录中修改代码，另一边立刻能看到修改后的效果。不需要每次修改都重新构建、安装包。
+:::
+
+在 Linux 服务器中安装包安装到全局还是用户目录下需要根据实际情况选择。
+
+- 如果需要安装到系统环境，可以使用 `--break-system-packages` 后缀，例如：`pip install --break-system-packages requests`。
+
+- 如果需要安装到用户目录下，可以使用 `--user` 后缀，例如：`pip install --user requests`。
+
+:::info
+在现代 Linux 发行版中，系统 Python 标记为"外部管理环境"（externally managed environment）。
+
+由操作系统的包管理器（如 apt）统一维护，禁止用户通过 `pip`（即使是 `--user`）直接安装包，以防破坏系统依赖。
+
+如果你要安装的是 `uv`、`ruff` 这样的<Highlight color="g">可执行应用程序</Highlight>，推荐使用 `pipx` 独立安装。
+
+```bash showLineNumbers
+sudo apt install pipx
+pipx install uv
+pipx install ruff
+```
+
+如果你要安装的是 `requests`、`opencv` 这样的<Highlight color="g">Python 包</Highlight>，推荐使用虚拟环境结合 `pip` 独立安装。
+```bash showLineNumbers
+python3 -m venv .venv
+source .venv/bin/activate
+pip install requests
+```
+
+对于更加特殊的一些包，如`ros2`会使用到特定的Python包(`rclpy`等)，`ros2`会将其下载到本地目录后，将这个目录添加到`PYTHONPATH`环境变量中。让所有Python解释器找包时都能加载这个目录内的模块。
+
+- `PYTHONPATH` 是一个操作系统级别的环境变量，用于指定Python解释器的搜索路径。
+- `PYTHONPATH` 的值是一个或多个目录路径，优先级高于标准库和 `site-packages`
+- `PYTHONPATH` 只是额外添加的搜索路径，为空时不会影响默认的搜索路径。
+- 除了`PYTHONPATH`环境变量，还有`PATH`等环境变量会影响Python解释器的搜索路径。你可以通过`env`命令查看当前所有设置的环境变量。
+
+不过这种方式也增加了包冲突的风险，我们个人开发时使用虚拟环境管理包。
+:::
+
+更多子命令与参数可以查看[pip官方文档](https://pip.pypa.io/en/stable/)。
+
+| 命令             | 作用说明 |
+|------------------|---------|
+| `pip install`    | 安装 Python 包（来自 PyPI、本地文件、VCS 等） |
+| `pip uninstall`  | 卸载已安装的包 |
+| `pip inspect`    | 以结构化 JSON 格式输出当前环境的包信息（实验性，较新版本支持） |
+| `pip list`       | 列出当前环境中所有已安装的包及其版本 |
+| `pip show`       | 显示某个已安装包的详细信息（如版本、作者、依赖、位置等） |
+| `pip freeze`     | 以 `requirements.txt` 兼容格式输出已安装包列表（常用于锁定依赖） |
+| `pip check`      | 验证已安装包的依赖是否满足，检测版本冲突 |
+| `pip lock`       | 生成可复现的依赖锁文件（截至 pip v25.2，此命令尚未正式实现，处于规划/实验阶段） |
+| `pip download`   | 下载包及其依赖（不安装），用于离线环境或缓存 |
+| `pip wheel`      | 将包构建为 wheel 格式的分发文件（`.whl`） |
+| `pip hash`       | 计算并输出文件的哈希值（用于验证包完整性） |
+| `pip search`     | **已弃用**：原用于在 PyPI 上搜索包，因 API 关闭已不可用 |
+| `pip index`      | 查询包在索引（如 PyPI）中的元数据（如版本、兼容性等） |
+| `pip cache`      | 管理 pip 的本地缓存（查看、清空等） |
+| `pip config`     | 管理 pip 的配置文件（设置镜像源、超时等） |
+| `pip debug`      | 显示 pip 的调试信息（如兼容标签、环境路径、版本等） |
+
+### 运行时与安装时视图
+
+从一次 import 开始 ，你写了一行代码：  
+
+```python showLineNumbers
+import requests  
+```  
+
+这行代码背后，Python 解释器做了三件事：  
+
+1. **找**：在 `sys.path` 列出的路径中搜索 `requests`。  
+2. **读**：找到后，读取模块内容，执行其中的代码。  
+3. **存**：把执行结果存入 `sys.modules`，避免重复导入。  
+
+这个过程，就是 Python 包管理的<Highlight color="g">运行时视图</Highlight>。  
+
+那么，包是怎么出现在 `sys.path` 里的？  
+
+答案是：`pip install requests`。pip 做了：
+
+1. **下载**：从 PyPI 下载 `requests` 的 wheel 包。  
+2. **解压**：把包内容解压到 `site-packages` 目录。  
+3. **记录**：在 `site-packages` 下生成一个 `requests-X.X.X.dist-info` 目录，里面存着元数据。  
+
+这个过程，就是 Python 包管理的<Highlight color="g">安装时视图</Highlight>。  
+
+当我们在命令行执行 `pip install requests` 时，pip 实际上会向 PyPI（Python Package Index）发送一系列 HTTP 请求来查找、下载和验证包。
+
+pip 首先会向 PyPI 发送一个 GET 请求，以获取包的元数据信息，例如版本号、依赖关系等。
+
+```bash showLineNumbers
+# 下载请求示例
+GET /pypi/requests/json HTTP/1.1
+Host: pypi.org
+User-Agent: pip/21.0.1
+Accept: application/json
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+```
+
+一旦 pip 获取了包的元数据，它会根据元数据中的下载链接发送另一个 GET 请求来下载包文件（通常是 wheel 文件或源码包）。
+
+```bash showLineNumbers
+# 下载请求示例
+GET /packages/66/49/7b6c842e994f9353296cb2865fc206635286b27415336348f39/requests-2.25.1-py2.py3-none-any.whl HTTP/1.1
+Host: files.pythonhosted.org
+User-Agent: pip/21.0.1
+Accept: */*
+Accept-Encoding: gzip, deflate
+Connection: keep-alive
+```
+
+下载完成后，pip 会使用元数据中提供的哈希值来验证包的完整性，确保包在传输过程中没有被篡改。
+
+:::info
+你可以提前获得包的wheel压缩文件，例如`requests-2.32.5-py3-none-any.whl`
+
+`PYPI`每个包的侧边栏`Download files`中可能会有多个版本的压缩文件，记得选择适配你Python与计算平台版本的压缩文件。
+
+那么你就可以通过`pip install requests-2.32.5-py3-none-any.whl`安装它，等价于跳过了前面的网络通信下载时间。
+:::
+
+验证通过后，pip 会将包文件解压并安装到 Python 的 site-packages 目录中，并记录安装信息以便后续管理。
+
+如果包有依赖关系，pip 会递归地对每个依赖包重复上述过程，直到所有依赖都被满足。
+
+为了提高效率，pip 还会使用本地缓存和索引，避免重复下载相同的包文件。
+
+在整个过程中，pip 会处理各种网络错误，如超时、连接失败等，并根据配置进行重试。
+
+对于私有包或需要认证的包，pip 会使用适当的认证机制，如 API 密钥或 OAuth，来发送请求。
+
+pip 会记录详细的日志信息，包括请求的 URL、响应状态码、下载速度等，以便用户排查问题。
+
+用户可以通过 pip 的配置文件或命令行选项来定制请求行为，例如使用代理、指定镜像源、设置超时时间等。
+
+通过这些步骤，pip 确保了 Python 包的可靠、高效和安全的安装。
+
+### 元数据
+
+很多人以为，pip install 就是“把文件拷过去”。但真正关键的是那个 `.dist-info` 目录。  
+
+它就像包的"身份证"，记录了：  
+- **包名、版本、作者、描述** —— `METADATA` 文件  
+- **所有安装的文件列表** —— `RECORD` 文件（卸载时用）  
+- **依赖哪些其他包** —— `METADATA` 中的 `Requires-Dist` 字段  
+- **顶级模块名称** —— `top_level.txt` 文件（import 时用）  
+- **安装工具** —— `INSTALLER` 文件（通常写着 `pip`）  
+
+没有这个身份证，pip 就不知道这个包是谁、从哪来、依赖谁、能不能卸载。  
+
+当你执行 `pip list` 或 `pip show requests`，看到的信息，全都来自这个 `.dist-info`。
+
+### 离线安装
+
+如果你完全没有网络，能不能不使用 pip，直接把整个模块文件夹复制到 `site-packages` 来代替安装？
+
+Python 能 import，但 pip 不知道它的存在，无法卸载，也无法管理依赖。  
+
+更严重的是复制时如 `requests` 依赖 `urllib3`等多个依赖，你忘了任意一个依赖运行时就会报错。  
+
+你必须把代码和元数据文件，以及相关的依赖库与依赖库元数据文件都复制过去，才能成功。因此对于嵌套依赖复杂的库来说，工作量非常大。
+
+:::tip
+最标准、最不容易出错的方法。你可以在一台联网且系统环境（OS、Python版本）与目标机器一致的电脑上，一次性导出所有依赖的wheel包，并重新下载。
+```bash showLineNumbers
+# 导出依赖列表
+pip freeze > requirements.txt
+# UV 导出依赖列表
+uv export --format requirements-txt --no-hashes --no-emit-project > requirements_offline.txt
+
+# 下载所有 Wheel 包到 /offline_packages 文件夹
+pip download -d ./offline_packages -r requirements.txt
+# UV 下载所有 Wheel 包到 /offline_packages 文件夹
+uv run python -m pip download -d ./offline_packages -r requirements_offline.txt 
+
+# 在离线机器通过pip安装
+pip install --no-index --find-links=./offline_packages -r requirements.txt
+# --no-index 别去PYPI
+# --find-links=./offline_packages 指定一个本地目录作为“临时仓库”。pip 会扫描这个文件夹里的所有 .whl（Wheel 文件）和 .tar.gz（源码包）。
+```
+:::
+
+开发机与内网生产环境不一致时，download 也可以添加参数额外指定操作系统、Python版本等等。
+
+pip 的价值，不在于“复制文件”，而在于“解析依赖 + 安装 + 记录元数据”这一整套自动化流程，是三个要素的闭环：   
+
+1. **代码**（Code）：真正的 `.py` 文件，实现功能。  
+2. **结构**（Structure）：包目录、`__init__.py`、子模块，构成可导入的层级。  
+3. **元数据**（Metadata）：`.dist-info`，让包可发现、可管理、可依赖。  
+
+只有三者齐全，一个包才算真正“安装”完成。
+
+## pyproject.toml
+
+我们安装的模块来自于`pypi.org`，我们也可以分享我们的模块到`pypi.org`。
+
+:::info
+pyproject.toml 规范 ，维护在 PyPA 规范页面上。
+
+鼓励用户静态地指定核心元数据，以提高速度、简化规范、消除歧义，并确保构建后端能够确定性地使用元数据。
+
+提供一种与工具无关的元数据指定方式，以便于学习和在不同构建后端之间进行转换。
+
+允许在构建后端之间共享更多项目元数据中“枯燥乏味部分”的代码。
+
+[PEP 621 – 在pyproject.toml中存储项目元数据](https://peps.python.org/pep-0621/)
+:::
+
+UV 已经成为最现代化和高效的 Python 包管理工具。集成了包管理、虚拟环境和打包发布功能并遵循PYPA的`pyproject.toml`规范。
+
+下面是一个使用 UV 管理的典型项目目录：
+
+```bash showLineNumbers
+your_project/
+├── .github/（可选）
+│  └── workflows/（可选）
+│      └── python-publish.yml（可选）
+│
+├── src/（推荐结构）
+│   └── your_package/（包名）
+│       ├── __init__.py
+│       └── module.py
+│
+├── tests/（可选）
+│   └── test_module.py
+│
+├── README.md（可选）
+├── LICENSE（可选）
+├── pyproject.toml
+└── uv.lock（UV 生成的锁文件）
+```
+
+### 字段
+
+```toml showLineNumbers title="pyproject.toml"
+[build-system]
+# ==============================================================================
+# 1. 构建系统配置 (Build System) - PEP 517/518
+# ==============================================================================
+# 构建后端依赖。hatchling 是现代、轻量且速度极快的后端；setuptools 则兼容性最强。
+requires = ["hatchling"]
+# 指定执行构建的后端对象
+build-backend = "hatchling.build"
+
+
+[project]
+# ==============================================================================
+# 2. 项目核心元数据 (Project Metadata) - PEP 621
+# ==============================================================================
+name = "exboard"  # 包名，分发到 PyPI 后的唯一标识
+version = "1.0.12" # 语义化版本号
+description = "A sophisticated exboard package for AIBOX" # 项目简介
+readme = "README.md" # 指定自述文件，PyPI 页面会渲染此内容
+requires-python = ">=3.8" # 运行所需的最低 Python 版本
+license = {text = "Apache-2.0"} # 明确授权协议
+keywords = ["ai", "agent", "automation", "scheduling"] # 关键词，方便在 PyPI 检索
+
+# 作者信息，支持多个成员
+authors = [
+  { name="Allen", email="jiangyangcreate@gmail.com" },
+]
+
+# 维护者信息（如果与作者不同）
+maintainers = [
+  { name="Jiang Yang", email="jiangyangcreate@gmail.com" },
+]
+
+# 分类器：定义项目状态、目标受众、协议等（由 PyPA 维护的标准列表）
+classifiers = [
+    "Development Status :: 4 - Beta", # 项目开发阶段（Alpha/Beta/Stable）
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+# 运行时必须安装的依赖 (Runtime Dependencies)
+dependencies = [
+    "pydantic>=2.0.0", # 现代数据校验
+    "httpx>=0.24.0",   # 替代 requests 的异步支持库
+    "loguru>=0.7.0",   # 更优雅的日志管理
+]
+
+# 可选依赖（可以通过 pip install exboard[dev] 安装）
+[project.optional-dependencies]
+gui = ["PyQt6>=6.5.0"]
+excel = ["pandas>=2.0.0", "openpyxl>=3.1.0"]
+
+# 命令行工具入口 (CLI Entry Points)
+[project.scripts]
+exboard-cli = "exboard.main:app" # 安装后可直接运行 exboard-cli 命令
+
+# 项目相关链接：主页、文档、提问题、变更日志
+[project.urls]
+Homepage = "https://github.com/jiangyangcreate/exboard"
+Documentation = "https://github.com/jiangyangcreate/exboard/wiki"
+Issues = "https://github.com/jiangyangcreate/exboard/issues"
+Changelog = "https://github.com/jiangyangcreate/exboard/blob/main/CHANGELOG.md"
+
+# ==============================================================================
+# 3. 工具特定配置 (Tool Configuration)
+# ==============================================================================
+
+# UV 特定配置：管理开发环境和锁文件
+[tool.uv]
+managed = true # 允许 uv 自动管理依赖锁
+dev-dependencies = [
+    "pytest>=7.0",   # 单元测试标准
+    "pytest-cov>=4.0", # 测试覆盖率工具
+    "black>=23.0",   # 严格的代码格式化工具
+    "ruff>=0.1.0",    # 极速的代码 Lint 工具（Rust 编写）
+    "mypy>=1.0.0",    # 静态类型检查
+]
+
+# Ruff 配置：替代了 Flake8, Isort, Black 等多个工具
+[tool.ruff]
+line-length = 88 # 遵循 Black 的默认行宽
+target-version = "py38"
+# 启用规则：E(错误), F(规范), I(排序), B(Bug防范)
+lint.select = ["E", "F", "I", "B", "UP"]
+lint.ignore = ["D100"] # 忽略缺失模块文档注释的警告
+
+# Pytest 配置：控制测试行为
+[tool.pytest.ini_options]
+testpaths = ["tests"] # 指定测试目录
+python_files = "test_*.py"
+addopts = "--strict-markers --tb=short" # 严格标记并简化报错信息
+
+# Mypy 配置：强制类型安全
+[tool.mypy]
+python_version = "3.8"
+strict = true # 启用最严格的类型检查模式
+ignore_missing_imports = true # 忽略没有类型提示的第三方库
+
+# Hatch 构建配置：控制打包时包含或排除的文件
+[tool.hatch.build.targets.wheel]
+packages = ["src/exboard"] # 明确指定源码路径
+```
+#### 准入点
+
+
+
+### 构建
+
+```bash showLineNumbers
+# 构建包（生成 wheel 和 sdist）
+uv build
+
+# 只构建 wheel
+uv build --wheel
+
+# 只构建源码分发
+uv build --sdist
+```
+
+该命令将在 `dist/` 目录下生成 `.tar.gz` 和 `.whl` 文件。
+
+### 发布
+
+在 PyPI 中获取 API Token：
+
+1. 访问：https://pypi.org/manage/account/token/
+2. 选择 "Add API token"
+3. 设置名称和权限范围
+4. 复制生成的 token
+
+#### 本地发布
+
+```bash
+# 直接使用 uv 发布，默认推送到 pypi.org
+uv publish --token [TOKEN]
+
+# 发布到 TestPyPI
+uv publish --publish-url https://test.pypi.org/legacy/
+```
+
+#### GitHub Actions 发布
+
+```yaml showLineNumbers title=".github/workflows/python-publish.yml"
+name: Upload Python Package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install UV
+      uses: astral-sh/setup-uv@v3
+      with:
+        version: "latest"
+    
+    - name: Set up Python
+      run: uv python install 3.12
+    
+    - name: Install dependencies
+      run: |
+        uv sync --all-extras --dev
+    
+    - name: Run tests
+      run: |
+        uv run pytest
+    
+    - name: Build package
+      run: |
+        uv build
+    
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+```
+
+在 GitHub 项目中添加PyPI密钥：
+
+```bash
+Settings -> Secrets and variables -> Actions -> New repository secret
+
+Name: PYPI_API_TOKEN
+Value: 刚刚复制的 API token
+```
+
+这样当我们在 GitHub 上<HoverText text="创建 release 时" explanation="注意不是 push 代码自动上传。"/>，会自动将包上传到 PyPI。
