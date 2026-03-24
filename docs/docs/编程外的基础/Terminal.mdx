@@ -93,7 +93,7 @@ title: Terminal
 | 卸载所有磁盘 | `wsl --unmount` | `wsl --unmount` | - |
 
 
-## 5分钟上手
+## 命令基本格式
 
 命令基本格式：`命令名 [选项] [参数]`
 
@@ -108,7 +108,7 @@ title: Terminal
 - 两者通常等效：`ls -l` = `ls --list`
 :::
 
-### 命令组合技巧
+### 命令组合
 
 | 符号 | 含义 | 示例 | 说明 |
 |------|------|------|------|
@@ -123,7 +123,7 @@ title: Terminal
 ps aux | grep python
 ```
 
-### 权限管理必知
+### sudo
 
 很多命令需要管理员权限，这时要用 `sudo`（**su**per user **do**）：
 
@@ -137,7 +137,7 @@ sudo reboot              # 以管理员身份重启系统
 - `sudo su` - 切换到root用户（管理员账户）
 - `exit` - 退出root用户
 
-## 快捷键
+### 快捷键
 
 这些快捷键能让你效率翻倍：
 
@@ -159,44 +159,6 @@ sudo reboot              # 以管理员身份重启系统
 
 ## 文件管理
 
-### 日常必用命令
-
-| 命令 | 功能 | 示例 | 记忆技巧 |
-|------|------|------|----------|
-| `pwd` | 显示当前目录 | `pwd` | **p**rint **w**orking **d**irectory |
-| `ls` | 列出文件 | `ls` / `ls -la` | **l**i**s**t |
-| `cd` | 切换目录 | `cd /home` | **c**hange **d**irectory |
-| `mkdir` | 创建目录 | `mkdir test` | **m**a**k**e **dir**ectory |
-| `touch` | 创建文件 | `touch file.txt` | touch（触碰） |
-| `rm` | 删除文件 | `rm file.txt` | **r**e**m**ove |
-| `rm -r` | 删除目录 | `rm -r folder` | **r**e**m**ove **r**ecursive |
-| `cp` | 复制 | `cp a.txt b.txt` | **c**o**p**y |
-| `mv` | 移动/重命名 | `mv old.txt new.txt` | **m**o**v**e |
-| `cat` | 查看文件内容 | `cat readme.txt` | con**cat**enate |
-
-:::danger
-`rm -rf /` 会删除所有文件！**永远不要**执行这个命令！
-- `-r`：递归删除（包括子目录）
-- `-f`：强制删除（不询问）
-:::
-
-### 快速编辑文件
-
-**方法1：使用nano编辑器（推荐新手）**
-```bash
-nano file.txt          # 打开文件
-# Ctrl+O 保存
-# Ctrl+X 退出
-```
-
-**方法2：使用vim编辑器（进阶）**
-```bash
-vim file.txt           # 打开文件
-# 按 i 进入编辑模式
-# 按 Esc 退出编辑模式
-# 输入 :wq 保存并退出
-```
-
 ### 文件权限
 
 Linux权限用3位数字表示，格式：`chmod 权限码 文件名`
@@ -212,7 +174,7 @@ Linux权限用3位数字表示，格式：`chmod 权限码 文件名`
 - **1** = 执行（e**x**ecute）
 - 组合相加即可：`7 = 4+2+1 = 读+写+执行`
 
-#### 常用权限速查
+常用权限
 
 | 权限码 | 含义 | 使用场景 | 示例 |
 |--------|------|----------|------|
@@ -234,6 +196,44 @@ ls -l file.txt
 - SSH密钥必须用600权限，否则SSH会拒绝使用
 - 脚本文件要加执行权限才能运行：`chmod +x script.sh`
 :::
+
+### 文件操作
+
+| 命令 | 功能 | 示例 | 记忆技巧 |
+|------|------|------|----------|
+| `pwd` | 显示当前目录 | `pwd` | **p**rint **w**orking **d**irectory |
+| `ls` | 列出文件 | `ls` / `ls -la` | **l**i**s**t |
+| `cd` | 切换目录 | `cd /home` | **c**hange **d**irectory |
+| `mkdir` | 创建目录 | `mkdir test` | **m**a**k**e **dir**ectory |
+| `touch` | 创建文件 | `touch file.txt` | touch（触碰） |
+| `rm` | 删除文件 | `rm file.txt` | **r**e**m**ove |
+| `rm -r` | 删除目录 | `rm -r folder` | **r**e**m**ove **r**ecursive |
+| `cp` | 复制 | `cp a.txt b.txt` | **c**o**p**y |
+| `mv` | 移动/重命名 | `mv old.txt new.txt` | **m**o**v**e |
+| `cat` | 查看文件内容 | `cat readme.txt` | con**cat**enate |
+
+:::danger
+`rm -rf /` 会删除所有文件！**永远不要**执行这个命令！
+- `-r`：递归删除（包括子目录）
+- `-f`：强制删除（不询问）
+:::
+
+### 编辑文件
+
+**方法1：使用nano编辑器（推荐新手）**
+```bash
+nano file.txt          # 打开文件
+# Ctrl+O 保存
+# Ctrl+X 退出
+```
+
+**方法2：使用vim编辑器（进阶）**
+```bash
+vim file.txt           # 打开文件
+# 按 i 进入编辑模式
+# 按 Esc 退出编辑模式
+# 输入 :wq 保存并退出
+```
 
 ## 实用进阶技能
 
@@ -296,7 +296,7 @@ source ~/.bashrc          # 重新加载配置
 - 查看：`echo $env:MY_VAR`
 :::
 
-### 端口管理（开发必备）
+### 端口管理
 
 开发时经常遇到"端口被占用"的问题，这些命令能帮你：
 
@@ -312,31 +312,61 @@ kill -9 $(lsof -i tcp:8080 -t)        # 强制终止8080端口进程
 nohup python3 app.py &                # 关闭终端后程序继续运行
 ```
 
-### 远程连接（SSH）
+### 远程连接
 
-通过SSH连接到远程Linux服务器：
+被连接的设备称为服务器，连接的设备称为本地
+
+需要在服务器防火墙中打开的端口：`22`。通过SSH连接到远程Linux服务器：
 
 ```bash
-# 基本连接
-ssh username@192.168.1.100            # 连接到远程主机
+# 本地输入：用户名@地址
+# 地址可以是IP地址或者域名
+ssh username@192.168.1.100            # 连接至192.168.1.100服务器
 
-# 指定端口连接
+# 本地输入指定端口连接
 ssh -p 2222 username@example.com      # 使用非默认端口（默认22）
 
-# 文件传输（scp命令）
-scp local.txt user@host:~/            # 上传文件到远程
-scp user@host:~/remote.txt ./         # 下载远程文件
-scp -r folder/ user@host:~/           # 传输整个文件夹
+# 本地输入：文件传输
+scp local.txt username@192.168.1.100:~/            # 上传文件到远程
+scp username@192.168.1.100:~/remote.txt ./         # 下载远程文件
+scp -r folder/ username@192.168.1.100:~/           # 传输整个文件夹
 ```
 
-:::tip SSH密钥登录（推荐）
-使用密钥代替密码更安全：
-```bash
-ssh-keygen                            # 生成SSH密钥对
-ssh-copy-id user@host                 # 将公钥复制到远程主机
-# 之后就可以免密码登录了
-```
+:::info
+虽然我们可以直接通过账号密码登录 ssh，但是账号密码权限太高，因此设置一个仅用于部署的 ssh 密钥。
 :::
+
+```bash showLineNumbers
+# 本地连接上服务器后输入：生成部署密钥对
+ssh-keygen -t rsa -b 4096 -f ~/.ssh/deploy_key -N ""
+
+# 本地连接上服务器后输入：查看生成的文件
+ls -la ~/.ssh/
+# 会看到：
+# deploy_key      (私钥)
+# deploy_key.pub  (公钥)
+
+# 本地连接上服务器后输入：将公钥加入登录白名单
+cat ~/.ssh/deploy_key.pub >> ~/.ssh/authorized_keys
+
+# 本地连接上服务器后输入：设置正确权限（过低没有权限，过高 ssh 会认为文件不安全）
+chmod 700 ~/.ssh
+chmod 600 ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/deploy_key
+
+# 本地连接上服务器后输入：断开连接
+exit
+
+# 本地输入：把服务器私钥复制到本地（替换为你的服务器信息）
+scp username@192.168.1.100:~/.ssh/deploy_key ~/.ssh/deploy_key
+
+# 本地输入：修正本地私钥权限
+chmod 600 ~/.ssh/deploy_key
+
+# 本地输入：测试 deploy_key 是否可用（应直接登录，不再需要密码）
+# 以后每次都只需输入下面的命令即可
+ssh -i ~/.ssh/deploy_key username@192.168.1.100
+```
 
 ## Makefile
 

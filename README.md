@@ -81,6 +81,7 @@
 - `npm install`：下载所需依赖包
 - `npm run start`：启动站点
 - `npm run build`: 打包为静态站点
+- `npm run serve`: 启动静态站点
 
 ## Docker参考
 

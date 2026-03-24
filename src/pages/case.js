@@ -4,11 +4,6 @@ import Layout from "@theme/Layout";
 import React, { Fragment, useEffect, useState } from "react";
 import { ShowcaseCard } from "@infinum/docusaurus-theme";
 
-const shuffleArray = (array) =>
-  array
-    // .map((value) => ({ value, sort: Math.random() })) 随机排序
-    // .sort((a, b) => a.sort - b.sort)
-    // .map(({ value }) => value);
 
 function ShowcaseGrid() {
   const headingTitle = "ShowCase";
@@ -18,13 +13,6 @@ function ShowcaseGrid() {
       title: "jiangmiemie",
       desc: "精巧且开源的个人博客站点。配置生成式 AI 文章总结、问答、播客。内置相册，支持 mermaid 、KaTeX 、交互式思维导图。可使用 GitHub 账号评论。",
       url: "https://github.com/jiangyangcreate/jiangyangcreate.github.io",
-      category: "维护中", 
-    },
-    {
-      image: useBaseUrl("pages/case/AI-Practice-Collection.webp"),
-      title: "Collection",
-      desc: "这是一个用于技术练习和探索的项目合集。该仓库汇集了多个完整的项目，适用于学习和练习。",
-      url: "https://github.com/jiangyangcreate/AI-Practice-Collection",
       category: "维护中", 
     },
     {
@@ -44,7 +32,7 @@ function ShowcaseGrid() {
     {
       image: useBaseUrl("pages/case/exboard.webp"),
       title: "exboard",
-      desc: "Python驱动库，适用于Jetson Orin Nano 和 RK3399 Pro芯片，支持RSS协议（摄像头云台）、数字量模拟量的处理（常见传感器）、i2c协议（控制RGB灯带）、超声波读取、非加密NFC读写。",
+      desc: "适用于NVIDIA Jetson Orin Nano 外接 RaspberryPi Sensor Board 拓展板的 Python 库，支持RSS协议控制摄像头云台、常见传感器的数字量模拟量处理、i2c协议控制RGB灯带、超声波读取、非加密NFC读写。",
       url: "https://github.com/jiangyangcreate/exboard/",
       category: "存档项目", 
     }

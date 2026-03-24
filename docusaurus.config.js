@@ -189,12 +189,12 @@ module.exports = {
       additionalLanguages: ['toml','yaml','bash'],
     },
     // 告示条
-    announcementBar: {
-      id: 'support',
-      content:
-        `全局AI问答、博客AI总结、博客转AI播客功能均已上线 🚀 `,
-      isCloseable: true,//允许用户关闭
-    },
+    // announcementBar: {
+    //   id: 'support',
+    //   content:
+    //     `全局AI问答、博客AI总结、博客转AI播客功能均已上线 🚀 `,
+    //   isCloseable: true,//允许用户关闭
+    // },
     navbar: {
       hideOnScroll: false,
       items: [
