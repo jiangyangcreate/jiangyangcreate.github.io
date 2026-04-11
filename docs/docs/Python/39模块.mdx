@@ -172,6 +172,8 @@ print(sys.argv)
 from .second_copy import *
 ```
 
+### 运行脚本的参数
+
 两种运行脚本的方式，以及对应的输出：
 
 1. **使用 `python -m top.second` 运行**：
@@ -212,6 +214,77 @@ from .second_copy import *
 - **相对导入失败**：`second.py` 中的 `from .second_copy import *` 依赖于包结构，但由于缺少包上下文，Python 不知道 `.` 代表什么，导致抛出 `ImportError: attempted relative import with no known parent package`。
 - **`sys.argv` 的值**：在这里，`sys.argv[0]` 是命令行中提供的路径，即 `top\second.py`（相对于当前工作目录 `C:\Users\jiang\Desktop`）。  
 - `second.py` 打印这个值后，尝试执行相对导入时失败，因此程序终止，`second_copy.py` 的代码未被执行。
+
+:::info
+`python -m` 的用途不止上文「在包结构里跑模块」这一种，实务里还常见：
+
+- **绑定当前解释器**：用 `python -m pip`、`python -m venv` 安装包或建虚拟环境时，会强制使用**当前这条** `python` 对应的 pip / venv，避免 PATH 里多个 Python 时装到别的版本。
+- **把标准库当命令行工具用**：例如 `python -m http.server` 在当前目录提供静态文件服务；`python -m json.tool` 格式化 JSON；`python -m pdb 脚本.py` 调试；`python -m compileall` 批量生成字节码。模块名即入口，且不依赖额外脚本路径。
+
+:::
+
+
+:::tip
+完整语法与全部开关见官方文档 [Command line and environment](https://docs.python.org/3/using/cmdline.html)。下面按类别整理常用项；**`-X`** 为 CPython 预留的**实现相关**开关，可用 `python --help-xoptions`（3.11+）查看本机支持的值，运行时也可查 [`sys._xoptions`](https://docs.python.org/3/library/sys.html#sys._xoptions)。
+
+**`-X`（CPython 常见取值，节选）**
+
+| 形式 | 作用 |
+| --- | --- |
+| `-X faulthandler` | 启用 [`faulthandler`](https://docs.python.org/3/library/faulthandler.html)，便于崩溃/卡死时打印 C 栈（等价环境变量 `PYTHONFAULTHANDLER`）。 |
+| `-X tracemalloc` / `-X tracemalloc=N` | 启动 [`tracemalloc`](https://docs.python.org/3/library/tracemalloc.html) 记录分配，`N` 为回溯帧数。 |
+| `-X importtime` / `-X importtime=2` | 打印各模块导入耗时（调性能、查慢导入）；`2` 会标出已缓存的模块（3.14+）。 |
+| `-X dev` | 开启[开发模式](https://docs.python.org/3/library/devmode.html)，额外运行时检查（等价 `PYTHONDEVMODE`）。 |
+| `-X utf8` / `-X utf8=0` | 显式开启或关闭 [UTF-8 模式](https://docs.python.org/3/library/os.html#utf8-mode)。 |
+| `-X pycache_prefix=PATH` | 把 `.pyc` 写到指定目录树，不污染源码目录（等价 `PYTHONPYCACHEPREFIX`）。 |
+
+其余如 `-X int_max_str_digits`、`-X perf`（Linux `perf`）、`-X gil=0` / `-X gil=1`（仅 free-threaded 构建）等以当前 Python 版本的 `--help-xoptions` 为准。
+
+---
+
+**1. 接口选项（Interface options）** — 决定解释器**如何找到并运行代码**。`[-c command | -m module-name | script | -]` 与后面的 `args` 分界：接口选项之后的参数会进入 `sys.argv`。
+
+| 参数 | 作用 | 示例 |
+| --- | --- | --- |
+| `-c <command>` | 执行字符串中的 Python 代码（可多行，前导空白有意义）。 | `python -c "print('Hello')"` |
+| `-m <module>` | 在 `sys.path` 中查找模块并以 `__main__` 运行（包则运行 `.__main__`）。 | `python -m http.server` |
+| `<script>` | 运行指定路径的脚本，或含 `__main__.py` 的目录/zip。 | `python main.py` |
+| `-` | 从标准输入读代码；若 stdin 是终端则隐含交互。 | 见下（管道把 stdin 交给 `python -`） |
+
+```bash
+echo "print(1)" | python -
+```
+
+---
+
+**2. 行为控制选项（Miscellaneous options）** — 调试、优化、环境与安全。
+
+- **调试与警告**：`-v` 每次初始化模块时打印加载位置；`-vv` 更细；`-W <arg>` 控制警告（如 `python -W error` 将警告视为异常，`python -W ignore` 忽略）；`-i` 在脚本、`-c`、`-m` 执行完后进入交互，便于查变量或栈。
+- **性能与字节码**：`-O` 去掉 `assert` 与依赖 `__debug__` 的代码；`-OO` 再去掉 docstring；`-B` 不写 `.pyc`，避免污染目录。
+- **环境与安全**：`-E` 忽略所有 `PYTHON*` 环境变量；`-I` **隔离模式**，隐含 `-E`、`-P`、`-s`，`sys.path` 不含当前目录/脚本目录与用户 site（比 `-E` 更彻底）；`-u` 让 stdout/stderr 不缓冲，容器里看日志常用；`-s` 不把用户级 site-packages 加入 `sys.path`。
+
+---
+
+**3. 通用信息选项（Generic options）**
+
+- `-h` / `--help`：简短列出所有命令行选项（3.11+ 还有 `--help-env`、`--help-xoptions`、`--help-all`）。
+- `-V` / `--version`：版本号；**写两次** `-VV` 输出构建信息（编译器等）。
+
+---
+
+**快速对照（常见场景）**
+
+| 场景 | 建议 |
+| --- | --- |
+| 日志要实时、不要缓冲 | `python -u script.py` |
+| 怀疑环境/`PYTHONPATH` 污染或库冲突 | `python -I script.py` |
+| 希望警告直接变成报错 | `python -W error script.py` |
+| 跑标准库或项目提供的 CLI 入口 | `python -m <module>`（如 `python -m venv venv`） |
+| 分析导入耗时 | `python -X importtime -c "import yourpackage"` |
+
+在 **Docker、systemd、K8s** 等环境里，`python -u` 很常见；排查「为什么本地能跑、服务器不行」时，`python -I` 或临时 `python -E` 有助于确认是否被环境变量或路径劫持。
+:::
+
 
 ### \_\_main\_\_.py
 
