@@ -1042,6 +1042,29 @@ print(process_point(Point(99, 0, 0))) # 彩蛋
 print(process_point(Point(100, 0, 0))) # TypeError: Point() accepts 1 positional sub-pattern (3 given)
 ```
 
+### \_\_fspath\_\_
+
+PEP 519 规定，只要一个类实现了 `__fspath__()` 方法，并返回一个字符串或字节串，它就是一个 "Path-like object"（类路径对象）。
+
+底层的 C 函数（比如 os.stat）和大量的库过去只认 `str` 或 `bytes`。现在，它们会寻找该对象是否有 `__fspath__()` 方法，如果有就用`os.fspath()`来获取路径字符串。
+
+通过这样的方式，老代码可以使用新的路径对象，新代码可以更加灵活的对路径进行操作。
+
+```python showLineNumbers
+class SmartPath:
+    def __init__(self, raw_path):
+        self.raw = raw_path
+    
+    def __fspath__(self):
+        # 将路径中环境变量的占位符替换为实际值
+        return os.path.expandvars(self.raw)
+
+# 传入一个字符串：环境变量 $USER_DATA 拼接 /config.json
+p = SmartPath("$USER_DATA/config.json")
+with open(p) as f:  # open() 会自动调用 __fspath__ 解析出真实路径
+    pass
+```
+
 ## 重载类型转换
 
 ### \_\_repr\_\_和\_\_str\_\_
