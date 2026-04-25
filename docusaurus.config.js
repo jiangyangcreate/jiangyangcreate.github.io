@@ -170,7 +170,7 @@ module.exports = {
       indexName: websitename,
       askAi: {
         appId: "B8DUWB4CMX",
-        apiKey: "7324233c84b4ffb7c51f7a11136750a9", 
+        apiKey: "7324233c84b4ffb7c51f7a11136750a9",
         indexName: "markdown-index",              // 你的 markdown 索引名
         assistantId: "PSPEr8rtpc0W",
         // Docusaurus 3.9 当前的 schema 不支持 suggestedQuestions 字段
@@ -186,7 +186,7 @@ module.exports = {
       theme: lightCodeTheme,
       darkTheme: darkCodeTheme,
       defaultLanguage: "markdown",
-      additionalLanguages: ['toml','yaml','bash'],
+      additionalLanguages: ['toml', 'yaml', 'bash'],
     },
     // 告示条
     // announcementBar: {
@@ -222,6 +222,20 @@ module.exports = {
           to: "/gallery",
           position: "left",
           label: "相簿",
+        },
+        {
+          label: '其他',
+          position: 'left',
+          items: [
+            {
+              label: '云盘',
+              href: 'https://yun.jiangmiemie.com',
+            },
+            {
+              label: 'AI助手',
+              href: 'https://ai.jiangmiemie.com',
+            },
+          ],
         },
         // 搜索框
         {
