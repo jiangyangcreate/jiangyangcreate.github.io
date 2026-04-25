@@ -33,6 +33,6 @@ jobs:
           SERVER_IP: ${{ secrets.IP }}
       - name: generate summary
         run: |
-          curl -X POST "https://chat.jiangyang.fun/blog/update?key=${{ secrets.KEY }}"
+          curl -X POST "https://ai.jiangmiemie.com/blog/update?key=${{ secrets.KEY }}"
         env:
           KEY: ${{ secrets.KEY }}

@@ -21,7 +21,7 @@ const CustomSearch = () => {
   };
 
   // 定义需要循环显示的文本
-  const words = ["当前的时间", "Python", "LLM&Agent", "娱乐至死", "Hello, World!"];
+  const words = ["猫会喵喵叫，羊会咩咩叫", "欢迎访问jiangmiemie", "当前的时间", "Python & Agent"];
 
   // 用于打字机效果的状态管理
   const [typedText, setTypedText] = useState("");
@@ -94,7 +94,7 @@ function MyComponent() {
         height: "79vh",
       }}
     >
-        <style>{`
+      <style>{`
           .custom-placeholder::-webkit-input-placeholder {
             color: var(--ifm-color-primary);
           }

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import clsx from "clsx";
 import { blogPostContainerID } from "@docusaurus/utils-common";
-import {useBlogPost} from '@docusaurus/plugin-content-blog/client';
+import { useBlogPost } from '@docusaurus/plugin-content-blog/client';
 import MDXContent from "@theme/MDXContent";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 
@@ -35,7 +35,7 @@ const JsonReader = ({
 }) => {
   // 替换url与/
   const path = fieldToMatch.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
-  const url = `https://chat.jiangyang.fun/static/summary/${path}.json`;
+  const url = `https://ai.jiangmiemie.com/static/summary/${path}.json`;
   const [jsonData, setJsonData] = useState(null);
 
   useEffect(() => {
@@ -61,7 +61,7 @@ const JsonReader = ({
     const matchingField = jsonData["summary"];
     return (
       <>
-      <TypingComponent text={matchingField} speed={100} />
+        <TypingComponent text={matchingField} speed={100} />
       </>
     );
   };
@@ -100,7 +100,7 @@ function formatTime(seconds) {
 
 const AiPodcast = ({ pageurl }) => {
   const path = pageurl.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
-  const audioUrl = `https://chat.jiangyang.fun/static/summary/${path}.mp3`;
+  const audioUrl = `https://ai.jiangmiemie.com/static/summary/${path}.mp3`;
 
   const audioRef = useRef(null);
   const [available, setAvailable] = useState(null);
@@ -162,42 +162,42 @@ const AiPodcast = ({ pageurl }) => {
         onError={handleError}
       />
       {available === true && (
-    <div className="post-ai podcast-player">
-      <div className="ai-title">
-        <div className="ai-title-left">
-          <div className="ai-title-text">AI 对谈</div>
-        </div>
-      </div>
-      <div className="podcast-controls">
-        <button
-          className="podcast-play-btn"
-          onClick={togglePlay}
-          aria-label={playing ? "暂停" : "播放"}
-        >
-          {playing ? (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <rect x="6" y="4" width="4" height="16" rx="1" />
-              <rect x="14" y="4" width="4" height="16" rx="1" />
-            </svg>
-          ) : (
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M8 5v14l11-7z" />
-            </svg>
-          )}
-        </button>
-        <div className="podcast-progress-wrap" onClick={handleSeek}>
-          <div className="podcast-progress-bar">
-            <div className="podcast-progress-fill" style={{ width: `${progress}%` }} />
+        <div className="post-ai podcast-player">
+          <div className="ai-title">
+            <div className="ai-title-left">
+              <div className="ai-title-text">AI 对谈</div>
+            </div>
+          </div>
+          <div className="podcast-controls">
+            <button
+              className="podcast-play-btn"
+              onClick={togglePlay}
+              aria-label={playing ? "暂停" : "播放"}
+            >
+              {playing ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="6" y="4" width="4" height="16" rx="1" />
+                  <rect x="14" y="4" width="4" height="16" rx="1" />
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </button>
+            <div className="podcast-progress-wrap" onClick={handleSeek}>
+              <div className="podcast-progress-bar">
+                <div className="podcast-progress-fill" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+            <span className="podcast-time">
+              {formatTime(currentTime)} / {formatTime(duration)}
+            </span>
+          </div>
+          <div className="ai-bottom">
+            <div className="ai-tips">AI 根据文章生成的播客对话，仅供参考</div>
           </div>
         </div>
-        <span className="podcast-time">
-          {formatTime(currentTime)} / {formatTime(duration)}
-        </span>
-      </div>
-      <div className="ai-bottom">
-        <div className="ai-tips">AI 根据文章生成的播客对话，仅供参考</div>
-      </div>
-    </div>
       )}
     </>
   );
