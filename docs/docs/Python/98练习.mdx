@@ -306,7 +306,7 @@ if __name__ == '__main__':
     print(f"是否为同一对象: {a is b}")  # True
 ```
 
-:::tip 装饰器优势
+:::tip[装饰器优势]
 - 代码简洁优雅
 - 可重用性强
 - 不需要修改原类的内部结构
@@ -336,7 +336,7 @@ print(f"是否为同一对象: {single_1 is single_2}")  # True
 
 ##### 线程安全版本
 
-:::warning 多线程问题
+:::warning[多线程问题]
 上述实现在多线程环境下不安全，需要加锁保护
 :::
 
@@ -382,7 +382,7 @@ print(f"single_2.name: {single_2.name}")  # 第1次创建
 print(f"是否为同一对象: {single_1 is single_2}")  # True
 ```
 
-:::info 元类原理
+:::info[元类原理]
 - `Singleton` 是元类 `SingletonType` 的实例
 - `Singleton('参数')` 实际上是调用元类的 `__call__` 方法
 - 使用 `super()` 避免递归调用
@@ -390,7 +390,7 @@ print(f"是否为同一对象: {single_1 is single_2}")  # True
 
 #### 方法五：使用模块
 
-:::tip 官方推荐
+:::tip[官方推荐]
 这是 Python 官方推荐的单例实现方式，简单且天然线程安全
 :::
 

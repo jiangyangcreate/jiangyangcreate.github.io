@@ -42,7 +42,7 @@ frac, integer = math.modf(3.75)
 print(f"小数: {frac}, 整数: {integer}")  # 小数: 0.75, 整数: 3.0
 ```
 
-:::tip ceil / floor / trunc 对负数的区别
+:::tip[ceil / floor / trunc 对负数的区别]
 | 函数 | -2.3 的结果 | 方向 |
 |------|-----------|------|
 | `ceil` | -2 | 向正无穷 |
@@ -161,6 +161,6 @@ print(math.isclose(1.0, 1.01, rel_tol=0.02))  # True（2% 相对容差）
 print(math.isclose(0.0, 0.001, abs_tol=0.01)) # True（绝对容差）
 ```
 
-:::info math vs cmath
+:::info[math vs cmath]
 `math` 不支持复数运算。如需处理复数，请使用 [`cmath`](https://docs.python.org/3/library/cmath.html) 模块，它提供了同名函数的复数版本。
 :::

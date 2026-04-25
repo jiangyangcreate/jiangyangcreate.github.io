@@ -21,7 +21,7 @@ title: Terminal
 
 详细内容请参考[WSL官方教程](https://learn.microsoft.com/zh-cn/windows/wsl/)。
 
-:::tip 提示
+:::tip[提示]
 - 某些版本的命令行需要使用 `wsl.exe` 而不是 `wsl`
 - `wsl --unregister` 会永久删除该发行版及其所有数据，无法恢复！
 :::
@@ -102,7 +102,7 @@ title: Terminal
 - `ls -l` - 列出详细信息（`-l` 是短参数）
 - `ls --list /home` - 长参数写法，等同于短参数
 
-:::tip 参数写法
+:::tip[参数写法]
 - **短参数**：`-l`（一个字母，方便手动输入）
 - **长参数**：`--list`（完整单词，脚本中更清晰）
 - 两者通常等效：`ls -l` = `ls --list`
@@ -151,7 +151,7 @@ sudo reboot              # 以管理员身份重启系统
 | `Ctrl + U` | 删除光标到行首 | ⭐⭐⭐ |
 | `Ctrl + W` | 删除前一个单词 | ⭐⭐ |
 
-:::tip Tab键的妙用
+:::tip[Tab键的妙用]
 - 输入 `cd /h` 按Tab → 自动补全为 `cd /home`
 - 按两次Tab → 显示所有可能的选项
 - **能用Tab就别手打！**
@@ -191,7 +191,7 @@ ls -l file.txt
 #       rw-    r-- r--
 ```
 
-:::warning 安全提示
+:::warning[安全提示]
 - **永远不要给关键文件777权限**（所有人可改）
 - SSH密钥必须用600权限，否则SSH会拒绝使用
 - 脚本文件要加执行权限才能运行：`chmod +x script.sh`
@@ -290,7 +290,7 @@ source ~/.bashrc          # 重新加载配置
 | `$USER` | 当前用户名 | 你的用户名 |
 | `$PWD` | 当前工作目录 | 当前所在目录 |
 
-:::tip Windows PowerShell对比
+:::tip[Windows PowerShell对比]
 在Windows PowerShell中，环境变量语法不同：
 - 设置：`$env:MY_VAR = "hello"`
 - 查看：`echo $env:MY_VAR`

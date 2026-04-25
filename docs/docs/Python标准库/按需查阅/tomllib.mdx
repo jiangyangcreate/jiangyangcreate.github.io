@@ -106,7 +106,7 @@ print(type(data["tags"]))      # <class 'list'>
 print(type(data["database"]))  # <class 'dict'>
 ```
 
-:::info 完整类型对照表
+:::info[完整类型对照表]
 | TOML 类型 | Python 类型 |
 |-----------|-------------|
 | 字符串 | `str` |
@@ -158,7 +158,7 @@ except tomllib.TOMLDecodeError as e:
     print(f"TOML 解析错误: {e}")
 ```
 
-:::tip 写入 TOML
+:::tip[写入 TOML]
 `tomllib` 只支持读取。如需写入 TOML 文件，可使用第三方库：
 - **tomli-w**：轻量写入库，与 `tomllib` 配套
 - **tomlkit**：保留格式和注释的读写库，适合编辑已有文件

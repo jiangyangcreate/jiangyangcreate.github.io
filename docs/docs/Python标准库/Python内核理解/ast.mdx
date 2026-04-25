@@ -46,7 +46,7 @@ Module(
 """
 ```
 
-:::tip 编译 pipeline 与 AST 节点
+:::tip[编译 pipeline 与 AST 节点]
 上文的管线中，语法分析先产生**解析树**（parse tree），再转换为 AST；AST 之后经符号表、控制流图等步骤生成字节码。AST 节点类型由 CPython 的 `Parser/Python.asdl` 定义，所有节点继承自 `ast.AST`，如 `FunctionDef`、`BinOp`、`Name` 等对应语法构造，节点有 `_fields` 列出子节点名，多数还带 `lineno`、`col_offset` 等位置信息。
 :::
 
@@ -109,7 +109,7 @@ print(namespace["result"])  # 12 (= 2 + 4 + 6)
 
 `ast.literal_eval(node_or_string)` 只允许求值「字面量」：数字、字符串、字节串、元组、列表、字典、集合、`True`/`False`/`None` 等，不允许函数调用、属性访问、运算符（除字面量构造外）等，因此无法执行任意代码，适合解析来自不可信输入的配置或数据。
 
-:::tip 安全与 eval
+:::tip[安全与 eval]
 `eval()` 会执行传入字符串中的任意 Python 表达式，若字符串来自用户或网络，可能执行 `__import__('os').system(...)` 等危险代码。`literal_eval` 在 AST 层面限制为仅字面量节点，从而在保持「把字符串当 Python 字面量解析」的便利性的同时避免代码执行风险。
 :::
 
@@ -185,7 +185,7 @@ for name, score in analyzer.results.items():
 
 `ast.parse()` 的 `mode` 可选 `"exec"`（模块/多语句）、`"eval"`（单表达式）、`"single"`（交互式单条语句）等；得到的 AST 用内置 `compile()` 编译为字节码后，可用 `exec()` 或 `eval()` 执行。
 
-:::tip 从 AST 到字节码
+:::tip[从 AST 到字节码]
 内置函数 `compile(source, filename, mode)` 可直接接受字符串 `source`；若传入 AST 根节点，则相当于跳过了「源码 → AST」一步，直接做「AST → 字节码」。这对「先修改 AST 再执行」的元编程场景很有用；CPython 内部也是先得到 AST 再调用编译器生成字节码。
 :::
 
@@ -203,7 +203,7 @@ result = eval(compile(expr_tree, "<ast>", "eval"))
 print(result)  # 1024
 ```
 
-:::tip AST 的实际应用
+:::tip[AST 的实际应用]
 - **代码格式化工具**（如 Black）基于 AST 确保格式化不改变语义
 - **静态分析工具**（如 Pylint、mypy）使用 AST 检查代码问题
 - **AI 代码生成**：分析/验证 LLM 生成代码的语法正确性

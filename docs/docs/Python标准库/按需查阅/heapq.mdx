@@ -44,7 +44,7 @@ old = heapq.heappushpop(heap, 2)
 print(f"弹出: {old}, 堆顶: {heap[0]}")  # 弹出: 2, 堆顶: 3
 ```
 
-:::tip heapreplace vs heappushpop
+:::tip[heapreplace vs heappushpop]
 - `heapreplace(heap, item)`：先 pop 后 push，返回值可能**大于** item
 - `heappushpop(heap, item)`：先 push 后 pop，返回值一定是**最小的**那个
 - 两者都比分开调用更高效（只做一次堆调整）
@@ -72,7 +72,7 @@ top2 = heapq.nlargest(2, students, key=lambda s: s["score"])
 print([s["name"] for s in top2])  # ['Carol', 'Alice']
 ```
 
-:::info 何时使用 nlargest/nsmallest
+:::info[何时使用 nlargest/nsmallest]
 - `n=1` 时，直接用 `min()` / `max()` 更快
 - `n` 接近列表长度时，`sorted(data)[:n]` 更快
 - `n` 远小于列表长度时，`heapq.nlargest` / `nsmallest` 最高效
@@ -170,7 +170,7 @@ heapq.heappush(max_heap, -10)
 print(-max_heap[0])  # 10
 ```
 
-:::tip heapq vs queue.PriorityQueue
+:::tip[heapq vs queue.PriorityQueue]
 | 特性 | `heapq` | `queue.PriorityQueue` |
 |------|---------|----------------------|
 | 线程安全 | 否 | 是（内置锁） |

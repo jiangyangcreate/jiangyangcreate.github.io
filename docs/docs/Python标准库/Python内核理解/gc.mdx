@@ -12,7 +12,7 @@ Python 的内存管理以**引用计数**为主：对象引用计数归零时立
 
 执行一次垃圾回收。可选参数 `generation` 指定回收哪一代（0、1、2）：`collect(0)` 只回收青年代，`collect(1)` 回收青年代并对老年代做增量回收，`collect(2)` 或 `collect()` 执行完整回收。返回本轮回收的对象数量（含不可回收）。
 
-:::tip 代（generation）
+:::tip[代（generation）]
 回收器把对象按“存活时间”分为**青年代**（新分配）和**老年代**（经历过回收仍存活）。默认优先回收青年代，减少全量扫描，提高回收效率。
 :::
 
@@ -41,7 +41,7 @@ print("当前阈值:", gc.get_threshold())
 print("统计信息:", gc.get_stats())
 ```
 
-:::tip 阈值与触发时机
+:::tip[阈值与触发时机]
 当“分配数 − 回收数”超过 `threshold0` 时，回收器开始工作；先收青年代，再按比例扫描老年代（比例与 `threshold1` 有关）。一般无需修改阈值，除非在做性能调优或特殊部署。
 :::
 
@@ -61,7 +61,7 @@ young = gc.get_objects(generation=0)
 print("青年代对象数:", len(young))
 ```
 
-:::tip 跟踪（tracking）
+:::tip[跟踪（tracking）]
 只有“可能参与循环”的对象才会被回收器跟踪，如列表、字典、类实例等；原子类型（int、str 等）通常不跟踪。`is_tracked(obj)` 可查询某对象是否被跟踪。
 :::
 
@@ -113,7 +113,7 @@ print(gc.get_threshold())
 - **get_referrers(*objs)**：返回**直接引用**了任意 `objs` 的对象列表；仅包含支持 GC 的容器，扩展类型若不参与 GC 则不会出现。调试时先调用 `collect()` 再调用可减少“已断开的环”的干扰。
 - **get_referents(*objs)**：返回被 `objs` **直接引用**的对象列表（由 C 层 `tp_traverse` 决定，未必包含所有可达对象，且可能只包含可能参与环的对象）。
 
-:::tip 循环检测
+:::tip[循环检测]
 回收器通过遍历对象的“引用关系”找出从根不可达的子图；若该子图内存在环，则整块可被判定为循环垃圾并回收。`get_referrers`/`get_referents` 可帮助人工分析引用关系。
 :::
 
@@ -184,6 +184,6 @@ gc.callbacks.remove(on_gc)
 print("gc.garbage 长度:", len(gc.garbage))
 ```
 
-:::tip 一般无需主动调用
+:::tip[一般无需主动调用]
 日常开发中很少需要手动 `gc.collect()` 或改阈值；解释器会自动按代回收。在调试内存泄漏、测量回收影响或特殊部署场景时，再结合 `get_debug`/`set_debug`、`get_count`/`get_stats` 等深入使用。
 :::

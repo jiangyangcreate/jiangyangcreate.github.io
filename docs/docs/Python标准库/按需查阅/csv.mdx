@@ -70,7 +70,7 @@ with open('dict_output.csv', 'w', newline='', encoding='utf-8') as f:
     writer.writerow({'姓名': '赵六', '年龄': 30, '城市': '深圳'})
 ```
 
-:::info DictReader vs reader
+:::info[DictReader vs reader]
 - `csv.reader` 返回列表，按索引访问：`row[0]`
 - `csv.DictReader` 返回字典，按字段名访问：`row['姓名']`
 
@@ -97,7 +97,7 @@ with open('pipe.csv', 'w', newline='') as f:
 csv.unregister_dialect('pipe')
 ```
 
-:::tip 常用格式参数
+:::tip[常用格式参数]
 | 参数 | 默认值 | 说明 |
 |------|--------|------|
 | `delimiter` | `','` | 字段分隔符 |

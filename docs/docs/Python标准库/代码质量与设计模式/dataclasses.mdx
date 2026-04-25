@@ -114,7 +114,7 @@ p2 = replace(p, x=5)
 print(p2)                           # Point(x=5, y=20)
 ```
 
-:::info 可变默认值、与 namedtuple 对比
+:::info[可变默认值、与 namedtuple 对比]
 - 列表/字典等可变默认值不能直接写 `x: list = []`，必须用 `field(default_factory=list)`，否则会触发 ValueError（不可哈希默认值检测）。
 - 与 **namedtuple**：dataclass 支持继承、可变实例、默认值、可控 `__init__`/`__repr__`/比较；不与元组意外相等；不要求“可迭代解包”。需要“类 + 字段 + 少写样板”时优先考虑 dataclass。
 :::

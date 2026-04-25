@@ -22,7 +22,7 @@ result = old_api()
 # <stdin>:1: DeprecationWarning: old_api() 已弃用，请使用 new_api()
 ```
 
-:::tip stacklevel 参数
+:::tip[stacklevel 参数]
 `stacklevel=2` 让警告指向调用 `old_api()` 的那一行，而非 `warnings.warn()` 所在行。这是库开发中的标准做法。
 :::
 
@@ -132,7 +132,7 @@ model = load_model("/tmp/model.pt")
 # DeprecationWarning: load_model() 已弃用，请使用 load_model_v2()
 ```
 
-:::info Python 3.13+ 内置 @warnings.deprecated
+:::info[Python 3.13+ 内置 @warnings.deprecated]
 从 Python 3.13 开始，标准库提供了 `@warnings.deprecated` 装饰器（源自 PEP 702），可以直接装饰类、函数或重载，同时被静态类型检查器识别。
 :::
 

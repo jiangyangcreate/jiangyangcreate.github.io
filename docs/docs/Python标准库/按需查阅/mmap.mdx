@@ -142,7 +142,7 @@ with open("array.bin", "r+b") as f:
 os.remove("array.bin")
 ```
 
-:::tip 为什么 AI 开发者需要了解 mmap
+:::tip[为什么 AI 开发者需要了解 mmap]
 - **HuggingFace datasets** 使用 Apache Arrow 的 memory-mapped 格式，底层就是 mmap
 - **numpy.memmap** 本质上是对 `mmap` 的封装
 - **PyTorch DataLoader** 在多进程数据加载时，共享内存也依赖类似机制

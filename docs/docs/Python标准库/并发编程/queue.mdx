@@ -84,7 +84,7 @@ print(sq.get())  # 1
 print(sq.empty())  # False（仅“大致”状态，不保证后续 get 不阻塞）
 ```
 
-:::info Empty / Full、与 multiprocessing.Queue / deque 对比
+:::info[Empty / Full、与 multiprocessing.Queue / deque 对比]
 - **Empty**：在空队列上调用非阻塞 `get()` 或 `get_nowait()` 时抛出。
 - **Full**：在已满队列上调用非阻塞 `put()` 或 `put_nowait()` 时抛出。
 - **multiprocessing.Queue**：用于多进程间通信；`queue.Queue` 用于多线程。

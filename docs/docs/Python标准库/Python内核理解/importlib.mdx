@@ -25,7 +25,7 @@ print(mod.__name__)  # json
 # importlib.import_module("..other", "pkg.subpkg")  # 得到 pkg.other
 ```
 
-:::tip **为何推荐 import_module 而非 __import__**
+:::tip[**为何推荐 import_module 而非 __import__**]
 `__import__` 是 `import` 语句的底层实现，但返回的是「顶层」包或模块；而 `import_module(name)` 返回的正是 `name` 对应的包或模块，更符合「按名字拿模块」的直觉，且与基于 finder/loader 的导入机制一致。
 :::
 
@@ -42,7 +42,7 @@ import sys
 # 注意：其他模块里已用 from some_module import X 的引用不会自动更新，需重新执行 from 或使用 module.X
 ```
 
-:::tip **reload 与 ModuleSpec**
+:::tip[**reload 与 ModuleSpec**]
 从 Python 3.7 起，若被重载的模块没有 `ModuleSpec`（例如缺少 `__spec__`），会抛出 `ModuleNotFoundError`。reload 内部会通过 `find_spec(name, target=module)` 获取规格再执行加载。
 :::
 
@@ -61,7 +61,7 @@ if spec is not None:
     print(spec.submodule_search_locations)  # None（非包）
 ```
 
-:::tip **ModuleSpec 与查找器/加载器**
+:::tip[**ModuleSpec 与查找器/加载器**]
 **Finder** 负责「找到」模块并给出 **Loader**；**Loader** 负责「执行」模块（如 `exec_module`）。PEP 451 引入的 **ModuleSpec** 把 name、loader、origin、cached、submodule_search_locations 等绑在一起，成为查找器与加载器之间的桥梁，并统一了重载和模块 repr 等行为。
 :::
 
@@ -76,7 +76,7 @@ import importlib
 importlib.invalidate_caches()
 ```
 
-:::tip **sys.meta_path 与查找器**
+:::tip[**sys.meta_path 与查找器**]
 **sys.meta_path** 是一个「元路径查找器」列表。导入时，解释器会先依次调用这些 finder 的 `find_spec(name, path, target)`；若都返回 None，再走 sys.path 等路径查找。invalidate_caches() 会调用列表中每个 finder 的 invalidate_caches()（若存在）。
 :::
 

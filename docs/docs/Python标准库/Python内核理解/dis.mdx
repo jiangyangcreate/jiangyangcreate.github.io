@@ -6,7 +6,7 @@ title: dis
 
 [dis](https://docs.python.org/zh-cn/3/library/dis.html)
 
-:::tip 字节码与栈机
+:::tip[字节码与栈机]
 **字节码**是 CPython 将源码编译后得到的中间表示，每条指令对应一个操作码（及可选参数）。Python 解释器本质上是一台**栈式虚拟机**：多数指令从栈顶取操作数、把结果压回栈顶（例如 `BINARY_OP` 弹出两个值、做运算、再压入结果）。采用栈式设计可以简化指令集、便于跨平台，`dis` 展示的正是这些栈机指令序列。
 :::
 
@@ -66,7 +66,7 @@ dis.disassemble(co)
 # dis.disassemble(co, lasti=2)
 ```
 
-:::tip 代码对象
+:::tip[代码对象]
 函数、模块等编译后会产生 **code object**（`__code__` 属性），其中包含字节码序列、常量、变量名等。`dis.dis()` 内部也会先取得代码对象再反汇编；直接对 `code` 使用 `disassemble` 可在调试时配合 `lasti` 精确定位。
 :::
 
@@ -174,7 +174,7 @@ eff = dis.stack_effect(dis.opmap["BINARY_OP"], 0)
 print("BINARY_OP stack effect:", eff)
 ```
 
-:::tip 栈效应
+:::tip[栈效应]
 每条字节码会改变虚拟机栈的高度：例如 `LOAD_CONST` 压入 1 个（+1），`BINARY_OP` 弹出 2 个再压入 1 个（-1）。`stack_effect()` 用于工具或分析器校验字节码是否在任意路径下栈深度一致，避免栈不平衡导致崩溃。
 :::
 

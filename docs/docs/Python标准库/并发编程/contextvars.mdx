@@ -76,6 +76,6 @@ async def main():
 # asyncio.run(main())
 ```
 
-:::tip 顶级模块创建
+:::tip[顶级模块创建]
 应在模块顶层创建 `ContextVar`，不要在闭包中创建。`Context` 会强引用这些变量，闭包中创建可能导致无法被正确回收。
 :::

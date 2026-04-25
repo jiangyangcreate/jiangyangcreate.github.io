@@ -21,7 +21,7 @@ print(sys.argv)
 print(sys.orig_argv)
 ```
 
-:::tip 平台与编码
+:::tip[平台与编码]
 在 Unix 上，命令行参数由操作系统以字节形式传入，Python 使用文件系统编码与 `surrogateescape` 解码为字符串。若需要原始字节，可用 `[os.fsencode(arg) for arg in sys.argv]` 获取。
 :::
 
@@ -54,7 +54,7 @@ sys.stdout.write("hello\n")
 # 恢复时可保存原引用: old_stdout = sys.stdout
 ```
 
-:::tip 标准流是什么
+:::tip[标准流是什么]
 `stdin`/`stdout`/`stderr` 是进程与外界通信的“标准流”，由操作系统在启动进程时绑定（通常对应终端或管道）。Python 通过 `sys` 暴露这三个流对象，便于重定向、捕获输出或替换成自定义 IO。
 :::
 
@@ -72,7 +72,7 @@ print(sys.executable)
 print(sys.platform)
 ```
 
-:::tip 平台标识
+:::tip[平台标识]
 `sys.platform` 来自编译/运行时的操作系统标识，常用于条件分支（如区分 Windows 与 Unix）。注意其值为小写字符串（如 `'win32'`、`'linux'`），与 `os.name` 等可能不同，以官方文档为准。
 :::
 
@@ -89,7 +89,7 @@ print(sys.getsizeof([]))
 print(sys.getsizeof("hello"))
 ```
 
-:::tip 递归限制
+:::tip[递归限制]
 解释器对调用栈深度设限，防止无限递归导致栈溢出。默认约 1000 层，可用 `setrecursionlimit` 提高，但过大可能触发 C 栈溢出；若需深层“递归”逻辑，更推荐用循环或显式栈替代。
 :::
 

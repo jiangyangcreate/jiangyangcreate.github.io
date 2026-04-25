@@ -64,7 +64,7 @@ random.shuffle(deck)
 print(deck)
 ```
 
-:::tip choice vs choices vs sample
+:::tip[choice vs choices vs sample]
 | 函数 | 放回 | 返回值 | 典型用途 |
 |------|------|--------|---------|
 | `choice` | — | 单个元素 | 随机选一个 |
@@ -94,7 +94,7 @@ random.setstate(state)
 print(random.random())  # 与上一行结果相同
 ```
 
-:::info 可复现性的应用
+:::info[可复现性的应用]
 在机器学习实验、单元测试、模拟仿真中，固定随机种子可以确保结果可复现，方便调试和对比。
 :::
 
@@ -145,6 +145,6 @@ flips = random.choices(
 print(Counter(flips))
 ```
 
-:::info random vs secrets
+:::info[random vs secrets]
 `random` 模块**不适用于安全场景**（如生成令牌、密码哈希盐值）。安全相关的随机数请使用 [`secrets`](https://docs.python.org/3/library/secrets.html) 模块。
 :::

@@ -117,7 +117,7 @@ class TestFileOperations(unittest.TestCase):
             self.assertEqual(f.read(), "test content")
 ```
 
-:::tip 执行顺序
+:::tip[执行顺序]
 `setUpClass` → (`setUp` → 测试方法 → `tearDown`) × N → `tearDownClass`。`setUp`/`tearDown` 对每个测试方法都会执行一次，而 `setUpClass`/`tearDownClass` 只在整个类开始和结束时各执行一次。
 :::
 

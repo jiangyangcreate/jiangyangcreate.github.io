@@ -173,7 +173,7 @@ print(inspect.getdoc(documented_function))
 # 输出: 这是一个有文档的函数\n\n这是详细说明。
 ```
 
-:::tip 获取源代码的限制
+:::tip[获取源代码的限制]
 `getsource()` 只能获取在 Python 源代码中定义的对象的源代码。对于：
 - C 扩展模块中的函数
 - 内置函数
@@ -268,7 +268,7 @@ print(full_args.kwonlyargs)  # ['c']
 print(full_args.kwonlydefaults)  # {'c': 20}
 ```
 
-:::warning 已弃用的函数
+:::warning[已弃用的函数]
 `getargspec()` 在 Python 3.11 中已弃用，应使用 `getfullargspec()` 或 `signature()`。
 :::
 
@@ -354,7 +354,7 @@ level1()
 
 ### 获取当前帧信息
 
-:::tip 栈帧与代码对象
+:::tip[栈帧与代码对象]
 **栈帧（frame）** 是 CPython 执行时代表一次函数调用的结构，保存该次调用的局部变量（`f_locals`）、全局命名空间（`f_globals`）、以及正在执行的 **代码对象（code object）**。代码对象是编译后的字节码及其元数据（如 `co_name`、`co_filename`、`co_varnames` 等），与具体某次调用无关；帧则把代码对象与当前命名空间、调用链（`f_back`）绑在一起。`inspect.currentframe()` 返回当前帧，`frame.f_code` 即当前执行的代码对象。
 :::
 
@@ -407,7 +407,7 @@ func1()
 
 ### 静态地获取属性
 
-:::tip 描述器（descriptor）
+:::tip[描述器（descriptor）]
 实现了 `__get__`（或还有 `__set__`/`__delete__`）的对象是**描述器**。访问类或实例上的属性时，若该属性是描述器，解释器会调用其 `__get__`，从而可能执行任意逻辑（如 `property`、`classmethod`）。若只想拿到“类/实例上挂着的那个对象本身”而不触发这段逻辑，需用不走过描述器协议的接口，例如 `inspect.getattr_static()`。
 :::
 
@@ -441,7 +441,7 @@ print(getattr(obj, 'normal_attr'))  # 正常属性
 print(inspect.getattr_static(obj, 'normal_attr'))  # 正常属性
 ```
 
-:::info 使用场景
+:::info[使用场景]
 `getattr_static()` 主要用于文档工具等需要静态内省的场景，避免触发动态属性查找。
 :::
 ### 检查生成器状态

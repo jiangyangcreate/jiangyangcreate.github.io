@@ -46,7 +46,7 @@ for block in matcher.get_matching_blocks():
 # 匹配: ' FFF GHIJK' (长度 10)
 ```
 
-:::tip 一行代码提取最长公共子串
+:::tip[一行代码提取最长公共子串]
 
 ```python showLineNumbers
 def longest_common_substring(s1: str, s2: str) -> str:
@@ -148,6 +148,6 @@ with open("diff.html", "w", encoding="utf-8") as f:
     f.write(html)
 ```
 
-:::info difflib vs filecmp
+:::info[difflib vs filecmp]
 `difflib` 关注内容差异的具体位置和细节；`filecmp` 只判断文件或目录是否相同，不提供差异内容。需要知道"哪里不同"时用 `difflib`，只需知道"是否相同"时用 `filecmp`。
 :::

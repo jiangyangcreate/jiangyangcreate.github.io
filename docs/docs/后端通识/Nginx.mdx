@@ -6,7 +6,7 @@ description: 深入理解Nginx配置与企业级实战
 
 Nginx (engine x) 是一个高性能的 HTTP 和反向代理服务器，特点是占用内存少，并发能力强。Nginx 专为性能优化而开发，在高并发场景下能够支持高达 50,000 个并发连接数的响应。
 
-:::info Nginx 的核心优势
+:::info[Nginx 的核心优势]
 - **高并发高性能**：基于事件驱动架构，采用异步非阻塞方式处理请求
 - **反向代理与负载均衡**：可将请求分发到多个后端服务器
 - **静态资源服务**：高效处理静态文件
@@ -131,7 +131,7 @@ graph TD
     A --> F[stream context<br/>TCP/UDP代理]
 ```
 
-:::tip 配置继承规则
+:::tip[配置继承规则]
 子 context 会继承父 context 的配置，子 context 中的同名指令会覆盖父 context 的配置
 :::
 
@@ -197,7 +197,7 @@ http {
 | `pid` | 主进程PID文件路径 | `pid /var/run/nginx.pid;` |
 | `include` | 引入其他配置文件 | `include /etc/nginx/conf.d/*.conf;` |
 
-:::warning 性能优化建议
+:::warning[性能优化建议]
 - `worker_processes` 通常设置为 CPU 核心数或设为 `auto`
 - `worker_connections` 默认 1024，高并发场景可设为 4096 或更高
 - 需同时调整系统的 `ulimit -n` 参数
@@ -387,7 +387,7 @@ server {
 }
 ```
 
-:::tip SPA配置要点
+:::tip[SPA配置要点]
 `try_files $uri $uri/ /index.html;` 的作用：
 1. 先尝试访问 `$uri` 对应的文件
 2. 如果不存在，尝试访问 `$uri/` 目录
@@ -446,7 +446,7 @@ server {
 }
 ```
 
-:::warning proxy_pass的路径规则
+:::warning[proxy_pass的路径规则]
 - `proxy_pass http://backend;` - 保留location匹配的路径
 - `proxy_pass http://backend/;` - 替换location匹配的路径
 - `proxy_pass http://backend/api;` - 使用指定路径替换
@@ -605,7 +605,7 @@ server {
 | `down` | 标记服务器永久不可用 | `down` |
 | `max_conns` | 最大连接数限制 | `max_conns=100` |
 
-:::info 健康检查机制
+:::info[健康检查机制]
 Nginx自带被动健康检查：
 - 当后端服务器连续失败 `max_fails` 次后，标记为不可用
 - 在 `fail_timeout` 时间内不再分配请求
@@ -667,7 +667,7 @@ server {
 }
 ```
 
-:::tip 免费SSL证书
+:::tip[免费SSL证书]
 推荐使用 [Let's Encrypt](https://letsencrypt.org/) 获取免费SSL证书：
 
 ```bash
@@ -802,7 +802,7 @@ grep "error" /var/log/nginx/error.log | tail -n 50
 
 ### 常见错误排查
 
-:::danger 502 Bad Gateway
+:::danger[502 Bad Gateway]
 **原因**：
 - 后端服务未启动或无法连接
 - 后端服务响应超时
@@ -826,7 +826,7 @@ sudo setsebool -P httpd_can_network_connect 1
 ```
 :::
 
-:::warning 413 Request Entity Too Large
+:::warning[413 Request Entity Too Large]
 **原因**：上传文件大小超过限制
 
 **解决方案**：
@@ -837,7 +837,7 @@ http {
 ```
 :::
 
-:::warning 504 Gateway Timeout
+:::warning[504 Gateway Timeout]
 **原因**：后端处理请求超时
 
 **解决方案**：
@@ -941,7 +941,7 @@ server {
 
 ## 最佳实践总结
 
-:::tip 配置文件组织
+:::tip[配置文件组织]
 1. **模块化配置**：将不同功能拆分到独立文件
    ```
    /etc/nginx/
@@ -965,7 +965,7 @@ server {
 3. **注释重要配置**：便于团队协作
 :::
 
-:::tip 性能优化清单
+:::tip[性能优化清单]
 - ✅ 设置合理的 `worker_processes` 和 `worker_connections`
 - ✅ 启用 `sendfile`、`tcp_nopush`、`tcp_nodelay`
 - ✅ 配置 Gzip 压缩
@@ -974,7 +974,7 @@ server {
 - ✅ 配置合理的超时时间
 :::
 
-:::tip 安全加固清单
+:::tip[安全加固清单]
 - ✅ 隐藏Nginx版本号 (`server_tokens off`)
 - ✅ 使用HTTPS并配置HSTS
 - ✅ 配置请求速率限制和连接数限制

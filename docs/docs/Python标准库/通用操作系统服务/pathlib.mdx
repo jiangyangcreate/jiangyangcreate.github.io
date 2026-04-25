@@ -140,7 +140,7 @@ print(new_p3)
 # p.rename(new_p1)
 ```
 
-:::tip with_segments 方法
+:::tip[with_segments 方法]
 在 Python 3.12 之前，如果你继承了 Path 并在 `__init__` 中添加了自定义参数（比如 session_id），你会发现当你执行 `my_path / "subdir"` 时，返回的新对象会把你的 session_id 丢掉，甚至直接报错。
 
 这是因为旧版的 pathlib 在内部创建新路径时，硬编码了只传递路径字符串。

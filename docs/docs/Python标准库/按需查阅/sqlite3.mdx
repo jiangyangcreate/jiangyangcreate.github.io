@@ -58,7 +58,7 @@ SELECT * FROM table1 JOIN table2 ON table1.id = table2.id;
 | Repeatable Read（MySQL默认） | ✓ | ✓ | ✗ | 中 |
 | Serializable | ✓ | ✓ | ✓ | 慢 |
 
-:::tip 实践建议
+:::tip[实践建议]
 - 大部分场景使用**Read Committed**即可
 - 需要强一致性时使用**Repeatable Read**
 - 高并发场景可以接受**最终一致性**，选NoSQL

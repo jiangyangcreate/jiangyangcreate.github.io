@@ -108,7 +108,7 @@ async def main():
                 break
 ```
 
-:::tip 一次性 / 可重入 / 可重用
+:::tip[一次性 / 可重入 / 可重用]
 - **一次性**：如 `@contextmanager` 生成的、文件对象等，同一实例只能在一条 with 中用一次，第二次用会报错或行为异常。
 - **可重入**：同一实例可在多条 with 中复用，且可嵌套（如 `suppress`、`redirect_stdout`）。
 - **可重用但不可重入**：如 `threading.Lock`、`ExitStack`，可在多条 with 中分别使用，但不宜在一条 with 里嵌套同一个实例。按需选择并查阅具体类型的文档。

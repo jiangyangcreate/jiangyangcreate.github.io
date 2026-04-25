@@ -71,7 +71,7 @@ results = doctest.testfile("tutorial.txt", verbose=True)
 print(f"通过 {results.attempted - results.failed}/{results.attempted} 个测试")
 ```
 
-:::info tutorial.txt 的格式
+:::info[tutorial.txt 的格式]
 文件内容视为一个大的 docstring，只需包含 `>>>` 开头的交互示例：
 
 ```
@@ -141,6 +141,6 @@ python -m doctest -v example.py
 python -m doctest -v tutorial.txt
 ```
 
-:::tip doctest vs unittest
+:::tip[doctest vs unittest]
 doctest 适合简单函数的快速验证和可执行文档；复杂的测试逻辑（mock、fixture、参数化）应该使用 `unittest` 或 `pytest`。两者可以共存。
 :::
