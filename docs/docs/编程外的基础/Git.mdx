@@ -88,7 +88,67 @@ docs/* linguist-documentation
 
 Git 默认不追踪空文件夹，如果你想在仓库中保留一个空文件夹（如 logs/），可以在里面放一个空的 `.gitkeep`。
 
-## 常见场景
+
+## Git 命令概览
+
+我们常用的命令约 30-40个，底层命令加参数组合起来有数千个，因此上[git-scm.com随用随查](https://git-scm.com/docs)，记住核心思想最重要。
+
+<MarkmapHooks initialMarkdown={`
+
+# Git 命令概览
+
+## init（初始化）
+
+- git init：把当前目录初始化为 Git 仓库
+- git clone 仓库地址：克隆远程仓库到本地
+- git config --global user.name "你的名字"：设置全局用户名
+- git config --global user.email "你的邮箱"：设置全局邮箱
+
+## check（检查当前状态）
+
+- git status：检查工作区和暂存区状态
+- git log --oneline --graph --decorate：检查提交历史结构
+- git diff：检查未暂存改动
+- git diff --staged：检查已暂存改动
+- git branch -a：检查本地与远程分支
+
+## record（记录变更）
+
+- git add 路径/文件名 / git add .：把改动加入暂存区
+- git commit -m "message"：生成一次可追踪记录
+
+## switch（切换与开分支）
+
+- git switch main：切换到已有分支
+- git switch -c feature-login：创建并切换到新分支
+- git switch --detach a1b2c3d：切到历史提交做只读实验
+
+## sync（与远程同步）
+
+- git fetch origin --prune：同步远程信息并清理失效远程分支
+- git pull --rebase：拉取并把本地提交重放到最新远程之后
+- git push origin main：推送当前分支
+
+## undo（撤销与修复）
+
+- git restore 路径/文件名：撤销工作区改动（未暂存）
+- git reset HEAD 路径/文件名：撤销暂存（保留工作区改动）
+- git revert a1b2c3d：用“反向提交”安全撤销历史提交
+- git reset --soft HEAD~1：回退提交但保留代码和暂存状态
+
+## tag（发布锚点）
+
+- git tag：查看标签
+- git tag -a v1.0.0 -m "release"：创建发布标签
+- git push origin v1.0.0：推送单个标签
+
+`} />
+
+
+* 先拉后推： 养成 `git push` 前先执行 `git pull --rebase` 的习惯。
+
+* 分支隔离： 严禁直接在 `main` 或 `master` 分支开发，所有新特性应在 `feature/` 分支进行。
+
 
 ### switch
 
@@ -258,68 +318,6 @@ A 和 B 同时修改了同一文件。B 先推送，A 在推送时被拒绝。
 - 执行 `git stash`，工作区恢复干净。
 - 切换分支修复 Bug 并提交。
 - 切回原分支，执行 `git stash pop` 恢复之前的进度。
-
-
-## Git 命令概览
-
-我们常用的命令约 30-40个，底层命令加参数组合起来有数千个，因此上[git-scm.com随用随查](https://git-scm.com/docs)，记住核心思想最重要。
-
-<MarkmapHooks initialMarkdown={`
-
-# Git 命令概览
-
-## init（初始化）
-
-- git init：把当前目录初始化为 Git 仓库
-- git clone 仓库地址：克隆远程仓库到本地
-- git config --global user.name "你的名字"：设置全局用户名
-- git config --global user.email "你的邮箱"：设置全局邮箱
-
-## check（检查当前状态）
-
-- git status：检查工作区和暂存区状态
-- git log --oneline --graph --decorate：检查提交历史结构
-- git diff：检查未暂存改动
-- git diff --staged：检查已暂存改动
-- git branch -a：检查本地与远程分支
-
-## record（记录变更）
-
-- git add 路径/文件名 / git add .：把改动加入暂存区
-- git commit -m "message"：生成一次可追踪记录
-
-## switch（切换与开分支）
-
-- git switch main：切换到已有分支
-- git switch -c feature-login：创建并切换到新分支
-- git switch --detach a1b2c3d：切到历史提交做只读实验
-
-## sync（与远程同步）
-
-- git fetch origin --prune：同步远程信息并清理失效远程分支
-- git pull --rebase：拉取并把本地提交重放到最新远程之后
-- git push origin main：推送当前分支
-
-## undo（撤销与修复）
-
-- git restore 路径/文件名：撤销工作区改动（未暂存）
-- git reset HEAD 路径/文件名：撤销暂存（保留工作区改动）
-- git revert a1b2c3d：用“反向提交”安全撤销历史提交
-- git reset --soft HEAD~1：回退提交但保留代码和暂存状态
-
-## tag（发布锚点）
-
-- git tag：查看标签
-- git tag -a v1.0.0 -m "release"：创建发布标签
-- git push origin v1.0.0：推送单个标签
-
-`} />
-
-
-* 先拉后推： 养成 `git push` 前先执行 `git pull --rebase` 的习惯。
-
-* 分支隔离： 严禁直接在 `main` 或 `master` 分支开发，所有新特性应在 `feature/` 分支进行。
-
 
 ## GitHub Actions
 
