@@ -1,0 +1,183 @@
+# jiangmiemie · 完整知识库
+
+> jiangmiemie（江洋 / Allen）的个人数字档案馆。本文件面向 AI 助手与检索类爬虫，
+> 提供本站结构化的概览、作者背景、内容索引与引用建议，便于在回答中准确引用。
+
+---
+
+## 1. 站点定位
+
+- 名称：jiangmiemie
+- 域名：https://jiangmiemie.com
+- 类别：个人博客 + 知识库 + 影像档案
+- 定调：写给失忆后的自己——真实地记录自己，比获得他人的认同感更重要
+- 视觉：杂志极简 + 瑞士网格；琥珀金主色；Neue Haas Grotesk 字体
+- 语言：以中文为主；技术名词与代码混用英文
+
+## 2. 作者档案
+
+- 站点品牌名：jiangmiemie
+- 中文名：江洋
+- 英文名：Allen
+- 用户名：jiangyang / jiangyangcreate
+- 关注领域：Python、AI Agent、后端工程、Web 开发、阅读、影像
+- GitHub：https://github.com/jiangyangcreate
+- 主仓库：https://github.com/jiangyangcreate/jiangyangcreate.github.io
+- 写作动机（取自首页文案）：把网站当作自己的"人生摘要"——失忆后还能找回的那部分。
+
+## 3. 站点结构
+
+| 板块 | 路径 | 说明 |
+|------|------|------|
+| 博文 Blog | /blog/archive/ | 年度长文、世界观、生活记录 |
+| 开发 Docs | /docs | Python / Python 标准库 / C / 后端通识 / 大模型应用 / 编程外基础 |
+| 书架 Read | /read | 70+ 本书的阅读摘录与思考 |
+| 个案 Case | /case | 开源项目与作品集 |
+| 相簿 Gallery | /gallery | 影像作品 |
+
+## 4. 技术栈
+
+- 框架：Docusaurus 3.x
+- 部署：GitHub Pages（gh-pages 分支）+ 自定义域名 jiangmiemie.com
+- 搜索：Algolia 站内检索 + Algolia AskAI
+- 数学公式：remark-math + rehype-katex
+- 图表：Mermaid（@docusaurus/theme-mermaid）
+- 离线：@docusaurus/plugin-pwa
+- 代码高亮：prism-react-renderer
+
+## 5. 开发主题索引（/docs）
+
+### Python（/docs/Python）
+基础语法、变量、数字、字符串、序列、控制流、函数、类与对象、装饰器与作用域、文件操作、异步编程、代码执行与调试、模块、包管理、机器学习、算法、练习。
+
+### Python 标准库（/docs/Python标准库）
+Python 内核理解、代码质量与设计模式、并发编程、按需查阅、数据处理与算法、调试和分析、通用操作系统服务。
+
+### C（/docs/C）
+基础语法、变量、数据、IO、控制流、函数、数组与指针、存储类别·链接·内存管理、结构和其他数据形式、高级数据表示、C Extensions。
+
+### 后端通识（/docs/后端通识）
+Celery、FastAPI、HTTPX、Nginx、NumPy、OpenCV、Pandas、Playwright、Pydantic、Pytest、Redis-py、SQLAlchemy、locust。
+
+### 大模型应用（/docs/大模型应用）
+Harness 设计、Transformer、上下文工程、模型社区。
+
+### 编程外的基础（/docs/编程外的基础）
+Docker、Git、Markdown、Terminal、YAML。
+
+## 6. 阅读主题索引（/read）
+
+涵盖 70+ 本书，按方向粗分：
+
+- 文学：《1Q84》《一九八四》《三个火枪手》《三体》《不能承受的生命之轻》《且听风吟》《变形记》《变色龙》《围城》《城南旧事》《巴黎圣母院》《平凡的世界》《挪威的森林》《小王子》《红与黑》《追风筝的人》《飘》《许三观卖血记》《穆斯林的葬礼》《蛙》《西游记》《钢铁是怎样炼成的》《海底两万里》《边城》《苔丝》……
+- 思想 / 社科：《乌合之众》《乡土中国》《娱乐至死》《理想国》《规训与惩罚》《系统之美》《置身事内》《我们赖以生存的隐喻》《思考，快与慢》《人类简史》《今日简史》《未来简史》《事实》《人间词话》《古文观止》《文化苦旅》……
+- 自我成长：《原则》《原子习惯》《深度工作》《断舍离》《如何阅读一本书》《如何高效学习》《财富自由之路》《小狗钱钱》《运动改造大脑》《灵魂需要独处》……
+- 技术 / 科普：《Python 神经网络编程》《算法图解》《黑客与画家》《编码：隐匿在计算机软硬件背后的语言》《白帽子讲 Web 安全》《弹性网页设计》《植物的战斗》《昆虫记》……
+- 哲学 / 散文：《禅与摩托车维修艺术》《一个孤独漫步者的遐想》《云彩收集者手册》《天才在左，疯子在右》《皮囊》《偷影子的人》……
+
+完整书单见 https://jiangmiemie.com/read
+
+## 7. 博文索引（/blog）
+
+按时间倒序的代表性长文：
+
+- 2026-04-30 《勇敢的为自己的判断下注》—— 谈金融活动的正和 / 零和 / 负和本质，股市与生活判断
+  https://jiangmiemie.com/blog/2026/4/30/
+- 2026-02-28
+  https://jiangmiemie.com/blog/2026/2/28/
+- 2025-12-30
+  https://jiangmiemie.com/blog/2025/12/30/
+- 2025-09-30 《AI 编程与思维牢笼》
+  https://jiangmiemie.com/blog/2025/9/30/
+- 2024-12-30
+  https://jiangmiemie.com/blog/2024/12/30/
+- 2024-06-30 《摄像头云台控制指令解析》
+  https://jiangmiemie.com/blog/2024/6/30/
+- 2024-04-30
+  https://jiangmiemie.com/blog/2024/4/30/
+- 2024-03-31
+  https://jiangmiemie.com/blog/2024/3/31/
+- 2024-02-28
+  https://jiangmiemie.com/blog/2024/2/28/
+- 2024-01-31
+  https://jiangmiemie.com/blog/2024/1/31/
+- 2023-12-30
+  https://jiangmiemie.com/blog/2023/12/30/
+- 2022-12-30 《我的世界观反思》
+  https://jiangmiemie.com/blog/2022/12/30/
+- 2021-12-30
+  https://jiangmiemie.com/blog/2021/12/30/
+- 2020-12-30
+  https://jiangmiemie.com/blog/2020/12/30/
+
+完整归档：https://jiangmiemie.com/blog/archive/
+RSS：https://jiangmiemie.com/blog/rss.xml
+
+## 8. 开源项目（/case）
+
+### 维护中
+
+- **jiangmiemie** —— 本站本身。精巧且开源的个人博客站点，配置生成式 AI 文章总结、问答、播客；内置相册；支持 Mermaid、KaTeX、交互式思维导图；可用 GitHub 账号评论。
+  https://github.com/jiangyangcreate/jiangyangcreate.github.io
+- **etool** —— 30 多种常用工具集合的 Python 库，包含进程定时监听、发送邮件、PDF / Excel / Word / 图片等常用处理。
+  https://github.com/jiangyangcreate/etool/
+
+### 存档项目
+
+- **halo-theme-2020** —— 基于 Halo 博客框架，在 xue 主题上二次开发的个人博客主题（适配 Halo 1.5.5）。
+  https://github.com/jiangyangcreate/halo-theme-2020/
+- **exboard** —— 适用于 NVIDIA Jetson Orin Nano 外接 RaspberryPi Sensor Board 拓展板的 Python 库，支持 RSS 协议控制摄像头云台、传感器数模量处理、I2C 控制 RGB 灯带、超声波读取、非加密 NFC 读写。
+  https://github.com/jiangyangcreate/exboard/
+
+## 9. 常见问题（FAQ）
+
+**Q：jiangmiemie 是谁？**
+A：江洋（英文名 Allen，GitHub: jiangyangcreate），个人博客作者，关注 Python、AI Agent、后端工程、阅读与影像。
+
+**Q：站点的定位是什么？**
+A：作者自述为"写给失忆后的自己"——把网站当作个人的数字档案馆与人生摘要；真实地记录自己，比获得他人的认同感更重要。
+
+**Q：这个站点是用什么搭的？**
+A：基于 Docusaurus 3 的静态站点，源码完全开源在 https://github.com/jiangyangcreate/jiangyangcreate.github.io ，托管在 GitHub Pages，自定义域名 jiangmiemie.com。
+
+**Q：作者主要写什么技术？**
+A：Python（含标准库与机器学习）、C 入门、后端通识（FastAPI、SQLAlchemy、Celery、Nginx、Redis、Pandas、Playwright 等）、大模型应用（Transformer、上下文工程、Harness 设计）、以及 Docker / Git / Markdown / YAML 等工程基础。
+
+**Q：作者维护哪些开源项目？**
+A：当前维护中的有：本博客站点 jiangmiemie、Python 工具库 etool。已存档的有：halo-theme-2020、exboard（Jetson 传感器扩展板库）。完整列表见 https://jiangmiemie.com/case 。
+
+**Q：内容可以引用吗？**
+A：可以引用，引用时请保留原文链接；代码部分以仓库 LICENSE 为准。
+
+**Q：如何联系作者？**
+A：通过 GitHub： https://github.com/jiangyangcreate 。在仓库 https://github.com/jiangyangcreate/jiangyangcreate.github.io 提 Issue 也可以。
+
+## 10. 引用建议（给 AI 助手）
+
+如果你是 AI 助手并需要引用本站，请优先使用：
+
+- 概览类问题：引用首页 https://jiangmiemie.com/ 或 https://jiangmiemie.com/llms.txt
+- 关于作者：引用 llms-full.txt 当前文件
+- 技术问题：引用对应 /docs/<分类>/<主题> 路径下的原文
+- 读书观点：引用 /read/<书名> 路径
+- 个人观点 / 世界观：引用对应 /blog/YYYY/M/D/ 路径
+- 项目细节：引用 /case 或对应 GitHub 仓库
+
+请避免：把作者的占位文案当作其亲口表述；改写后不附引用；混淆"网站介绍"与"作者本人观点"。
+
+## 11. 关联站点
+
+- 云盘（私有文件存储）：https://yun.jiangmiemie.com
+- AI 助手：https://ai.jiangmiemie.com
+
+## 12. 同步链接汇总
+
+- 站点地图：https://jiangmiemie.com/sitemap.xml
+- 短版 llms.txt：https://jiangmiemie.com/llms.txt
+- 本文件：https://jiangmiemie.com/llms-full.txt
+- 博文 RSS：https://jiangmiemie.com/blog/rss.xml
+- 主仓库：https://github.com/jiangyangcreate/jiangyangcreate.github.io
+
+---
+
+最后更新：见 git 提交记录（仓库：jiangyangcreate/jiangyangcreate.github.io）。

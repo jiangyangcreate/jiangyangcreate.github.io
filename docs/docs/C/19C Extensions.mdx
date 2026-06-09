@@ -1,0 +1,276 @@
+---
+sidebar_position: 19
+title: C Extensions🔨
+---
+
+Python调用C语言是高性能计算和系统编程的关键技术。
+
+为 Python 核心代码（CPython 标准库）工作时，必须使用C扩展模块。标准库不能依赖 Cython 这种第三方工具来编译。要确保用户只要有 C 编译器，就能编译 Python。
+
+如果你在客户的服务器上，没有权限安装 GCC 或 Cython，但你需要调用一个系统动态库（.so 或 .dll），ctypes 是救命稻草。
+
+为自己的项目或商业项目工作时，Cython或者Rust都是很好的选择。语法更简单让开发效率更高。自动处理引用计数和 C 类型转换。
+
+| 方案 | 描述 | 学习难度 | 技术半衰期 |
+|------|------|----------|------------|
+| Cython | 混合 Python 和 C 语法的编译器 | 中 | 长 |
+| ctypes | Python 直接调用 C 库 | 低 | 很长 |
+| C扩展模块 | 编写 Python C API 扩展 | 高 | 很长 |
+
+本文主要讲述C扩展模块的开发。一个 C 扩展模块由四个部分组成：
+
+1. 函数实现 — 用 C 写业务逻辑，通过 Python C API 做参数解析和返回值转换
+2. 方法表 — 告诉 Python 这个模块暴露了哪些函数
+3. 模块定义 — 描述模块的名称和元信息
+4. 初始化函数 — Python 导入模块时的入口点，函数名必须是 `PyInit_模块名`
+
+
+## 环境准备
+
+```bash showLineNumbers
+# Ubuntu/Debian — 安装 Python 开发头文件
+sudo apt install python3-dev
+```
+
+然后用 pkg-config 或 python3-config 获取编译参数：
+
+```bash showLineNumbers
+# 查看编译参数
+python3-config --includes
+# 输出: -I/usr/include/python3.12
+
+python3-config --ldflags --embed
+# 从 Python 3.8 开始，为了防止在不需要嵌入整个 Python 解释器的情况下（比如只写一个简单的 C 扩展模块）产生冲突，官方强制要求在嵌入开发时明确加上 --embed。
+# 输出: -L/usr/lib/python3.12/config-3.12-x86_64-linux-gnu -L/usr/lib/x86_64-linux-gnu -lpython3.12 -ldl  -lm
+```
+
+使用 GCC 将C语言源代码编译为共享库
+
+```bash showLineNumbers
+# gcc: GNU 编译器套件
+
+# 编译参数说明：
+# -shared: 生成共享库,在 Linux 上通常以 .so 结尾，在 Windows 上是 .pyd 或 .dll
+# -fPIC: 生成位置无关代码 (Linux 必须)确保代码中的跳转和变量访问使用相对地址而非绝对地址。
+# `python3-config --cflags`: 获取头文件路径和编译优化标志
+
+# Python 自动配置参数
+# $(python3-config --cflags) ：获取编译 C 代码所需的 头文件路径 和 预处理器宏。
+# mymodule.c: 你的 C 语言源代码文件
+# -o mymodule.so: 指定输出文件名。必须与你在 C 代码中 PyInit_ 后面的名称完全一致。
+# $(python3-config --ldflags) ：获取链接器所需的库路径和链接选项。
+
+gcc -shared -fPIC $(python3-config --cflags) myextension.c -o myextension.so $(python3-config --ldflags)
+```
+
+
+## 基本结构
+
+```c showLineNumbers title="myextension.c"
+#include <Python.h>
+
+// ① 函数实现：所有暴露给 Python 的函数签名都是固定的
+//    self  — 模块对象本身（模块级函数中通常不用）
+//    args  — Python 传入的参数，打包在一个 tuple 里
+//    返回值必须是 PyObject*，返回 NULL 表示抛出异常
+static PyObject* add(PyObject* self, PyObject* args) {
+    int a, b;
+    // "ii" = 解析两个 int，写入 &a 和 &b
+    if (!PyArg_ParseTuple(args, "ii", &a, &b)) {
+        return NULL;  // 解析失败，Python 层会收到 TypeError
+    }
+    return PyLong_FromLong(a + b);  // C long → Python int
+}
+
+// ② 方法表：每行描述一个函数，以全 NULL 行结尾
+static PyMethodDef methods[] = {
+    // {Python中的函数名, C函数指针, 调用约定, 文档字符串}
+    {"add", add, METH_VARARGS, "Add two integers"},
+    {NULL, NULL, 0, NULL}
+};
+
+// ③ 模块定义
+static struct PyModuleDef module = {
+    PyModuleDef_HEAD_INIT,
+    "myextension",  // 模块名
+    "A simple C extension module",  // 模块文档
+    -1,             // -1 表示模块状态保存在全局变量中（不支持子解释器）
+    methods
+};
+
+// ④ 初始化函数：名称必须是 PyInit_<模块名>
+PyMODINIT_FUNC PyInit_myextension(void) {
+    return PyModule_Create(&module);
+}
+```
+
+## 构建与使用
+
+```python showLineNumbers title="setup.py"
+from setuptools import setup, Extension
+
+module = Extension(
+    'myextension',
+    sources=['myextension.c']
+)
+
+setup(
+    name='MyExtension',
+    version='1.0',
+    ext_modules=[module]
+)
+```
+
+```bash
+# 编译（生成 .so 或 .pyd 到当前目录）
+python setup.py build_ext --inplace
+
+# 使用
+python -c "import myextension; print(myextension.add(1, 2))"
+# 输出: 3
+```
+
+## 参数解析
+
+`PyArg_ParseTuple` 是 C 扩展中最常用的函数，它把 Python 传入的参数按格式字符串拆解为 C 变量，和 `scanf` 的思路一样。
+
+常用格式字符：
+
+| 格式 | C 类型 | Python 类型 | 说明 |
+|------|--------|-------------|------|
+| i | int | int | 整数 |
+| l | long | int | 长整数 |
+| f | float | float | 单精度浮点 |
+| d | double | float | 双精度浮点 |
+| s | const char* | str | UTF-8 字符串 |
+| s# | const char*, Py_ssize_t | str | 字符串 + 长度 |
+| O | PyObject* | any | 任意 Python 对象（不增加引用计数） |
+| O! | typeobject, PyObject* | 指定类型 | 带类型检查的对象 |
+
+返回值转换（C → Python）：
+
+| C → Python 函数 | 作用 |
+|-----------------|------|
+| PyLong_FromLong(x) | C long → Python int |
+| PyFloat_FromDouble(x) | C double → Python float |
+| PyUnicode_FromString(s) | C 字符串 → Python str |
+| Py_BuildValue("i", x) | 通用转换，格式同 ParseTuple |
+| Py_RETURN_NONE | 返回 None |
+| Py_RETURN_TRUE / Py_RETURN_FALSE | 返回布尔值 |
+
+## 更多示例
+
+### 处理字符串
+
+```c showLineNumbers title="myextension.c"
+static PyObject* greet(PyObject* self, PyObject* args) {
+    const char* name;
+    if (!PyArg_ParseTuple(args, "s", &name)) {
+        return NULL;
+    }
+    char buffer[256];
+    snprintf(buffer, sizeof(buffer), "Hello, %s!", name);
+    return PyUnicode_FromString(buffer);
+}
+```
+
+### 处理浮点数
+
+```c showLineNumbers title="myextension.c"
+static PyObject* circle_area(PyObject* self, PyObject* args) {
+    double radius;
+    if (!PyArg_ParseTuple(args, "d", &radius)) {
+        return NULL;
+    }
+    if (radius < 0) {
+        PyErr_SetString(PyExc_ValueError, "radius must be non-negative");
+        return NULL;
+    }
+    return PyFloat_FromDouble(3.14159265358979323846 * radius * radius);
+}
+```
+
+### 返回多个值
+
+Python 函数可以返回元组，C 扩展中用 `Py_BuildValue` 实现：
+
+```c showLineNumbers title="myextension.c"
+static PyObject* divmod_(PyObject* self, PyObject* args) {
+    int a, b;
+    if (!PyArg_ParseTuple(args, "ii", &a, &b)) {
+        return NULL;
+    }
+    if (b == 0) {
+        PyErr_SetString(PyExc_ZeroDivisionError, "division by zero");
+        return NULL;
+    }
+    // "(ii)" 构建一个包含两个 int 的 tuple
+    return Py_BuildValue("(ii)", a / b, a % b);
+}
+```
+
+### 操作 Python 列表
+
+```c showLineNumbers title="myextension.c"
+// 对列表中所有数字求和
+static PyObject* list_sum(PyObject* self, PyObject* args) {
+    PyObject* list_obj;
+    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &list_obj)) {
+        return NULL;
+    }
+    Py_ssize_t len = PyList_Size(list_obj);
+    double total = 0.0;
+    for (Py_ssize_t i = 0; i < len; i++) {
+        PyObject* item = PyList_GetItem(list_obj, i);  // 借用引用
+        if (!PyNumber_Check(item)) {
+            PyErr_SetString(PyExc_TypeError, "list items must be numbers");
+            return NULL;
+        }
+        total += PyFloat_AsDouble(item);
+        if (PyErr_Occurred()) return NULL;
+    }
+    return PyFloat_FromDouble(total);
+}
+```
+
+把上面所有函数注册到方法表：
+
+```c showLineNumbers title="myextension.c"
+static PyMethodDef methods[] = {
+    {"add",         add,         METH_VARARGS, "Add two integers"},
+    {"greet",       greet,       METH_VARARGS, "Greet someone by name"},
+    {"circle_area", circle_area, METH_VARARGS, "Calculate circle area"},
+    {"divmod_",     divmod_,     METH_VARARGS, "Return (quotient, remainder)"},
+    {"list_sum",    list_sum,    METH_VARARGS, "Sum a list of numbers"},
+    {NULL, NULL, 0, NULL}
+};
+```
+
+```python showLineNumbers title="test.py"
+import myextension
+
+print(myextension.add(10, 20))         # 30
+print(myextension.greet("World"))      # Hello, World!
+print(myextension.circle_area(5.0))    # 78.53981633974483
+print(myextension.divmod_(17, 5))      # (3, 2)
+print(myextension.list_sum([1, 2.5, 3]))  # 6.5
+```
+
+## 引用计数
+
+CPython 通过引用计数管理内存。每个 `PyObject*` 都有一个计数器，降到 0 时自动释放。在写 C 扩展时，必须遵守两条规则：
+
+- 拿到了所有权（新引用）→ 用完后必须 `Py_DECREF`，或者交给调用者（作为返回值）
+- 只是借用（借用引用）→ 不要 `Py_DECREF`，也不要长期保存
+
+| 操作 | 引用类型 | 你需要做什么 |
+|------|----------|-------------|
+| `PyLong_FromLong()` 等创建函数 | 新引用 | 返回给调用者，或用完 `Py_DECREF` |
+| `PyList_GetItem()` | 借用引用 | 不要 DECREF；如需保存，先 `Py_INCREF` |
+| `PyList_SetItem()` | 偷取引用 | 传入后不要再 DECREF（所有权已转移） |
+| `PyTuple_GetItem()` | 借用引用 | 同 GetItem |
+| 函数的返回值 | 新引用 | 调用者负责 DECREF |
+
+:::tip
+最常见的 bug 就是对借用引用调了 `Py_DECREF`，导致对象被提前释放后崩溃。如果拿不准，查文档中函数说明里的 Return: New reference 或 Return: Borrowed reference。
+:::

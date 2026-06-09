@@ -1,0 +1,139 @@
+---
+title: tempfile
+---
+
+`tempfile` 模块用于安全地创建临时文件和目录，支持自动清理，避免残留临时数据。
+
+[tempfile](https://docs.python.org/3/library/tempfile.html)
+
+## TemporaryFile：匿名临时文件
+
+```python showLineNumbers
+import tempfile
+
+# 创建匿名临时文件，关闭后自动删除
+# 在 Unix 上甚至没有目录条目，其他进程无法访问
+with tempfile.TemporaryFile() as fp:
+    fp.write(b"Hello World!")
+    fp.seek(0)
+    print(fp.read())  # b'Hello World!'
+# 退出 with 后文件自动删除
+```
+
+:::info
+默认模式为 `w+b`（二进制读写）。如需文本模式，使用 `mode='w+t'` 并指定 `encoding`。
+:::
+
+## NamedTemporaryFile：有名字的临时文件
+
+```python showLineNumbers
+import tempfile
+
+# 有名字 → 其他进程可以通过文件名访问
+with tempfile.NamedTemporaryFile(suffix=".txt", prefix="data_") as fp:
+    print(fp.name)  # /tmp/data_xxxxxxxx.txt
+    fp.write(b"some data")
+    fp.flush()
+    # 文件在 with 块内可通过 fp.name 访问
+# 退出 with 后自动删除
+
+# 如果需要关闭后仍保留文件
+with tempfile.NamedTemporaryFile(delete=False) as fp:
+    fp.write(b"persistent data")
+    temp_path = fp.name
+print(f"文件保留在: {temp_path}")
+
+# 需要手动删除
+import os
+os.unlink(temp_path)
+```
+
+```python showLineNumbers
+import tempfile
+
+# 关闭后再通过文件名重新打开（Python 3.12+）
+with tempfile.NamedTemporaryFile(delete_on_close=False) as fp:
+    fp.write(b"reopen me")
+    fp.close()
+    # 文件已关闭但未删除，可重新打开
+    with open(fp.name, "rb") as f:
+        print(f.read())  # b'reopen me'
+# 退出外层 with 后自动删除
+```
+
+## TemporaryDirectory：临时目录
+
+```python showLineNumbers
+import tempfile
+import os
+
+with tempfile.TemporaryDirectory(prefix="myapp_") as tmpdir:
+    print(tmpdir)  # /tmp/myapp_xxxxxxxx
+
+    # 在临时目录中创建文件
+    filepath = os.path.join(tmpdir, "result.txt")
+    with open(filepath, "w") as f:
+        f.write("计算结果")
+
+    print(os.listdir(tmpdir))  # ['result.txt']
+# 退出 with 后目录及其内容全部删除
+```
+
+## SpooledTemporaryFile：内存缓冲临时文件
+
+```python showLineNumbers
+import tempfile
+
+# 数据先存内存，超过 max_size 字节后写入磁盘
+with tempfile.SpooledTemporaryFile(max_size=1024) as fp:
+    fp.write(b"small data")  # 仍在内存中
+    fp.seek(0)
+    print(fp.read())
+
+    # 强制写入磁盘
+    fp.rollover()
+```
+
+:::tip
+`SpooledTemporaryFile` 适合处理大量小数据——先在内存中累积，超过阈值再落盘，兼顾性能和内存。
+:::
+
+## 底层函数：mkstemp / mkdtemp
+
+```python showLineNumbers
+import tempfile
+import os
+
+# mkstemp 返回 (文件描述符, 路径)，需手动关闭和删除
+fd, path = tempfile.mkstemp(suffix=".dat")
+try:
+    with os.fdopen(fd, "w") as f:
+        f.write("底层临时文件")
+finally:
+    os.unlink(path)
+
+# mkdtemp 返回临时目录路径，需手动删除
+tmpdir = tempfile.mkdtemp()
+try:
+    print(f"临时目录: {tmpdir}")
+finally:
+    import shutil
+    shutil.rmtree(tmpdir)
+```
+
+## 查看临时目录位置
+
+```python showLineNumbers
+import tempfile
+
+# 获取系统默认的临时目录
+print(tempfile.gettempdir())     # /tmp（Linux）或 C:\Users\xxx\AppData\Local\Temp（Windows）
+
+# 获取临时文件名前缀
+print(tempfile.gettempprefix())  # tmp
+```
+
+:::info
+临时目录的选择顺序：环境变量 `TMPDIR` → `TEMP` → `TMP` → 系统默认路径（如 `/tmp`）。
+可通过设置环境变量或传入 `dir` 参数来自定义位置。
+:::

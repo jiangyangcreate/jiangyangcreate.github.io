@@ -1,0 +1,94 @@
+---
+title: os
+---
+
+现代路径操作推荐使用 **pathlib**，但以下能力只有 **os**（及 os.path）能提供，pathlib 无法替代。
+
+## 进程与工作目录
+
+pathlib 的 `Path.cwd()` 只能**读取**当前工作目录，不能**改变**它。改变进程级工作目录必须用 os：
+
+- **os.chdir(path)**：把当前进程的工作目录改为指定路径（影响后续所有相对路径）。
+- **os.getcwd()**：返回当前工作目录的字符串。
+- **os.curdir**：当前目录符号（`'.'`），用于表示“当前目录”。
+
+```python showLineNumbers
+import os
+
+os.chdir("/tmp")   # 仅 os 能做；pathlib 无 chdir
+print(os.getcwd()) # 如 '/tmp'
+print(os.curdir)   # '.'
+```
+
+### pathlib 没有的目录/文件操作
+
+- **os.removedirs(path)**：自底向上递归删除空目录（pathlib 只有单层的 `Path.rmdir()`，不能一次删多级空目录）。
+- **os.renames(old, new)**：重命名文件或目录，若目标路径的父目录不存在则自动创建（pathlib 的 `Path.rename()` 不会创建中间目录）。
+
+其余如删除文件、单层建目录、多级建目录、单层删空目录、普通重命名等，pathlib 都有对应方法（如 `unlink()`、`mkdir()`、`mkdir(parents=True)`、`rmdir()`、`rename()`），可优先用 pathlib；需要与旧接口或字符串路径打交道的场景再保留 os。
+
+```python showLineNumbers
+import os
+
+# 递归删除空目录（pathlib 做不了）
+# os.removedirs("a/b/c")  # 会删除 c、b、a（若均为空）
+
+# 重命名并自动创建目标父目录（pathlib 的 rename 不会创建父目录）
+# os.renames("old.txt", "dir/subdir/new.txt")
+```
+
+### 可剪枝的目录遍历：os.walk()
+
+pathlib 有 `Path.rglob()` 等递归遍历，但**不能**在遍历过程中按目录名剪枝（例如跳过 `.git`、`__pycache__`）。**os.walk()** 可以：在循环里修改 `dirnames` 列表，即可决定下一层进入哪些子目录。
+
+- **os.walk(top)**： yields `(根路径, 子目录名列表, 文件名列表)`；**原地修改** `dirnames` 即可排除某些目录，不进入其子树。
+
+```python showLineNumbers
+import os
+
+def get_files(dir_path, skip_dirs=None):
+    skip_dirs = set(skip_dirs or [".git", "__pycache__", "node_modules"])
+    for parent, dirnames, filenames in os.walk(dir_path):
+        # 剪枝：不进入 skip_dirs 中的目录（pathlib.rglob 无法边遍历边排除）
+        dirnames[:] = [d for d in dirnames if d not in skip_dirs]
+        for filename in filenames:
+            print("parent:", parent, "file:", filename)
+            print("full path:", os.path.join(parent, filename))
+
+get_files(os.curdir)
+```
+
+## 系统常量
+
+pathlib 不提供这些与平台相关的**字符串常量**，只能从 os 取：
+
+- **os.linesep**：当前平台的换行符（Windows `'\r\n'`，Unix `'\n'`）。
+- **os.sep**：路径分隔符（Windows `'\\'`，Unix `'/'`）。
+- **os.pathsep**：环境变量/PATH 中的分隔符（Windows `';'`，Unix `':'`）。
+
+```python showLineNumbers
+import os
+
+print(repr(os.linesep))   # Windows: '\r\n'；Unix: '\n'
+print(repr(os.sep))       # Windows: '\\'；Unix: '/'
+print(repr(os.pathsep))   # Windows: ';'；Unix: ':'
+```
+
+## 环境变量
+
+pathlib 不处理环境变量。读写环境变量只能用 os：
+
+- **os.environ**：类似字典，表示当前进程的环境变量，可读可写。
+- **os.getenv(key, default=None)** / **os.environ.get(key)**：读取。
+- **os.putenv(key, value)** / **os.environ[key] = value**：写入（修改只影响当前进程及子进程）。
+
+```python showLineNumbers
+import os
+
+# 读取
+print(os.environ.get("HOME", ""))
+print(os.getenv("PATH", ""))
+
+# 修改（仅当前进程）
+os.environ["MY_VAR"] = "value"
+```

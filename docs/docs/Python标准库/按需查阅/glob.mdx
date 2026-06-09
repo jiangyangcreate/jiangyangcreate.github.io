@@ -1,0 +1,111 @@
+---
+title: glob
+---
+
+`glob` 模块提供 Unix shell 风格的路径名模式匹配，支持通配符 `*`、`?` 和 `[]`。
+
+[glob](https://docs.python.org/3/library/glob.html)
+
+## 匹配规则
+
+```python showLineNumbers
+# glob 支持的通配符：
+# *      匹配任意数量的字符（不含路径分隔符）
+# ?      匹配单个字符
+# [abc]  匹配方括号内的任意一个字符
+# [!abc] 匹配不在方括号内的字符
+# **     递归匹配所有子目录（需要 recursive=True）
+```
+
+## glob.glob
+
+`glob.glob()` 返回匹配模式的路径列表。
+
+```python showLineNumbers
+import glob
+import os
+
+# 准备示例文件
+os.makedirs("demo/sub", exist_ok=True)
+for name in ["demo/a.py", "demo/b.py", "demo/data.txt", "demo/sub/c.py"]:
+    open(name, "w").close()
+
+# 匹配当前目录下所有 .py 文件
+print(glob.glob("demo/*.py"))
+# ['demo/a.py', 'demo/b.py']
+
+# 匹配单个字符
+print(glob.glob("demo/?.py"))
+# ['demo/a.py', 'demo/b.py']
+
+# 递归匹配所有子目录中的 .py 文件
+print(glob.glob("demo/**/*.py", recursive=True))
+# ['demo/a.py', 'demo/b.py', 'demo/sub/c.py']
+
+# 使用 root_dir 指定搜索根目录（Python 3.10+）
+print(glob.glob("*.py", root_dir="demo"))
+# ['a.py', 'b.py']
+```
+
+:::info
+`glob.glob()` 返回结果的顺序取决于文件系统，不保证有序。如需特定顺序，请对结果排序。
+:::
+
+## glob.iglob
+
+`glob.iglob()` 与 `glob.glob()` 功能相同，但返回迭代器而非列表，适合处理大量文件。
+
+```python showLineNumbers
+import glob
+
+# 使用迭代器逐个处理，节省内存
+for path in glob.iglob("demo/**/*.py", recursive=True):
+    print(f"找到: {path}")
+```
+
+## glob.escape
+
+`glob.escape()` 转义路径中的特殊字符，用于匹配包含通配符的文件名。
+
+```python showLineNumbers
+import glob
+
+# 如果文件名本身包含特殊字符，用 escape 转义
+pattern = glob.escape("file[1].txt")
+print(pattern)
+# 'file[[]1].txt'
+
+# 组合使用：在特定目录下匹配含特殊字符的文件
+directory = glob.escape("/path/to/dir[1]")
+result = glob.glob(f"{directory}/*.txt")
+```
+
+## glob.translate
+
+`glob.translate()` 将 glob 模式转换为正则表达式（Python 3.13+）。
+
+```python showLineNumbers
+import glob
+import re
+
+# 将 glob 模式转换为正则表达式
+regex = glob.translate("**/*.txt", recursive=True, include_hidden=True)
+print(regex)
+
+# 用于自定义匹配逻辑
+pattern = re.compile(regex)
+paths = ["docs/readme.txt", "src/main.py", "data/input.txt"]
+matched = [p for p in paths if pattern.match(p)]
+print(matched)
+# ['docs/readme.txt', 'data/input.txt']
+```
+
+:::tip
+如果需要更面向对象的路径操作，可以使用 `pathlib.Path.glob()` 方法，它内部也使用 `glob` 模块的匹配规则。
+:::
+
+```python showLineNumbers
+import shutil
+# 清理示例文件
+shutil.rmtree("demo", ignore_errors=True)
+```

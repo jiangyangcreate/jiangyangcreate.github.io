@@ -1,0 +1,35 @@
+# Dependencies
+**/node_modules
+
+# Production
+**/build
+
+# Generated files
+**.docusaurus
+**.cache-loader
+
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# draft
+draft
+
+# gallery 图片由外部服务 (ai.jiangmiemie.com/static/gallery) 托管，不入库
+static/pages/gallery
+
+**/test
+
+.cursor
+nohup.out
+
+# Claude Code
+.claude
+CLAUDE.md

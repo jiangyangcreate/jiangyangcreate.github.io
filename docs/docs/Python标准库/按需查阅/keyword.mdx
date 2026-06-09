@@ -1,0 +1,81 @@
+---
+title: keyword
+---
+
+`keyword` 模块用于检测字符串是否为 Python 关键字或软关键字，并提供所有关键字的完整列表。
+
+[keyword](https://docs.python.org/3/library/keyword.html)
+
+## 查看所有关键字
+
+```python showLineNumbers
+import keyword
+
+# 获取当前 Python 版本的所有关键字列表
+print(keyword.kwlist)
+# ['False', 'None', 'True', 'and', 'as', 'assert', 'async', 'await',
+#  'break', 'class', 'continue', 'def', 'del', 'elif', 'else', 'except',
+#  'finally', 'for', 'from', 'global', 'if', 'import', 'in', 'is',
+#  'lambda', 'nonlocal', 'not', 'or', 'pass', 'raise', 'return',
+#  'try', 'while', 'with', 'yield']
+
+print(f"共 {len(keyword.kwlist)} 个关键字")
+```
+
+## 判断是否为关键字
+
+```python showLineNumbers
+import keyword
+
+# 关键字不能用作变量名、函数名等标识符
+print(keyword.iskeyword("if"))       # True
+print(keyword.iskeyword("return"))   # True
+print(keyword.iskeyword("print"))    # False（print 是内置函数，不是关键字）
+print(keyword.iskeyword("hello"))    # False
+```
+
+## 软关键字
+
+软关键字（soft keyword）是仅在特定语法上下文中有特殊含义的标识符，其他位置可以作为普通变量名使用。
+
+```python showLineNumbers
+import keyword
+
+# 查看所有软关键字（Python 3.9+）
+print(keyword.softkwlist)
+# ['_', 'case', 'match', 'type']
+
+print(keyword.issoftkeyword("match"))   # True
+print(keyword.issoftkeyword("case"))    # True
+print(keyword.issoftkeyword("if"))      # False（if 是硬关键字）
+```
+
+:::tip
+软关键字如 `match` 和 `case` 仅在 `match/case` 语句中有特殊含义。在其他地方，你仍然可以用 `match` 作为变量名，但为了代码可读性，不建议这样做。
+:::
+
+## 实用场景：验证标识符合法性
+
+```python showLineNumbers
+import keyword
+
+def is_valid_identifier(name: str) -> bool:
+    """检查字符串是否可以作为合法的 Python 变量名"""
+    return name.isidentifier() and not keyword.iskeyword(name)
+
+test_names = ["my_var", "class", "for", "_private", "2name", "match"]
+for name in test_names:
+    valid = is_valid_identifier(name)
+    print(f"{name:>10} -> {'合法' if valid else '不合法'}")
+# 输出：
+#     my_var -> 合法
+#      class -> 不合法
+#        for -> 不合法
+#   _private -> 合法
+#      2name -> 不合法
+#      match -> 合法（match 是软关键字，可以用作变量名）
+```
+
+:::info
+`str.isidentifier()` 只检查字符串是否符合标识符的语法规则（字母/下划线开头，仅含字母、数字、下划线），不会排除关键字。需要配合 `keyword.iskeyword()` 一起使用才能完整验证。
+:::

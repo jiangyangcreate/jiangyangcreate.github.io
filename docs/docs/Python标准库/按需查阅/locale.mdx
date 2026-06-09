@@ -1,0 +1,127 @@
+---
+title: locale
+---
+
+`locale` 模块提供国际化与本地化服务，让程序能根据用户所在地区的文化习惯来格式化数字、货币、日期等。
+
+[locale](https://docs.python.org/3/library/locale.html)
+
+:::info
+`locale` 基于 C 库的区域设置机制工作。程序启动时默认使用 `C` 区域（最小化、可移植的英文设置），需要显式调用 `setlocale` 才能切换到用户偏好的区域。
+:::
+
+## 设置与获取区域
+
+```python showLineNumbers
+import locale
+
+# 获取当前区域设置
+print(locale.getlocale())  # 例：(None, None) 或 ('zh_CN', 'UTF-8')
+
+# 设置为用户系统默认区域
+locale.setlocale(locale.LC_ALL, '')
+print(locale.getlocale())  # 例：('zh_CN', 'UTF-8')
+
+# 设置为特定区域
+try:
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+    print(locale.getlocale())  # ('en_US', 'UTF-8')
+except locale.Error:
+    print("该区域在此系统上不可用")
+
+# 恢复为 C 区域
+locale.setlocale(locale.LC_ALL, 'C')
+```
+
+:::tip
+`setlocale()` 不是线程安全的。推荐在程序启动时设置一次，之后不再更改。
+:::
+
+## 数字格式化
+
+```python showLineNumbers
+import locale
+
+locale.setlocale(locale.LC_ALL, '')
+
+# 按当前区域格式化数字（自动添加千位分隔符和小数点）
+result = locale.format_string("%d", 1234567, grouping=True)
+print(result)  # 例：'1,234,567'（en_US）或 '1.234.567'（de_DE）
+
+# 格式化浮点数
+result = locale.format_string("%.2f", 1234567.89, grouping=True)
+print(result)  # 例：'1,234,567.89'
+
+# 将本地化数字字符串转回数值
+num = locale.atof("1,234.56")
+print(num)  # 1234.56
+
+# 将本地化整数字符串转回整数
+num = locale.atoi("1,234,567")
+print(num)  # 1234567
+```
+
+## 货币格式化
+
+```python showLineNumbers
+import locale
+
+locale.setlocale(locale.LC_ALL, '')
+
+# 格式化货币
+print(locale.currency(1234567.89, grouping=True))
+# 例：'￥1,234,567.89'（zh_CN）或 '$1,234,567.89'（en_US）
+
+# 使用国际货币符号
+print(locale.currency(1234567.89, grouping=True, international=True))
+# 例：'CNY 1,234,567.89' 或 'USD 1,234,567.89'
+```
+
+## 查看区域约定详情
+
+```python showLineNumbers
+import locale
+
+locale.setlocale(locale.LC_ALL, '')
+
+conv = locale.localeconv()
+print(f"小数点符号: {conv['decimal_point']}")      # 例：'.'
+print(f"千位分隔符: {conv['thousands_sep']}")       # 例：','
+print(f"货币符号: {conv['currency_symbol']}")       # 例：'￥' 或 '$'
+print(f"国际货币符号: {conv['int_curr_symbol']}")   # 例：'CNY ' 或 'USD '
+print(f"小数位数: {conv['frac_digits']}")           # 例：2
+```
+
+## 字符串排序
+
+```python showLineNumbers
+import locale
+
+locale.setlocale(locale.LC_ALL, '')
+
+# 按当前区域的排序规则比较字符串
+words = ["über", "apple", "Äpfel", "banana"]
+words_sorted = sorted(words, key=locale.strxfrm)
+print(words_sorted)
+# 区域敏感的排序（德语区域会将 Ä 排在 A 附近）
+```
+
+:::info
+`locale.strcoll(a, b)` 适合单次比较两个字符串；如果要对列表排序，用 `locale.strxfrm` 作为 `key` 更高效，因为每个字符串只需转换一次。
+:::
+
+## 获取编码信息
+
+```python showLineNumbers
+import locale
+
+# 获取当前区域编码（不受 UTF-8 模式影响）
+print(locale.getencoding())  # 例：'UTF-8'
+
+# 获取用户偏好编码
+print(locale.getpreferredencoding())  # 例：'UTF-8'
+
+# 区域名称规范化
+print(locale.normalize("zh_CN"))        # 'zh_CN.UTF-8' 或类似
+print(locale.normalize("en_US"))        # 'en_US.ISO8859-1' 或类似
+```

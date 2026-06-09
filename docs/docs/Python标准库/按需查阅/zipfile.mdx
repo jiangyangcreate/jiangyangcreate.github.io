@@ -1,0 +1,133 @@
+---
+title: zipfile
+---
+
+`zipfile` 模块提供创建、读取、写入和解压 ZIP 归档文件的功能。
+
+[zipfile](https://docs.python.org/3/library/zipfile.html)
+
+## 创建 ZIP 文件
+
+```python showLineNumbers
+import zipfile
+import os
+
+os.makedirs("mydata", exist_ok=True)
+with open("mydata/hello.txt", "w") as f:
+    f.write("Hello, World!")
+with open("mydata/notes.txt", "w") as f:
+    f.write("一些笔记内容")
+
+# 创建 ZIP 文件并添加文件
+with zipfile.ZipFile("archive.zip", "w", zipfile.ZIP_DEFLATED) as zf:
+    zf.write("mydata/hello.txt")
+    zf.write("mydata/notes.txt")
+
+# 使用 writestr 直接写入字符串内容
+with zipfile.ZipFile("archive.zip", "a") as zf:
+    zf.writestr("generated.txt", "这是动态生成的内容")
+```
+
+:::info
+常用压缩方式：
+- `ZIP_STORED`：不压缩（默认）
+- `ZIP_DEFLATED`：标准压缩（需要 zlib）
+- `ZIP_BZIP2`：bzip2 压缩（需要 bz2）
+- `ZIP_LZMA`：lzma 压缩（需要 lzma）
+:::
+
+## 读取 ZIP 文件
+
+```python showLineNumbers
+import zipfile
+
+with zipfile.ZipFile("archive.zip", "r") as zf:
+    # 列出所有文件
+    print(zf.namelist())
+    # ['mydata/hello.txt', 'mydata/notes.txt', 'generated.txt']
+
+    # 读取文件内容
+    content = zf.read("mydata/hello.txt")
+    print(content.decode("utf-8"))
+
+    # 获取文件详细信息
+    info = zf.getinfo("mydata/hello.txt")
+    print(f"文件名: {info.filename}")
+    print(f"压缩大小: {info.compress_size} 字节")
+    print(f"原始大小: {info.file_size} 字节")
+
+    # 打印归档目录
+    zf.printdir()
+```
+
+## 解压文件
+
+```python showLineNumbers
+import zipfile
+
+with zipfile.ZipFile("archive.zip", "r") as zf:
+    # 解压所有文件到指定目录
+    zf.extractall("output")
+
+    # 解压单个文件
+    zf.extract("mydata/hello.txt", "output_single")
+
+    # 以文件对象方式读取（不解压到磁盘）
+    with zf.open("mydata/notes.txt") as f:
+        print(f.read().decode("utf-8"))
+```
+
+## 检查与验证
+
+```python showLineNumbers
+import zipfile
+
+# 判断文件是否为有效的 ZIP 文件
+print(zipfile.is_zipfile("archive.zip"))  # True
+print(zipfile.is_zipfile("mydata/hello.txt"))  # False
+
+# 验证归档完整性
+with zipfile.ZipFile("archive.zip", "r") as zf:
+    bad_file = zf.testzip()
+    if bad_file is None:
+        print("归档完整，无损坏")
+    else:
+        print(f"损坏的文件: {bad_file}")
+```
+
+## 批量打包目录
+
+```python showLineNumbers
+import zipfile
+import os
+
+def zip_directory(folder_path, output_path):
+    """将整个目录打包为 ZIP 文件"""
+    with zipfile.ZipFile(output_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        for root, dirs, files in os.walk(folder_path):
+            for file in files:
+                file_path = os.path.join(root, file)
+                arcname = os.path.relpath(file_path, folder_path)
+                zf.write(file_path, arcname)
+
+zip_directory("mydata", "mydata_packed.zip")
+
+# 验证打包结果
+with zipfile.ZipFile("mydata_packed.zip", "r") as zf:
+    print(zf.namelist())
+```
+
+```python showLineNumbers
+import shutil, os
+# 清理示例文件
+shutil.rmtree("mydata", ignore_errors=True)
+shutil.rmtree("output", ignore_errors=True)
+shutil.rmtree("output_single", ignore_errors=True)
+for f in ["archive.zip", "mydata_packed.zip"]:
+    if os.path.exists(f):
+        os.remove(f)
+```
+
+:::tip
+对于简单的打包解压需求，也可以用 `shutil.make_archive()` 和 `shutil.unpack_archive()`，接口更简洁。`zipfile` 适合需要精细控制（如逐文件添加、设置压缩级别、读取元信息）的场景。
+:::

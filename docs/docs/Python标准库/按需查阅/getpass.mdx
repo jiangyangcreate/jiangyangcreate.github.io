@@ -1,0 +1,62 @@
+---
+title: getpass
+---
+
+`getpass` 模块提供便携的密码输入和用户名获取功能，输入密码时不会在终端回显。
+
+[getpass](https://docs.python.org/3/library/getpass.html)
+
+## 密码输入
+
+`getpass.getpass()` 提示用户输入密码，输入内容不会显示在屏幕上。
+
+```python showLineNumbers
+import getpass
+
+password = getpass.getpass()  # 默认提示 "Password: "
+print(f"你输入了 {len(password)} 个字符")
+
+# 自定义提示语
+password = getpass.getpass(prompt="请输入密码：")
+```
+
+:::tip
+Python 3.14+ 新增 `echo_char` 参数，可以用掩码字符代替隐藏输入，提供输入反馈：
+
+```python showLineNumbers
+import getpass
+
+# 每输入一个字符显示一个 *
+password = getpass.getpass(prompt="密码：", echo_char="*")
+```
+:::
+
+## 获取当前用户名
+
+`getpass.getuser()` 依次检查环境变量 `LOGNAME`、`USER`、`LNAME`、`USERNAME`，返回第一个非空值。
+
+```python showLineNumbers
+import getpass
+
+username = getpass.getuser()
+print(f"当前用户：{username}")
+```
+
+## 实际应用：简单登录
+
+```python showLineNumbers
+import getpass
+
+username = getpass.getuser()
+password = getpass.getpass(prompt=f"{username} 的密码：")
+
+# 实际项目中应使用 hashlib 或 bcrypt 校验密码哈希
+if username == "admin" and password == "secret":
+    print("登录成功")
+else:
+    print("用户名或密码错误")
+```
+
+:::info
+`getpass` 在 IDLE 等非终端环境中可能无法正常隐藏输入，会回退到 `sys.stdin` 读取并发出 `GetPassWarning` 警告。在脚本或终端中使用效果最佳。
+:::

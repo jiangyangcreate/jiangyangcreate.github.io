@@ -1,0 +1,146 @@
+---
+title: tracemalloc
+---
+
+`tracemalloc` 模块用于追踪 Python 的内存分配，能够精确定位内存在哪行代码被分配。
+
+[tracemalloc](https://docs.python.org/3.14/library/tracemalloc.html)
+
+## 基本内存追踪
+
+```python showLineNumbers
+import tracemalloc
+
+tracemalloc.start()
+
+data = [i ** 2 for i in range(100000)]
+big_dict = {str(i): i for i in range(50000)}
+
+snapshot = tracemalloc.take_snapshot()
+top_stats = snapshot.statistics("lineno")
+
+print("Top 5 内存分配:")
+for stat in top_stats[:5]:
+    print(stat)
+```
+
+## 比较两个时间点的内存差异
+
+```python showLineNumbers
+import tracemalloc
+
+tracemalloc.start()
+
+snapshot1 = tracemalloc.take_snapshot()
+
+# 模拟一些操作
+x = [bytearray(1024) for _ in range(1000)]
+y = list(range(100000))
+
+snapshot2 = tracemalloc.take_snapshot()
+
+top_stats = snapshot2.compare_to(snapshot1, "lineno")
+
+print("内存增长 Top 5:")
+for stat in top_stats[:5]:
+    print(stat)
+```
+
+## 按文件统计内存
+
+```python showLineNumbers
+import tracemalloc
+
+tracemalloc.start()
+
+data = [i for i in range(1000000)]
+text = "hello " * 100000
+
+snapshot = tracemalloc.take_snapshot()
+stats = snapshot.statistics("filename")
+
+print("按文件统计:")
+for stat in stats[:10]:
+    print(f"  {stat.traceback}: {stat.size / 1024:.1f} KiB")
+```
+
+## 获取当前内存使用
+
+```python showLineNumbers
+import tracemalloc
+
+tracemalloc.start()
+
+arrays = []
+for i in range(10):
+    arrays.append(bytearray(1024 * 1024))  # 每次 1MB
+    current, peak = tracemalloc.get_traced_memory()
+    print(f"第 {i+1} 轮: 当前 {current / 1024 / 1024:.1f} MB, 峰值 {peak / 1024 / 1024:.1f} MB")
+
+tracemalloc.stop()
+```
+
+## 显示分配的完整调用链
+
+```python showLineNumbers
+import tracemalloc
+
+tracemalloc.start(25)  # 保存最多25层调用栈
+
+def allocate():
+    return [bytearray(1024) for _ in range(100)]
+
+def process():
+    return allocate()
+
+def main():
+    return process()
+
+data = main()
+
+snapshot = tracemalloc.take_snapshot()
+top_stats = snapshot.statistics("traceback")
+
+# 查看最大内存分配的完整调用链
+stat = top_stats[0]
+print(f"最大分配: {stat.size / 1024:.1f} KiB, {stat.count} 次")
+for line in stat.traceback.format():
+    print(f"  {line}")
+```
+
+## 过滤特定模块的内存
+
+```python showLineNumbers
+import tracemalloc
+
+tracemalloc.start()
+
+import json
+data = json.dumps({str(i): list(range(100)) for i in range(1000)})
+
+snapshot = tracemalloc.take_snapshot()
+
+# 只看当前文件的分配
+filtered = snapshot.filter_traces([
+    tracemalloc.Filter(True, "<string>"),
+])
+for stat in filtered.statistics("lineno")[:5]:
+    print(stat)
+
+# 排除 importlib 的分配
+filtered2 = snapshot.filter_traces([
+    tracemalloc.Filter(False, "<frozen importlib._bootstrap>"),
+    tracemalloc.Filter(False, "<frozen importlib._bootstrap_external>"),
+])
+for stat in filtered2.statistics("lineno")[:5]:
+    print(stat)
+```
+
+:::tip
+在 AI 场景中，内存问题非常常见：
+- **数据加载**：大数据集未及时释放
+- **模型推理**：tensor 缓存累积
+- **特征工程**：中间 DataFrame 占用过多
+
+`tracemalloc` 配合 `gc` 模块是排查 Python 层内存问题的标准组合。对于 C 扩展层（如 PyTorch CUDA 内存），需要使用框架自带的工具。
+:::

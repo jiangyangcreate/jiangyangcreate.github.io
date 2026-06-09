@@ -1,0 +1,161 @@
+---
+title: cProfile、profile、pstats
+---
+
+cProfile 是 Python 内置的确定性性能分析器（C 扩展实现，开销小），用来回答「我的代码慢在哪」。如果 cProfile 在您的系统上不可用，请使用纯 Python 版的 profile。
+
+这些统计数据可以通过 pstats 模块格式化为报表。
+
+## 命令行直接分析脚本
+
+不改一行代码，直接从命令行分析整个脚本的性能：
+
+```bash showLineNumbers
+python -m cProfile -s cumulative my_script.py
+```
+
+`-s cumulative` 按累计耗时排序，快速定位最耗时的函数。如果想把结果存到文件以便后续分析：
+
+```bash showLineNumbers
+python -m cProfile -o profile_result.prof my_script.py
+```
+
+## 分析某段代码
+
+用上下文管理器包裹你想分析的代码块，不需要侵入整个程序：
+
+```python showLineNumbers
+import cProfile
+from pstats import Stats, SortKey
+
+with cProfile.Profile() as pr:
+    # 把你想分析的代码放在这里
+    result = sum(i * i for i in range(1_000_000))
+
+Stats(pr).strip_dirs().sort_stats(SortKey.CUMULATIVE).print_stats(10)
+```
+
+## 用装饰器分析单个函数
+
+写一个可复用的装饰器，想分析哪个函数就套上去：
+
+```python showLineNumbers
+import cProfile
+import functools
+from pstats import Stats, SortKey
+
+def profile(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        with cProfile.Profile() as pr:
+            result = func(*args, **kwargs)
+        Stats(pr).strip_dirs().sort_stats(SortKey.CUMULATIVE).print_stats(20)
+        return result
+    return wrapper
+
+@profile
+def process_data(n):
+    data = [i ** 2 for i in range(n)]
+    return sorted(data, reverse=True)
+
+process_data(500_000)
+```
+
+## 读懂分析报告
+
+```text showLineNumbers
+   ncalls  tottime  percall  cumtime  percall filename:lineno(function)
+   500000    0.062    0.000    0.062    0.000 {built-in method builtins.pow}
+        1    0.031    0.031    0.120    0.120 example.py:12(process_data)
+        1    0.027    0.027    0.027    0.027 {built-in method builtins.sorted}
+```
+
+| 列 | 含义 |
+|---|---|
+| ncalls | 调用次数（如 `3/1` 表示递归调用 3 次，原始调用 1 次） |
+| tottime | 函数自身耗时（不含子函数） |
+| cumtime | 函数总耗时（含子函数） |
+| percall | 平均每次调用耗时 |
+
+重点关注：**cumtime 大**的函数是整体瓶颈，**tottime 大**的函数是自身计算密集的热点。
+
+## 用 pstats 做深度分析
+
+将结果保存到文件后，可以反复筛选、排序：
+
+```python showLineNumbers
+import pstats
+from pstats import SortKey
+
+p = pstats.Stats("profile_result.prof")
+
+# 按累计耗时排序，只看前 15 行
+p.strip_dirs().sort_stats(SortKey.CUMULATIVE).print_stats(15)
+
+# 只看某个模块或文件的函数
+p.sort_stats(SortKey.TIME).print_stats("my_module")
+
+# 查看谁调用了耗时最多的函数
+p.print_callers("process_data")
+
+# 查看某函数调用了哪些子函数
+p.print_callees("process_data")
+```
+
+## 接口调优
+
+假设你有一个处理请求的函数，响应时间忽然变长了：
+
+```python showLineNumbers
+import cProfile
+from pstats import Stats, SortKey
+
+def handle_request(user_id):
+    user = query_user(user_id)        # 数据库查询
+    orders = query_orders(user_id)    # 数据库查询
+    report = generate_report(orders)  # CPU 密集计算
+    send_email(user, report)          # 网络 IO
+    return report
+
+with cProfile.Profile() as pr:
+    handle_request(42)
+
+stats = Stats(pr)
+stats.strip_dirs().sort_stats(SortKey.CUMULATIVE).print_stats(10)
+# 如果 cumtime 大头在 query_orders → 优化 SQL 或加索引
+# 如果 cumtime 大头在 generate_report → 优化算法或用缓存
+# 如果 cumtime 大头在 send_email → 改为异步发送
+```
+
+### 对比优化前后效果
+
+保存两次分析结果，用 `add` 方法合并或对比：
+
+```python showLineNumbers
+import cProfile
+
+# 优化前
+cProfile.run("old_implementation()", "before.prof")
+
+# 优化后
+cProfile.run("new_implementation()", "after.prof")
+
+# 分别查看对比
+import pstats
+print("=== 优化前 ===")
+pstats.Stats("before.prof").strip_dirs().sort_stats("cumulative").print_stats(5)
+print("=== 优化后 ===")
+pstats.Stats("after.prof").strip_dirs().sort_stats("cumulative").print_stats(5)
+```
+
+### 可视化分析结果
+
+将 `.prof` 文件转换为可视化图形（需安装第三方工具）：
+
+```bash showLineNumbers
+pip install snakeviz
+snakeviz profile_result.prof
+```
+
+snakeviz 会在浏览器中打开一个交互式火焰图，比文字报告直观得多。
+

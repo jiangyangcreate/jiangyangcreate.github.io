@@ -1,0 +1,114 @@
+---
+title: base64
+---
+
+`base64` 模块提供将二进制数据编码为可打印 ASCII 字符（以及反向解码）的功能，支持 Base64、Base32、Base16 和 Base85 等编码方案。
+
+[base64](https://docs.python.org/3/library/base64.html)
+
+## Base64 编解码
+
+最常用的编解码函数，将字节数据转为 Base64 字符串，或反向解码。
+
+```python showLineNumbers
+import base64
+
+# 编码
+data = b"Hello, Python!"
+encoded = base64.b64encode(data)
+print(encoded)  # b'SGVsbG8sIFB5dGhvbiE='
+
+# 解码
+decoded = base64.b64decode(encoded)
+print(decoded)  # b'Hello, Python!'
+```
+
+## URL 安全的 Base64
+
+标准 Base64 中的 `+` 和 `/` 在 URL 中有特殊含义，`urlsafe_b64encode` 用 `-` 和 `_` 替代，适合在 URL 和文件名中使用。
+
+```python showLineNumbers
+import base64
+
+data = b"subjects?python/base64"
+# 标准 Base64：可能包含 + 和 /
+standard = base64.b64encode(data)
+print(standard)  # b'c3ViamVjdHM/cHl0aG9uL2Jhc2U2NA=='
+
+# URL 安全 Base64：用 - 和 _ 替代
+urlsafe = base64.urlsafe_b64encode(data)
+print(urlsafe)   # b'c3ViamVjdHM_cHl0aG9uL2Jhc2U2NA=='
+
+# 解码
+print(base64.urlsafe_b64decode(urlsafe))  # b'subjects?python/base64'
+```
+
+:::tip
+JWT（JSON Web Token）就使用 URL 安全的 Base64 编码。如果你需要构造或解析 URL 中的编码数据，优先使用 `urlsafe_b64encode` / `urlsafe_b64decode`。
+:::
+
+## Base32 与 Base16
+
+Base32 使用大写字母 A-Z 和数字 2-7，Base16 本质就是十六进制编码。
+
+```python showLineNumbers
+import base64
+
+data = b"Hello"
+
+# Base32 编解码
+b32 = base64.b32encode(data)
+print(b32)  # b'JBSWY3DP'
+print(base64.b32decode(b32))  # b'Hello'
+
+# Base16 编解码（等价于十六进制）
+b16 = base64.b16encode(data)
+print(b16)  # b'48656C6C6F'
+print(base64.b16decode(b16))  # b'Hello'
+```
+
+## 文件的 Base64 编码
+
+读取二进制文件并转为 Base64 字符串，常用于在文本协议（如 JSON、邮件）中嵌入图片等二进制数据。
+
+```python showLineNumbers
+import base64
+
+# 将文件编码为 Base64 字符串
+def file_to_base64(filepath):
+    with open(filepath, "rb") as f:
+        return base64.b64encode(f.read()).decode("utf-8")
+
+# 将 Base64 字符串还原为文件
+def base64_to_file(b64_string, output_path):
+    with open(output_path, "wb") as f:
+        f.write(base64.b64decode(b64_string))
+
+# 示例：编码图片
+# encoded = file_to_base64("photo.png")
+# base64_to_file(encoded, "photo_copy.png")
+```
+
+## Base85 编码
+
+Base85 比 Base64 更紧凑（4 字节二进制 → 5 字符 ASCII），常见于 PDF 和 Git 二进制差异。
+
+```python showLineNumbers
+import base64
+
+data = b"Hello, Base85!"
+
+# Ascii85（Adobe 风格）
+a85 = base64.a85encode(data)
+print(a85)  # 类似 b'87cURD]i,"Ebo80'
+print(base64.a85decode(a85))
+
+# b85encode（Git 风格）
+b85 = base64.b85encode(data)
+print(b85)
+print(base64.b85decode(b85))
+```
+
+:::info
+Base64 是**编码**而非**加密**，任何人都可以轻松解码。不要用它来保护敏感数据，加密应使用 `cryptography` 等专用库。
+:::

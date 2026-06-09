@@ -1,0 +1,560 @@
+---
+sidebar_position: 2
+title: 数据
+---
+
+C语言基本数据类型：`char`、`int`、`float`、`double`、`void`（不能被修饰）、`_Bool`（不能被修饰）、`_Complex`（可指定单精度或双精度）和`_Imaginary`（可指定单精度或双精度）
+
+通过2个长度修饰符：
+- `short`：只能修饰`int`
+- `long` ：可修饰1~2次 `int` 或1次 `double`
+
+以及2个符号修饰符(只能修饰整型类型，可以和长度修饰符组合)：
+- `signed` ：可以缺省，不写符号修饰符等同于`signed`。有符号则表示正数和负数，绝对值范围减半。
+- `unsigned`：不可以缺省。无符号则只表示正数，不表示负数。
+
+可以组合出14种基本数据类型。
+
+| 计算机存储 | 分类 | 字节数 | 类型 | 完整形式 | 简化形式 | 取值范围 | 描述 |
+|--------:|--------:|--------:|------|----------|----------|----------|------|
+| 整型类型 | 布尔型 | 1 | `_Bool` | `_Bool` | `bool` (需头文件) | 0 或 1 | 逻辑真(true)或假(false) |
+| 整型类型 | 字符型 | 1 | `char` | `signed char` | `char` | -2⁷ ~ 2⁷-1 | 字符类型（8位，**不支持中文**）|
+| 整型类型 | 字符型 | 1 | `unsigned char` | `unsigned char` | `unsigned char` | 0 ~ 2⁸-1 | 无符号字符型（8位，**不支持中文**） |
+| 整型类型 | 短整型 | 2 | `short` | `signed short int` | `short`/`short int` | -2¹⁵ ~ 2¹⁵-1 | 有符号短整型（16位） |
+| 整型类型 | 短整型 | 2 | `unsigned short` | `unsigned short int` | `unsigned short` | 0 ~ 2¹⁶-1 | 无符号短整型（16位） |
+| 整型类型 | 标准整型 | 4 | `int` | `signed int` | `int`/`signed` | -2³¹ ~ 2³¹-1 | 有符号整型（32位，默认） |
+| 整型类型 | 标准整型 | 4 | `unsigned int` | `unsigned int` | `unsigned int`/`unsigned` | 0 ~ 2³²-1 | 无符号整型（32位） |
+| 整型类型 | 长整型 | 4/8 | `long` | `signed long int` | `long` | -2³¹ ~ 2³¹-1 或 -2⁶³ ~ 2⁶³-1 | 有符号长整型（32位或64位） |
+| 整型类型 | 长整型 | 4/8 | `unsigned long` | `unsigned long int` | `unsigned long` | 0 ~ 2³²-1 或 0 ~ 2⁶⁴-1 | 无符号长整型（32位或64位） |
+| 整型类型 | 长长整型 | 8 | `long long` | `signed long long int` | `long long int`/`signed long long`/`long long` | -2⁶³ ~ 2⁶³-1 | 有符号长长整型（64位） |
+| 整型类型 | 长长整型 | 8 | `unsigned long long` | `unsigned long long int` | `unsigned long long` | 0 ~ 2⁶⁴-1 | 无符号长长整型（64位） |
+| 浮点型类型 | 单精度 | 4 | `float` | `float` | `float` | ±1.18×2⁻¹²⁶ ~ ±3.40×2¹²⁷ | 单精度浮点型（32位IEEE754） |
+| 浮点型类型 | 双精度 | 8 | `double` | `double` | `double` | ±2.23×2⁻¹⁰²² ~ ±1.80×2¹⁰²³ | 小数默认类型，双精度浮点型（64位IEEE754） |
+| 浮点型类型 | 扩展精度 | 8/12/16 | `long double` | `long double` | `long double` | 平台相关 | 扩展精度浮点型（64/80/128位） |
+| 整型类型 | 复数 | 8/16/24 | `_Complex` | `float/double _Complex` | - | 实部+虚部 | 处理复数运算 |
+| 整型类型 | 虚数 | 4/8/12 | `_Imaginary` | `float/double _Imaginary` | - | 纯虚数 | 处理纯虚数运算 |
+| 特殊类型 | - | 0 | `void` | `void` | `void` | - | 空类型，不占存储空间 |
+
+
+## \_Bool
+
+`_Bool` 类型用于表示布尔值，即逻辑值 `true` 和 `false`。因为 C 语言用值 `1` 表示 `true`，值 `0` 表示 `false`，所以 `_Bool` 类型实际上也是一种整数类型。但原则上它仅占用 1 位存储空间，因为对 0 和 1 而言，1 位的存储空间足够了。
+
+虽然关键字是 `_Bool`，但 C99 引入了 `<stdbool.h>` 头文件，允许你直接使用更符合直觉的 `bool`、`true` 和 `false`。
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdbool.h> // 使用 bool 必须包含此头文件
+
+int main() {
+    bool is_coding = true;
+    _Bool is_fun = 1; // 原生写法
+    
+    if (is_coding) {
+        printf("Keep coding!\n");
+    }
+    return 0;
+}
+
+```
+
+## char
+
+char 用于存储一个基本的 ASCII 字符（不可以存储中文）。
+
+- 用<Highlight>单引号</Highlight>括起来的<Highlight>单个</Highlight>ASCII 码表字符： `'A'`, `'1'`, `'$'`, `'\n'`
+
+ASCII 码表很小，只包含大小写字母、数字、标点。及打印机用的换行`\n`、换页`\f`、退格等符号`\b`、警报`\a`、回车`\r`、制表`\t`、反斜杠`\\`、单引号`\`、双引号`\"`、问号`\?`、空字符`\0`（<Highlight>转义字符</Highlight>）。
+
+<Highlight>C语言严格区分单引号和双引号</Highlight>，单引号才表示单个字符，双引号表示<HoverText text="字符串" explanation="由字符组成的数组。" />
+
+在计算机中以整数形式存储的就是整型。字符型（char）本质上也是小整数（通常对应ASCII码值），所以字符型也属于整型家族，可以进行算术运算。
+
+`char`和`int`类型转换时，`int`转为`char`时会是对应的`ASCII`码表中字符。`char`转为`int`时会是对应的`ASCII`码表中对应的数字。
+
+ASCII 表完整内容可以查看：[https://www.asciitable.com/](https://www.asciitable.com/)
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    const char letter = 'C';
+    const char newline = '\n';
+    const char tab = '\t';
+    
+    printf("字符: %c 编号是 %d\n", letter, letter);
+    // 字符: C 编号是 67
+    printf("换行前%c换行后\n", newline);
+    printf("制表符前%c制表符后\n", tab);
+    return 0;
+}
+```
+
+:::tip
+想要存储中文可以用字符串数组。
+
+- 用双引号括起来：例如 `"Hello"`, `"C语言"`
+- <Highlight>系统会自动在字符串末尾添加 '\0' 作为结束标志</Highlight>
+
+```c showLineNumbers
+#include <stdio.h>
+#include <string.h>
+int main(){
+    const char greeting[] = "Hello World";
+    const char empty[] = "";
+    
+    printf("问候语: %s\n", greeting);
+    printf("空字符串长度: %lu\n", strlen(empty));
+    return 0;
+}
+```
+:::
+
+
+## int
+
+定义时可以带正负号，默认是正数。支持四种进制格式：
+
+- 十进制整数：例如 `666`, `-120`, `0`
+- 二进制整数：以 `0b` 开头，例如 `0b1010`（十进制的10）
+- 八进制整数：以 `0` 开头，例如 `0123`（十进制的83）
+- 十六进制整数：以 `0x` 开头，例如 `0x123`（十进制的291）
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    printf("十进制: %d\n", 123);      // 123
+    printf("八进制: %d\n", 0123);     // 83
+    printf("十六进制: %d\n", 0x123);  // 291
+    printf("二进制: %d\n", 0b1010);   // 10
+    return 0;
+}
+```
+
+判断下列数字是否合理
+
+```c showLineNumbers
++178
+
+0b325 // 二进制只能是0-1
+0b0010
+
+0986 // 八进制只能是0-7
+00011
+
+0x001
+0x7h4 // 十六进制只能是0-9,a-f,A-F
+0xffdc
+```
+
+## signed 和 unsigned
+
+符号修饰符（仅适用于整数类型）：
+
+- `signed` - 有符号位
+- `unsigned` - 无符号位
+
+`signed` 和 `unsigned` 的区别就是它们的最高位是否要当做符号位，并不会像 `short` 和 `long` 那样改变数据的长度，即所占的字节数。
+
+
+:::tip
+浮点数类型（`float`、`double`、`long double`）天然支持正负值，不能使用符号修饰符
+
+`signed` 表示有符号的，也就是说最高位要当做符号位。刚好 `int` 的最高位本来就是符号位。
+
+因此 `signed` 等价 `int` 等价 `signed int` 。
+
+:::
+### 溢出
+
+如果整数超出了相应类型的取值范围会怎样？
+```c showLineNumbers
+/* toobig.c-- 超出系统允许的最大int值*/
+#include <stdio.h>
+int main(void)
+{
+    int i = 2147483647; 
+    unsigned int j = 4294967295;
+
+    printf("%d %d %d\n", i, i+1, i+2);
+    printf("%u %u %u\n", j, j+1, j+2);
+
+    return 0;
+}
+// 2147483647    -2147483648    -2147483647
+// 4294967295    0    1
+```
+
+可以把无符号整数j看作是汽车的里程表。当达到它能表示的最大值时，会重新从起始点开始。
+
+整数i也是类似的情况。它们主要的区别是，在超过最大值时，unsigned int类型的变量j从0开始；而int类型的变量i则从−2147483648开始。
+
+## short 和 long
+
+- `short`：只能修饰`int`
+- `long` ：可修饰1~2次 `int` 或1次 `double`
+
+:::tip
+
+🤔 为什么 `long` 不一定比 `int` 大？有时是4字节，有时是8字节？
+
+**核心原因：C标准只规定了相对大小关系，没有规定绝对大小！**
+
+```c showLineNumbers
+// C标准只保证这些相对关系：
+sizeof(char) <= sizeof(short) <= sizeof(int) <= sizeof(long) <= sizeof(long long)
+//    1字节      ≥2字节         ≥2字节        ≥4字节         ≥8字节
+```
+
+**1980年代-1990年代（32位时代）：**
+```c showLineNumbers
+// 当时的"标准"配置
+char  = 1字节  (8位)
+short = 2字节  (16位) 
+int   = 4字节  (32位) ← 与CPU字长匹配
+long  = 4字节  (32位) ← 也是32位，够用了
+```
+
+**2000年代后（64位时代）：**
+```c
+// 两种不同的选择
+// Linux/macOS (LP64模型)
+int   = 4字节  (32位) ← 保持兼容性
+long  = 8字节  (64位) ← 升级到64位
+
+// Windows (LLP64模型)  
+int   = 4字节  (32位) ← 保持兼容性
+long  = 4字节  (32位) ← 与32位系统保持一致，向前兼容
+long long = 8字节  (64位) ← 用long long做64位
+```
+:::
+
+### stdint.h
+
+C语言为现有类型创建了更多类型名。这些新的类型名定义在 `stdint.h` 头文件中。它的核心作用是提供**宽度确定的整数类型**，解决了不同硬件平台和编译器下，原生类型（如 `int`、`long`）占用字节数不一致的问题。
+
+`stdint.h` 主要定义了以下四类整数类型：
+
+**1. 定宽整数 (Exact-width integer types)：**
+这类类型具有精确的位数，最适合用于协议解析、硬件寄存器操作或文件格式定义。
+
+```c
+// ✅ 推荐：使用标准库的固定大小类型
+#include <stdint.h>
+int32_t  x;    // 明确32位（4字节），有符号
+int64_t  y;    // 明确64位（8字节），有符号
+uint32_t z;    // 明确32位（4字节），无符号
+
+// ⚠️ 不推荐：依赖long的大小
+long maybe_big;    // 在32位系统通常是4字节，在64位Linux是8字节，在64位Windows又是4字节
+
+```
+
+**2. 最小宽度整数 (Minimum-width integer types)：**
+格式为 `int_leastN_t`。它们保证至少有  位，如果某种架构上没有正好  位的类型，编译器会提供一个更宽的类型。
+
+```c
+int_least16_t min_short; // 保证至少有16位，防止数据溢出
+
+```
+
+**3. 最快最小宽度整数 (Fastest minimum-width integer types)：**
+格式为 `int_fastN_t`。它们保证至少有  位，但会选择该系统上**处理速度最快**的位宽。
+
+```c
+int_fast32_t fast_counter; // 在64位CPU上，它可能是64位的，因为64位运算通常更快
+
+```
+
+**4. 极大宽度与指针整数：**
+
+* **intmax_t / uintmax_t：** 该平台支持的最大整数类型。
+* **intptr_t / uintptr_t：** 足以容纳指针地址的整数类型，常用于指针运算的类型转换。
+
+
+## float与double
+
+**实型常量**
+
+- <HoverText text="单精度小数" explanation="占用4个字节，精度约6-7位有效数字" />：以字母 `f` 或 `F` 结尾，例如 `3.14f`
+- <HoverText text="双精度小数" explanation="占用8个字节，精度约15-16位有效数字" />：默认的小数形式，例如 `3.14159`
+- 指数形式：使用 `e` 或 `E` 表示科学计数法，例如 `1.23e5`（表示123000）
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    const float pi_f = 3.14f;          // 单精度
+    const double pi_d = 3.14159;       // 双精度（默认的小数形式就是双精度）
+    const double big_num = 1.23e5;     // 科学计数法
+    const double small_num = 1.23e-3;  // 0.00123
+    
+    printf("单精度PI: %.7f\n", pi_f);
+    printf("双精度PI: %.15f\n", pi_d);
+    printf("大数: %.0f\n", big_num);
+    printf("小数: %.5f\n", small_num);
+    return 0;
+}
+```
+
+判断下列数字是否合理
+
+```c showLineNumbers
+10.98    // ✅ 合理：标准的十进制小数
+.089     // ✅ 合理：浮点数，前面的0可以省略，等同于0.089
+-.003    // ✅ 合理：负数浮点常量
+96.0f    // ✅ 合理：单精度浮点常量
+3.14E-2  // ✅ 合理：科学计数法，等同于0.0314
+
+96f      // ❌ 错误：缺少小数点
+96.oF    // ❌ 错误：用了字母'o'而不是数字'0'，应该是96.0F
+3.14.15  // ❌ 错误：多个小数点
+```
+
+:::info
+`long double` 精度差异的技术演进
+
+如果说`long int`字节不一致是处理器字长升级导致的兼容性问题，那么`long double`字节差异则反映了不同厂商在"精度与效率"之间的技术权衡。
+
+C标准只规定了相对大小关系，没有规定绝对大小，因此`long double`的精度取决于各大硬件厂商的具体实现。
+
+**1980年代初期**
+
+Intel开发了x87浮点协处理器（8087），采用80位（10字节）扩展精度格式，提供了比标准64位double更高的计算精度。这在当时的科学计算领域具有重要意义。
+
+**Linux和GCC** 选择充分利用Intel的80位精度能力，为需要高精度计算的应用提供支持。
+
+**Microsoft** 则采用了更为保守的策略，在Visual Studio中将`long double`实现为64位，与`double`相同。这样做的考虑是：
+- 简化编译器实现和调试
+- 保持与早期Windows系统的兼容性
+- 64位精度已能满足大多数应用需求
+
+**2000年代后期**
+
+随着移动设备兴起，**ARM架构** 开始在嵌入式和移动领域占主导地位。ARM处理器专注于功耗优化：
+- 80位运算增加功耗和复杂度
+- 移动设备电池容量有限
+- 64位精度足够满足移动应用需求
+
+**苹果、Google、高通、三星** 等移动平台厂商都选择了ARM的64位实现方案。
+
+**同时期：高性能计算的野心**
+
+就在移动厂商追求效率的同时，高性能计算领域却在追求更极致的精度：
+
+**IBM AIX/PowerPC** 拿出了"双倍双精度"方案："既然单个64位不够，那就用两个64位组合！" 这种Double-Double格式提供了约31位十进制精度。
+
+**GCC社区** 更进一步，推出了`__float128`："我们要真正的128位IEEE标准实现！" 34位十进制精度，满足最苛刻的科学计算需求。
+
+**现在的状况：**
+
+| 平台/编译器 | long double大小 | 设计考量 |
+|------------|----------------|----------|
+| **Windows + Visual Studio** | 8字节（64位） | 兼容性优先，简化实现 |
+| **Linux + GCC (x86)** | 12/16字节（80位） | 充分利用x87硬件能力 |
+| **Mac + Clang (Intel)** | 16字节（80位） | 遵循x86-64 ABI标准 |
+| **Mac + Clang (Apple Silicon)** | 8字节（64位） | ARM架构的效率优化 |
+| **Android开发** | 8字节（64位） | 移动平台功耗考量 |
+| **IBM AIX/PowerPC** | 16字节（128位） | 双倍双精度，超高精度计算 |
+| **GCC __float128** | 16字节（128位） | IEEE 754四精度扩展 |
+
+32位处理器一次操作处理32位（4字节）数据，64位处理器一次操作处理64位（8字节）数据。
+
+80位（10字节）数据在32位处理器需要操作3次，等价处理了3x4=12字节。在64位处理器需要操作2次，等价处理了2x8=16字节。
+
+
+**开发建议：**
+- 不要假设`long double`一定比`double`大
+- 需要特定精度时，考虑使用专门的高精度数学库
+- 跨平台项目应该测试各平台的精度差异
+
+:::
+
+### 上溢
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main() {
+     float toobig = 3.4E38 * 100.0f;
+     printf("%e\n", toobig);
+    return 0;
+}
+```
+当计算导致数字过大，超过当前类型能表达的范围时，就会发生上溢。这种行为在过去是未定义的，不过现在C语言规定，在这种情况下会给toobig赋一个表示无穷大的特定值。
+
+而且printf()显示该值为inf或infinity（或者具有无穷含义的其他内容）​。
+
+:::tip
+还有另一个特殊的浮点值NaN（not a number的缩写）​。例如，给asin()函数传递一个值，该函数将返回一个角度，该角度的正弦就是传入函数的值。但是正弦值不能大于1，因此，如果传入的参数大于1，该函数的行为是未定义的。在这种情况下，该函数将返回NaN值，
+
+printf()函数可将其显示为nan、NaN或其他类似的内容。
+:::
+
+### 下溢
+
+当结果小于“规格化”所能表示的最小值时，系统不会立即将其变为 0，而是进入**次正规数（Subnormal/Denormalized Numbers）**状态。此时，浮点数的精度会逐渐降低，直到最终无法表示。
+
+例如浮点数最多可以表示0.01，但是计算出来的结果是0.005。比其能表示的最低精度还要低，超出了次正规数的表示范围，C 语言通常会将其处理为 0.0。
+
+在 `<fenv.h>` 中，FE_UNDERFLOW 标志会被触发。你可以通过 fetestexcept(FE_UNDERFLOW) 来检查是否发生了下溢。
+
+
+## \_Complex
+
+`_Complex` 实际上是一对浮点数的组合。例如 `double _Complex` 占用的空间等同于两个 `double`（16 字节），一个存实部，一个存虚部。C99 提供了 `<complex.h>` 头文件来辅助运算。
+
+```c showLineNumbers
+#include <stdio.h>
+#include <complex.h> // 复数运算头文件
+
+int main() {
+    double complex z = 3.0 + 4.0 * I; // I 是 complex.h 定义的虚数单位
+    printf("实部: %.1f, 虚部: %.1f\n", creal(z), cimag(z));
+    return 0;
+}
+
+```
+
+## \_Imaginary
+
+`_Imaginary` 类型用于表示纯虚数。它同样是 C99 引入的关键字，主要用于科学计算，以区分“实部为零的复数”和“纯虚数”。
+
+* **存储形式**：与对应精度的浮点型相同（如 `float _Imaginary` 占用 4 字节）。
+* **注意**：并非所有编译器都完全支持 `_Imaginary` 可选标准（通常更多使用 `_Complex`）。
+
+```c showLineNumbers
+#include <stdio.h>
+#include <complex.h>
+
+int main() {
+    double _Imaginary v = 5.0 * I;
+    // 纯虚数与实数相加会退化为复数
+    double complex z = 2.0 + v; 
+    printf("结果: %.1f + %.1fi\n", creal(z), cimag(z));
+    return 0;
+}
+
+```
+
+
+## void
+
+**`void` 的主要用途：**
+
+| 用途 | 语法 | 示例 | 说明 |
+|------|------|------|------|
+| **函数返回类型** | `void 函数名()` | `void print_hello() { printf("Hello"); }` | 表示函数不返回任何值 |
+| **函数参数** | `函数名(void)` | `int get_random(void) { return 42; }` | 表示函数不接受任何参数 |
+| **通用指针** | `void*` | `void *ptr; ptr = &some_variable;` | 可以指向任何类型的数据 |
+
+```c
+// ✅ void 的正确用法
+void print_message(void) {          // 无返回值，无参数
+    printf("Hello World\n");
+}
+
+int main(void) {                    // 返回int，无参数
+    void *generic_ptr;              // 通用指针
+    int num = 10;
+    generic_ptr = &num;             // 指向int类型数据
+    
+    print_message();                // 调用void函数
+    return 0;
+}
+
+// ❌ void 的错误用法
+void variable;                      // 错误！不能声明void类型变量
+void array[10];                     // 错误！不能创建void数组
+```
+
+**重要提醒：**
+- `void` 本身不能存储数据，只用于类型声明
+- `void*` 是通用指针，使用前需要强制类型转换
+- 函数参数写 `void` 比省略更明确（C89标准推荐）
+
+
+## 类型转换
+
+### 趋零截断
+
+整数除法的结果是整数。整数是没有小数部分的数。这使得5除以3结果为1，因为实际结果有小数部分。
+
+在C语言中，整数除法结果的小数部分被丢弃，这一过程被称为截断（truncation）​。
+
+C 取整时，总是向0取整。这种方法被称为“<Highlight>趋零截断</Highlight>”​，
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    int a ;
+    a = 5 /3; // 1
+    a = 5.0 / 3.0; // 1.666667
+    return 0;
+}
+```
+
+### 显式转换
+
+显式转换也叫强制类型转换：`(需要转换的类型)(表达式)`
+
+```c showLineNumbers
+// 将double转换为int
+int a = (int)(10.5 + 0.6);
+// C 取整时，总是向0取整。(计算余数和四舍五入时也总是向0取整)
+// 所以结果为11
+
+// 当只有一个数时，括号可以省略
+int a = (int) 10.5;
+// 结果为10
+
+// 括号省略会导致可读性变差
+int a = (int) 10.5 + 0.6;
+// 结果为10
+// 第一步：(int) 10.5 被强制转换为 10（int类型）
+// 第二步：10（int）+ 0.6（double）→ 10（int）被自动提升为10.0（double），计算得10.6（double）
+// 第三步：将10.6（double）隐式转换为int类型赋值给a，结果为10
+// C 取整时，总是向0取整（截断小数部分）
+```
+
+### 赋值转换
+
+```c showLineNumbers
+// 赋值时左边是什么类型,就会自动将右边转换为什么类型再保存
+int a = 10.6;
+// 结果为10
+// C 取整时，总是向0取整。(计算余数和四舍五入时也总是向0取整)
+```
+
+### 运算时转换
+
+当运算符左右两边类型不一致时，系统会自动对占用内存较少的类型做一个“自动类型提升”的操作。
+
+:::info
+类型的级别从高至低依次是long double、double、float、unsignedlong long、long long、unsigned long、long、unsigned int、int。
+
+例外的情况是，当long和int的大小相同时，unsigned int比long的级别高。
+
+之所以short和char类型没有列出，是因为它们已经被升级到int或unsigned int。
+:::
+
+先将其转换为当前算数表达式中占用内存高的类型, 然后再参与运算。
+
+```c showLineNumbers
+// 结果为0, 因为参与运算的都是整型，先得出0，再转换为double类型
+double a = (double)(1 / 2);
+
+// 结果为0.5, 因为1被强制转换为了double类型, 2也会被自动提升为double类型
+double b = (double)1 / 2;
+// 等价于
+double b = 1.0 / 2;
+```
+
+- 类型转换并不会影响到原有变量的值
+
+```c showLineNumbers
+#include <stdio.h>
+int main(){
+    double d = 3.14;
+    int num = (int)d;
+    printf("num = %i\n", num); // 3
+    printf("d = %lf\n", d); // 3.140000
+}
+```
