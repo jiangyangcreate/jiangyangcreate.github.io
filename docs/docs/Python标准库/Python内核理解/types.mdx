@@ -1,0 +1,201 @@
+---
+title: types
+---
+
+`types` 模块主要做两件事：**为解释器内部使用的若干对象类型提供名称常量**，以及**提供动态创建类型（类、模块等）的工具函数**。像 `int`、`str`、`list` 这类内置类型在全局命名空间里就有名字，可直接用于 `isinstance()` / `issubclass()`；而函数对象、生成器、模块、代码对象等类型的「类型名」并不作为内置名暴露，若要按类型做判断或元编程，就需要通过 `types` 获取（如 `types.FunctionType`、`types.ModuleType`）。此外，PEP 484 引入的类型提示体系与 PEP 585 在标准库中推广的泛型语法（如 `list[int]`）在运行时会表现为 `types.GenericAlias`，联合类型表达式 `int | str`（PEP 604，Python 3.10+）的类型为 `types.UnionType`，这些也由 `types` 提供，便于在运行时做类型内省。设计上，该模块刻意只暴露「实现解释器或类型系统时常用」的类型名，避免把偶然出现的内部类型（如 `listiterator`）也纳入；动态创建方面则提供 `new_class()`、`prepare_class()`、`ModuleType` 等接口，与元类机制（PEP 3115）及泛型解析（PEP 560）相配合，用于在运行时按需构造类或模块对象。
+
+[types](https://docs.python.org/zh-cn/3/library/types.html)
+
+## SimpleNamespace
+
+用于「属性访问的简单对象」：可像对象一样用点号访问属性，也可动态添加、删除属性，适合替代 `class NS: pass` 这类空命名空间。初始化方式与 `dict` 类似，支持关键字参数或映射/可迭代对象。
+
+```python showLineNumbers
+from types import SimpleNamespace
+
+ns = SimpleNamespace(a=1, b=2)
+print(ns.a)   # 1
+print(ns.b)   # 2
+ns.c = 3
+print(ns)     # SimpleNamespace(a=1, b=2, c=3)
+```
+
+用映射或可迭代对象初始化（Python 3.13+ 支持单参数 positional）：
+
+```python showLineNumbers
+from types import SimpleNamespace
+
+ns = SimpleNamespace({"x": 10, "y": 20})
+print(ns.x, ns.y)   # 10 20
+```
+
+## 类型名称常量（解释器类型）
+
+`types` 提供许多「类型名称」常量，便于用 `isinstance()` / `issubclass()` 做类型判断。这些类型由解释器在运行函数、生成器、模块等时使用，但不作为内置名暴露。
+
+### 函数与可调用
+
+- **types.FunctionType** / **types.LambdaType** — 用户自定义函数及 `lambda` 的类型。
+- **types.MethodType** — 用户类实例方法的类型。
+- **types.BuiltinFunctionType** / **types.BuiltinMethodType** — 内置（C 实现）函数及内置类方法的类型。
+
+```python showLineNumbers
+from types import FunctionType, MethodType, BuiltinFunctionType
+
+def f(): pass
+print(isinstance(f, FunctionType))           # True
+print(isinstance(lambda x: x, FunctionType)) # True
+
+class C:
+    def m(self): pass
+c = C()
+print(isinstance(c.m, MethodType))           # True
+print(isinstance(len, BuiltinFunctionType))  # True
+```
+
+### 生成器与协程
+
+- **types.GeneratorType** — 生成器迭代器的类型（由带 `yield` 的函数返回）。
+- **types.CoroutineType** — 由 `async def` 创建的协程对象类型。
+- **types.AsyncGeneratorType** — 异步生成器迭代器的类型。
+
+```python showLineNumbers
+from types import GeneratorType, CoroutineType
+import asyncio
+
+def gen():
+    yield 1
+g = gen()
+print(type(g) is GeneratorType)   # True
+
+async def coro():
+    return 42
+c = coro()
+print(type(c) is CoroutineType)   # True
+```
+
+### 模块与代码对象
+
+- **types.ModuleType** — 模块对象的类型；构造器可动态创建模块：`types.ModuleType(name, doc=None)`。
+- **types.CodeType** — 代码对象类型（如 `compile()` 返回的对象）。
+
+```python showLineNumbers
+from types import ModuleType
+
+mod = ModuleType("mymod", "docstring")
+mod.x = 42
+print(mod.x)           # 42
+print(mod.__name__)    # mymod
+print(type(mod))       # <class 'module'>
+```
+
+### 常量与描述符
+
+- **types.NoneType** — `None` 的类型（Python 3.10+）。
+- **types.EllipsisType** — `Ellipsis` 的类型（Python 3.10+）。
+- **types.NotImplementedType** — `NotImplemented` 的类型（Python 3.10+）。
+
+```python showLineNumbers
+from types import NoneType, EllipsisType
+
+print(type(None) is NoneType)       # True
+print(type(Ellipsis) is EllipsisType)  # True
+```
+
+:::tip
+更多类型名如 `CellType`、`TracebackType`、`FrameType`、`WrapperDescriptorType`、`MethodWrapperType`、`GetSetDescriptorType`、`MemberDescriptorType` 等见[官方文档](https://docs.python.org/zh-cn/3/library/types.html)。它们多用于实现解释器或扩展模块，日常类型检查中较少直接使用。
+:::
+
+## GenericAlias（泛型别名）
+
+形参化泛型的类型，如 `list[int]`、`dict[str, int]`，对应 `GenericAlias(origin, args)`。PEP 585 在 Python 3.9 中为内置容器引入了泛型语法，运行时的表示即为 `types.GenericAlias`；配合 `typing.get_origin()` 与 `typing.get_args()` 可对泛型别名做内省。
+
+```python showLineNumbers
+from types import GenericAlias
+import typing
+
+list_int = list[int]
+print(type(list_int) is GenericAlias)           # True
+print(list_int == GenericAlias(list, (int,)))   # True
+print(typing.get_origin(list_int))              # <class 'list'>
+print(typing.get_args(list_int))                # (int,)
+
+dict_str_int = dict[str, int]
+print(typing.get_origin(dict_str_int))         # <class 'dict'>
+print(typing.get_args(dict_str_int))           # (str, int)
+```
+
+:::tip
+`isinstance(obj, list[int])` 会报错：`isinstance() arg 2 cannot be a parameterized generic`。若只想检查「是否为 list」，应使用 `get_origin(list[int])` 得到 `list`，再写 `isinstance(obj, list)`。泛型参数在运行时仅用于内省，不在实例上做元素类型检查。
+:::
+
+## UnionType（联合类型）
+
+联合类型表达式的类型，即 `int | str` 这类语法（PEP 604，Python 3.10+）。
+
+```python showLineNumbers
+from types import UnionType
+import typing
+
+u = int | str
+print(type(u) is UnionType)        # True
+print(typing.get_origin(u))        # types.UnionType
+print(typing.get_args(u))          # (int, str)
+```
+
+## 动态创建类与模块
+
+### new_class 与 prepare_class
+
+- **types.new_class(name, bases=(), kwds=None, exec_body=None)** — 使用合适的元类动态创建类对象；`exec_body` 为接收类命名空间的回调，用于填充类体。
+- **types.prepare_class(name, bases=(), kwds=None)** — 计算元类并准备类命名空间，返回 `(metaclass, namespace, kwds)`，供更底层的类构造流程使用。
+
+```python showLineNumbers
+from types import new_class
+
+# 动态创建类，等价于 class D(A, B): x = 1
+def fill(ns):
+    ns["x"] = 1
+
+D = new_class("D", (object,), {}, exec_body=fill)
+print(D.__name__)   # D
+print(D.x)          # 1
+```
+
+### resolve_bases 与 get_original_bases
+
+- **types.resolve_bases(bases)** — 按 PEP 560 解析 MRO 中的条目，将支持 `__mro_entries__()` 的基替换为展开后的元组。
+- **types.get_original_bases(cls)** — 返回类在解析 `__mro_entries__` 之前的原始基类元组，便于内省泛型基类（如 `typing.Generic[T]`、`list[str]`）。
+
+```python showLineNumbers
+from types import get_original_bases
+from typing import TypeVar, Generic
+
+T = TypeVar("T")
+class Foo(Generic[T]): ...
+class Bar(Foo[int], float): ...
+
+print(Bar.__bases__)               # (Foo, float)
+print(get_original_bases(Bar))     # (Foo[int], float)
+```
+
+:::tip
+`get_original_bases` 在 Python 3.12 中加入，对 `NamedTuple`、`TypedDict` 或继承 `list[str]` 的类做内省时，可以看到「原始」的泛型基而非展开后的 `(list,)`。
+:::
+
+## MappingProxyType（只读映射代理）
+
+对某个映射提供只读视图，底层映射变化会反映到视图中。
+
+```python showLineNumbers
+from types import MappingProxyType
+
+d = {"a": 1, "b": 2}
+proxy = MappingProxyType(d)
+print(proxy["a"])   # 1
+d["c"] = 3
+print(proxy["c"])   # 3
+# proxy["d"] = 4   # TypeError: 'mappingproxy' object does not support item assignment
+```
+
+---

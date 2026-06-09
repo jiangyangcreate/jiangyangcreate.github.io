@@ -1,0 +1,134 @@
+---
+title: time
+---
+
+`time` 模块提供底层的时间访问与转换功能，包括获取时间戳、休眠、格式化以及性能计时。
+
+[time](https://docs.python.org/3/library/time.html)
+
+## 获取当前时间
+
+```python showLineNumbers
+import time
+
+# 时间戳（自 1970-01-01 00:00:00 UTC 起的秒数）
+print(time.time())          # 1735689600.123456
+
+# 纳秒级时间戳，避免浮点精度损失
+print(time.time_ns())       # 1735689600123456789
+
+# 可读的本地时间字符串
+print(time.ctime())         # 'Wed Jan  1 08:00:00 2025'
+```
+
+## 休眠
+
+```python showLineNumbers
+import time
+
+# 暂停执行 1.5 秒
+time.sleep(1.5)
+
+# 常见用途：轮询等待
+for i in range(3):
+    print(f"第 {i+1} 次检查...")
+    time.sleep(0.5)
+```
+
+:::tip
+`sleep()` 的参数可以是浮点数，支持亚秒级精度。被信号中断后会自动重新计时（Python 3.5+）。
+:::
+
+## struct_time 与 localtime / gmtime
+
+```python showLineNumbers
+import time
+
+# 时间戳 → 本地时间的 struct_time
+lt = time.localtime()
+print(lt.tm_year, lt.tm_mon, lt.tm_mday)  # 2025 1 1
+print(lt.tm_hour, lt.tm_min, lt.tm_sec)   # 8 0 0
+
+# 时间戳 → UTC 时间的 struct_time
+gt = time.gmtime()
+print(gt.tm_hour)   # 0（比北京时间晚 8 小时）
+
+# struct_time → 时间戳
+ts = time.mktime(lt)
+print(ts)            # 1735689600.0
+```
+
+## 时间格式化与解析
+
+```python showLineNumbers
+import time
+
+# struct_time → 格式化字符串
+now = time.localtime()
+print(time.strftime("%Y-%m-%d %H:%M:%S", now))      # 2025-01-01 08:00:00
+print(time.strftime("%Y年%m月%d日 %A", now))          # 2025年01月01日 Wednesday
+
+# 格式化字符串 → struct_time
+t = time.strptime("2025-12-25 13:45", "%Y-%m-%d %H:%M")
+print(t.tm_year, t.tm_mon, t.tm_mday)  # 2025 12 25
+print(t.tm_hour, t.tm_min)             # 13 45
+```
+
+:::info
+常用格式化指令：`%Y` 四位年、`%m` 月、`%d` 日、`%H` 时（24h）、`%M` 分、`%S` 秒、`%A` 星期全称、`%z` 时区偏移。
+完整列表见 [strftime 格式码](https://docs.python.org/3/library/time.html#time.strftime)。
+:::
+
+## 性能计时
+
+```python showLineNumbers
+import time
+
+# perf_counter：最高精度的墙钟计时器，适合测量短时间间隔
+start = time.perf_counter()
+sum(range(1000000))
+elapsed = time.perf_counter() - start
+print(f"耗时: {elapsed:.6f} 秒")
+
+# perf_counter_ns：纳秒版本，避免浮点误差
+start_ns = time.perf_counter_ns()
+sum(range(1000000))
+elapsed_ns = time.perf_counter_ns() - start_ns
+print(f"耗时: {elapsed_ns} 纳秒")
+```
+
+```python showLineNumbers
+import time
+
+# monotonic：单调递增时钟，不受系统时间调整影响，适合超时判断
+deadline = time.monotonic() + 5.0  # 5 秒后超时
+while time.monotonic() < deadline:
+    # 做一些轮询工作...
+    time.sleep(0.5)
+    break  # 示例提前退出
+
+# process_time：仅计算 CPU 时间，不包含 sleep
+start = time.process_time()
+total = sum(i * i for i in range(1000000))
+cpu_time = time.process_time() - start
+print(f"CPU 时间: {cpu_time:.6f} 秒")
+```
+
+:::tip
+| 函数 | 包含 sleep | 受系统时间影响 | 典型用途 |
+|------|-----------|--------------|---------|
+| `perf_counter()` | 是 | 否 | 性能基准测试 |
+| `monotonic()` | 是 | 否 | 超时、调度 |
+| `process_time()` | 否 | 否 | CPU 密集型分析 |
+:::
+
+## 查看时钟信息
+
+```python showLineNumbers
+import time
+
+# 获取各时钟的详细信息
+for name in ['time', 'perf_counter', 'monotonic', 'process_time']:
+    info = time.get_clock_info(name)
+    print(f"{name}: 精度={info.resolution:.9f}s, 单调={info.monotonic}, 可调={info.adjustable}")
+```

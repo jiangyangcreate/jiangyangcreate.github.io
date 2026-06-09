@@ -1,0 +1,137 @@
+---
+title: timeit
+---
+
+`timeit` 模块用于精确测量小段 Python 代码的执行时间，自动规避常见的计时陷阱。
+
+[timeit](https://docs.python.org/3/library/timeit.html)
+
+## 基本使用
+
+```python showLineNumbers
+import timeit
+
+# 测量单条语句的执行时间（默认执行 1000000 次）
+t = timeit.timeit('"-".join(str(n) for n in range(100))', number=10000)
+print(f"耗时: {t:.4f} 秒")
+
+# 直接传入 lambda 或可调用对象
+t = timeit.timeit(lambda: "-".join(map(str, range(100))), number=10000)
+print(f"耗时: {t:.4f} 秒")
+```
+
+## 使用 setup 参数
+
+```python showLineNumbers
+import timeit
+
+# setup 只在计时开始前执行一次，用于初始化
+t = timeit.timeit(
+    stmt='char in text',
+    setup='text = "sample string"; char = "g"',
+    number=1000000
+)
+print(f"in 运算符: {t:.4f} 秒")
+
+t = timeit.timeit(
+    stmt='text.find(char)',
+    setup='text = "sample string"; char = "g"',
+    number=1000000
+)
+print(f"find 方法: {t:.4f} 秒")
+```
+
+## 多次重复取最优
+
+```python showLineNumbers
+import timeit
+
+# repeat 返回每轮的耗时列表，取最小值最有参考价值
+results = timeit.repeat(
+    stmt='sum(range(1000))',
+    number=10000,
+    repeat=5
+)
+print(f"每轮耗时: {results}")
+print(f"最佳: {min(results):.4f} 秒")
+```
+
+:::tip
+官方建议关注 `min()` 而非平均值——较高的值通常是系统其他进程干扰所致，最小值才接近代码的真实性能。
+:::
+
+## Timer 类
+
+```python showLineNumbers
+import timeit
+
+timer = timeit.Timer(
+    stmt='sorted(data)',
+    setup='import random; data = [random.randint(0, 1000) for _ in range(100)]'
+)
+
+# autorange 自动确定合适的执行次数（总时间 ≥ 0.2 秒）
+loops, total = timer.autorange()
+print(f"{loops} 次循环, 共 {total:.4f} 秒, 每次 {total/loops*1e6:.2f} μs")
+```
+
+## 测量自定义函数
+
+```python showLineNumbers
+import timeit
+
+def fibonacci(n):
+    if n < 2:
+        return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+# 方法一：通过 globals 参数传入当前命名空间
+t = timeit.timeit('fibonacci(20)', globals=globals(), number=1000)
+print(f"递归 fibonacci(20): {t:.4f} 秒")
+
+# 方法二：通过 setup 导入
+t = timeit.timeit(
+    'fibonacci(20)',
+    setup='from __main__ import fibonacci',
+    number=1000
+)
+print(f"递归 fibonacci(20): {t:.4f} 秒")
+```
+
+## 命令行接口
+
+```bash
+# 基本用法
+python -m timeit "'-'.join(str(n) for n in range(100))"
+
+# 指定 setup 和执行次数
+python -m timeit -s "import random; data = list(range(1000))" -n 10000 "sorted(data)"
+
+# 常用选项
+# -n N     执行次数
+# -r N     重复轮数（默认 5）
+# -s S     setup 语句
+# -u UNIT  输出单位（nsec / usec / msec / sec）
+# -p       使用 process_time 而非 perf_counter
+```
+
+:::info
+命令行模式会自动选择合适的循环次数，Python 接口中需要手动指定 `number` 或使用 `Timer.autorange()`。
+:::
+
+## 对比示例：列表推导 vs map
+
+```python showLineNumbers
+import timeit
+
+# 对比三种字符串拼接方式
+stmts = {
+    "生成器表达式": '"-".join(str(n) for n in range(100))',
+    "列表推导式": '"-".join([str(n) for n in range(100)])',
+    "map 函数": '"-".join(map(str, range(100)))',
+}
+
+for name, stmt in stmts.items():
+    t = timeit.timeit(stmt, number=50000)
+    print(f"{name}: {t:.4f} 秒")
+```

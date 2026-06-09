@@ -1,0 +1,146 @@
+---
+title: urllib
+---
+
+`urllib` 是一个处理 URL 的标准库包，包含请求发送、异常处理、URL 解析和 robots.txt 解析四个子模块。
+
+[urllib](https://docs.python.org/3/library/urllib.html)
+
+:::tip
+`urllib` 仅支持 HTTP/1.1 且为同步调用。如果需要更友好的 HTTP 客户端接口，推荐使用第三方库 `requests`；需要异步请求则可使用 `aiohttp`。
+:::
+
+## 发送请求（urllib.request）
+
+`urlopen()` 是最基础的请求函数，支持 GET 和 POST。
+
+```python showLineNumbers
+import urllib.request
+
+# GET 请求
+response = urllib.request.urlopen('https://www.python.org')
+print(response.status)       # 200
+print(response.getheaders())  # 响应头列表
+html = response.read()        # 响应体（bytes）
+```
+
+使用 `Request` 对象可以自定义请求头、方法等：
+
+```python showLineNumbers
+import urllib.request
+import urllib.parse
+
+# 自定义请求头
+req = urllib.request.Request(
+    'https://www.python.org',
+    headers={'User-Agent': 'Mozilla/5.0'}
+)
+response = urllib.request.urlopen(req)
+print(response.status)
+
+# POST 请求：data 参数需要是 bytes
+data = urllib.parse.urlencode({'key': 'value'}).encode('utf-8')
+req = urllib.request.Request('https://httpbin.org/post', data=data)
+response = urllib.request.urlopen(req)
+print(response.read().decode('utf-8'))
+```
+
+## 异常处理（urllib.error）
+
+`URLError` 是所有请求错误的基类（继承自 `OSError`），`HTTPError` 是它的子类，携带 HTTP 状态码。
+
+```python showLineNumbers
+from urllib import request, error
+
+try:
+    response = request.urlopen('http://www.example.invalid/')
+except error.HTTPError as e:
+    print(f'HTTP 错误: {e.code} {e.reason}')
+except error.URLError as e:
+    print(f'请求错误: {e.reason}')
+```
+
+:::info
+捕获异常时应先捕获 `HTTPError`，再捕获 `URLError`，因为 `HTTPError` 是 `URLError` 的子类。
+:::
+
+## URL 解析（urllib.parse）
+
+### 解析与拼接 URL
+
+```python showLineNumbers
+from urllib.parse import urlparse, urlunparse, urljoin
+
+# 解析 URL 为各组成部分
+result = urlparse('https://www.example.com:8080/path?query=1#frag')
+print(result.scheme)    # 'https'
+print(result.hostname)  # 'www.example.com'
+print(result.port)      # 8080
+print(result.path)      # '/path'
+print(result.query)     # 'query=1'
+print(result.fragment)  # 'frag'
+
+# 从组件重新拼装 URL
+url = urlunparse(('https', 'example.com', '/api', '', 'v=1', ''))
+print(url)  # 'https://example.com/api?v=1'
+
+# 基于基准 URL 拼接相对路径
+print(urljoin('https://example.com/docs/', 'api.html'))
+# 'https://example.com/docs/api.html'
+```
+
+### 查询参数编解码
+
+```python showLineNumbers
+from urllib.parse import urlencode, parse_qs
+
+# 字典 → 查询字符串
+params = {'name': '张三', 'age': '25', 'lang': 'python'}
+qs = urlencode(params)
+print(qs)  # 'name=%E5%BC%A0%E4%B8%89&age=25&lang=python'
+
+# 查询字符串 → 字典
+parsed = parse_qs(qs)
+print(parsed)  # {'name': ['张三'], 'age': ['25'], 'lang': ['python']}
+```
+
+### 编码与解码（quote / unquote）
+
+URL 中的非 ASCII 字符和特殊字符需要百分号编码。浏览器地址栏看到中文是浏览器的"人性化"显示，实际传输的是编码后的形式。
+
+```python showLineNumbers
+from urllib.parse import quote, unquote
+
+# 编码：中文 → 百分号编码
+encoded = quote('科技&技术')
+print(encoded)  # '%E7%A7%91%E6%8A%80%26%E6%8A%80%E6%9C%AF'
+
+# 解码：百分号编码 → 中文
+url = 'https://www.baidu.com/s?wd=%E7%A7%91%E6%8A%80'
+print(unquote(url))
+# 'https://www.baidu.com/s?wd=科技'
+
+# quote 默认不编码 /，safe 参数可控制哪些字符不被编码
+print(quote('/path/to/文件', safe='/'))
+# '/path/to/%E6%96%87%E4%BB%B6'
+```
+
+:::tip
+`quote()` 用于编码 URL 路径部分（默认保留 `/`），`quote_plus()` 用于编码查询参数（空格变 `+`，`/` 也会被编码）。
+:::
+
+## 解析 robots.txt（urllib.robotparser）
+
+`robots.txt` 是网站声明哪些页面允许或禁止爬虫访问的文件。
+
+```python showLineNumbers
+import urllib.robotparser
+
+rp = urllib.robotparser.RobotFileParser()
+rp.set_url('https://www.python.org/robots.txt')
+rp.read()
+
+# 检查某个 URL 是否允许爬取（'*' 表示所有爬虫）
+print(rp.can_fetch('*', 'https://www.python.org/'))
+print(rp.can_fetch('*', 'https://www.python.org/admin/'))
+```

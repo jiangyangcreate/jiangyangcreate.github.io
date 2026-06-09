@@ -1,0 +1,94 @@
+---
+title: webbrowser
+---
+
+`webbrowser` 模块提供了一个高层接口，用于调用系统默认浏览器打开指定 URL。
+
+[webbrowser](https://docs.python.org/3/library/webbrowser.html)
+
+## 打开网页
+
+三个核心函数对应三种打开方式：
+
+```python showLineNumbers
+import webbrowser
+
+url = 'https://docs.python.org/'
+
+# 在默认浏览器中打开（尽量复用已有窗口）
+webbrowser.open(url)
+
+# 在新窗口中打开
+webbrowser.open_new(url)
+
+# 在新标签页中打开（最常用）
+webbrowser.open_new_tab(url)
+```
+
+:::tip
+`open(url, new=0)` 的 `new` 参数控制打开方式：`0` 复用窗口、`1` 新窗口、`2` 新标签页。`open_new_tab(url)` 等价于 `open(url, new=2)`。
+:::
+
+## 指定浏览器
+
+`get()` 返回指定浏览器的控制器对象，可以用它来调用特定浏览器：
+
+```python showLineNumbers
+import webbrowser
+
+# 使用 Firefox 打开
+try:
+    firefox = webbrowser.get('firefox')
+    firefox.open('https://docs.python.org/')
+except webbrowser.Error:
+    print('未找到 Firefox 浏览器')
+
+# 使用 Chrome 打开
+try:
+    chrome = webbrowser.get('google-chrome')
+    chrome.open_new_tab('https://docs.python.org/')
+except webbrowser.Error:
+    print('未找到 Chrome 浏览器')
+```
+
+常见的浏览器类型名称：
+
+| 类型名 | 浏览器 |
+|--------|-------|
+| `'firefox'` | Firefox |
+| `'google-chrome'` / `'chrome'` | Chrome |
+| `'chromium'` / `'chromium-browser'` | Chromium |
+| `'safari'` | Safari（macOS） |
+| `'opera'` | Opera |
+| `'windows-default'` | Windows 系统默认浏览器 |
+
+## 注册自定义浏览器
+
+如果浏览器不在预定义列表中，可以手动注册：
+
+```python showLineNumbers
+import webbrowser
+
+# 注册自定义浏览器路径（以 Windows 下的 Edge 为例）
+edge_path = 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe %s'
+webbrowser.register('edge', None, webbrowser.BackgroundBrowser(edge_path))
+
+# 使用注册的浏览器
+webbrowser.get('edge').open('https://docs.python.org/')
+```
+
+## 命令行使用
+
+`webbrowser` 也可以在命令行中直接调用：
+
+```bash
+# 在新标签页中打开
+python -m webbrowser -t "https://www.python.org"
+
+# 在新窗口中打开
+python -m webbrowser -n "https://www.python.org"
+```
+
+:::info
+在 Unix 系统上，如果没有图形界面（X11），会尝试使用文本模式浏览器（如 `lynx`、`w3m`），此时调用进程会阻塞直到浏览器退出。可以通过设置环境变量 `BROWSER` 来指定优先使用的浏览器。
+:::

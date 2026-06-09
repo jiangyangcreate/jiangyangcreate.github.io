@@ -1,0 +1,227 @@
+---
+title: argparse
+---
+
+`argparse` 用于解析命令行参数，自动生成帮助信息和错误提示，是编写 CLI 工具的标准方式。
+
+[argparse](https://docs.python.org/3/library/argparse.html)
+
+## 基本结构
+
+一个完整的 `argparse` 程序由三步组成：创建解析器、定义参数、解析参数。
+
+```python showLineNumbers
+import argparse
+
+# 1. 创建解析器
+parser = argparse.ArgumentParser(
+    prog="mytool",
+    description="一个示例命令行工具",
+)
+
+# 2. 定义参数
+parser.add_argument("filename")                       # 位置参数
+parser.add_argument("-o", "--output", default="out.txt")  # 可选参数
+parser.add_argument("-v", "--verbose", action="store_true")  # 布尔开关
+
+# 3. 解析参数
+args = parser.parse_args()
+print(args.filename, args.output, args.verbose)
+```
+
+```bash showLineNumbers
+# 命令行运行示例
+# python mytool.py data.csv -o result.txt -v
+# python mytool.py --help
+```
+
+## 位置参数与可选参数
+
+```python showLineNumbers
+import argparse
+
+parser = argparse.ArgumentParser()
+
+# 位置参数：按顺序传入，必须提供
+parser.add_argument("source", help="源文件路径")
+parser.add_argument("dest", help="目标文件路径")
+
+# 可选参数：以 - 或 -- 开头，可以不提供
+parser.add_argument("-n", "--count", type=int, default=1, help="重复次数")
+parser.add_argument("--dry-run", action="store_true", help="仅模拟执行")
+
+args = parser.parse_args()
+# args.source, args.dest, args.count, args.dry_run
+```
+
+:::info
+可选参数名中的连字符 `-` 会自动转换为下划线 `_`，例如 `--dry-run` 对应 `args.dry_run`。
+:::
+
+## type 与 choices
+
+`type` 指定参数类型转换函数，`choices` 限制可选值。
+
+```python showLineNumbers
+import argparse
+
+parser = argparse.ArgumentParser()
+
+# 自动将输入转为 int
+parser.add_argument("-p", "--port", type=int, default=8080)
+
+# 限制可选值
+parser.add_argument("--log-level", choices=["debug", "info", "warning", "error"])
+
+# 使用 open 作为 type，直接得到文件对象
+parser.add_argument("--config", type=open)
+
+args = parser.parse_args()
+```
+
+## nargs：控制参数个数
+
+```python showLineNumbers
+import argparse
+
+parser = argparse.ArgumentParser()
+
+# 接受固定 2 个值
+parser.add_argument("--range", nargs=2, type=int, metavar=("MIN", "MAX"))
+
+# 接受 1 个或多个值
+parser.add_argument("files", nargs="+", help="至少一个文件")
+
+# 接受 0 个或多个值
+parser.add_argument("--tags", nargs="*", default=[])
+
+# 可选值（0 或 1 个）
+parser.add_argument("--name", nargs="?", const="default_name", default=None)
+
+args = parser.parse_args()
+print(args.range)  # [1, 100]
+print(args.files)  # ['a.txt', 'b.txt']
+```
+
+## action：参数行为
+
+```python showLineNumbers
+import argparse
+
+parser = argparse.ArgumentParser()
+
+# store_true / store_false：布尔开关
+parser.add_argument("--verbose", action="store_true")
+parser.add_argument("--no-cache", action="store_true")
+
+# count：统计出现次数，常用于控制日志级别
+parser.add_argument("-v", action="count", default=0)
+
+# append：多次指定同一选项，收集到列表
+parser.add_argument("--include", action="append")
+
+# version：显示版本号后退出
+parser.add_argument("--version", action="version", version="%(prog)s 1.0.0")
+
+args = parser.parse_args()
+# -vvv → args.v == 3
+# --include a --include b → args.include == ['a', 'b']
+```
+
+## 互斥参数组
+
+同一组中的参数只能选其一。
+
+```python showLineNumbers
+import argparse
+
+parser = argparse.ArgumentParser()
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("--json", action="store_true", help="以 JSON 格式输出")
+group.add_argument("--csv", action="store_true", help="以 CSV 格式输出")
+group.add_argument("--table", action="store_true", help="以表格格式输出")
+
+args = parser.parse_args()
+```
+
+```bash showLineNumbers
+# 正确: python tool.py --json
+# 错误: python tool.py --json --csv  → 报错
+```
+
+## 子命令
+
+大型 CLI 工具常用子命令来组织功能（类似 `git commit`、`git push`）。
+
+```python showLineNumbers
+import argparse
+
+parser = argparse.ArgumentParser(prog="app")
+subparsers = parser.add_subparsers(dest="command", help="可用的子命令")
+
+# 子命令: init
+parser_init = subparsers.add_parser("init", help="初始化项目")
+parser_init.add_argument("name", help="项目名称")
+
+# 子命令: run
+parser_run = subparsers.add_parser("run", help="运行项目")
+parser_run.add_argument("--port", type=int, default=8000)
+parser_run.add_argument("--debug", action="store_true")
+
+args = parser.parse_args()
+
+if args.command == "init":
+    print(f"初始化项目: {args.name}")
+elif args.command == "run":
+    print(f"启动服务: 端口 {args.port}, debug={args.debug}")
+else:
+    parser.print_help()
+```
+
+```bash showLineNumbers
+# python app.py init myproject
+# python app.py run --port 3000 --debug
+# python app.py --help
+```
+
+## 实战示例：文件处理工具
+
+```python showLineNumbers
+import argparse
+import sys
+
+def main():
+    parser = argparse.ArgumentParser(
+        prog="wordcount",
+        description="统计文件中的行数、单词数和字符数",
+    )
+    parser.add_argument("files", nargs="+", help="要统计的文件")
+    parser.add_argument("-l", "--lines", action="store_true", help="只统计行数")
+    parser.add_argument("-w", "--words", action="store_true", help="只统计单词数")
+    parser.add_argument("-c", "--chars", action="store_true", help="只统计字符数")
+
+    args = parser.parse_args()
+    show_all = not (args.lines or args.words or args.chars)
+
+    for filepath in args.files:
+        try:
+            with open(filepath, encoding="utf-8") as f:
+                content = f.read()
+            parts = []
+            if show_all or args.lines:
+                parts.append(f"{content.count(chr(10)):>8} 行")
+            if show_all or args.words:
+                parts.append(f"{len(content.split()):>8} 词")
+            if show_all or args.chars:
+                parts.append(f"{len(content):>8} 字符")
+            print(" ".join(parts) + f"  {filepath}")
+        except FileNotFoundError:
+            print(f"错误: 文件 '{filepath}' 不存在", file=sys.stderr)
+
+if __name__ == "__main__":
+    main()
+```
+
+:::tip
+将解析逻辑放在 `main()` 函数中，用 `if __name__ == "__main__"` 守卫调用，这是 CLI 工具的标准写法，方便测试和复用。
+:::

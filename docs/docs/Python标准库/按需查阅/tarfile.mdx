@@ -1,0 +1,142 @@
+---
+title: tarfile
+---
+
+`tarfile` 模块用于读写 tar 归档文件，支持 gzip、bz2、xz 等压缩格式。
+
+[tarfile](https://docs.python.org/3/library/tarfile.html)
+
+## 创建 tar 归档
+
+```python showLineNumbers
+import tarfile
+import os
+
+os.makedirs("project/src", exist_ok=True)
+with open("project/src/main.py", "w") as f:
+    f.write("print('hello')")
+with open("project/README.md", "w") as f:
+    f.write("# My Project")
+
+# 创建 gzip 压缩的 tar 归档
+with tarfile.open("project.tar.gz", "w:gz") as tar:
+    tar.add("project", arcname="project")
+
+# 创建 bz2 压缩的 tar 归档
+with tarfile.open("project.tar.bz2", "w:bz2") as tar:
+    tar.add("project")
+
+# 创建不压缩的 tar 归档
+with tarfile.open("project.tar", "w") as tar:
+    tar.add("project")
+```
+
+:::info
+常用模式字符串：
+- `'w'` / `'w:'`：不压缩
+- `'w:gz'`：gzip 压缩
+- `'w:bz2'`：bzip2 压缩
+- `'w:xz'`：lzma 压缩
+- 读取时用 `'r'` 可自动检测压缩格式
+:::
+
+## 读取 tar 归档
+
+```python showLineNumbers
+import tarfile
+
+with tarfile.open("project.tar.gz", "r:gz") as tar:
+    # 列出所有成员
+    tar.list()
+
+    # 获取成员名称列表
+    print(tar.getnames())
+
+    # 获取单个成员的详细信息
+    info = tar.getmember("project/README.md")
+    print(f"文件名: {info.name}")
+    print(f"大小: {info.size} 字节")
+    print(f"是否为文件: {info.isfile()}")
+    print(f"是否为目录: {info.isdir()}")
+```
+
+## 解压文件
+
+```python showLineNumbers
+import tarfile
+
+# 解压所有文件
+with tarfile.open("project.tar.gz", "r:gz") as tar:
+    tar.extractall("output")
+
+# 解压单个文件
+with tarfile.open("project.tar.gz", "r:gz") as tar:
+    tar.extract("project/README.md", "output_single")
+
+# 以文件对象方式读取（不解压到磁盘）
+with tarfile.open("project.tar.gz", "r:gz") as tar:
+    f = tar.extractfile("project/src/main.py")
+    if f:
+        print(f.read().decode("utf-8"))
+```
+
+## 筛选添加文件
+
+```python showLineNumbers
+import tarfile
+import os
+
+os.makedirs("build/dist", exist_ok=True)
+with open("build/app.py", "w") as f:
+    f.write("print('app')")
+with open("build/debug.log", "w") as f:
+    f.write("debug info")
+with open("build/dist/output.bin", "w") as f:
+    f.write("binary")
+
+def exclude_filter(tarinfo):
+    """排除日志文件和隐藏文件"""
+    if tarinfo.name.endswith(".log"):
+        return None
+    if os.path.basename(tarinfo.name).startswith("."):
+        return None
+    return tarinfo
+
+with tarfile.open("build_clean.tar.gz", "w:gz") as tar:
+    tar.add("build", filter=exclude_filter)
+
+# 验证：日志文件已被排除
+with tarfile.open("build_clean.tar.gz", "r:gz") as tar:
+    print(tar.getnames())
+```
+
+## 检查与验证
+
+```python showLineNumbers
+import tarfile
+
+# 判断文件是否为 tar 归档
+print(tarfile.is_tarfile("project.tar.gz"))  # True
+print(tarfile.is_tarfile("project/README.md"))  # False
+
+# 使用自动检测模式读取（推荐）
+with tarfile.open("project.tar.gz", "r") as tar:
+    print(tar.getnames())
+```
+
+```python showLineNumbers
+import shutil, os
+# 清理示例文件
+for d in ["project", "build", "output", "output_single"]:
+    shutil.rmtree(d, ignore_errors=True)
+for f in ["project.tar.gz", "project.tar.bz2", "project.tar", "build_clean.tar.gz"]:
+    if os.path.exists(f):
+        os.remove(f)
+```
+
+:::tip
+`tarfile` 与 `zipfile` 的选择：
+- tar 归档在 Linux/macOS 上更常见，能保留 Unix 文件权限和符号链接
+- ZIP 格式跨平台兼容性更好，Windows 原生支持
+- 简单场景可直接用 `shutil.make_archive()` 代替
+:::

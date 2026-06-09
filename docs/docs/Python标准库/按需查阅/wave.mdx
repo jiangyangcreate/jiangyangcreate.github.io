@@ -1,0 +1,134 @@
+---
+title: wave
+---
+
+`wave` 模块提供对 WAV 音频文件的读写接口，仅支持未压缩的 PCM 编码格式。
+
+[wave](https://docs.python.org/3/library/wave.html)
+
+## 读取 WAV 文件
+
+```python showLineNumbers
+import wave
+
+with wave.open("audio.wav", "rb") as wf:
+    # 获取音频基本参数
+    channels = wf.getnchannels()     # 声道数（1=单声道，2=立体声）
+    sampwidth = wf.getsampwidth()    # 采样宽度（字节，2=16位）
+    framerate = wf.getframerate()    # 采样率（如 44100）
+    nframes = wf.getnframes()        # 总帧数
+    duration = nframes / framerate   # 时长（秒）
+
+    print(f"声道: {channels}, 采样宽度: {sampwidth}字节")
+    print(f"采样率: {framerate}Hz, 帧数: {nframes}")
+    print(f"时长: {duration:.2f}秒")
+
+    # 也可以用 getparams() 一次获取所有参数
+    params = wf.getparams()
+    print(params)
+    # _wave_params(nchannels=1, sampwidth=2, framerate=44100, ...)
+
+    # 读取全部音频数据（返回 bytes）
+    frames = wf.readframes(nframes)
+    print(f"数据大小: {len(frames)} 字节")
+```
+
+## 写入 WAV 文件
+
+```python showLineNumbers
+import wave
+import struct
+import math
+
+# 生成一段正弦波音频并写入 WAV 文件
+filename = "sine_wave.wav"
+duration = 2        # 时长 2 秒
+framerate = 44100   # 采样率
+frequency = 440     # 频率 440Hz（标准 A 音）
+amplitude = 32767   # 16 位采样的最大振幅
+
+with wave.open(filename, "wb") as wf:
+    wf.setnchannels(1)       # 单声道
+    wf.setsampwidth(2)       # 16 位 = 2 字节
+    wf.setframerate(framerate)
+
+    for i in range(framerate * duration):
+        t = i / framerate
+        sample = int(amplitude * math.sin(2 * math.pi * frequency * t))
+        wf.writeframes(struct.pack("<h", sample))
+
+print(f"已生成 {filename}")
+```
+
+:::tip
+也可以用 `setparams()` 一次性设置所有参数：`wf.setparams((1, 2, 44100, 0, 'NONE', 'not compressed'))`。注意必须在写入任何帧数据之前完成参数设置。
+:::
+
+## 复制并修改 WAV 文件
+
+```python showLineNumbers
+import wave
+import audioop
+
+# 将立体声 WAV 转换为单声道
+with wave.open("stereo.wav", "rb") as src:
+    params = src.getparams()
+    frames = src.readframes(src.getnframes())
+
+    if params.nchannels == 2:
+        # 将立体声混合为单声道
+        frames = audioop.tomono(frames, params.sampwidth, 0.5, 0.5)
+
+    with wave.open("mono.wav", "wb") as dst:
+        dst.setnchannels(1)
+        dst.setsampwidth(params.sampwidth)
+        dst.setframerate(params.framerate)
+        dst.writeframes(frames)
+```
+
+:::info
+`audioop` 模块在 Python 3.13 中已被移除。如果使用 Python 3.13+，可以考虑用 `numpy` 或 `pydub` 等第三方库处理音频数据。
+:::
+
+## 拼接多个 WAV 文件
+
+```python showLineNumbers
+import wave
+
+def concatenate_wav(file_list: list[str], output: str):
+    """将多个相同参数的 WAV 文件拼接为一个"""
+    with wave.open(file_list[0], "rb") as first:
+        params = first.getparams()
+
+    with wave.open(output, "wb") as out:
+        out.setparams(params)
+        for filepath in file_list:
+            with wave.open(filepath, "rb") as wf:
+                out.writeframes(wf.readframes(wf.getnframes()))
+
+# 用法示例
+# concatenate_wav(["part1.wav", "part2.wav", "part3.wav"], "merged.wav")
+```
+
+:::tip
+拼接要求所有文件的声道数、采样宽度和采样率完全一致，否则输出文件会出现杂音或播放异常。
+:::
+
+## 配合 struct 解析音频帧数据
+
+```python showLineNumbers
+import wave
+import struct
+
+with wave.open("audio.wav", "rb") as wf:
+    sampwidth = wf.getsampwidth()
+    nframes = min(wf.getnframes(), 10)  # 只读前 10 帧
+    raw = wf.readframes(nframes)
+
+    # 16 位采样用 'h'（short），8 位用 'b'（byte）
+    fmt = f"<{nframes}h" if sampwidth == 2 else f"<{nframes}b"
+    samples = struct.unpack(fmt, raw)
+
+    for i, s in enumerate(samples):
+        print(f"帧 {i}: {s}")
+```
