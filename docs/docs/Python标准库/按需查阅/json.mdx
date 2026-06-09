@@ -1,0 +1,171 @@
+---
+title: json
+---
+
+## 格式转换规则
+
+Python 字典 (Dict) 和 JSON 字符串 (String) 是导致校验失败的最常见原因。
+
+| **特性**     | **Python 字典 (Dict)**          | **JSON 字符串 (String)**           |
+| ------------------ | ------------------------------------- | ---------------------------------------- |
+| **引号**     | 单引号 `'`或 双引号 `"`均可       | **必须**使用双引号 `"`           |
+| **布尔值**   | `True`/`False`(首字母大写)        | `true`/`false`(全小写)               |
+| **空值**     | `None`                              | `null`                                 |
+| **末尾逗号** | 允许有额外逗号 `{"a":1,}`           | **严禁**有末尾逗号 `{"a":1}`     |
+| **数据类型** | 可以存 Python 对象（如 `datetime`） | 只能是字符串、数字、数组、对象等基本类型 |
+
+如果你希望传输一个对象，键为 `A` ,值为 `1'"2`可以写为 `{"A":"1'\"2"}`，其中`\`是转义字符，和Python一致。
+
+json 模块提供了 python->json 以及 json->python 两种格式，转换规则如下
+
+| JSON ->        | Python -> | JSON           |
+| -------------- | --------- | -------------- |
+| object -- 对象  | dict      | object -- 对象 |
+| array          | list      | array          |
+| string         | str       | string         |
+| number (int)   | int       | number         |
+| number (real)  | float     | number         |
+| true           | True      | true           |
+| false          | False     | false          |
+| null           | None      | null           |
+|                | tuple     | array          |
+
+注意：JSON 中的键-值对中的键永远是 str 类型的。当一个对象被转化为
+JSON 时，字典中所有的键都会被强制转换为字符串。这所造成的结果是字典被转换为 JSON 然后转换回字典时可能和原来的不相等。
+
+换句话说，如果 x 具有非字符串的键，则有 loads(dumps(x)) != x。
+
+json 模块还有一些其他参数可以控制：编码形式、格式化输出等，不过很少用到
+
+[json 官方模块文档](https://docs.python.org/zh-cn/3/library/json.html#module-json)
+
+## json
+
+我们常见的标准 JSON 文件，后缀为：`.json`。
+
+```json
+[
+    {
+        "name": "John",
+        "age": 30
+    },
+    {
+        "name": "Jane",
+        "age": 25
+    }
+]
+```
+
+- 外层用方括号 [] 包裹。
+
+- 读取时，解析器必须一次性将整个文件加载到内存中。
+
+- 如果文件非常大（比如几个 GB），普通电脑的内存会直接"爆掉"。
+
+### json.load 与 json.dump
+
+json.load 与 json.dump 是基于文件的转换。
+
+```python showLineNumbers
+import json
+
+data = {
+    "name": "Satyam kumar",
+    "place": "patna",
+    "skills": [
+        "Raspberry pi",
+        "Machine Learning",
+        "Web Development"
+    ],
+    "email": "xyz@gmail.com",
+    "projects": [
+        "Python Data Mining",
+        "Python Data Science"
+    ]
+}
+with open("data_file.json", "w") as write:
+    json.dump(data, write)
+
+with open("data_file.json", "r") as read_content:
+    print(json.load(read_content))
+```
+
+### json.loads 与 json.dumps
+
+`json.loads` 与 `json.dumps` 是直接基于数据的转换，这里的`s`表示`string`(字符串)。
+
+```python showLineNumbers
+import json
+
+# JSON string:
+# Multi-line string
+data = """{
+    "Name": "Jennifer Smith",
+    "Contact Number": 7867567898,
+    "Email": "jen123@gmail.com",
+    "Hobbies":["Reading", "Sketching", "Horse Riding"]
+    }"""
+
+# parse data:
+res_p = json.loads(data)
+print(type(res_p)) # <class 'dict'>
+
+res_j = json.dumps(res_p)
+print(type(res_j)) # <class 'str'>
+```
+
+## jsonl
+
+JSONL 的全称是 JSON Lines。后缀为：`.jsonl`或`.ndjson`。
+
+它的核心逻辑是：每一行都是一个独立的、合法的 JSON 对象。
+
+```json
+{"name": "John", "age": 30}
+{"name": "Jane", "age": 25}
+{"name": "Jim", "age": 35}
+```
+
+- 没有外层的方括号，各行之间也没有逗号。
+
+- 流式处理友好：你可以一行一行地读取文件，而不需要一次性加载整个文件。这在处理大数据集或模型训练（如大语言模型的预训练语料）时简直是救星。
+
+- 容错性高：如果文件末尾损坏了，之前的行依然是有效的；而标准的 JSON 文件如果少了一个反括号，整个文件就废了。
+
+### 读取JSONL文件
+
+```python showLineNumbers
+import json
+
+# 假设文件名为 data.jsonl
+with open('data.jsonl', 'r', encoding='utf-8') as f:
+    for line in f:
+        # 核心：每一行都是一个独立的 JSON 字符串
+        try:
+            item = json.loads(line)
+            print(f"处理 ID 为 {item.get('id')} 的数据: {item.get('text')}")
+        except json.JSONDecodeError:
+            print("跳过损坏的行")
+```
+
+### 写入JSONL文件
+
+在使用 json.dumps() 时，如果你不小心设置了 indent=4（每一层级缩进 4 个空格，并自动在逗号后换行。）
+
+生成的就不再是标准的 JSONL 了，因为一个对象会被拆成多行，后续读取会直接报错。
+
+```python showLineNumbers
+import json
+
+data_list = [
+    {"id": 1, "text": "你好\n我是第一行"},
+    {"id": 2, "text": "这是第二个对象"}
+]
+
+with open('output.jsonl', 'w', encoding='utf-8') as f:
+    for entry in data_list:
+        # 重点：ensure_ascii=False 可以让中文不变成 \uXXXX
+        # 不设置 indent，保证一个对象只占物理上的一行
+        json_record = json.dumps(entry, ensure_ascii=False)
+        f.write(json_record + '\n')
+```

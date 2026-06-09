@@ -1,0 +1,56 @@
+---
+title: io
+---
+
+[io 官方模块文档](https://docs.python.org/zh-cn/3/library/io.html)
+
+:::info
+假设你有一个函数，它要求传入一个文件对象作为参数，但你并不想真的在磁盘上创建一个文件。这时，你可以用 io.StringIO 创建一个内存中的"假文件"。
+
+```python showLineNumbers
+import io
+
+def process_file(file_object):
+    """一个需要文件对象作为参数的函数"""
+    content = file_object.read()
+    # 假设这里对文件内容进行了一些处理
+    return content.upper()
+
+# 使用 io.StringIO 创建一个内存中的文件
+text_data = "hello world from memory"
+string_file = io.StringIO(text_data)
+
+# 将内存中的文件对象传递给函数
+result = process_file(string_file)
+
+print(result)
+# 输出：HELLO WORLD FROM MEMORY
+```
+:::
+
+## BytesIO（二进制内存流）
+
+`io.BytesIO` 用于在内存中读写 **bytes**，同样可以替代真实文件对象：当你需要把二进制数据当作“文件”来读写（例如传给只接受文件对象的 API）时，用 `BytesIO` 即可，无需落盘。
+
+```python showLineNumbers
+import io
+
+# 创建内存中的二进制缓冲区，可写入 bytes
+buf = io.BytesIO()
+buf.write(b'hello ')
+buf.write(b'world')
+
+# 将“读写头”移回开头，再读取
+buf.seek(0)
+data = buf.read()
+
+print(data)
+# 输出：b'hello world'
+```
+
+## 文本与二进制模式（小结）
+
+- **StringIO** 对应**文本 I/O**：读写的是 `str`，与用 `open(..., 'r')` 打开的文件对象类似。
+- **BytesIO** 对应**二进制 I/O**：读写的是 `bytes`，与用 `open(..., 'rb')` 打开的文件对象类似。
+
+在 `io` 模块的层级里，`BytesIO` 继承自 `BufferedIOBase`，`StringIO` 继承自 `TextIOBase`；前者处理字节缓冲，后者处理文本编码与解码。

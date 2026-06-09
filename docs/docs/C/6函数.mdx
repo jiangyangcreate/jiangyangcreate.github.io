@@ -1,0 +1,300 @@
+---
+sidebar_position: 6
+title: 函数🔨
+---
+
+C 源程序是由函数组成的，C 语言不仅提供了极为丰富的库函数, 还允许用户建立自己定义的函数。用户可把自己的算法编写成一个个相对独立的函数，然后再需要的时候调用它。
+
+可以说 C 程序的全部工作都是由各式各样的函数完成的,所以也把 C 语言称为函数式语言。
+
+在 C 语言中可从不同的角度对函数分类。
+
+从函数定义的角度可分为：
+
+- **_库函数:_** 由 C 语言系统提供,用户无须定义,也不必在程序中作类型说明,只需在程序前包含有该函数原型的头文件即可在程序中直接调用。在前面各章的例题中反复用到 printf、scanf、getchar、putchar 等函数均属此类
+- **_用户定义函数:_**由用户按需编写的函数。对于用户自定义函数,不仅要在程序中定义函数本身,而且在主调函数模块中还必须对该被调函数进行类型说明,然后才能使用
+
+从函数执行结果的角度可分为：
+
+- **_有返回值函数:_** 此类函数被调用执行完后将向调用者返回一个执行结果,称为函数返回值。(必须指定返回值类型和使用 return 关键字返回对应数据)
+- **_无返回值函数:_** 此类函数用于完成某项特定的处理任务,执行完成后不向调用者返回函数值。(返回值类型为 void, 不用使用 return 关键字返回对应数据)
+
+从主调函数和被调函数之间数据传送的角度可分为：
+
+- **_无参函数:_** 在函数定义及函数说明及函数调用中均不带参数。主调函数和被调函数之间不进行参数传送。
+- **_有参函数:_** 在函数定义及函数说明时都有参数,称为形式参数(简称为形参)。在函数调用时也必须给出参数,称为实际参数(简称为实参)
+
+
+## 定义
+
+- 定义函数的步骤
+
+```c showLineNumbers
+返回值类型 函数名(参数类型 形式参数1，参数类型 形式参数2，…) {
+    函数体;
+    返回值;
+}
+```
+* 函数名：函数叫什么名字（函数名称不能相同）
+* 参数：函数需要什么条件才能执行，如果函数不接受任何参数，应该写上关键字`void`（可选）。
+* 函数体：函数是干啥的，里面包含了什么代码
+* 返回值类型: 函数执行完毕返回什么和调用者（可选）
+
+- 自定义函数的书写格式
+
+```c showLineNumbers
+int max(int value1, int value2) {
+    int result = value1 > value2 ? value1 : value2;
+    printf("这是一个有参数，也有返回值的函数\n");
+    printf("max = %i\n", result);
+    return result;
+}
+
+void min(int value1, int value2) {
+    int result = value1 < value2 ? value1 : value2;
+    printf("这是一个有参数，但没有返回值的函数\n");
+    printf("min = %i\n", result);
+}
+
+void call(){
+    printf("这是一个没有参数，也没有返回值的函数\n");
+    // 没有返回值时 return 可以省略
+}
+
+int main(){
+    printf("这是一个没有参数，但有返回值的函数\n");
+    // 标准C要求main函数返回int类型
+    return 0;
+}
+```
+
+
+## 参数
+
+- 形式参数
+  - 在**定义函数**时，函数名后面小括号()中定义的变量称为形式参数，简称形参
+  - 形参变量只有在被调用时才分配内存单元,在调用结束时,即刻释放所分配的内存单元。
+  - 因此,形参只有在函数内部有效,函数调用结束返回主调函数后则不能再使用该形参变量
+
+```c showLineNumbers
+int max(int number1, int number2) //  形式参数
+{
+    return number1 > number2 ? number1 : number2;
+}
+```
+
+- 实际参数
+  - 在**\*调用函数\***时, 传入的值称为实际参数，简称实参
+  - 实参可以是常量、变量、表达式、函数等,无论实参是何种类型的量,在进行函数调用时,它们都必须具有确定的值,以便把这些值传送给形参
+  - 因此应预先用赋值,输入等办法使实参获得确定值
+
+```c showLineNumbers
+int main() {
+    int num = 99;
+    // 88, num均能得到一个确定的值, 所以都可以作为实参
+    max(88, num); // 实际参数
+    return 0;
+}
+```
+
+
+- 调用函数时传递的实参个数必须和函数的形参个数必须保持一致。
+
+  ```c showLineNumbers
+  int max(int number1, int number2) { //  形式参数
+      return number1 > number2 ? number1 : number2;
+  }
+  int main() {
+      // 函数需要2个形参, 但是我们只传递了一个实参, 所以报错
+      max(88); // 实际参数
+      return 0;
+  }
+  ```
+
+- 形参实参类型不一致, <Highlight>会自动转换为形参类型</Highlight>。
+
+  ```c showLineNumbers
+  void change(double number1, double number2) {//  形式参数
+     // 输出结果: 10.000000, 20.000000
+     // 自动将实参转换为double类型后保存
+     printf("number1 = %f, number2 = %f", number1, number2);
+  }
+  int main() {
+      change(10, 20);
+      return 0;
+  }
+  ```
+
+- 当使用基本数据类型（char、int、float 等）作为实参时，<Highlight>实参和形参之间只是值传递，修改形参的值并不影响到实参函数</Highlight>。
+
+  ```c showLineNumbers
+  void change(int number1, int number2) { //  形式参数
+      number1 = 250; // 不会影响实参
+      number2 = 222;
+  }
+  int main() {
+      int a = 88;
+      int b = 99;
+      change(a, b);
+      printf("a  = %d, b = %d", a, b); // 输出结果: 88, 99
+      return 0;
+  }
+  ```
+
+## 返回值
+
+- 如果没有写返回值类型，默认是 int
+
+  ```c showLineNumbers
+  max(int number1, int number2) {//  形式参数
+      return number1 > number2 ? number1 : number2;
+  }
+  ```
+
+- 一个函数内部可以多次使用 return 语句，但是 return 语句会终止函数，后面的代码就不再被执行
+
+  ```c showLineNumbers
+  int max(int number1, int number2) {//  形式参数
+      return number1 > number2 ? number1 : number2;
+      printf("执行不到"); // 执行不到
+      return 250; // 执行不到
+  }
+  ```
+
+- 函数声名的返回值的类型和 return 实际返回的值类型应保持一致。如果两者不一致,则<Highlight>以返回值类型为准,自动进行类型转换</Highlight>。
+
+  ```c showLineNumbers
+  int height() {
+      return 3.14;
+  }
+  int main() {
+    double temp = height();
+    printf("%lf", temp);// 输出结果: 3.000000
+  }
+  ```
+
+## 函数的声明
+
+函数实现是告诉系统, 这个函数具体的业务逻辑是怎么运作的。
+
+去掉函数体的部分在加上分号，就可以得到函数声明。
+
+函数声明格式：`返回值类型 函数名(参数类型 形式参数1，参数类型 形式参数2，…);`
+
+:::tip
+因为你有时候并没有想好具体代码怎么写，所以先在顶部声明一下有这个函数，后面再随便在哪里实现这个函数的功能。
+
+函数声明,就是在系统中记录, 有个函数叫什么名称, 该函数接收几个参数, 该函数的返回值类型是什么。
+
+一个函数如果能被正常调用, 那么它在调用位置之前先被声明或实现。实际开发中推荐总是先声明后实现。
+
+:::
+
+```c showLineNumbers
+// 函数的声明可以重复
+void getMax(int v1, int v2);
+void getMax(int v1, int v2);
+void getMax(int v1, int v2); // 不会报错
+int main(int argc, const char * argv[]) {
+    getMax(10, 20); // 调用函数
+    return 0;
+}
+// 函数的实现不能重复
+void getMax(int v1, int v2) {
+    int max = v1 > v2 ? v1 : v2;
+    printf("max = %i\n", max);
+}
+```
+
+函数声明可以写在函数外面,也可以写在函数里面, 只要在调用之前被声明即可
+
+```c showLineNumbers
+int main() {
+    void getMax(int v1, int v2); // 函数声明, 不会报错
+    getMax(10, 20); // 调用函数
+    return 0;
+}
+// 函数实现
+void getMax(int v1, int v2) {
+    int max = v1 > v2 ? v1 : v2;
+    printf("max = %i\n", max);
+}
+```
+
+
+## 主函数自动传参
+
+main 函数最大的特点是会自动执行，如果你在命令行中运行一个名为 `demo` 的程序，并传入参数 `hello world`。
+
+命令示例：`gcc demo.c -o demo && ./demo hello world`
+
+那么 main 函数会自动接收到这些参数。
+
+```c showLineNumbers title="demo.c"
+int main(int argc, const char * argv[]) {
+    printf("argc = %d\n", argc); // 表示参数的个数
+    printf("argv = %s\n", argv[0]); // 表示第1个参数的值
+    printf("argv = %s\n", argv[1]); // 表示第2个参数的值
+    printf("argv = %s\n", argv[2]); // 表示第3个参数的值
+    return 0;
+}
+/*
+argc = 3
+argv = ./demo
+argv = hello
+argv = world
+*/
+```
+
+## 递归函数
+
+一个函数在它的函数体内调用它自身称为递归调用
+
+```c showLineNumbers
+void function(int x){
+    function(x);
+}
+```
+
+递归函数必须满足三个条件：
+- **自己调用自己**：函数在内部调用自身
+- **存在递归结束条件**：必须有明确的终止条件，否则会无限递归
+- **问题规模递减**：每次递归调用都应该让问题变小
+
+- 递归和循环区别
+
+* 能用循环实现的功能,用递归都可以实现
+* 递归常用于"回溯", "树的遍历","图的搜索"等问题
+* 但代码理解难度大，内存消耗大(易导致栈溢出), 所以考虑到代码理解难度和内存消耗问题, 在企业开发中一般能用循环都不会使用递归
+
+
+- 示例:
+
+* 获取用户输入的数字, 直到用户输入一个正数为止
+
+```c showLineNumbers
+void getNumber(){
+    int number = -1;
+    while (number < 0) {
+        printf("请输入一个正数\n");
+        scanf("%d", &number);
+    }
+
+    printf("number = %d\n", number);
+}
+```
+
+```c showLineNumbers
+void getNumber2(){
+    int number = -1;
+    printf("请输入一个正数\n");
+    scanf("%d", &number);
+    if (number < 0) {
+//        负数
+        getNumber2();
+    }else{
+//        正数
+       printf("number = %d\n", number);
+    }
+}
+```

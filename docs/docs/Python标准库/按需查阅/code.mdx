@@ -1,0 +1,107 @@
+---
+title: code
+---
+
+`code` 模块提供了在 Python 中实现交互式解释器（REPL）的基础设施，可用于构建自定义的交互式控制台。
+
+[code](https://docs.python.org/3/library/code.html)
+
+## 快速启动交互控制台
+
+`code.interact()` 是最简单的用法，一行代码即可启动一个嵌入式 Python 交互环境。
+
+```python showLineNumbers
+import code
+
+# 将当前局部变量传入交互环境
+x = 42
+data = [1, 2, 3]
+
+# 启动交互控制台，可直接访问 x 和 data
+code.interact(
+    banner="=== 自定义调试控制台 ===",
+    local=locals(),
+    exitmsg="已退出调试控制台",
+)
+```
+
+:::tip
+在调试复杂程序时，可以在关键位置插入 `code.interact(local=locals())`，临时进入交互环境检查变量状态，比 `print` 调试更灵活。
+:::
+
+## 使用 InteractiveConsole
+
+`InteractiveConsole` 类可以模拟 Python 交互解释器的行为，支持逐行推送代码执行。
+
+```python showLineNumbers
+import code
+
+# 创建自定义命名空间
+namespace = {"__name__": "__console__"}
+
+console = code.InteractiveConsole(locals=namespace)
+
+# push() 返回 True 表示代码不完整，需要更多输入
+print(console.push("x = 10"))          # False（语句完整，已执行）
+print(console.push("def greet():"))    # True（函数定义未完成）
+print(console.push("    return 'hi'")) # True（缩进块未结束）
+print(console.push(""))               # False（空行结束定义）
+
+# 执行后变量已存在于命名空间中
+print(namespace["x"])                  # 10
+print(namespace["greet"]())            # hi
+```
+
+## 检查代码完整性
+
+`compile_command()` 可以判断一段代码是否完整、是否有语法错误，适合构建自定义编辑器或教学工具。
+
+```python showLineNumbers
+import code
+
+# 完整的语句 → 返回 code 对象
+result = code.compile_command("x = 1 + 2")
+print(type(result))  # <class 'code'>
+
+# 不完整的语句 → 返回 None
+result = code.compile_command("def foo():")
+print(result)  # None（需要更多输入）
+
+# 语法错误 → 抛出 SyntaxError
+try:
+    code.compile_command("if if if")
+except SyntaxError as e:
+    print(f"语法错误: {e}")
+```
+
+## 构建自定义 REPL
+
+继承 `InteractiveConsole` 可以构建带有自定义功能的解释器，例如记录命令历史、添加特殊指令等。
+
+```python showLineNumbers
+import code
+
+class MyConsole(code.InteractiveConsole):
+    def __init__(self):
+        self.history = []
+        super().__init__(locals={"help_cmd": self.show_help})
+
+    def push(self, line):
+        self.history.append(line)
+        return super().push(line)
+
+    def show_help(self):
+        print("可用命令：直接输入 Python 代码")
+        print("输入 help_cmd() 查看帮助")
+        print(f"已执行 {len(self.history)} 条命令")
+
+console = MyConsole()
+console.interact(
+    banner="=== 自定义 REPL（输入 help_cmd() 查看帮助）===",
+    exitmsg="再见！",
+)
+```
+
+:::info
+`InteractiveConsole` 的 `local_exit=True` 参数（Python 3.13+）可以让 `exit()` 不抛出 `SystemExit`，而是安静地返回调用方，适合嵌入式场景。
+:::

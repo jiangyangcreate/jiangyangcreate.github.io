@@ -1,0 +1,481 @@
+---
+sidebar_position: 28
+title: 装饰器与作用域
+---
+
+## 装饰器
+
+### callable函数
+
+`callable`函数用于检查一个对象是否是可调用的。返回 True 或 False，用于条件判断。
+
+下面是一些示例，总之就是<Highlight>可以被`()`调用的对象都是可callable的</Highlight>。
+
+```python showLineNumbers
+def test():
+    print('test')
+
+demo = lambda x: x + 1
+
+# 内置函数是可callable的
+print(callable(print)) # True
+# 匿名函数是可callable的
+print(callable(demo)) # True
+# 自定义函数是可callable的
+print(callable(test)) # True
+
+class Test:
+    def __call__(self):
+        """实例被调用时，会执行__call__方法"""
+        print('called')
+
+a = Test()
+a() # 打印 called
+# 类是可callable的
+print(callable(Test)) # True
+# 定义了__call__方法的实例是可callable的，调用实例会执行__call__方法
+print(callable(a))    # True
+
+
+class NoCall:
+    def some_method(self):
+        print('some_method')
+b = NoCall()
+# 没有定义__call__方法的实例是不可callable的
+print(callable(b))  # False
+# 类方法是可callable的
+print(callable(b.some_method))  # True
+```
+
+### @装饰器语法
+
+装饰器也叫修饰器，用于将一个`callable`对象指向另一个`callable`对象。
+
+在一个`callable`对象定义前使用`@装饰器名`，装饰器名下的`callable`对象的引用，会作为装饰器对象的参数被传入。
+
+大部分装饰器的使用场景都是围绕函数，下面这个装饰器只是将函数重定向到自己，没有改变`callable`对象（原test函数）的功能、传参方式。
+
+```python showLineNumbers
+def mark(func):
+    """
+    装饰器函数，用于将函数重定向到另一个函数。
+    装饰器函数的第一个参数，默认是被装饰的函数。
+    """
+    # 返回被装饰的函数，即test函数。
+    return func
+
+@mark
+def test(a):
+    print('test', a)
+
+test(1) # 打印test 1
+
+```
+
+:::info
+
+<Highlight>装饰器在被装饰函数定义时执行，而不是在被装饰函数调用时执行</Highlight>。
+
+可以利用这个特性来收集工具函数信息作为大模型的上下文。
+
+```python showLineNumbers
+def log(func):
+    print(func.__name__, func.__doc__)
+
+@log
+def test1():
+    """test1 function"""
+    pass
+
+@log
+def test2():
+    pass
+"""
+输出：
+test1 test1 function
+test2 None
+"""
+```
+:::
+
+装饰器的其他使用示例：记录函数运行时间、用于自动测试。
+
+```python showLineNumbers
+import time
+
+def log(func):
+    """
+    你可以返回被装饰的函数、也可以返回匿名函数、自然也可以在函数中再定义一个函数然后返回他。
+    只要是callable对象都可以。
+    """
+    def wrapper(*args,**kwargs):
+        print('测试开始：现在时间是',time.time())
+        ret = func(*args,**kwargs)
+        print('测试结束：现在时间是',time.time())
+        return ret
+    return wrapper
+
+@log
+def test1(s):
+    """test1 function"""
+    print('test1 ..', s)
+    return s
+@log
+def test2(s1, s2):
+    """test2 function"""
+    print('test2 ..', s1, s2)
+    return s1 + s2
+
+test1(1)
+"""
+测试开始：现在时间是 1760794859.3488584
+test1 .. 1
+测试结束：现在时间是 1760794859.3490396
+"""
+test2(1,2)
+"""
+测试开始：现在时间是 1760794859.3491104
+test2 .. 1 2
+测试结束：现在时间是 1760794859.349173
+"""
+
+# 装饰器会让函数名称指向装饰器返回的callable对象的名称
+print(test1.__name__) # wrapper
+print(test2.__name__) # wrapper
+
+# 知名的`pytest`模块就是通过装饰器指定测试函数，因此如果你的框架中使用了装饰器，需要注意。
+
+# 获取本地变量所有函数
+for k,v in locals().copy().items():
+    # 如果f是函数
+    if callable(v):
+        # 如果函数名以test开头，并且有文档字符串，则执行函数
+        if v.__doc__ and v.__name__.startswith('test'):
+            v()# 不会执行test1和test2函数，因为它们此时的名称是wrapper
+```
+
+如果不想改写函数名称、文档字符串等属性，可以使用`functools`模块
+
+```python showLineNumbers
+from functools import wraps
+ 
+def my_decorator(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        return func(*args, **kwargs)
+    return wrapper
+ 
+@my_decorator
+def say_hello(name):
+    """A function that says hello"""
+    print(f'Hello, {name}!')
+ 
+print(say_hello.__name__)   # 输出 'say_hello'
+print(say_hello.__doc__)    # 输出 'A function that says hello'
+```
+
+
+也可以使用装饰器实现单例模式。
+
+```python
+def singleton(cls):
+    instances = {}
+    '''
+    instances 是在 singleton 装饰器函数中定义的局部变量。
+    由于 wrapper 函数引用了 instances，instances 成为了 wrapper 的闭包变量。
+    闭包变量的生命周期会延长到 wrapper 函数的存在期间，即使 singleton 函数已经执行完毕。
+    '''
+    def wrapper(*args, **kwargs):
+        if cls not in instances:
+            instances[cls] = cls(*args, **kwargs)
+        return instances[cls]
+
+    return wrapper
+
+@singleton
+class MyClass:
+    def __init__(self, name):
+        self.name = name
+
+    def greet(self):
+        print(f"Hello, {self.name}!")
+
+# 测试单例模式
+obj1 = MyClass("Alice")
+obj2 = MyClass("Bob")
+
+print(obj1 is obj2)  # 输出 True，说明是同一个实例
+obj1.greet()         # 输出 "Hello, Alice!"
+obj2.greet()         # 输出 "Hello, Alice!"（因为 obj2 实际上是 obj1）
+```
+
+### 多重装饰器
+
+定义两个装饰器函数
+
+```python showLineNumbers
+def plus_one(f):
+    def new_func(x):
+        return f(x) + 1
+    return new_func
+
+def times_two(f):
+    def new_func(x):
+        return f(x) * 2
+    return new_func
+
+@plus_one # 再执行plus_one装饰器
+@times_two # 先执行times_two装饰器
+def foo(x):
+    return int(x)
+
+b = foo(2)
+print(b) # 5
+```
+
+### 修饰器工厂
+
+decorators factories 是返回修饰器的函数，它的作用在于产生一个可以接受参数的修饰器
+
+可以用作多次执行某个函数
+
+```python showLineNumbers
+import functools
+
+def moretime(times):                 # 1 装饰器工厂（接收参数）
+    print(locals())                  # 打印局部变量，可以看到times参数被注册
+    def decorator(func):             # 2 真正的装饰器（接收函数）
+        @functools.wraps(func)       # 3 保留原函数元信息
+        def wrapper(*args, **kwargs):# 4 包装函数（执行多次原函数）
+            for _ in range(times):
+                func(*args, **kwargs)
+        return wrapper               # 返回包装后的函数
+    return decorator                 # 返回装饰器
+
+@moretime(times = 3) # 出现()表示调用，直接执行，注册times参数为5，并返回 decorator 函数作为真正的装饰器
+def test2():
+    print('test2')
+print('准备执行test2函数')
+# 出现()表示调用，执行 decorator 函数，返回 wrapper 函数并执行
+test2()
+"""
+{'times': 3}
+准备执行test2函数
+test2
+test2
+test2
+"""
+```
+
+## 作用域
+
+作用域是变量可以被访问的区域。Python的LEGB作用域规则（Local → Enclosing → Global → Built-in），即：
+
+- 局部作用域（Local）：在函数内部定义的变量，只能在函数内部访问，函数内都是局部作用域。其他都是非局部作用域。
+- 闭包作用域（Enclosing）：在嵌套函数中，内部函数可以访问外部函数中定义的变量。
+- 全局作用域（Global）：在模块文件中定义的变量，可以在模块文件的任何地方访问。全局作用域是全局变量。
+- 内置作用域（Built-in）：Python 内置的变量、函数、类、关键字等，可以在任何地方访问。
+
+:::tip
+<Highlight>Python在编译函数时会静态分析作用域，而非运行时动态判断</Highlight>
+
+```python showLineNumbers
+x = 10
+def foo():
+    print(x) # 此句直接报错
+    x = 5
+foo()
+```
+
+- 一旦函数体内出现 x = 5（对 x 的赋值），Python立即将 x 标记为局部变量
+- 因此 print(x) 会在局部作用域查找 x，但此时 x 尚未赋值（运行时），导致 UnboundLocalError
+- 关键点：不是"局部不能修改全局"，而是"局部变量在赋值前被引用"
+:::
+
+### global
+
+global 语句将应用于函数或类语句体的整个作用域。 如果一个变量在本作用域的 global 声明之前被使用或赋值则会引发 SyntaxError。
+
+以`global x`为例，`global` 关键字工作顺序：
+1. 查找当前作用域是否已分配局部变量`x`，如果在`global`语句之前已存在，则报错。
+2. 如果当前作用域未分配局部变量`x`，则将`x`声明为全局变量（不论全局变量是否已存在`x`）。
+3. 如果全局变量已存在`x`，则局部空间的`x`与全局变量`x`指向同一块内存空间。
+4. 如果全局变量不存在`x`，全局空间会自动创建`x`变量，并指向新的内存空间。（此时未分配值）
+5. 局部空间的`x`与全局变量`x`指向同一块内存空间。修改局部变量`x`或全局变量`x`的值，都会影响另一方。
+
+```python
+# 全局作用域
+x = 1 # 全局变量
+y = 2 # 全局变量
+
+def print_newx():
+    # 局部作用域
+    global x
+    global z
+    # print("函数内的z",z) # 这里会报错，因为z没有分配值
+    # 等价于你在全局只写了一个z
+    x = 10
+    y = 20
+    z = 30
+    print("函数内的x",x)
+    print("函数内的y",y)
+    print("函数内的z",z)
+
+
+print_newx()
+print("函数外的x",x)
+print("函数外的y",y)
+print("函数外的z",z)
+
+# 函数内的x 10
+# 函数内的y 20
+# 函数内的z 30
+# 函数外的x 10
+# 函数外的y 2
+# 函数外的z 30
+```
+
+### nonlocal
+
+当一个函数或类的定义嵌套（被包围）在其他函数的定义中时，其非局部作用域就是<Highlight>包围它的函数的局部作用域</Highlight> 。
+
+`nonlocal` 语句会使其所列出的标识符指向之前在<Highlight>非局部作用域</Highlight>中绑定的名称。 它允许封装的代码重新绑定这样的非局部标识符。 
+
+工作顺序与`global`类似。
+
+```python showLineNumbers
+# 这是全局空间
+def outer():
+    # 这是outer函数的局部空间，相对与inner函数，这里是它的非局部作用域（包围它的函数的局部作用域）
+    x = 1
+    def inner():
+        nonlocal x
+        x = 2
+        print(x)
+    inner()
+    print(x)
+outer()
+# 2
+# 2
+```
+
+### 闭包
+
+闭包的特别之处在于，生命周期的延长。普通函数内部的变量会随着函数被调用而创建，函数执行结束而被销毁。
+
+而闭包可以让函数内部的变量变成函数对象的属性，生命周期与函数定义本身绑定。每次函数执行结束不会被销毁，只有函数被删除才会被销毁。
+
+```python showLineNumbers
+def func():
+    name = 1 # 变量在局部作用域
+    def inner():
+        """
+        nonlocal 简单说就是让内部函数中的变量在上一层函数中生效
+        非局部声明变量指代的已有标识符是最近外面函数的已声明变量，但是不包括全局变量。
+        这个是很重要的，因为绑定的默认行为是首先搜索本地命名空间。nonlocal声明的变量只对局部起作用，离开封装函数，那么该变量就无效。
+        """
+        nonlocal name
+        name += 1
+        """
+        __closure__ 是函数对象的一个属性（仅当该函数是闭包时才非 None）。
+        它是一个 元组（tuple），每个元素是 cell 对象（类型为 <class 'cell'>）。
+        每个 cell 对象封装了被内部函数引用的、来自外层作用域的自由变量（free variables）。
+        """
+        print("闭包单元:", inner.__closure__)
+        print("自由变量名:", inner.__code__.co_freevars)  # ('name',)
+        print("当前值:", inner.__closure__[0].cell_contents)
+        return name
+    return inner
+
+p = func()
+print(p()) # 2
+print(p()) # 3
+"""
+闭包单元: (<cell at 0x0000021E4197FAC0: function object at 0x0000021E41930C20>, <cell at 0x0000021E4197FAF0: int object at 0x00007FF9AB1673C8>)      
+自由变量名: ('inner', 'name')
+当前值: <function func.<locals>.inner at 0x0000021E41930C20>
+2
+闭包单元: (<cell at 0x0000021E4197FAC0: function object at 0x0000021E41930C20>, <cell at 0x0000021E4197FAF0: int object at 0x00007FF9AB1673E8>)      
+自由变量名: ('inner', 'name')
+当前值: <function func.<locals>.inner at 0x0000021E41930C20>
+3
+
+闭包元组中，同个函数对象没有发生变化，延续之前的值+1后再绑定为新的属性值，即你看到的 int object 地址是不同的。
+"""
+
+
+print(func()()) # 2
+print(func()()) # 2
+"""
+闭包单元: (<cell at 0x000001A3FDDBFDF0: function object at 0x000001A3FDC618A0>, <cell at 0x000001A3FDDBFE20: int object at 0x00007FF9AB1673C8>)
+自由变量名: ('inner', 'name')
+当前值: <function func.<locals>.inner at 0x000001A3FDC618A0>
+2
+闭包单元: (<cell at 0x000001A3FDDBFE80: function object at 0x000001A3FDDE0B80>, <cell at 0x000001A3FDDBFE50: int object at 0x00007FF9AB1673C8>)
+自由变量名: ('inner', 'name')
+当前值: <function func.<locals>.inner at 0x000001A3FDDE0B80>
+2
+
+每次 func() 都是全新调用，创建新的局部作用域，name = 1 重新初始化；
+"""
+
+```
+
+## 内置函数
+
+### locals函数、globals函数
+
+`locals()` 和 `globals()` 都是用来**查看当前命名空间中的变量**的内置函数，本质上都是**返回一个字典对象**。
+
+- **locals()**：返回当前局部作用域中的变量字典
+- **globals()**：返回当前全局作用域（模块级别）中的变量字典
+
+两者都**不需要参数**：
+
+- 函数签名：`locals() -> dict`
+- 函数签名：`globals() -> dict`
+
+```python showLineNumbers
+x = 10
+
+def func(y):
+    z = 20
+    print("函数内部 locals():")
+    print(locals())      # {'y': 5, 'z': 20}
+    print("函数内部 globals() 是否包含 x? ->", "x" in globals())  # True
+
+func(5)
+
+print("模块级别 globals() 中的部分键：")
+print(list(globals().keys())[:8])  # 只看前几个键
+```
+
+> 一般来说：
+>
+> - 在**函数内部**：`locals()` 反映的是当前函数的局部变量，`globals()` 反映的是整个模块的全局变量；
+> - 在**模块顶层**（不在函数里）：`locals()` 和 `globals()` 返回的其实是同一个字典（都是全局命名空间）。
+
+`locals()` 返回的字典在函数内部通常是**只读视图**，直接修改其返回值，不一定会真正改变局部变量；而通过 `globals()` 返回的字典修改全局变量，一般是有效的：
+
+```python showLineNumbers
+a = 1
+
+def demo():
+    b = 2
+    # 尝试修改局部变量
+    locals()["b"] = 100
+    print("b =", b)  # 仍然是 2，大多数实现中修改无效
+
+demo()
+
+# 通过 globals() 修改全局变量
+globals()["a"] = 99
+print("a =", a)  # 99
+```
+
+## 标准库推荐
+
+- builtins: 内置函数与常用类型的集合，例如 `id`、`hash` 等。
+- gc: 控制和调试垃圾回收器（GC），可以查看、调整引用计数与循环引用的回收行为，常用于分析内存泄漏。
+- inspect: 提供运行时反射能力，能获取函数签名、源码、调用栈等信息，是调试装饰器、动态生成函数时的利器。
+- sys: 暴露解释器级别的接口（如 `sys.modules`、`sys.path`、`sys.getsizeof` 等），便于查看模块加载、内存占用与运行环境信息。

@@ -1,0 +1,131 @@
+---
+title: typing
+---
+
+Python 运行时不强制要求函数与变量类型标注。 它们可被 类型检查器、IDE、语法检查器等第三方工具使用。
+
+`typing` 模块提供高级类型支持：
+
+```python
+from typing import List, Dict, Tuple, Optional, Union
+
+# 容器类型
+names: List[str] = ["Alice", "Bob"]
+person: Dict[str, Union[str, int]] = {"name": "Alice", "age": 30}
+
+# 可选类型
+def get_age(name: str) -> Optional[int]:
+    if name == "Alice":
+        return 30
+    return None
+
+# 类型别名
+UserId = int
+user_id: UserId = 1001
+```
+
+## 泛型 (Generic)
+
+创建可复用的类型安全容器：
+
+```python
+from typing import TypeVar, Generic, List
+
+T = TypeVar('T')
+
+class Stack(Generic[T]):
+    def __init__(self) -> None:
+        self._items: List[T] = []
+    
+    def push(self, item: T) -> None:
+        self._items.append(item)
+    
+    def pop(self) -> T:
+        return self._items.pop()
+
+# 使用
+int_stack: Stack[int] = Stack()
+int_stack.push(42)
+```
+
+## Literal 字面量类型
+
+限制值只能是特定的字面量：
+
+```python
+from typing import Literal
+
+def set_mode(mode: Literal["read", "write", "append"]) -> None:
+    print(f"Mode set to: {mode}")
+
+set_mode("read")    # 正确
+set_mode("delete")  # 类型检查器会报错
+
+# 多种类型的字面量
+def process_flag(flag: Literal[True, False, 0, 1]) -> None:
+    pass
+```
+
+## TypedDict和NamedTuple
+
+当一个类继承了`TypedDict`或`NamedTuple`，那么这个类就是支持类型检查的字典或元组。
+
+检查如果不一致，不影响运行和`ruff`格式检查。但是会被`uv run ty check`类型检查挑出来。
+
+### TypedDict
+
+为字典的每个键指定值的类型，适合描述 JSON 等结构化数据：
+
+```python showLineNumbers
+from typing import TypedDict
+
+class Movie(TypedDict):
+    name: str
+    year: int
+    rating: float
+
+movie: Movie = {"name": "Inception", "year": 2010, "rating": 8.8}
+
+# 支持可选键（total=False 表示所有键均可缺省）
+class Config(TypedDict, total=False):
+    debug: bool
+    log_level: str
+    max_retries: int
+
+config: Config = {"debug": True}  # 其余键可以不提供
+
+# 混合必选与可选键：继承一个 total=True 的基类
+class _UserRequired(TypedDict):
+    id: int
+    name: str
+
+class User(_UserRequired, total=False):
+    email: str
+    age: int
+
+user: User = {"id": 1, "name": "Alice"}            # email、age 可省略
+user_full: User = {"id": 2, "name": "Bob", "age": 25}  # 也可以提供
+```
+
+### NamedTuple
+
+比 `collections.namedtuple` 更强的类型化版本，每个字段都有明确的类型标注：
+
+```python showLineNumbers
+from typing import NamedTuple
+
+class Point(NamedTuple):
+    x: float
+    y: float
+    label: str = "origin"   # 支持默认值
+
+p = Point(3.0, 4.0)
+# 使用属性访问
+print(p.x, p.y, p.label)   # 3.0 4.0 origin
+
+# 解包与索引——与普通元组完全兼容
+x, y, label = p
+print(p[0])                 # 3.0
+
+# 不可变：p.x = 128 会抛出 AttributeError
+```

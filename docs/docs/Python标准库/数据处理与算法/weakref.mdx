@@ -1,0 +1,165 @@
+---
+title: weakref
+---
+
+`weakref` 模块提供对对象的**弱引用**：弱引用不会增加对象的引用计数，当除弱引用外不再有强引用指向该对象时，垃圾回收器可以回收该对象并复用其内存。因此，弱引用常用于**缓存**（避免“仅因在缓存中”而长期保留大对象）、**打破循环引用**（弱引用不参与引用计数，可切断环），以及**对象与附加数据的关联**（对象被回收时条目自动清理）。
+
+该模块的设计源于“引用计数 + 垃圾回收”下对生命周期控制的精细需求：普通字典/集合会强引用键或值，导致对象仅因出现在容器中就无法被回收；弱引用则允许容器“看见”对象而不“持有”对象。设计上，`weakref.ref` 是底层原语，适合需要手动解引用和判空的场景；`weakref.proxy` 则提供透明代理，访问方式像原对象，但对象被回收后访问会抛出 `ReferenceError`；日常开发更常用的是**弱引用容器**：`WeakValueDictionary`（值弱引用，适合键→大对象缓存）、`WeakKeyDictionary`（键弱引用，适合对象→附加数据）、`WeakSet`（元素弱引用）；若只需在对象被回收时执行清理，可用 `weakref.finalize` 注册回调，比在 `ref` 上设 callback 更简单。
+
+[weakref](https://docs.python.org/zh-cn/3/library/weakref.html)
+
+## weakref.ref(obj[, callback])
+
+返回 `obj` 的弱引用。调用返回的引用对象可得到原对象；若对象已被回收则得到 `None`。可选参数 `callback` 在对象即将被回收时被调用（以弱引用为参数）。
+
+```python showLineNumbers
+import weakref
+
+class Node:
+    pass
+
+obj = Node()
+r = weakref.ref(obj)
+print(r() is obj)  # True
+del obj
+print(r())          # None
+```
+
+:::tip
+**引用计数**：CPython 用引用计数管理对象生命周期，强引用会增加计数，对象计数为 0 时被回收。弱引用不计入该计数，因此不会阻止对象被回收。
+:::
+
+### 使用 callback 在回收时执行清理
+
+带回调的用法：对象被回收时执行清理逻辑。
+
+```python showLineNumbers
+import weakref
+
+def on_finalize(wr):
+    print("对象已被回收")
+
+obj = object()
+r = weakref.ref(obj, on_finalize)
+del obj  # 触发 callback，输出: 对象已被回收
+```
+
+## weakref.proxy(obj[, callback])
+
+返回对象的**代理**，可像原对象一样访问属性或调用方法，无需显式调用 `ref()` 解引用。对象被回收后，再访问代理会抛出 `ReferenceError`。若 `obj` 可调用，返回 `CallableProxyType`，否则为 `ProxyType`。代理不可哈希，不能作为字典键。
+
+```python showLineNumbers
+import weakref
+
+class Data:
+    def __init__(self, x):
+        self.x = x
+    def double(self):
+        return self.x * 2
+
+obj = Data(21)
+p = weakref.proxy(obj)
+print(p.x, p.double())  # 21 42
+del obj
+# 之后访问 p 会抛出 ReferenceError（此处不执行以免影响文档构建）
+# print(p.x)
+```
+
+## WeakValueDictionary
+
+值持弱引用的字典：当值的强引用全部消失时，对应条目会被自动移除，适合「键 → 大对象」的缓存，避免缓存单独持有对象导致无法回收。
+
+```python showLineNumbers
+import weakref
+
+# 值弱引用：大对象仅因在缓存中而不会被长期保留
+cache = weakref.WeakValueDictionary()
+cache["a"] = bytearray(10**6)
+print(len(cache))  # 1
+del cache["a"]     # 或没有其它对 bytearray 的引用后，条目自动消失
+```
+
+:::tip
+**缓存**：用 `WeakValueDictionary` 做缓存时，条目会随值的回收而消失，缓存不会无限增长，适合“键稳定、值可被别处释放”的场景。
+:::
+
+## WeakKeyDictionary
+
+键持弱引用的字典：当键被回收时，对应条目被移除，适合「对象 → 附加数据」的映射，且不想在对象上增加属性时使用。
+
+```python showLineNumbers
+import weakref
+
+class Widget:
+    pass
+
+# 对象 -> 附加数据，对象回收后条目自动删除
+extra = weakref.WeakKeyDictionary()
+w = Widget()
+extra[w] = {"theme": "dark"}
+print(extra[w]["theme"])  # dark
+del w
+# 键 w 被回收后，该条目会从 extra 中自动移除
+print(len(extra))  # 0
+```
+
+:::tip
+**对象与附加数据**：当键是“别人拥有的对象”（如第三方库实例）时，用 `WeakKeyDictionary` 可在不修改对象的前提下关联数据，对象销毁时数据一并清理。
+:::
+
+## WeakSet
+
+元素以弱引用保存的集合；当元素没有其它强引用时会被自动从集合中移除。
+
+```python showLineNumbers
+import weakref
+
+class Event:
+    pass
+
+s = weakref.WeakSet()
+e = Event()
+s.add(e)
+print(len(s))  # 1
+del e
+# 下次 GC 后 len(s) 可为 0（依赖解释器回收时机）
+import gc; gc.collect()
+print(len(s))  # 0
+```
+
+## weakref.finalize(obj, func, *args, **kwargs)
+
+在对象被垃圾回收时调用 `func(*args, **kwargs)`，无需保存返回的 finalizer 对象即可完成注册，比在 `ref` 上设置 callback 更省心。finalizer 会存活到被调用（或程序退出），且最多调用一次。
+
+```python showLineNumbers
+import weakref
+
+class Resource:
+    pass
+
+def cleanup(name):
+    print(f"清理资源: {name}")
+
+obj = Resource()
+weakref.finalize(obj, cleanup, "my-resource")
+del obj  # 输出: 清理资源: my-resource
+```
+
+:::tip
+**循环引用**：若 A 引用 B、B 又引用 A，仅靠引用计数无法回收。弱引用不增加计数，将其中一环改为弱引用即可打破环，让 GC 正常回收。
+:::
+
+## 小结与选用
+
+| 需求 | 选用 |
+|------|------|
+| 手动解引用、判空、回收时回调 | `weakref.ref(obj[, callback])` |
+| 像原对象一样访问，不关心回收后报错 | `weakref.proxy(obj[, callback])` |
+| 键→大对象缓存，值可随别处释放而消失 | `WeakValueDictionary` |
+| 对象→附加数据，对象回收时条目消失 | `WeakKeyDictionary` |
+| 元素弱引用的集合 | `WeakSet` |
+| 对象回收时执行清理，且不想维护 ref/proxy | `weakref.finalize(obj, func, *args, **kwargs)` |
+
+:::tip
+**缓存**：用 `WeakValueDictionary` 或 `WeakKeyDictionary` 做缓存时，条目会随键/值回收而消失，避免缓存无限增长。**循环引用**：弱引用不参与引用计数，可用来打断循环引用。**proxy**：`weakref.proxy(obj)` 返回对象的代理，可像原对象一样访问属性/方法，对象被回收后访问代理会抛出 `ReferenceError`；多数场景用 `ref` 或弱引用容器即可。
+:::

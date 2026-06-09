@@ -1,0 +1,54 @@
+---
+title: copy
+---
+
+Python 的赋值不会复制对象，只建立绑定。对可变对象或包含可变项的结构，需要副本时可用本模块做浅拷贝或深拷贝。
+
+[copy](https://docs.python.org/zh-cn/3/library/copy.html)
+
+## 浅拷贝
+
+`copy.copy(obj)` 返回对象的浅拷贝：新建一个复合对象，但内部元素仍是原对象中各项的**引用**。列表可用 `lst[:]`、字典可用 `d.copy()` 做浅拷贝，复杂对象用本函数更通用。
+
+```python showLineNumbers
+import copy
+
+lst = [1, [2, 3]]
+shallow = copy.copy(lst)
+shallow[0] = 99
+shallow[1].append(4)
+print(lst)      # [1, [2, 3, 4]] 内层列表被修改
+print(shallow)  # [99, [2, 3, 4]]
+```
+
+## 深拷贝
+
+`copy.deepcopy(obj[, memo])` 递归复制对象及其内部所有引用，得到完全独立的副本。递归对象（自引用）和重复引用通过 memo 字典避免死循环与过度复制；自定义类可实现 `__deepcopy__(self, memo)` 控制行为。
+
+```python showLineNumbers
+import copy
+
+lst = [1, [2, 3]]
+deep = copy.deepcopy(lst)
+deep[1].append(4)
+print(lst)   # [1, [2, 3]]
+print(deep)  # [1, [2, 3, 4]]
+```
+
+## 替换字段 copy.replace（3.13+）
+
+`copy.replace(obj, /, **changes)` 创建一个与 obj 同类型的新对象，并用 `**changes` 中的字段替换对应属性。适用于由 `namedtuple`、`dataclasses` 或实现了 `__replace__` 的类创建的对象。
+
+```python showLineNumbers
+import copy
+from collections import namedtuple
+
+Point = namedtuple('Point', 'x y')
+p = Point(1, 2)
+p2 = copy.replace(p, y=3)
+print(p2)  # Point(x=1, y=3)
+```
+
+:::info
+自定义类可通过实现 `__copy__()` 和 `__deepcopy__(self, memo)` 控制浅拷贝与深拷贝行为，接口与 pickle 所用方式一致。
+:::

@@ -1,0 +1,97 @@
+---
+title: ensurepip
+---
+
+`ensurepip` 用于在离线环境下为 Python 引导安装 `pip` 包管理器。
+
+[ensurepip](https://docs.python.org/3/library/ensurepip.html)
+
+## 命令行接口
+
+大多数情况下，通过命令行调用是最简单直接的方式。
+
+```bash showLineNumbers
+# 在当前未安装 pip 的情况下安装 pip
+python -m ensurepip
+
+# 确保 pip 版本至少为 ensurepip 所捆绑的版本
+python -m ensurepip --upgrade
+```
+
+你还可以控制 `pip` 的安装位置：
+
+```bash showLineNumbers
+# 将 pip 安装到指定的根目录
+python -m ensurepip --root <dir>
+
+# 将 pip 安装到用户的站点包目录（不能在虚拟环境内使用）
+python -m ensurepip --user
+```
+
+默认情况下，`pipX` 和 `pipX.Y`（X.Y 为 Python 版本，如 `pip3` 和 `pip3.14`）脚本会被安装。你也可以通过选项来控制：
+
+```bash showLineNumbers
+# 只安装 pipX.Y 脚本，不安装 pipX
+python -m ensurepip --altinstall
+
+# 额外安装 pip 脚本（方便直接使用 pip 命令）
+python -m ensurepip --default-pip
+```
+
+:::warning
+`--altinstall` 和 `--default-pip` 不能同时使用，否则会触发异常。
+:::
+
+## 模块 API
+
+对于需要在程序中动态管理 `pip` 安装的场景，`ensurepip` 提供了两个函数。
+
+### ensurepip.version()
+
+返回 `ensurepip` 捆绑的 `pip` 版本字符串。
+
+```python showLineNumbers
+import ensurepip
+
+print(ensurepip.version())  # 例如输出: '24.2'
+```
+
+### ensurepip.bootstrap()
+
+将 `pip` 引导安装到当前或指定的环境中，参数与命令行选项一一对应。
+
+```python showLineNumbers
+import ensurepip
+
+# 在当前环境中引导安装 pip
+ensurepip.bootstrap()
+
+# 升级已有的 pip 并显示详细输出
+ensurepip.bootstrap(upgrade=True, verbosity=1)
+
+# 安装到指定目录，只安装 pipX.Y 脚本
+ensurepip.bootstrap(root="/path/to/env", altinstall=True)
+```
+
+:::tip
+`bootstrap()` 会对 `sys.path` 和 `os.environ` 产生附带影响。如需避免，推荐在子进程中调用命令行接口：`subprocess.run([sys.executable, "-m", "ensurepip"])`。
+:::
+
+## 常见场景
+
+```bash showLineNumbers
+# 场景 1：安装 Python 时跳过了 pip，事后补装
+python -m ensurepip --upgrade
+
+# 场景 2：创建虚拟环境时没有 pip，手动引导
+python -m venv --without-pip myenv
+source myenv/bin/activate
+python -m ensurepip --default-pip
+
+# 场景 3：确认捆绑的 pip 版本
+python -c "import ensurepip; print(ensurepip.version())"
+```
+
+:::info
+`ensurepip` 不会访问网络，它安装的 `pip` 来自 Python 发行版内部捆绑的 wheel 包。如果需要最新版 `pip`，安装后再执行 `pip install --upgrade pip`。
+:::

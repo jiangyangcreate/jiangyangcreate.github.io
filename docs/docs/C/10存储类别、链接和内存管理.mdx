@@ -1,0 +1,484 @@
+---
+sidebar_position: 10
+title: 存储类别、链接和内存管理🔨
+---
+
+## 存储类修饰符
+
+- 变量作用域基本概念
+
+* 变量作用域：变量的可用范围
+* 按照作用域的不同，变量可以分为：局部变量和全局变量
+
+- 局部变量
+
+* 定义在函数内部的变量以及函数的形参, 我们称为局部变量
+* 作用域：从定义的那一行开始, 直到遇到 `}` 结束或者遇到 `return` 返回为止
+* 生命周期: 从程序运行到定义哪一行开始分配存储空间到程序离开该变量所在的作用域
+* 存储位置: 局部变量会存储在内存的栈区中
+* 特点：
+* 相同作用域内不可以定义同名变量
+* 不同作用范围可以定义同名变量，内部作用域的变量会覆盖外部作用域的变量
+
+- 全局变量
+
+* 定义在函数外面的变量称为全局变量
+* 作用域范围：从定义哪行开始直到文件结尾
+* 生命周期:程序一启动就会分配存储空间,直到程序结束
+* 存储位置：静态存储区
+* 特点: 多个同名的全局变量指向同一块存储空间
+
+
+### static 关键字
+
+- **对局部变量的作用**
+
+* 延长局部变量的生命周期,从程序启动到程序退出,但是它并没有改变变量的作用域
+* 定义变量的代码在整个程序运行期间仅仅会执行一次
+
+```c showLineNumbers
+#include <stdio.h>
+void test();
+int main()
+{
+    test();
+    test();
+    test();
+
+    return 0;
+}
+void test(){
+    static int num = 0; // 局部变量
+    num++;
+    // 如果不加static输出 1 1 1
+    // 如果添加static输出 1 2 3
+    printf("num = %i\n", num);
+}
+```
+
+- **对全局变量的作用**
+- 全局变量分类：
+
+* 内部变量:只能在本文件中访问的变量
+* 外部变量:可以在其他文件中访问的变量,默认所有全局变量都是外部变量
+
+- 默认情况下多个同名的全局变量共享一块空间, 这样会导致全局变量污染问题
+- 如果想让某个全局变量只在某个文件中使用, 并且不和其他文件中同名全局变量共享同一块存储空间, 那么就可以使用 static
+
+```c showLineNumbers
+// A文件中的代码
+int num; // 和B文件中的num共享
+void test(){
+    printf("ds.c中的 num = %i\n", num);
+}
+```
+
+```c showLineNumbers
+// B文件中的代码
+#include <stdio.h>
+#include "ds.h"
+
+int num; // 和A文件中的num共享
+int main()
+{
+    num = 666;
+    test(); // test中输出666
+    return 0;
+}
+```
+
+```c showLineNumbers
+// A文件中的代码
+static int num; // 不和B文件中的num共享
+void test(){
+    printf("ds.c中的 num = %i\n", num);
+}
+```
+
+```c showLineNumbers
+// B文件中的代码
+#include <stdio.h>
+#include "ds.h"
+
+int num; // 不和A文件中的num共享
+int main()
+{
+    num = 666;
+    test(); // test中输出0
+    return 0;
+}
+```
+
+### extern 关键字
+
+- 对局部变量的作用
+
+* extern 不能用于局部变量
+* extern 代表声明一个变量, 而不是定义一个变量, 变量只有定义才会开辟存储空间
+* 所以如果是局部变量, 虽然提前声明有某个局部变量, 但是局部变量只有执行到才会分配存储空间
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main()
+{
+    extern int num;
+    num = 998; // 使用时并没有存储空间可用, 所以声明了也没用
+    int num; // 这里才会开辟
+    printf("num = %i\n", num);
+    return 0;
+}
+```
+
+- 对全局变量的作用
+
+* 声明一个全局变量, 代表告诉编译器我在其它地方定义了这个变量, 你可以放心使用
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main()
+{
+    extern int num; // 声明我们有名称叫做num变量
+    num = 998; // 使用时已经有对应的存储空间
+    printf("num = %i\n", num);
+    return 0;
+}
+int num; // 全局变量, 程序启动就会分配存储空间
+```
+
+### static 与 extern 对函数的作用
+
+- 内部函数:只能在本文件中访问的函数
+- 外部函数:可以在本文件中以及其他的文件中访问的函数
+- 默认情况下所有的函数都是外部函数
+
+- **static 作用**
+- 声明一个内部函数
+
+```c showLineNumbers
+static int sum(int num1,int num2);
+```
+
+- 定义一个内部函数
+
+```c showLineNumbers
+static int sum(int num1,int num2)
+{
+  return num1 + num2;
+}
+```
+
+- **extern 作用**
+
+* 声明一个外部函数
+
+```c showLineNumbers
+extern int sum(int num1,int num2);
+```
+
+- 定义一个外部函数
+
+```c showLineNumbers
+extern int sum(int num1,int num2)
+{
+  return num1 + num2;
+}
+```
+
+> - 注意点:
+> - 由于默认情况下所有的函数都是外部函数, 所以 extern 一般会省略
+> - 如果只有函数声明添加了 static 与 extern, 而定义中没有添加 static 与 extern, 那么无效
+
+### auto 
+
+- 设计目的：显式标注“自动存储期”（进入作用域分配、离开作用域释放），用于与 `static` 的“静态存储期”区分。现代 C 中局部变量默认即为 `auto`，通常无需显式书写。
+- 基本示例：
+
+```c showLineNumbers
+#include <stdio.h>
+
+void demo_auto(void) {
+    auto int a = 1;   // 等价于 int a = 1;
+    int b = 2;        // 局部变量默认就是 auto
+    printf("%d %d\n", a, b);
+}
+
+void counter_auto(void) {
+    auto int c = 0;   // 每次调用都会重新分配，输出始终为 1
+    c++;
+    printf("%d\n", c);
+}
+
+void counter_static(void) {
+    static int c = 0; // 静态存储期，跨调用保留值：1, 2, 3...
+    c++;
+    printf("%d\n", c);
+}
+```
+
+### register
+
+- 设计目的：向编译器“建议”把高频使用的局部标量放入 CPU 寄存器以减少内存访问。只是提示而非强制；现代优化器通常会自行决定是否放入寄存器。
+- 限制：不能对 `register` 变量取地址（不允许 `&var`）。
+- 基本示例：
+
+```c showLineNumbers
+#include <stdio.h>
+
+void sum_n(int n) {
+    register int i; // 建议放入寄存器
+    int s = 0;
+    for (i = 0; i < n; i++) {
+        s += i;
+    }
+    printf("%d\n", s);
+    // int *p = &i; // 编译错误：不能取得 register 变量地址
+}
+```
+{/* 
+## 类型限定符
+
+- const: 常量修饰符
+- volatile: 易变修饰符
+- restrict: 限制修饰符（C99） */}
+
+
+## 内存管理
+
+## 进程空间
+
+- 程序，是经源码编译后的可执行文件，可执行文件可以多次被执行，比如我们可以多次打开 office。
+- 而进程，是程序加载到内存后开始执行，至执行结束，这样一段时间概念，多次打开的 wps,每打开一次都是一个进程，当我们每关闭一个 office，则表示该进程结束。
+- 程序是静态概念，而进程动态/时间概念。 ###进程空间图示
+  有了进程和程序的概念以后，我们再来看一下，程序被加载到内存以后内存空间布局是什么样的
+  ![](https://images.weserv.nl/?url=https://img-blog.csdnimg.cn/img_convert/5d2e966e95f1518585804e57779e7fe6.png)
+
+
+## 栈内存(Stack)
+
+- 栈中存放任意类型的变量，但必须是 auto 类型修饰的，即自动类型的局部变量， 随用随开，用完即消。
+- 内存的分配和销毁系统自动完成，不需要人工干预
+- 栈的最大尺寸固定，超出则引起栈溢出
+
+* 局部变量过多，过大 或 递归层数太多等就会导致栈溢出
+
+```c showLineNumbers
+int ages[10240*10240]; // 程序会崩溃, 栈溢出
+```
+
+```c showLineNumbers
+#include <stdio.h>
+
+int main()
+{
+    // 存储在栈中, 内存地址从大到小
+    int a = 10;
+    int b = 20;
+    printf("&a = %p\n", &a); // &a = 0060FEAC
+    printf("&b = %p\n", &b); // &b = 0060FEA8
+
+    return 0;
+}
+```
+
+
+## 堆内存(Heap)
+
+- 堆内存可以存放任意类型的数据，但需要自己申请与释放
+- 堆大小，想像中的无穷大，但实际使用中，受限于实际内存的大小和内存是否连续性
+
+```c showLineNumbers
+int *p = (int *)malloc(10240 * 1024); // 不一定会崩溃
+```
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+
+int main()
+{
+    // 存储在栈中, 内存地址从小到大
+    int *p1 = malloc(4);
+    *p1 = 10;
+    int *p2 = malloc(4);
+    *p2 = 20;
+
+    printf("p1 = %p\n", p1); //  p1 = 00762F48
+    printf("p2 = %p\n", p2); // p2 = 00762F58
+
+    return 0;
+}
+```
+
+## malloc 函数
+
+| 函数声明           | void \* malloc(size_t \_Size);                         |
+| ------------------ | ------------------------------------------------------ |
+| 所在文件           | stdlib.h                                               |
+| 函数功能           | 申请堆内存空间并返回,所申请的空间并未初始化。          |
+| 常见的初始化方法是 | memset 字节初始化。                                    |
+| 参数及返回解析     |                                                        |
+| 参数               | size_t \_size 表示要申请的字符数                       |
+| 返回值             | void \* 成功返回非空指针指向申请的空间 ，失败返回 NULL |
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main()
+{
+    /*
+     * malloc
+     * 第一个参数: 需要申请多少个字节空间
+     * 返回值类型: void *
+     */
+    int *p = (int *)malloc(sizeof(int));
+    printf("p = %i\n", *p); // 保存垃圾数据
+    /*
+     * 第一个参数: 需要初始化的内存地址
+     * 第二个初始: 需要初始化的值
+     * 第三个参数: 需要初始化对少个字节
+     */
+    memset(p, 0, sizeof(int)); // 对申请的内存空间进行初始化
+    printf("p = %i\n", *p); // 初始化为0
+    return 0;
+}
+```
+
+## free 函数
+
+- 注意: 通过 malloc 申请的存储空间一定要释放, 所以 malloc 和 free 函数总是成对出现
+
+| 函数声明       | void free(void \*p);        |
+| -------------- | --------------------------- |
+| 所在文件       | stdlib.h                    |
+| 函数功能       | 释放申请的堆内存            |
+| 参数及返回解析 |                             |
+| 参数           | void\* p 指向手动申请的空间 |
+| 返回值         | void 无返回                 |
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main()
+{
+    // 1.申请4个字节存储空间
+    int *p = (int *)malloc(sizeof(int));
+    // 2.初始化4个字节存储空间为0
+    memset(p, 0, sizeof(int));
+    // 3.释放申请的存储空间
+    free(p);
+    return 0;
+}
+```
+
+## calloc 函数
+
+| 函数声明       | void \*calloc(size_t nmemb, size_t size);              |
+| -------------- | ------------------------------------------------------ |
+| 所在文件       | stdlib.h                                               |
+| 函数功能       | 申请堆内存空间并返回，所申请的空间，自动清零           |
+| 参数及返回解析 |                                                        |
+| 参数           | size_t nmemb 所需内存单元数量                          |
+| 参数           | size_t size 内存单元字节数量                           |
+| 返回值         | void \* 成功返回非空指针指向申请的空间 ，失败返回 NULL |
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main()
+{
+    /*
+    // 1.申请3块4个字节存储空间
+    int *p = (int *)malloc(sizeof(int) * 3);
+    // 2.使用申请好的3块存储空间
+    p[0] = 1;
+    p[1] = 3;
+    p[2] = 5;
+    printf("p[0] = %i\n", p[0]);
+    printf("p[1] = %i\n", p[1]);
+    printf("p[2] = %i\n", p[2]);
+    // 3.释放空间
+    free(p);
+    */
+
+    // 1.申请3块4个字节存储空间
+    int *p = calloc(3, sizeof(int));
+    // 2.使用申请好的3块存储空间
+    p[0] = 1;
+    p[1] = 3;
+    p[2] = 5;
+    printf("p[0] = %i\n", p[0]);
+    printf("p[1] = %i\n", p[1]);
+    printf("p[2] = %i\n", p[2]);
+    // 3.释放空间
+    free(p);
+
+    return 0;
+}
+```
+
+## realloc 函数
+
+| 函数声明       | void *realloc(void *ptr, size_t size);                                                |
+| -------------- | ------------------------------------------------------------------------------------- |
+| 所在文件       | stdlib.h                                                                              |
+| 函数功能       | 扩容(缩小)原有内存的大小。通常用于扩容，缩小会会导致内存缩去的部分数据丢失。          |
+| 参数及返回解析 |                                                                                       |
+| 参数           | void \* ptr 表示待扩容(缩小)的指针， ptr 为之前用 malloc 或者 calloc 分配的内存地址。 |
+| 参数           | size_t size 表示扩容(缩小)后内存的大小。                                              |
+| 返回值         | void\* 成功返回非空指针指向申请的空间 ，失败返回 NULL。                               |
+
+- 注意点:
+  - 若参数 ptr==NULL，则该函数等同于 malloc
+  - 返回的指针，可能与 ptr 的值相同，也有可能不同。若相同，则说明在原空间后面申请，否则，则可能后续空间不足，重新申请的新的连续空间，原数据拷贝到新空间， 原有空间自动释放
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main()
+{
+    // 1.申请4个字节存储空间
+    int *p = NULL;
+    p = realloc(p, sizeof(int)); // 此时等同于malloc
+    // 2.使用申请好的空间
+    *p = 666;
+    printf("*p = %i\n",  *p);
+    // 3.释放空间
+    free(p);
+
+    return 0;
+}
+```
+
+```c showLineNumbers
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int main()
+{
+    // 1.申请4个字节存储空间
+    int *p = malloc(sizeof(int));
+    printf("p = %p\n", p);
+    // 如果能在传入存储空间地址后面扩容, 返回传入存储空间地址
+    // 如果不能在传入存储空间地址后面扩容, 返回一个新的存储空间地址
+    p = realloc(p, sizeof(int) * 2);
+    printf("p = %p\n", p);
+    // 2.使用申请好的空间
+    *p = 666;
+    printf("*p = %i\n",  *p);
+    // 3.释放空间
+    free(p);
+
+    return 0;
+}
+```

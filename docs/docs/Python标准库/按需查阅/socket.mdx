@@ -1,0 +1,285 @@
+---
+title: socket
+---
+
+`socket` 模块提供了底层网络编程接口（BSD 套接字），是 Python 中进行 TCP/UDP 网络通信的基础。
+
+[socket](https://docs.python.org/3/library/socket.html)
+
+## 套接字协议族与类型
+
+常用的协议族和套接字类型：
+
+| 协议族 | 常量 | 地址格式 | 说明 |
+|--------|------|---------|------|
+| IPv4 | `AF_INET` | `(host, port)` | 最常用，如 `('192.168.1.1', 8080)` |
+| IPv6 | `AF_INET6` | `(host, port, flowinfo, scope_id)` | IPv6 网络通信 |
+| Unix 域 | `AF_UNIX` | 文件路径字符串 | 同一机器上的进程间通信 |
+
+| 套接字类型 | 常量 | 说明 |
+|-----------|------|------|
+| TCP 流 | `SOCK_STREAM` | 面向连接、可靠传输 |
+| UDP 数据报 | `SOCK_DGRAM` | 无连接、不可靠传输 |
+| 原始套接字 | `SOCK_RAW` | 底层协议访问，需管理员权限 |
+
+## 工作流程
+
+| 类型 | 工作流程 |
+|------|---------|
+| TCP 服务器 | `socket()` → `bind()` → `listen()` → `accept()` → `send/recv` → `close()` |
+| TCP 客户端 | `socket()` → `connect()` → `send/recv` → `close()` |
+| UDP 服务器 | `socket()` → `bind()` → `sendto/recvfrom` → `close()` |
+| UDP 客户端 | `socket()` → `sendto/recvfrom` → `close()` |
+
+:::tip
+TCP 和 UDP 都是全双工通信。TCP 建立连接后用 `send()`/`recv()` 收发；UDP 无连接，每次用 `sendto()`/`recvfrom()` 并指定地址。
+:::
+
+## 创建套接字
+
+```python showLineNumbers
+import socket
+
+# 创建 TCP 套接字（IPv4）—— 最常用
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 创建 UDP 套接字（IPv4）
+udp_sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+
+# 默认参数就是 AF_INET + SOCK_STREAM
+sock = socket.socket()
+```
+
+## 套接字选项与超时
+
+```python showLineNumbers
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 允许地址重用（避免 "Address already in use" 错误）
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+# 设置 5 秒超时
+sock.settimeout(5.0)
+
+# 设置为非阻塞模式
+sock.setblocking(False)
+
+# 查看接收缓冲区大小
+rcvbuf = sock.getsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF)
+print(f'接收缓冲区大小: {rcvbuf}')
+```
+
+:::info
+`settimeout()` 影响 `connect()`、`recv()`、`send()`、`accept()` 等操作。设为 `None`（默认）则无限期阻塞。
+:::
+
+## 地址解析
+
+```python showLineNumbers
+import socket
+
+# 获取本机主机名
+hostname = socket.gethostname()
+print(hostname)
+
+# 主机名 → IPv4 地址
+ip = socket.gethostbyname('www.baidu.com')
+print(f'IP 地址: {ip}')
+
+# 详细解析：返回 (主机名, 别名列表, IP 地址列表)
+hostname, aliases, addresses = socket.gethostbyname_ex('www.baidu.com')
+print(f'主机名: {hostname}')
+print(f'别名: {aliases}')
+print(f'IP 地址: {addresses}')
+
+# 获取常见服务的端口号
+print(socket.getservbyname('http', 'tcp'))   # 80
+print(socket.getservbyname('ftp', 'tcp'))    # 21
+```
+
+## 服务器端操作
+
+`bind()` 绑定地址，`listen()` 进入监听，`accept()` 接受连接（阻塞直到有客户端连入）。
+
+```python showLineNumbers
+import socket
+
+sock = socket.socket()
+sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+sock.bind(('localhost', 8080))
+sock.listen(5)  # 参数为等待队列的最大长度
+
+client_sock, client_addr = sock.accept()
+print(f'收到来自 {client_addr} 的连接')
+
+message = client_sock.recv(1024).decode('utf-8')
+print(f'消息: {message}')
+
+client_sock.close()
+sock.close()
+```
+
+:::tip
+绑定到 `''`（空字符串）表示监听所有网络接口（INADDR_ANY），绑定到 `'localhost'` 只接受本机连接。
+:::
+
+## 客户端操作
+
+```python showLineNumbers
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+try:
+    sock.connect(('localhost', 8080))
+    print('连接成功')
+except OSError as e:
+    print(f'连接失败: {e}')
+
+# connect_ex() 返回错误码而非抛异常，0 表示成功
+err = sock.connect_ex(('localhost', 8080))
+if err == 0:
+    print('连接成功')
+```
+
+## 数据传输
+
+```python showLineNumbers
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(('localhost', 8080))
+
+# send() 返回实际发送字节数（可能少于数据长度）
+sent = sock.send(b'Hello, Server')
+
+# sendall() 确保所有数据发送完毕
+sock.sendall(b'Hello, Server' * 100)
+
+# recv() 接收最多 1024 字节
+data = sock.recv(1024)
+print(f'收到 {len(data)} 字节: {data}')
+
+sock.close()
+```
+
+:::info
+`recv(bufsize)` 中 `bufsize` 是单次最多接收的字节数，实际收到的可能更少。常用值为 `1024`、`4096`、`8192` 等。如果需要接收完整数据，需循环调用直到收够为止。
+:::
+
+## 关闭套接字
+
+```python showLineNumbers
+import socket
+
+sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+sock.connect(('www.example.com', 80))
+
+# shutdown() 可以只关闭一个方向
+# SHUT_RD: 关闭接收  SHUT_WR: 关闭发送  SHUT_RDWR: 双向关闭
+sock.shutdown(socket.SHUT_RDWR)
+sock.close()
+
+# 获取地址信息
+# sock.getsockname()  → 本地地址
+# sock.getpeername()  → 远程地址
+```
+
+## 示例：TCP 回显服务器与客户端
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+<Tabs>
+  <TabItem value="server" label="服务端" default>
+
+```python showLineNumbers
+import socket
+import threading
+
+def handle_client(client_sock, client_addr):
+    """回显客户端发送的数据"""
+    print(f'客户端 {client_addr} 已连接')
+    try:
+        while True:
+            data = client_sock.recv(1024)
+            if not data:
+                break
+            print(f'收到 {client_addr}: {data.decode("utf-8")}')
+            client_sock.sendall(data)  # 回显
+    except (ConnectionResetError, BrokenPipeError):
+        pass
+    finally:
+        client_sock.close()
+        print(f'客户端 {client_addr} 已断开')
+
+def main():
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    server.bind(('localhost', 8888))
+    server.listen(5)
+    print('服务器启动，监听 localhost:8888')
+
+    try:
+        while True:
+            client_sock, client_addr = server.accept()
+            t = threading.Thread(target=handle_client, args=(client_sock, client_addr), daemon=True)
+            t.start()
+    except KeyboardInterrupt:
+        print('\n服务器关闭')
+    finally:
+        server.close()
+
+if __name__ == '__main__':
+    main()
+```
+
+  </TabItem>
+  <TabItem value="client" label="客户端">
+
+```python showLineNumbers
+import socket
+
+def main():
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        sock.connect(('localhost', 8888))
+        print('已连接到服务器，输入消息后回车发送（空行退出）')
+
+        while True:
+            message = input('> ')
+            if not message:
+                break
+            sock.sendall(message.encode('utf-8'))
+            data = sock.recv(1024)
+            print(f'服务器回显: {data.decode("utf-8")}')
+    except ConnectionRefusedError:
+        print('无法连接，请确保服务器已启动')
+    finally:
+        sock.close()
+
+if __name__ == '__main__':
+    main()
+```
+
+  </TabItem>
+</Tabs>
+
+## IP 地址基础
+
+IPv4 地址由 4 个字节组成，写作点分十进制形式（如 `192.168.1.1`）。IPv6 地址由 8 组 16 位十六进制数组成（如 `2001:0db8:85a3::8a2e:0370:7334`）。
+
+**常见私有地址范围（局域网使用）：**
+
+| 名称 | 地址范围 | CIDR 表示 |
+|------|---------|----------|
+| A 类 | `10.0.0.0` – `10.255.255.255` | `10.0.0.0/8` |
+| B 类 | `172.16.0.0` – `172.31.255.255` | `172.16.0.0/12` |
+| C 类 | `192.168.0.0` – `192.168.255.255` | `192.168.0.0/16` |
+
+回环地址 `127.0.0.1` 用于本机网络测试。
+
+:::info
+IPv4 地址已不够用。解决方案有二：使用 IPv6（每个设备独立地址）；或使用 NAT（路由器共享一个公网 IP，内部设备使用私有地址）。
+:::

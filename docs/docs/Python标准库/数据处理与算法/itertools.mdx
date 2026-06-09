@@ -1,0 +1,96 @@
+---
+title: itertools
+---
+
+`itertools` 为高效循环提供一系列构造迭代器的函数，形成「迭代器代数」，可与 `map`、`filter`、`reduce` 等配合使用。
+
+[itertools](https://docs.python.org/zh-cn/3/library/itertools.html)
+
+## 无限迭代器（count, cycle, repeat）
+
+`count(start, step)` 从 start 开始按 step 递增；`cycle(iterable)` 无限重复可迭代对象；`repeat(elem, times)` 重复 elem，不指定 times 则无限重复。
+
+```python showLineNumbers
+from itertools import count, cycle, repeat, islice
+
+# count: 10, 11, 12, ...
+list(islice(count(10), 5))  # [10, 11, 12, 13, 14]
+
+# cycle: A B C D A B C ...
+list(islice(cycle('ABCD'), 10))  # ['A','B','C','D','A','B','C','D','A','B']
+
+# repeat: 10 重复 3 次
+list(repeat(10, 3))  # [10, 10, 10]
+```
+
+## 组合多可迭代对象（chain, chain.from_iterable, zip_longest）
+
+`chain(*iterables)` 依次迭代多个可迭代对象；`chain.from_iterable(iterable)` 从「可迭代对象的可迭代对象」中扁平化一层；`zip_longest` 按最长者对齐，短者用 `fillvalue` 填充。
+
+```python showLineNumbers
+from itertools import chain, zip_longest
+
+list(chain('ABC', 'DEF'))                    # ['A','B','C','D','E','F']
+list(chain.from_iterable(['ABC', 'DEF']))    # ['A','B','C','D','E','F']
+list(zip_longest('ABCD', 'xy', fillvalue='-'))  # [('A','x'),('B','y'),('C','-'),('D','-')]
+```
+
+## 截取/过滤（islice, takewhile, dropwhile, filterfalse）
+
+`islice(iterable, start, stop[, step])` 对迭代器做切片；`takewhile(predicate, iterable)` 取到第一个不满足条件的元素为止；`dropwhile` 跳过满足条件的开头；`filterfalse` 只保留谓词为假的元素。
+
+```python showLineNumbers
+from itertools import islice, takewhile, dropwhile, filterfalse
+
+list(islice('ABCDEFG', 2, None))           # ['C','D','E','F','G']
+list(takewhile(lambda x: x < 5, [1,4,6,3,8]))   # [1, 4]
+list(dropwhile(lambda x: x < 5, [1,4,6,3,8]))   # [6, 3, 8]
+list(filterfalse(lambda x: x < 5, [1,4,6,3,8])) # [6, 8]
+```
+
+## 分组与批处理（groupby, batched）
+
+`groupby(iterable, key=None)` 按 key 将连续相同键的元素分组，**使用前通常需先对 iterable 按同一 key 排序**；`batched(iterable, n)` 将可迭代对象按长度 n 分批，最后一批可能不足 n（3.12+）。
+
+```python showLineNumbers
+from itertools import groupby, batched
+
+# groupby：需先排序
+data = sorted([(1,'a'), (2,'b'), (1,'c')], key=lambda x: x[0])
+for k, g in groupby(data, key=lambda x: x[0]):
+    print(k, list(g))  # 1 [(1,'a'),(1,'c')]  2 [(2,'b')]
+
+list(batched('ABCDEFG', 3))  # [('A','B','C'), ('D','E','F'), ('G',)]
+```
+
+## 排列与组合（product, permutations, combinations...）
+
+`product(*iterables, repeat=1)` 笛卡尔积；`permutations(iterable, r=None)` 长度为 r 的排列；`combinations(iterable, r)` 长度为 r 的组合（无重复）；`combinations_with_replacement` 允许元素重复的组合。
+
+```python showLineNumbers
+from itertools import product, permutations, combinations, combinations_with_replacement
+
+list(product('AB', '12'))           # [('A','1'),('A','2'),('B','1'),('B','2')]
+list(permutations('ABC', 2))       # AB AC BA BC CA CB
+list(combinations('ABC', 2))        # ('A','B') ('A','C') ('B','C')
+list(combinations_with_replacement('AB', 2))  # ('A','A') ('A','B') ('B','B')
+```
+
+## 其他常用（accumulate, starmap, tee, compress, pairwise）
+
+`accumulate(iterable, func=add, *, initial=None)` 累积值（如累加、累乘）；`starmap(func, iterable)` 对「元组序列」做 `func(*args)`；`tee(iterable, n=2)` 将一个迭代器拆成 n 个；`compress(data, selectors)` 按 selectors 真假筛选；`pairwise(iterable)` 返回连续重叠对（3.10+）。
+
+```python showLineNumbers
+from itertools import accumulate, starmap, tee, compress, pairwise
+import operator
+
+list(accumulate([1,2,3,4,5]))                    # [1, 3, 6, 10, 15]
+list(starmap(pow, [(2,5), (3,2), (10,3)]))     # [32, 9, 1000]
+a, b = tee('ABC', 2); list(a), list(b)          # (['A','B','C'], ['A','B','C'])
+list(compress('ABCDEF', [1,0,1,0,1,1]))        # ['A','C','E','F']
+list(pairwise('ABCDEFG'))                       # [('A','B'),('B','C'),...,('F','G')]
+```
+
+:::tip
+可与 `functools.reduce`、内置 `map`/`filter` 组合使用；更多迭代器配方见 [itertools 配方](https://docs.python.org/zh-cn/3/library/itertools.html#itertools-recipes) 或第三方 [more-itertools](https://pypi.org/project/more-itertools/)。
+:::
