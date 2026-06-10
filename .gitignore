@@ -33,3 +33,9 @@ nohup.out
 # Claude Code
 .claude
 CLAUDE.md
+
+# wrangler files
+.wrangler
+.dev.vars*
+!.dev.vars.example
+!.env.example
