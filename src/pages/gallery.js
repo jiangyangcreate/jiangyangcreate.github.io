@@ -26,8 +26,8 @@ import "yet-another-react-lightbox/plugins/thumbnails.css";
 import "yet-another-react-lightbox/plugins/captions.css";
 import { createTheme, ThemeProvider, styled } from "@mui/material/styles";
 import { useColorMode } from "@docusaurus/theme-common";
-//定义图片路径（图片由外部服务托管，不再随仓库分发）
-const GALLERY_BASE = "https://ai.jiangmiemie.com/static/gallery";
+//定义图片路径（图片随仓库分发于 static/pages/gallery/）
+const GALLERY_BASE = "/pages/gallery";
 const unsplashLink = (id, width, height) =>
   `${GALLERY_BASE}/${id}-${width}-${height}.webp`;
 //定义相册图片

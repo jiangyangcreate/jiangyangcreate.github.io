@@ -4,8 +4,8 @@ import Layout from "@theme/Layout";
 import { useHistory } from "@docusaurus/router";
 import React, { useState } from "react";
 
-// 满幅背景照片。换图只需改这一行（相簿里任意横幅照片均可）。图片由外部服务托管。
-const HERO_PHOTO = "https://ai.jiangmiemie.com/static/gallery/2022085-1920-1080.webp";
+// 满幅背景照片。换图只需改这一行（相簿里任意横幅照片均可）。图片随仓库分发于 static/pages/gallery/。
+const HERO_PHOTO = "/pages/gallery/2022085-1920-1080.webp";
 
 function SearchBar() {
   const [value, setValue] = useState("");

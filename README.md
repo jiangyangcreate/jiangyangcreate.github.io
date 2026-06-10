@@ -12,7 +12,7 @@
 
 ## 核心特性
 
-- 配置生成式 AI 文章总结、对谈音频生成，完全的Github部署。[访问 博客文本摘要](https://jiangmiemie.com/blog/2024/1/31/)
+- 生成式 AI 文章总结、对谈音频：本地运行 `make summary` 生成，以静态文件入库（`static/blog/summary/`），纯静态托管、无需后端。[访问 博客文本摘要](https://jiangmiemie.com/blog/2024/1/31/)
 
 - 集成 Algolia 的ASK AI功能，本地技术文档与博客变动态RAG，如需配置可在`docusaurus.config.js`中搜索`Algolia`。
 
@@ -48,6 +48,7 @@
 ```
 ├──.github
 │   └── workflows           # GitHub Actions自动部署
+├── Makefile                # 构建 / AI 摘要生成等常用命令入口
 ├── docusaurus.config.js    # 站点配置
 ├── package.json            # 依赖包
 ├── LICENSE                 # 许可证
@@ -61,16 +62,20 @@
 ├── docs
 │   ├── read                # 书架文档
 │   └── docs                # 开发文档
+├── scripts
+│   └── summary             # AI 摘要/播客生成脚本（Python 3.12 + uv）
 ├── src
 │   ├── components          # 自定义组件：相册、markdown等
 │   ├── theme               # 自定义主题
 │   └── pages               # 自定义页面：首页、案例页、相册页等
 └── static
+    ├── blog
+    │   └── summary         # 博文 AI 摘要(.json)与播客音频(.mp3)
     ├── img                 # 公用图片
     ├── katex               # LaTeX 公式插件所需资源
     └── pages
         ├── case            # 与案例页相关的静态资源
-        └── gallery         # 与相册页相关的静态资源
+        └── gallery         # 与相册页相关的静态资源（随仓库分发）
 ```
 
 ## 快速启动
@@ -81,6 +86,17 @@
 - `npm run start`：启动站点
 - `npm run build`: 打包为静态站点
 - `npm run serve`: 启动静态站点
+
+## AI 摘要与播客生成
+
+博文摘要与对谈音频在本地生成后以静态文件入库，站点本身不依赖任何后端服务。
+
+前置条件：安装 [uv](https://docs.astral.sh/uv/)，并复制 `scripts/summary/.env.example` 为 `scripts/summary/.env` 填入模型密钥。
+
+- `make summary`：构建站点后，为新增/内容变更的博文生成摘要(.json)与播客(.mp3)，输出到 `static/blog/summary/`，提交入库即可
+- `make hash`：仅刷新 `content_hash`，不调用模型（用于样式、重构等不改变文意的修改，替代旧的 `skip` 提交约定）
+
+工作流：写完博文 → `make summary` → `git add static/blog/summary && git commit && git push`。
 
 ## Docker参考
 

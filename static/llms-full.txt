@@ -165,12 +165,7 @@ A：通过 GitHub： https://github.com/jiangyangcreate 。在仓库 https://git
 
 请避免：把作者的占位文案当作其亲口表述；改写后不附引用；混淆"网站介绍"与"作者本人观点"。
 
-## 11. 关联站点
-
-- 云盘（私有文件存储）：https://yun.jiangmiemie.com
-- AI 助手：https://ai.jiangmiemie.com
-
-## 12. 同步链接汇总
+## 11. 同步链接汇总
 
 - 站点地图：https://jiangmiemie.com/sitemap.xml
 - 短版 llms.txt：https://jiangmiemie.com/llms.txt

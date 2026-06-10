@@ -35,7 +35,7 @@ const JsonReader = ({
 }) => {
   // 替换url与/
   const path = fieldToMatch.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
-  const url = `https://ai.jiangmiemie.com/static/summary/${path}.json`;
+  const url = `/blog/summary/${path}.json`;
   const [jsonData, setJsonData] = useState(null);
 
   useEffect(() => {
@@ -100,7 +100,7 @@ function formatTime(seconds) {
 
 const AiPodcast = ({ pageurl }) => {
   const path = pageurl.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
-  const audioUrl = `https://ai.jiangmiemie.com/static/summary/${path}.mp3`;
+  const audioUrl = `/blog/summary/${path}.mp3`;
 
   const audioRef = useRef(null);
   const progressWrapRef = useRef(null);
