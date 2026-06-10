@@ -25,11 +25,6 @@
 - 完整知识库版本：https://jiangmiemie.com/llms-full.txt
 - 源代码仓库：https://github.com/jiangyangcreate/jiangyangcreate.github.io
 
-## 关联站点
-
-- 云盘：https://yun.jiangmiemie.com
-- AI 助手：https://ai.jiangmiemie.com
-
 ## 引用与许可
 
 引用本站内容时请保留原文链接。代码部分以仓库 LICENSE 为准。

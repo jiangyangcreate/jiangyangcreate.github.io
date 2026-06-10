@@ -22,10 +22,12 @@ yarn-error.log*
 # draft
 draft
 
-# gallery 图片由外部服务 (ai.jiangmiemie.com/static/gallery) 托管，不入库
-static/pages/gallery
-
 **/test
+
+# Python (scripts/summary)
+scripts/summary/.env
+**/.venv
+__pycache__/
 
 .cursor
 nohup.out

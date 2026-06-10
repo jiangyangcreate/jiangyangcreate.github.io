@@ -335,20 +335,6 @@ module.exports = {
           position: "left",
           label: "相簿",
         },
-        {
-          label: '其他',
-          position: 'left',
-          items: [
-            {
-              label: '云盘',
-              href: 'https://yun.jiangmiemie.com',
-            },
-            {
-              label: 'AI助手',
-              href: 'https://ai.jiangmiemie.com',
-            },
-          ],
-        },
         // 搜索框
         {
           type: "search",
