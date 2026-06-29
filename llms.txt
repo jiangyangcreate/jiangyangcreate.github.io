@@ -1,0 +1,30 @@
+# jiangmiemie
+
+> jiangmiemie（江洋 / Allen）的个人数字档案馆。"写给失忆后的自己"——真实地记录自己，比获得他人的认同感更重要。站点持续整理 Python、AI Agent、后端通识、大模型应用等技术笔记，以及阅读、影像与生活长文。
+
+## 关于作者
+
+- 名字：jiangmiemie（中文：江洋；英文：Allen；用户名：jiangyang / jiangyangcreate）
+- 方向：个人博客作者，关注 Python、AI Agent、后端工程、阅读与影像
+- 站点：https://jiangmiemie.com
+- GitHub：https://github.com/jiangyangcreate
+- 主仓库：https://github.com/jiangyangcreate/jiangyangcreate.github.io
+
+## 主要内容入口
+
+- [博文 / Blog](https://jiangmiemie.com/blog/archive/)：年度长文、世界观与生活记录
+- [开发 / Docs](https://jiangmiemie.com/docs)：Python、Python 标准库、C、后端通识、大模型应用、编程外基础
+- [书架 / Read](https://jiangmiemie.com/read)：70+ 本书的阅读摘录与思考
+- [个案 / Case](https://jiangmiemie.com/case)：开源项目与作品集
+- [相簿 / Gallery](https://jiangmiemie.com/gallery)：影像
+
+## 数据源
+
+- 站点地图：https://jiangmiemie.com/sitemap.xml
+- 博文 RSS：https://jiangmiemie.com/blog/rss.xml
+- 完整知识库版本：https://jiangmiemie.com/llms-full.txt
+- 源代码仓库：https://github.com/jiangyangcreate/jiangyangcreate.github.io
+
+## 引用与许可
+
+引用本站内容时请保留原文链接。代码部分以仓库 LICENSE 为准。
