@@ -74,7 +74,7 @@ class BlogManager:
 
     对每个内容哈希发生变化的 RSS 条目：
       1. 通过 LLM 生成文字摘要
-      2. 通过 Volcengine TTS 生成播客
+      2. 通过 OpenAI TTS 生成「男 + 女」双人对谈播客
       3. 持久化到磁盘
     """
 
@@ -92,6 +92,10 @@ class BlogManager:
         path = SUMMARY_DIR / url_to_filename(url)
         with path.open("w", encoding="utf-8") as f:
             json.dump(data, f, indent=4, ensure_ascii=False)
+
+    @staticmethod
+    def _audio_path(url: str) -> Path:
+        return SUMMARY_DIR / Path(url_to_filename(url)).with_suffix(".mp3")
 
     def _clean_stale(self, active_filenames: set[str]) -> None:
         files = list(SUMMARY_DIR.glob("*.json")) + list(SUMMARY_DIR.glob("*.mp3"))
@@ -143,15 +147,42 @@ class BlogManager:
             # 将还在 RSS 中的文章文件名 .json 和 .mp3 加入活跃文件列表
             # 未加入的会被删除
             active_filenames.add(url_to_filename(url))
-            active_filenames.add(Path(url_to_filename(url)).with_suffix(".mp3").name)
+            audio_path = self._audio_path(url)
+            active_filenames.add(audio_path.name)
             # 提取文章正文
             body_text = extract_body(page)
             # 计算文章正文哈希值
             hash_value = compute_hash(body_text)
             # 获取本地缓存
             cached = cache.get(url)
-            # 如果hash值相等，则跳过生成环节
+            # 正文未变时，文字摘要无需重建；但若已配置 TTS 而 MP3 缺失，
+            # 仍要补生成播客，避免一次临时失败导致音频永远不再重试。
             if cached and cached.get("content_hash") == hash_value:
+                if (
+                    not hash_only
+                    and config.TTS_API_KEY
+                    and not audio_path.is_file()
+                ):
+                    logger.info("Podcast missing for %s, generating it", url)
+                    try:
+                        podcast_path = await generate_podcast(
+                            url, body_text, output_dir=SUMMARY_DIR
+                        )
+                    except Exception as e:
+                        logger.exception("Failed to generate podcast for %s", url)
+                        results.append(BlogResult(url=url, status="error", message=str(e)))
+                    else:
+                        if podcast_path:
+                            results.append(BlogResult(url=url, status="podcast-updated"))
+                        else:
+                            results.append(
+                                BlogResult(
+                                    url=url,
+                                    status="unchanged",
+                                    message="podcast skipped",
+                                )
+                            )
+                    continue
                 results.append(BlogResult(url=url, status="unchanged"))
                 continue
             if hash_only:

@@ -2,7 +2,7 @@
 
 懒校验——只在真正用到对应服务时才要求必填：
 - 生成摘要需要 TEXT_API_KEY / TEXT_BASE_URL / TEXT_MODEL
-- 生成播客需要 PODCAST_*（缺失时跳过播客，仅生成文字摘要）
+- 生成播客需要 TEXT_*（对谈台词，可用 TEXT_DIALOGUE_MODEL 单独指定便宜模型）+ TTS_API_KEY（语音合成）；缺失时跳过播客，仅生成文字摘要
 - --hash-only 模式不需要任何密钥
 """
 
@@ -25,17 +25,23 @@ BLOG_RSS = os.getenv("BLOG_RSS", str(ROOT / "build" / "blog" / "rss.xml"))
 # 摘要 JSON / 播客 MP3 的输出目录
 SUMMARY_DIR = Path(os.getenv("SUMMARY_DIR", str(ROOT / "static" / "blog" / "summary")))
 
-# 文本模型（生成摘要时必填；OpenAI 兼容接口）
+# 文本模型（生成摘要、播客对谈台词时必填；OpenAI 兼容接口）
 TEXT_API_KEY = os.getenv("TEXT_API_KEY", "")
 TEXT_BASE_URL = os.getenv("TEXT_BASE_URL", "")
 TEXT_MODEL = os.getenv("TEXT_MODEL", "")
+# 对谈台词模型（可选）：默认沿用 TEXT_MODEL；可单独配置更便宜的模型跑台词
+TEXT_DIALOGUE_MODEL = os.getenv("TEXT_DIALOGUE_MODEL", "") or TEXT_MODEL
 
-# 播客 TTS（字节火山 SAMI）
-PODCAST_BASE_URL = os.getenv("PODCAST_BASE_URL", "")
-PODCAST_APPID = os.getenv("PODCAST_APPID", "")
-PODCAST_ACCESS_TOKEN = os.getenv("PODCAST_ACCESS_TOKEN", "")
-PODCAST_APP_KEY = os.getenv("PODCAST_APP_KEY", "")
-PODCAST_RESOURCE_ID = os.getenv("PODCAST_RESOURCE_ID", "")
+# 播客 TTS（OpenAI audio/speech 接口；缺失 TTS_API_KEY 时跳过播客，仅生成文字摘要）
+TTS_API_KEY = os.getenv("TTS_API_KEY", "")
+TTS_BASE_URL = os.getenv("TTS_BASE_URL", "https://api.openai.com/v1")
+TTS_MODEL = os.getenv("TTS_MODEL", "tts-1")
+TTS_VOICE_MALE = os.getenv("TTS_VOICE_MALE", "onyx")
+TTS_VOICE_FEMALE = os.getenv("TTS_VOICE_FEMALE", "nova")
+# 片头音乐：一段 mp3，直接二进制拼接到语音最前；默认 scripts/summary/intro.mp3，缺失时跳过
+TTS_INTRO_MUSIC = os.getenv(
+    "TTS_INTRO_MUSIC", str(Path(__file__).resolve().parent / "intro.mp3")
+)
 
 
 def require(*names: str) -> None:
