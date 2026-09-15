@@ -22,8 +22,6 @@ def main() -> None:
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
-    # TTS 二进制协议日志过于啰嗦，默认压低
-    logging.getLogger("podcast_protocols").setLevel(logging.WARNING)
 
     results = asyncio.run(BlogManager().run(hash_only=args.hash_only))
 
