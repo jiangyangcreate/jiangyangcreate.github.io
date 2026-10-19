@@ -6,7 +6,7 @@ title: ast
 
 在编译流程中，AST 处于承上启下的位置。CPython 的典型管线是：**源码 → 词法/语法分析 → 解析树（parse tree）→ AST → 符号表/控制流图 → 字节码（code object）→ 执行**；自 2.5 起采用「解析树 → AST → 控制流图 → 字节码」这一套（参见 PEP 339 等）。`ast` 模块把「生成与操作 AST」暴露给用户：用 `ast.parse()` 从源码得到 AST，用 `ast.dump()` 查看结构，用 `NodeVisitor`/`NodeTransformer` 做只读遍历或改写，用 `ast.literal_eval()` 安全求值字面量，再用内置 `compile()` 把 AST 编译成可执行字节码。设计上围绕「解析—查看—遍历/修改—求值/编译」这条主线展开。
 
-[ast](https://docs.python.org/3.14/library/ast.html)
+[ast](https://docs.python.org/zh-cn/3/library/ast.html)
 
 ## 解析与查看 AST
 

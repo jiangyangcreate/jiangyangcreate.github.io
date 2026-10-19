@@ -225,17 +225,17 @@ from .second_copy import *
 
 
 :::tip
-完整语法与全部开关见官方文档 [Command line and environment](https://docs.python.org/3/using/cmdline.html)。下面按类别整理常用项；**`-X`** 为 CPython 预留的**实现相关**开关，可用 `python --help-xoptions`（3.11+）查看本机支持的值，运行时也可查 [`sys._xoptions`](https://docs.python.org/3/library/sys.html#sys._xoptions)。
+完整语法与全部开关见官方文档 [Command line and environment](https://docs.python.org/zh-cn/3/using/cmdline.html)。下面按类别整理常用项；**`-X`** 为 CPython 预留的**实现相关**开关，可用 `python --help-xoptions`（3.11+）查看本机支持的值，运行时也可查 [`sys._xoptions`](https://docs.python.org/zh-cn/3/library/sys.html#sys._xoptions)。
 
 **`-X`（CPython 常见取值，节选）**
 
 | 形式 | 作用 |
 | --- | --- |
-| `-X faulthandler` | 启用 [`faulthandler`](https://docs.python.org/3/library/faulthandler.html)，便于崩溃/卡死时打印 C 栈（等价环境变量 `PYTHONFAULTHANDLER`）。 |
-| `-X tracemalloc` / `-X tracemalloc=N` | 启动 [`tracemalloc`](https://docs.python.org/3/library/tracemalloc.html) 记录分配，`N` 为回溯帧数。 |
+| `-X faulthandler` | 启用 [`faulthandler`](https://docs.python.org/zh-cn/3/library/faulthandler.html)，便于崩溃/卡死时打印 C 栈（等价环境变量 `PYTHONFAULTHANDLER`）。 |
+| `-X tracemalloc` / `-X tracemalloc=N` | 启动 [`tracemalloc`](https://docs.python.org/zh-cn/3/library/tracemalloc.html) 记录分配，`N` 为回溯帧数。 |
 | `-X importtime` / `-X importtime=2` | 打印各模块导入耗时（调性能、查慢导入）；`2` 会标出已缓存的模块（3.14+）。 |
-| `-X dev` | 开启[开发模式](https://docs.python.org/3/library/devmode.html)，额外运行时检查（等价 `PYTHONDEVMODE`）。 |
-| `-X utf8` / `-X utf8=0` | 显式开启或关闭 [UTF-8 模式](https://docs.python.org/3/library/os.html#utf8-mode)。 |
+| `-X dev` | 开启[开发模式](https://docs.python.org/zh-cn/3/library/devmode.html)，额外运行时检查（等价 `PYTHONDEVMODE`）。 |
+| `-X utf8` / `-X utf8=0` | 显式开启或关闭 [UTF-8 模式](https://docs.python.org/zh-cn/3/library/os.html#utf8-mode)。 |
 | `-X pycache_prefix=PATH` | 把 `.pyc` 写到指定目录树，不污染源码目录（等价 `PYTHONPYCACHEPREFIX`）。 |
 
 其余如 `-X int_max_str_digits`、`-X perf`（Linux `perf`）、`-X gil=0` / `-X gil=1`（仅 free-threaded 构建）等以当前 Python 版本的 `--help-xoptions` 为准。

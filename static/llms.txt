@@ -14,7 +14,7 @@
 
 - [博文 / Blog](https://jiangmiemie.com/blog/archive/)：年度长文、世界观与生活记录
 - [开发 / Docs](https://jiangmiemie.com/docs)：Python、Python 标准库、C、后端通识、大模型应用、编程外基础
-- [书架 / Read](https://jiangmiemie.com/read)：70+ 本书的阅读摘录与思考
+- [书架 / Read](https://jiangmiemie.com/read/)：阅读摘录与思考，书目以该页侧栏为准
 - [个案 / Case](https://jiangmiemie.com/case)：开源项目与作品集
 - [相簿 / Gallery](https://jiangmiemie.com/gallery)：影像
 
