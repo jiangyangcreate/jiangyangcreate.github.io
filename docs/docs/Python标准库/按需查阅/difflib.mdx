@@ -107,7 +107,7 @@ print("".join(diff))
 
 ## unified_diff
 
-生成标准 unified diff 格式，适合 patch 文件和代码审查。
+生成标准 unified diff 格式，适合 patch 文件和代码审查。Python 3.15+ 可选参数 `color=True` 可输出类似 `git diff` 的彩色差异（可由环境变量控制颜色）。
 
 ```python showLineNumbers
 from difflib import unified_diff

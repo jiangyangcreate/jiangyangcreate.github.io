@@ -330,7 +330,7 @@ if p.exists():
 
 | 常用 API | 说明与常用参数 |
 | :--- | :--- |
-| `p.mkdir(parents=True, exist_ok=True)` | `parents=True`：允许创建不存在的多级父目录<br/>`exist_ok=True`：若目录已存在则不报错（默认会抛出 `FileExistsError`） |
+| `p.mkdir(parents=True, exist_ok=True, parent_mode=...)` | `parents=True`：允许创建不存在的多级父目录<br/>`exist_ok=True`：若目录已存在则不报错（默认会抛出 `FileExistsError`）<br/>`parent_mode`（3.15+）：中间顺带创建出的父目录的权限模式 |
 | `p.touch(mode=0o666, exist_ok=True)` | 创建空文件或更新文件修改时间。`exist_ok=False` 时文件已存在会报错 |
 | `p.symlink_to(target, target_is_directory=False)` | 创建符号链接，指向 `target` |
 | `p.hardlink_to(target)` | 创建硬链接，指向 `target`（要求同一文件系统） |

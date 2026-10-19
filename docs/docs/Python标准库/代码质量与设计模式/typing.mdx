@@ -107,6 +107,37 @@ user: User = {"id": 1, "name": "Alice"}            # email、age 可省略
 user_full: User = {"id": 2, "name": "Bob", "age": 25}  # 也可以提供
 ```
 
+普通 `TypedDict` 无法表达「只能有这些键」或「其余键必须是某种类型」：按结构化兼容规则，一个 `TypedDict` 值上总可能带着类型里没写出来的额外键，类型检查器因此推不出 `.items()` / `.values()` 的精确类型，也不能靠 `"author" in entry` 这类检查收窄联合类型。Python 3.15+（PEP 728）为此新增 `closed` 与 `extra_items`（二者只约束类型检查器，运行时构造出来的仍是普通 `dict`）：
+
+```python showLineNumbers
+from typing import TypedDict
+
+# closed=True：不允许类体以外的额外键
+class Point2D(TypedDict, closed=True):
+    x: float
+    y: float
+
+# extra_items=str：允许任意额外键，且值类型为 str
+class Headers(TypedDict, extra_items=str):
+    host: str
+```
+
+:::warning[构造方式变更（3.15）]
+`TypedDict("TD")` / `TypedDict("TD", None)` 零字段写法已不支持，请用 `class TD(TypedDict): pass` 或 `TypedDict("TD", {})`。`NamedTuple` 的旧关键字参数构造（如 `NamedTuple("Point", x=int)`）也已移除，改用类语法或函数式字段列表。
+:::
+
+### TypeForm
+
+`TypeForm[T]`（PEP 747）用于标注「参数本身是一个类型表达式」的场景，运行时 `TypeForm(x)` 直接返回 `x`：
+
+```python showLineNumbers
+from typing import Any, TypeForm
+
+def cast[T](typ: TypeForm[T], value: Any) -> T: ...
+```
+
+`int | str`、`list[int]`、`"int | str"`、类型别名都是合法的类型表达式，运行时却分别是 `UnionType`、`GenericAlias`、`str`、`TypeAliasType` 等不同对象。以往接收这类参数的函数（运行时类型校验、类型转换、反序列化库）只能把参数标成过宽的 `object`，类型检查器也就没法把传进来的类型和返回值关联起来。有了 `TypeForm[T]`，上面的 `cast(int, value)` 能被推断为返回 `int`。
+
 ### NamedTuple
 
 比 `collections.namedtuple` 更强的类型化版本，每个字段都有明确的类型标注：

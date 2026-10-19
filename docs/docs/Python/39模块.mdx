@@ -70,6 +70,42 @@ from module import foo as foo2 # 导入模块中的foo函数，并别名为foo2
 foo2() # 输出goodbye, world!
 ```
 
+### lazy 导入
+
+导入一个模块时，Python 要定位文件、读盘、编译成字节码，再执行它的全部顶层代码。依赖树一深，启动就可能要几秒，即使这次运行根本用不到其中大部分模块。
+
+以前的绕法是把 `import` 挪进函数，或用 `importlib` 按需加载，结果导入语句散落在各处，难读也难维护。
+
+Python 3.15 引入软关键字 `lazy`（PEP 810）：声明仍写在文件顶部，但真正加载推迟到**第一次使用该名字**时。
+
+```python showLineNumbers
+lazy import json
+lazy from pathlib import Path
+
+print("Starting up...")  # 此时尚未完整加载 json / pathlib
+
+data = json.loads('{"key": "value"}')  # 在此才真正导入 json
+p = Path(".")                          # 在此才真正导入 pathlib
+```
+
+要点：
+
+- 仅允许在**模块顶层**使用；函数体、类体、`try`/`except`/`finally` 内写 `lazy` 会 `SyntaxError`。
+- `lazy from module import *` 与 `lazy from __future__ import ...` 非法。
+- 加载失败时，异常在**首次使用**处抛出，回溯会同时指向使用处与原 `import` 语句。
+- 兼容旧版本写法：在模块中定义 `__lazy_modules__ = ["json", "pathlib"]`，则对这些模块的普通 `import` 也会按 lazy 处理。
+
+全局开关（不必改源码）：
+
+| 方式 | 说明 |
+| --- | --- |
+| `-X lazy_imports=all` / `PYTHON_LAZY_IMPORTS=all` | 默认让所有导入变 lazy |
+| `-X lazy_imports=normal`（默认） | 仅尊重源码中的 `lazy` |
+| `sys.set_lazy_imports()` / `sys.get_lazy_imports()` | 运行时查询或切换模式 |
+| `sys.set_lazy_imports_filter(fn)` | 按模块名选择性允许 lazy（返回 `True`/`False`） |
+
+代理类型为 `types.LazyImportType`，可用于检测某个名字是否仍是 lazy 代理。
+
 ### \_\_name\_\_ 属性
 
 `__name__` 属性是一个特殊的属性，用于获取模块的名称。
@@ -78,7 +114,7 @@ foo2() # 输出goodbye, world!
 print(__name__)
 """
 当模块被直接运行时，__name__的值为__main__，即便在多线程和协程中也是__main__
-3.14多进程中，会将子进程的__name__设为__mp_main__
+3.15 多进程中，会将子进程的 `__name__` 设为 `__mp_main__`
 
 当模块被导入时，__name__的值为模块的名称,即module
 
@@ -234,8 +270,9 @@ from .second_copy import *
 | `-X faulthandler` | 启用 [`faulthandler`](https://docs.python.org/zh-cn/3/library/faulthandler.html)，便于崩溃/卡死时打印 C 栈（等价环境变量 `PYTHONFAULTHANDLER`）。 |
 | `-X tracemalloc` / `-X tracemalloc=N` | 启动 [`tracemalloc`](https://docs.python.org/zh-cn/3/library/tracemalloc.html) 记录分配，`N` 为回溯帧数。 |
 | `-X importtime` / `-X importtime=2` | 打印各模块导入耗时（调性能、查慢导入）；`2` 会标出已缓存的模块（3.14+）。 |
+| `-X lazy_imports=all` / `normal` | 全局延迟导入策略（3.15+，等价 `PYTHON_LAZY_IMPORTS`）。 |
 | `-X dev` | 开启[开发模式](https://docs.python.org/zh-cn/3/library/devmode.html)，额外运行时检查（等价 `PYTHONDEVMODE`）。 |
-| `-X utf8` / `-X utf8=0` | 显式开启或关闭 [UTF-8 模式](https://docs.python.org/zh-cn/3/library/os.html#utf8-mode)。 |
+| `-X utf8` / `-X utf8=0` | 显式开启或关闭 [UTF-8 模式](https://docs.python.org/zh-cn/3/library/os.html#utf8-mode)。3.15 起默认即 UTF-8，一般只需在要恢复旧行为时写 `utf8=0`。 |
 | `-X pycache_prefix=PATH` | 把 `.pyc` 写到指定目录树，不污染源码目录（等价 `PYTHONPYCACHEPREFIX`）。 |
 
 其余如 `-X int_max_str_digits`、`-X perf`（Linux `perf`）、`-X gil=0` / `-X gil=1`（仅 free-threaded 构建）等以当前 Python 版本的 `--help-xoptions` 为准。

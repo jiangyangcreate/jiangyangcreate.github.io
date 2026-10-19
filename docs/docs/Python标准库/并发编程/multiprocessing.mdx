@@ -21,7 +21,6 @@ print("程序启动")
 from multiprocessing import Pool
 
 def f(x):
-    # 3.14中，会将其设为__mp_main__
     print(__name__) # __mp_main__
     return x*x
 

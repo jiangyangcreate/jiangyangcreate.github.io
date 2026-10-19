@@ -141,6 +141,8 @@ print(keyword.kwlist)
 
 - `type` 在语法这一部分中仅被解释为关键字。巧合的是：内置函数中也有名为 `type()` 的函数。
 
+- `lazy` 仅在模块顶层的 `import` / `from ... import` 前有特殊含义（PEP 810），用于显式延迟导入。
+
 软关键字虽然没有收录在 `keyword.kwlist` 中，但本文亦将其列出。
 
 <MarkmapHooks initialMarkdown={`
@@ -188,6 +190,7 @@ print(keyword.kwlist)
 ### 模块
 - import, from: 模块导入
 - as: 别名
+- lazy: 显式延迟导入（软关键字）
 
 `} />
 
@@ -197,14 +200,14 @@ print(keyword.kwlist)
 有部分教材会归纳为六类基础数据类型：数字、字符串、列表、元组、字典、集合。
 > 如果只追求学习 Python 基础语法，确实可以只学习这六类基础数据类型。
 
-事实上，Python3.14 内置有数据类型非常多。
+事实上，Python3.15 内置有数据类型非常多。
 > 注意：Python 中，`bool` 是 `int` 的子类。
 
 而且 Python 中你自己创建一个新类，设置一下实例，就是一种新的数据类型。
 
 <MarkmapHooks initialMarkdown={`
 
-# Python3.14 内置数据类型
+# Python3.15 内置数据类型
 
 ## 基础数据类型
 ### 数值类型
@@ -219,6 +222,9 @@ print(keyword.kwlist)
 ### 空值类型
 - type(None): None的类型，表示空值
 
+### 哨兵类型
+- sentinel: 内置哨兵值
+
 ## 容器类型
 ### 序列类型
 - list: 可变有序列表
@@ -231,6 +237,7 @@ print(keyword.kwlist)
 
 ### 映射类型
 - dict: 可变键值对字典
+- frozendict: 不可变键值对字典
 
 ### 二进制序列
 - bytes: 不可变字节序列
@@ -437,10 +444,13 @@ print(keyword.kwlist)
 - bytes(): 不可变字节序列
 - ascii(): ASCII表示
 - repr(): 对象表示
+- frozendict(): 不可变字典
+- sentinel(): 唯一哨兵值
 
 ### 序列操作
 - list(): 列表
 - dict(): 字典
+- frozendict(): 不可变字典
 - tuple(): 元组
 - set(): 集合
 - frozenset(): 不可变集合
@@ -508,7 +518,7 @@ print(keyword.kwlist)
 
 ### 内置常量
 
-Python3.14中，内置常量有：
+Python3.15中，内置常量有：
 
 - `True`: 布尔值True。
 - `False`: 布尔值False。
@@ -553,7 +563,7 @@ print(... is Ellipsis) # 输出True
 标准库就是内置的模块库，不需要安装，直接导入就可以使用。
 
 <MarkmapHooks initialMarkdown={`
-## Python 3.14 标准库
+## Python 3.15 标准库
 
 ### 文本处理服务
 - string: 常见的字符串操作
@@ -573,7 +583,7 @@ print(... is Ellipsis) # 输出True
 - datetime: 基本日期和时间类型
 - zoneinfo: IANA 时区支持
 - calendar: 通用日历相关函数
-- collections: 容器数据类型 (包括 .abc)
+- collections: 容器数据类型
 - heapq: 堆队列算法
 - bisect: 数组二分算法
 - array: 高效的数字值数组
@@ -724,7 +734,7 @@ print(... is Ellipsis) # 输出True
 - bdb: 调试器框架
 - faulthandler: 转储 Python 回溯信息
 - pdb: Python 的调试器
-- cProfile, profile: Python 分析器
+- profiling: 性能分析包（tracing / sampling；cProfile 为 tracing 别名）
 - timeit: 测量小代码片段的执行时间
 - trace: 跟踪或记录 Python 语句的执行
 - tracemalloc: 跟踪内存分配

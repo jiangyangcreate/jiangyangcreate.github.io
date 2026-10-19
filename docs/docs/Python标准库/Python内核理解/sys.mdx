@@ -60,9 +60,10 @@ sys.stdout.write("hello\n")
 
 ## 解释器信息
 
-- **sys.version_info** — 版本号元组，如 `(3, 12, 0)`，便于做版本判断。
+- **sys.version_info** — 版本号元组，如 `(3, 15, 0)`，便于做版本判断。
 - **sys.executable** — 当前 Python 解释器可执行文件的路径。
 - **sys.platform** — 平台标识，如 `'linux'`、`'win32'`、`'darwin'`。
+- **sys.abi_info** —（Python 3.15+）ABI 相关信息命名空间，便于查询构建/ABI 细节。
 
 ```python showLineNumbers
 import sys
@@ -70,6 +71,7 @@ import sys
 print(sys.version_info.major, sys.version_info.minor)
 print(sys.executable)
 print(sys.platform)
+print(sys.abi_info)
 ```
 
 :::tip[平台标识]

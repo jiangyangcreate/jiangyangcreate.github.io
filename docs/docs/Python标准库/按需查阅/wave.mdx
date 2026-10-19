@@ -2,7 +2,7 @@
 title: wave
 ---
 
-`wave` 模块提供对 WAV 音频文件的读写接口，仅支持未压缩的 PCM 编码格式。
+`wave` 模块提供对 WAV 音频文件的读写接口。传统上以未压缩 PCM 为主；**Python 3.15+** 增加 IEEE 浮点 WAVE（`WAVE_FORMAT_IEEE_FLOAT`），以及 `getformat()` / `setformat()` 显式处理帧格式。旧的 `getmark` / `setmark` / `getmarkers` 已移除。
 
 [wave](https://docs.python.org/zh-cn/3/library/wave.html)
 

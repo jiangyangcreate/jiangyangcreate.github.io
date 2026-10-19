@@ -43,15 +43,16 @@ import keyword
 
 # 查看所有软关键字（Python 3.9+）
 print(keyword.softkwlist)
-# ['_', 'case', 'match', 'type']
+# 3.15+: ['_', 'case', 'lazy', 'match', 'type']
 
 print(keyword.issoftkeyword("match"))   # True
+print(keyword.issoftkeyword("lazy"))    # True（3.15+，显式延迟导入）
 print(keyword.issoftkeyword("case"))    # True
 print(keyword.issoftkeyword("if"))      # False（if 是硬关键字）
 ```
 
 :::tip
-软关键字如 `match` 和 `case` 仅在 `match/case` 语句中有特殊含义。在其他地方，你仍然可以用 `match` 作为变量名，但为了代码可读性，不建议这样做。
+软关键字如 `match` / `case` 仅在 `match/case` 中有特殊含义；`lazy` 仅在模块顶层的 `import` 前有特殊含义。其他位置仍可用作普通标识符，但为了可读性不建议这样做。
 :::
 
 ## 实用场景：验证标识符合法性

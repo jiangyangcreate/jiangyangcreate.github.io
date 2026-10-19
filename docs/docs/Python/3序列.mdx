@@ -434,6 +434,24 @@ print(averages)
 # [{'name': 'Alice', 'average': 87.67}, {'name': 'Bob', 'average': 85.0}, {'name': 'Charlie', 'average': 91.67}]
 ```
 
+### 推导式中的解包
+
+列表、集合、字典推导式以及生成器表达式支持 `*` / `**` 解包（PEP 798），可替代一层嵌套推导或 `itertools.chain`：
+
+```python showLineNumbers
+lists = [[1, 2], [3, 4], [5]]
+print([*L for L in lists])  # [1, 2, 3, 4, 5]，等价于 [x for L in lists for x in L]
+
+sets = [{1, 2}, {2, 3}, {3, 4}]
+print({*s for s in sets})   # {1, 2, 3, 4}
+
+dicts = [{'a': 1}, {'b': 2}, {'a': 3}]
+print({**d for d in dicts})  # {'a': 3, 'b': 2}，后写的键覆盖先写的
+
+gen = (*L for L in lists)
+print(list(gen))  # [1, 2, 3, 4, 5]
+```
+
 ## 字典
 
 字典是 Python 中另一种非常重要的数据结构，它是一个**无序**、**可变**的键值对（key-value pair）集合。
@@ -788,6 +806,26 @@ print(d_copy)  # {'list': [100, 2, 3], 'value': 10}
 print(d_deep)  # {'list': [1, 2, 3], 'value': 10}
 ```
 :::
+
+### frozendict
+
+普通 `dict` 可变、不可哈希，所以不能作为字典的键或集合元素；传给 `@functools.lru_cache` 装饰的函数会直接报错；用作函数默认参数还有「可变默认值」被意外修改的隐患。此前只能依赖第三方的 `frozendict` / `frozenmap` 包。
+
+Python 3.15 将 `frozendict` 内置（PEP 814）。它不是 `dict` 的子类，直接继承自 `object`；创建后不能增删改。当键与值均可哈希时，`frozendict` 本身也可哈希（可用作集合元素或字典键）。它保留插入顺序，但相等比较**不考虑**顺序。
+
+
+```python showLineNumbers
+a = frozendict(x=1, y=2)
+print(a)                 # frozendict({'x': 1, 'y': 2})
+# a['z'] = 3             # TypeError: 不支持项赋值
+
+b = frozendict(y=2, x=1)
+print(a == b)            # True（顺序无关）
+print(hash(a) == hash(b))  # True（键值均可哈希时）
+
+# 需要同时接受 dict / frozendict 时：
+# isinstance(x, (dict, frozendict)) 或 isinstance(x, collections.abc.Mapping)
+```
 
 ### 字典推导式
 

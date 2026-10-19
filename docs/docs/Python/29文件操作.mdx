@@ -31,9 +31,8 @@ title: 文件操作
   - 在 Python 中，主要区别体现在打开模式：`'t'`（文本模式，默认）与 `'b'`（二进制模式），以及是否需要编码/解码。
 
 - 编码格式（encoding）  
-  - 文本文件在落盘时必须选择一种字符编码（如 `UTF-8`、`GBK`、`ISO-8859-1` 等）。  
-  - 读取文本时，Python 会按照你提供的编码参数（或系统默认编码）把字节解码为 `str`；编码不匹配时就会出现“乱码”或 `UnicodeDecodeError`。  
-  - 建议统一使用 UTF-8，并在 `open()` 时显式指定 `encoding='utf-8'`，避免不同平台默认编码不一致的问题。
+  - **Python 3.15+**（PEP 686）：未指定 `encoding` 时，`open()` 等 I/O **默认使用 UTF-8**，不再跟随系统 locale。跨版本兼容仍建议显式写 `encoding='utf-8'`；若要恢复旧行为可用 `PYTHONUTF8=0` 或 `-X utf8=0`，或传 `encoding='locale'`。
+  - 读取文本时，Python 会按照你提供的编码参数（或默认编码）把字节解码为 `str`；编码不匹配时就会出现“乱码”或 `UnicodeDecodeError`。  
 
 - 换行符与跨平台差异  
   - Unix 系统使用 `\n` 作为换行符，Windows 传统上使用 `\r\n`。  
@@ -74,7 +73,7 @@ title: 文件操作
 
 -   `encoding`：
     -   用于编码或解码文件的编码格式名称，仅在文本模式下使用。
-    -   默认编码格式依赖于具体平台（`locale.getencoding()`）。
+    -   **Python 3.15+** 默认 `UTF-8`（PEP 686）；更早版本默认随平台 locale。传 `encoding='locale'` 可显式使用当前区域编码。
 
 -   `errors`：
     -   可选字符串参数，指定如何处理编码和解码错误，不能在二进制模式下使用。

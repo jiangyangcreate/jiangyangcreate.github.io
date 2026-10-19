@@ -1,34 +1,62 @@
 ---
-title: cProfile、profile、pstats
+title: profiling
 ---
 
-cProfile 是 Python 内置的确定性性能分析器（C 扩展实现，开销小），用来回答「我的代码慢在哪」。如果 cProfile 在您的系统上不可用，请使用纯 Python 版的 profile。
+Python 3.15 起，内置性能分析工具收归到 [`profiling`](https://docs.python.org/zh-cn/3/library/profiling.html) 包（PEP 799）：
 
-这些统计数据可以通过 pstats 模块格式化为报表。
+| 模块 | 说明 |
+| --- | --- |
+| `profiling.tracing` | 确定性函数调用追踪（由原 `cProfile` 迁入） |
+| `profiling.sampling` | Tachyon：高频统计采样分析器，可按 PID 附加、开销极低 |
+
+`cProfile` 仍作为 `profiling.tracing` 的兼容别名；`profile` 已弃用，计划在 3.17 移除。统计数据仍可用 `pstats` 格式化为报表。
+
+过去标准库的 `profile` 和 `cProfile` 两个追踪式分析器。纯 Python 的 `profile` 太慢，基本只剩教学用途，名字却更像「正式」入口；`cProfile` 快一些，但要记录每一次函数调用和返回，开销大，会让解释器的部分优化失效，而且只观察主线程。
+
+新的采样分析器开销极低，支持多线程、异步和附加到正在运行的进程。`profiling` 包按分析方法把它们归到 `tracing` 和 `sampling` 两个名字下，一看就知道该选哪个。
 
 ## 命令行直接分析脚本
 
 不改一行代码，直接从命令行分析整个脚本的性能：
 
 ```bash showLineNumbers
-python -m cProfile -s cumulative my_script.py
+python -m profiling.tracing -s cumulative my_script.py
+# 兼容旧写法：python -m cProfile -s cumulative my_script.py
 ```
 
 `-s cumulative` 按累计耗时排序，快速定位最耗时的函数。如果想把结果存到文件以便后续分析：
 
 ```bash showLineNumbers
-python -m cProfile -o profile_result.prof my_script.py
+python -m profiling.tracing -o profile_result.prof my_script.py
 ```
+
+### Tachyon 采样分析
+
+需要低开销、甚至附加到已在跑的进程时，用 `profiling.sampling`（不必改代码、不必重启）：
+
+```bash showLineNumbers
+# 按 PID 附加（墙钟时间，默认）
+python -m profiling.sampling attach <PID>
+
+# 直接跑脚本并采样；--flamegraph 生成可浏览器打开的火焰图
+python -m profiling.sampling run --flamegraph my_script.py
+
+# 只看 CPU 时间 / GIL 占用 / 异常处理时间
+python -m profiling.sampling run --mode cpu my_script.py
+python -m profiling.sampling run --mode gil -a my_script.py
+```
+
+适合生产环境排查；确定性追踪（`profiling.tracing`）更适合开发期精确定位调用次数与累计耗时。
 
 ## 分析某段代码
 
 用上下文管理器包裹你想分析的代码块，不需要侵入整个程序：
 
 ```python showLineNumbers
-import cProfile
+from profiling import tracing
 from pstats import Stats, SortKey
 
-with cProfile.Profile() as pr:
+with tracing.Profile() as pr:
     # 把你想分析的代码放在这里
     result = sum(i * i for i in range(1_000_000))
 
@@ -40,14 +68,14 @@ Stats(pr).strip_dirs().sort_stats(SortKey.CUMULATIVE).print_stats(10)
 写一个可复用的装饰器，想分析哪个函数就套上去：
 
 ```python showLineNumbers
-import cProfile
 import functools
+from profiling import tracing
 from pstats import Stats, SortKey
 
 def profile(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
-        with cProfile.Profile() as pr:
+        with tracing.Profile() as pr:
             result = func(*args, **kwargs)
         Stats(pr).strip_dirs().sort_stats(SortKey.CUMULATIVE).print_stats(20)
         return result
@@ -107,7 +135,7 @@ p.print_callees("process_data")
 假设你有一个处理请求的函数，响应时间忽然变长了：
 
 ```python showLineNumbers
-import cProfile
+from profiling import tracing
 from pstats import Stats, SortKey
 
 def handle_request(user_id):
@@ -117,7 +145,7 @@ def handle_request(user_id):
     send_email(user, report)          # 网络 IO
     return report
 
-with cProfile.Profile() as pr:
+with tracing.Profile() as pr:
     handle_request(42)
 
 stats = Stats(pr)
@@ -132,13 +160,13 @@ stats.strip_dirs().sort_stats(SortKey.CUMULATIVE).print_stats(10)
 保存两次分析结果，用 `add` 方法合并或对比：
 
 ```python showLineNumbers
-import cProfile
+from profiling import tracing
 
 # 优化前
-cProfile.run("old_implementation()", "before.prof")
+tracing.run("old_implementation()", "before.prof")
 
 # 优化后
-cProfile.run("new_implementation()", "after.prof")
+tracing.run("new_implementation()", "after.prof")
 
 # 分别查看对比
 import pstats
@@ -157,5 +185,4 @@ pip install snakeviz
 snakeviz profile_result.prof
 ```
 
-snakeviz 会在浏览器中打开一个交互式火焰图，比文字报告直观得多。
-
+snakeviz 会在浏览器中打开一个交互式火焰图，比文字报告直观得多。采样分析也可用 `profiling.sampling` 直接生成 `--flamegraph` HTML，无需额外工具。

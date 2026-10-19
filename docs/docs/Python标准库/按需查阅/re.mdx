@@ -128,6 +128,10 @@ title: re
 
 `} />
 
+:::tip[prefixmatch（Python 3.15+）]
+许多语言里的 `match` 实际对应 Python 的 `search`。3.15 新增更直白的别名：`re.prefixmatch()` / `Pattern.prefixmatch()`，语义与现有 `re.match()` / `Pattern.match()` 相同；原 `match` API 现为软弃用，新代码优先写 `prefixmatch`。
+:::
+
 经典示例
 
 ```python showLineNumbers

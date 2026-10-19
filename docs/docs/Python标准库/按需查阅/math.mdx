@@ -161,6 +161,36 @@ print(math.isclose(1.0, 1.01, rel_tol=0.02))  # True（2% 相对容差）
 print(math.isclose(0.0, 0.001, abs_tol=0.01)) # True（绝对容差）
 ```
 
+## 浮点分类与符号
+
+`factorial` / `gcd` / `lcm` / `comb` / `perm` / `isqrt` 在 3.15 起于 `math` 上为**软弃用**别名，推荐改用 `math.integer` 同名函数（见下节）。
+
+```python showLineNumbers
+import math
+
+x = 1.5e-308
+print(math.isnormal(1.0))       # True：正规数
+print(math.issubnormal(x))     # 视平台/数值而定：次正规数检测
+print(math.signbit(-0.0))      # True：符号位为负
+print(math.fmax(1.0, math.nan))  # 1.0（忽略 NaN 的一侧）
+print(math.fmin(1.0, -2.0))      # -2.0
+```
+
+## math.integer
+
+[`math.integer`](https://docs.python.org/zh-cn/3/library/math.html#module-math.integer)（PEP 791）是整数专用数论函数所在模块。`math.factorial` 等仍可用，但新代码应写：
+
+```python showLineNumbers
+import math.integer as mi
+
+print(mi.factorial(5))       # 120
+print(mi.gcd(12, 18, 24))    # 6
+print(mi.lcm(4, 6, 10))      # 60
+print(mi.comb(10, 3))        # 120
+print(mi.perm(10, 3))        # 720
+print(mi.isqrt(10))          # 3
+```
+
 :::info[math vs cmath]
 `math` 不支持复数运算。如需处理复数，请使用 [`cmath`](https://docs.python.org/zh-cn/3/library/cmath.html) 模块，它提供了同名函数的复数版本。
 :::

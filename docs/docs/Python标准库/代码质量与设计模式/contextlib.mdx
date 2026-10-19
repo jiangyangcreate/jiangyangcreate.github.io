@@ -6,6 +6,10 @@ title: contextlib
 
 [contextlib](https://docs.python.org/zh-cn/3/library/contextlib.html)
 
+:::tip[3.15]
+`ExitStack` / `AsyncExitStack` 现支持任意描述符形式的 `__enter__` / `__exit__`（及异步对应方法）。`@contextmanager` / `@asynccontextmanager` 用作装饰器时，若被装饰的是生成器/协程/异步生成器函数，上下文会在迭代或 await 期间保持打开（此前会在创建生成器对象时立刻退出）。
+:::
+
 ## @contextmanager 用生成器写上下文管理器
 
 用 `@contextmanager` 装饰一个**只 yield 一次**的生成器函数，即可得到上下文管理器：yield 之前相当于 `__enter__`，之后相当于 `__exit__`（含异常处理）。无需手写类与 `__enter__`/`__exit__`。

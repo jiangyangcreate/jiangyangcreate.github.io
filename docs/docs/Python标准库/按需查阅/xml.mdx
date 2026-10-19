@@ -6,6 +6,12 @@ title: xml
 
 [xml.etree.ElementTree](https://docs.python.org/zh-cn/3/library/xml.etree.elementtree.html)
 
+:::tip[名称与文本校验（Python 3.15+）]
+顶层 `xml` 包新增：
+- `xml.is_valid_name(s)`：字符串能否作为元素/属性名
+- `xml.is_valid_text(s)`：字符串能否安全出现在 XML 文本中
+:::
+
 ## 解析 XML
 
 ```python showLineNumbers

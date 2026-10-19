@@ -202,6 +202,51 @@ print(add_item('b'))  # ['b'] - 正确结果！
 **原因**：Python在定义函数时计算默认参数值，而不是在每次调用时计算。对于不可变对象（如数字、字符串），这不是问题；但对于可变对象，所有调用会共享同一个对象。
 :::
 
+### sentinel
+
+:::info
+[PEP 661 – Sentinel Values](https://peps.python.org/pep-0661/)：内置 `sentinel`，用来做「没传这个参数」这类唯一占位值。Python 3.15 起可用。
+:::
+
+传统函数中设计一个可传可不传的参数时，都会将其设为默认值 `None`，但 `None` 有时本身就是合法数据，这时需要另一个语义清晰的占位值。
+
+它和 `None` 的差别：`sentinel` 是真值，而且每次调用 `sentinel()` 都是新对象。要在多处共用，必须自己存成一个变量，再用 `is` 判断。
+
+```python showLineNumbers
+import copy
+import pickle
+
+# 定义一个哨兵对象 
+MISSING = sentinel("MISSING")
+# 自定义 repr 可以打印出其他信息
+OTHER = sentinel("OTHER", repr="<other2>") 
+print("1. 显示名字:", MISSING, MISSING.__name__,MISSING.__module__,type(MISSING))
+print("2. 自定义 repr:", OTHER)
+print("3. 它是真值，不能靠 if value 判断:", bool(MISSING))
+print("4. 两次调用不是同一个对象:", sentinel("MISSING") is sentinel("MISSING"))
+print("5. pickle 还原后、拷贝后仍是同一个对象:", 
+    pickle.loads(pickle.dumps(MISSING)) is copy.copy(MISSING))
+"""
+1. 显示名字: MISSING MISSING __main__ <class 'sentinel'>
+2. 自定义 repr: <other2>
+3. 它是真值，不能靠 if value 判断: True
+4. 两次调用不是同一个对象: False
+5. pickle 还原后、拷贝后仍是同一个对象: True
+"""
+
+def first_present(value = MISSING) -> str | int | None | MISSING:
+    """
+    能写入类型表达式
+    """
+    if value is MISSING:
+        return MISSING 
+    return value
+print("6. 默认参数:", first_present(), "|", first_present(0), "|", first_present(None))
+"""
+6. 默认参数: MISSING | 0 | None
+"""
+```
+
 #### 不定长参数
 
 位置不定长参数：`*args`

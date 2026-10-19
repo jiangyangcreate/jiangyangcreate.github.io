@@ -114,6 +114,23 @@ res_j = json.dumps(res_p)
 print(type(res_j)) # <class 'str'>
 ```
 
+### array_hook 与 object_pairs_hook
+
+`json.load` / `json.loads` 新增 `array_hook`，可自定义 JSON 数组如何变成 Python 对象。与 `object_pairs_hook=frozendict` 组合，可得到深层不可变结构：
+
+```python showLineNumbers
+import json
+
+text = '{"nums": [1, 2], "meta": {"ok": true}}'
+data = json.loads(
+    text,
+    object_pairs_hook=frozendict,
+    array_hook=tuple,
+)
+print(data)              # frozendict({'nums': (1, 2), 'meta': frozendict({'ok': True})})
+print(type(data["nums"]))  # <class 'tuple'>
+```
+
 ## jsonl
 
 JSONL 的全称是 JSON Lines。后缀为：`.jsonl`或`.ndjson`。

@@ -145,6 +145,28 @@ asyncio.run(main())
 # 结果: ['结果-A', '结果-B', '结果-C']
 # 总耗时: 3.00秒
 ```
+### TaskGroup.cancel
+
+`asyncio.TaskGroup` 新增 `cancel()`，可在目标已达成或子任务不再需要时**提前取消整组**，不必再靠「额外任务抛自定义异常再被吞掉」这类样板代码：
+
+```python showLineNumbers
+import asyncio
+
+async def worker(n):
+    await asyncio.sleep(n)
+    return n
+
+async def main():
+    async with asyncio.TaskGroup() as tg:
+        t1 = tg.create_task(worker(10))
+        t2 = tg.create_task(worker(0.1))
+        await t2
+        tg.cancel()  # 提前结束组内其余任务
+    # 退出 with 时，被取消的任务按 TaskGroup 规则收尾
+
+asyncio.run(main())
+```
+
 ### asyncio.create_task()
 
 使用 `asyncio.gather()` 或 `asyncio.create_task()` 可以并发执行多个协程。
