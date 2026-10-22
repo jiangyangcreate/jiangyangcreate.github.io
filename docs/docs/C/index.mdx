@@ -7,9 +7,7 @@ title: C语言基础
 
 C++几乎是C的超集，这意味着一个有效的C程序也是一个有效的C++程序。同时学习C的过程也会理解大部分C++的知识。
 
-C和C++的主要区别是，C++支持许多附加特性。但是，C++中有许多规则与C稍有不同。
-
-这些不同使得C程序作为C++程序编译时可能以不同的方式运行或根本不能运行。
+C++支持许多附加特性。规则与C稍有不同。这些不同使得C程序作为C++程序编译时有概率以不同的方式运行或根本不能运行。
 
 | 方向 | 语言 |说明|
 |-----|-----|-----|
@@ -38,7 +36,7 @@ C语言诞生于 1972 年，至今已经涌现出诸多教程和教材，其内�
 :::info
 本教程基于《C Primer Plus》，目标是压缩其50%的体积，按知识点重排同时保持其核心内容。
 
-额外推荐《C陷阱与缺陷》，不是批判C语言，而是要帮助C程序员绕过编程过程中的陷阱和障碍。
+额外推荐《C陷阱与缺陷》，帮助C程序员绕过编程过程中的陷阱和障碍。
 :::
 
 ## 环境安装
@@ -64,42 +62,32 @@ gdb --version
 
 ## 编辑器
 
-[Vscdoe 官网下载网址](https://code.visualstudio.com/download)
+[Vscdium 官网下载网址](https://vscodium.com/)
 
-- VSCode（Visual Studio Code）是一款通用跨平台的编辑器
+- Vscdium 是 VSCode（Visual Studio Code）的开源社区版，是一款通用跨平台的编辑器
 
 它不会运行程序，它需要安装相应的语言包才能运行程序。它可以编辑任何语言的程序，支持几乎所有主流的开发语言的语法高亮、智能代码补全等。安装过程全部勾选。
 
-- 注意与 Visual Studio 区别
-
 ### 推荐扩展
 
-使用 VSCode 或 Cursor，安装以下扩展：
+使用 VSCodium ，安装以下扩展：
 
 | 扩展名称            | 功能描述                                                           |
 | ------------------- | ------------------------------------------------------------------ |
-| Remote - SSH        | 通过SSH连接远程服务器，在本地编辑远程文件                          |
-| C/C++               | 为 C/C++ 语言提供代码高亮、智能感知（自动补全）、代码格式化和调试等核心功能。|
+| BasePyright         | 高性能Python语言服务器，提供类型检查和智能提示                     |
+| clangd              | 为 C 语言提供代码高亮、智能感知（自动补全）、代码格式化和调试等核心功能。|
+| Docker              | 管理Docker容器，支持创建、运行和调试容器化应用                     |
+| Error Lens          | 直接在代码行内展示错误和警告信息，无需悬停鼠标                     |
+| Git History         | 提供Git历史记录的可视化界面，支持查看文件的修改历史                |
+| Hex Editor          | 提供十六进制编辑器，支持编辑二进制文件                             |
+| Jupyter             | 提供Jupyter Notebook支持，支持在编辑器中编辑和运行Jupyter Notebook |
+| Live Server         | 提供本地开发服务器，支持实时预览和自动刷新网页                     |
+| Markmap             | 以思维导图的形式展示markdown结构                                   |
+| MDX                 | 提供Markdownx编辑、预览、导出等功能                                 |
+| Office Viewer       | 在编辑器中直接预览Word、Excel等Office文档并附赠IDE主题               |
+| Open Remote - SSH   | 通过SSH连接远程服务器，在本地编辑远程文件                          |
 | Python              | 提供Python语言基础支持，包括语法高亮、代码补全和格式化             |
-| Pylance             | 高性能Python语言服务器，提供类型检查和智能提示                     |
 | Python Debugger     | 支持Python代码的断点调试、变量监控和单步执行                       |
 | Ruff Formatter      | 自动格式化Python代码，保持一致的代码风格                           |
-| Jupyter             | 提供Jupyter Notebook支持，支持在VSCode中编辑和运行Jupyter Notebook |
-| Error Lens          | 直接在代码行内展示错误和警告信息，无需悬停鼠标                     |
-| Office Viewer       | 在VSCode中直接预览Word、Excel等Office文档并附赠IDE主题                          |
-| Markmap             | 以思维导图的形式展示markdown结构                                   |
-| Markdown All in One | 提供Markdown编辑、预览、导出等功能                                 |
 | SQLite Viewer       | 提供SQLite数据库的可视化界面，支持数据浏览和查询                   |
-| Hex Editor          | 提供十六进制编辑器，支持编辑二进制文件                             |
-| Live Server         | 提供本地开发服务器，支持实时预览和自动刷新网页                     |
-| Git History         | 提供Git历史记录的可视化界面，支持查看文件的修改历史                |
-| Gitmoji             | 在VSCode中使用Gitmoji，支持在提交时使用Gitmoji                     |
-| Docker              | 管理Docker容器，支持创建、运行和调试容器化应用                     |
-
-### 易用性配置
-
-- 推荐颜色主题：Dark Modern
-- 推荐图标主题：office material
-- 推荐字体：Fira Code（可选连字符显示）
-- Cursor侧边栏方向修改：`workbench.activityBar.orientation`，改为`vertical`
 
