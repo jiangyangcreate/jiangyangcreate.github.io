@@ -1,0 +1,83 @@
+# Algolia-Crawler-Verif: EE358A7F464665BD
+
+# --- 检索类 AI 爬虫（用于在 AI 回答中引用本站，建议放行） ---
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+# --- 用户触发型 AI 爬虫（用户主动让 AI 读取本页，建议放行） ---
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-User
+Allow: /
+
+User-agent: Perplexity-User
+Allow: /
+
+# --- 训练类爬虫（用于训练模型，不带来引用，建议屏蔽） ---
+User-agent: GPTBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+User-agent: FacebookBot
+Disallow: /
+
+User-agent: Amazonbot
+Disallow: /
+
+User-agent: Diffbot
+Disallow: /
+
+User-agent: ImagesiftBot
+Disallow: /
+
+User-agent: Omgilibot
+Disallow: /
+
+User-agent: Omgili
+Disallow: /
+
+# --- 未声明用途/规避身份的爬虫，建议屏蔽 ---
+User-agent: Bytespider
+Disallow: /
+
+User-agent: PetalBot
+Disallow: /
+
+User-agent: TimpiBot
+Disallow: /
+
+User-agent: cohere-ai
+Disallow: /
+
+User-agent: cohere-training-data-crawler
+Disallow: /
+
+# --- 其余默认放行 ---
+User-agent: *
+Allow: /
+
+Sitemap: https://jiangmiemie.com/sitemap.xml
