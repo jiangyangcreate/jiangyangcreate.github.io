@@ -344,7 +344,13 @@ module.exports = {
     },
     footer: {
       style: "light",
-      copyright: `<div style="font-size: 0.75rem;">Copyright ©  ${username} ${new Date().getFullYear()} ⭐ <a href="${githuborgurl}" target="_blank">Open Source on GitHub</a><div/>`,
+      copyright: `<div style="font-size: 0.75rem; display:flex; flex-direction:row; flex-wrap:wrap; justify-content:center; align-items:center; gap:0.75rem 1rem;">
+  <span>Copyright ©  ${username} ${new Date().getFullYear()} ⭐ <a href="${githuborgurl}" target="_blank" rel="noopener noreferrer">Open Source on GitHub</a></span>
+  <a href="https://www.foreverblog.cn/go.html" target="_blank" rel="noopener noreferrer" title="虫洞 · 随机访问十年之约成员博客">
+    <img class="footer__foreverblog-wormhole footer__foreverblog-wormhole--light" src="https://www.foreverblog.cn/assets/logo/wormhole_v2_dark.webp" alt="十年之约虫洞" style="width:auto;height:32px;vertical-align:middle;" />
+    <img class="footer__foreverblog-wormhole footer__foreverblog-wormhole--dark" src="https://www.foreverblog.cn/assets/logo/wormhole_v2_light.webp" alt="十年之约虫洞" style="width:auto;height:32px;vertical-align:middle;" />
+  </a>
+</div>`,
     },
   },
 };
