@@ -74,7 +74,7 @@ class BlogManager:
 
     对每个内容哈希发生变化的 RSS 条目：
       1. 通过 LLM 生成文字摘要
-      2. 通过 OpenAI TTS 生成「男 + 女」双人对谈播客
+      2. 通过 TTS 生成「男 + 女」双人对谈播客
       3. 持久化到磁盘
     """
 
@@ -160,7 +160,7 @@ class BlogManager:
             if cached and cached.get("content_hash") == hash_value:
                 if (
                     not hash_only
-                    and config.TTS_API_KEY
+                    and config.tts_configured()
                     and not audio_path.is_file()
                 ):
                     logger.info("Podcast missing for %s, generating it", url)

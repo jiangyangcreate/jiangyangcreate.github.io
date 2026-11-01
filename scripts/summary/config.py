@@ -2,7 +2,7 @@
 
 懒校验——只在真正用到对应服务时才要求必填：
 - 生成摘要需要 TEXT_API_KEY / TEXT_BASE_URL / TEXT_MODEL
-- 生成播客需要 TEXT_*（对谈台词，可用 TEXT_DIALOGUE_MODEL 单独指定便宜模型）+ TTS_API_KEY（语音合成）；缺失时跳过播客，仅生成文字摘要
+- 生成播客需要 TEXT_*（对谈台词，可用 TEXT_DIALOGUE_MODEL 单独指定便宜模型）+ 当前 TTS_PROVIDER 的密钥；缺失时跳过播客，仅生成文字摘要
 - --hash-only 模式不需要任何密钥
 """
 
@@ -32,16 +32,31 @@ TEXT_MODEL = os.getenv("TEXT_MODEL", "")
 # 对谈台词模型（可选）：默认沿用 TEXT_MODEL；可单独配置更便宜的模型跑台词
 TEXT_DIALOGUE_MODEL = os.getenv("TEXT_DIALOGUE_MODEL", "") or TEXT_MODEL
 
-# 播客 TTS（OpenAI audio/speech 接口；缺失 TTS_API_KEY 时跳过播客，仅生成文字摘要）
+# 播客 TTS。TTS_PROVIDER=openai 走 audio/speech；=grok 走 xAI /v1/tts（language=zh，中文更自然）。
+# 未配置对应密钥时跳过播客，仅生成文字摘要。
+TTS_PROVIDER = os.getenv("TTS_PROVIDER", "openai").strip().lower()
 TTS_API_KEY = os.getenv("TTS_API_KEY", "")
 TTS_BASE_URL = os.getenv("TTS_BASE_URL", "https://api.openai.com/v1")
-TTS_MODEL = os.getenv("TTS_MODEL", "tts-1")
-TTS_VOICE_MALE = os.getenv("TTS_VOICE_MALE", "onyx")
-TTS_VOICE_FEMALE = os.getenv("TTS_VOICE_FEMALE", "nova")
-# 片头音乐：一段 mp3，直接二进制拼接到语音最前；默认 scripts/summary/intro.mp3，缺失时跳过
-TTS_INTRO_MUSIC = os.getenv(
-    "TTS_INTRO_MUSIC", str(Path(__file__).resolve().parent / "intro.mp3")
-)
+TTS_MODEL = os.getenv("TTS_MODEL", "gpt-4o-mini-tts")
+TTS_VOICE_MALE = os.getenv("TTS_VOICE_MALE", "cedar")
+TTS_VOICE_FEMALE = os.getenv("TTS_VOICE_FEMALE", "marin")
+# xAI Grok TTS。中文指定 language=zh，并可用 [pause]/[chuckle] 控制口气。
+XAI_API_KEY = os.getenv("XAI_API_KEY", "")
+XAI_TTS_URL = os.getenv("XAI_TTS_URL", "https://api.x.ai/v1/tts")
+XAI_VOICE_MALE = os.getenv("XAI_VOICE_MALE", "kepler")
+XAI_VOICE_FEMALE = os.getenv("XAI_VOICE_FEMALE", "iris")
+# 片头与句间留白：24 kHz / 128 kbps / 单声道 mp3，和 TTS 输出按帧拼接。
+# 片头默认 scripts/summary/intro.mp3，缺失时跳过。
+_ASSETS = Path(__file__).resolve().parent
+TTS_INTRO_MUSIC = os.getenv("TTS_INTRO_MUSIC", str(_ASSETS / "intro.mp3"))
+TTS_GAP_MUSIC = os.getenv("TTS_GAP_MUSIC", str(_ASSETS / "gap.mp3"))
+
+
+def tts_configured() -> bool:
+    """当前 TTS_PROVIDER 所需的密钥是否已填写。"""
+    if TTS_PROVIDER == "grok":
+        return bool(XAI_API_KEY.strip())
+    return bool(TTS_API_KEY.strip())
 
 
 def require(*names: str) -> None:
