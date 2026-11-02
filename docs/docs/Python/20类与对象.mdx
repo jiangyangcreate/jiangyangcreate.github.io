@@ -204,7 +204,7 @@ while True:
 
 ### super
 
-`super(class, instance)` 函数用于在子类中调用父类（或超类）的方法，特别是支持多继承的场景下，它会根据方法的解析顺序[Method Resolution Order, MRO](#__mro__与mro)来决定调用查找类的下一个类的方法。
+`super(class, instance)` 函数用于在子类中调用父类（或超类）的方法，特别是支持多继承的场景下，它会根据方法的解析顺序(Method Resolution Order, MRO)来决定调用查找类的下一个类的方法。
 
 <Highlight>参数`class`决定从MRO的哪个类之后开始查找（即从该类的下一个类开始找），参数`instance`决定使用谁的MRO。`instance`可以是实例对象或类对象。</Highlight>
 

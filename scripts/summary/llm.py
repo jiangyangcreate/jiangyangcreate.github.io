@@ -21,7 +21,6 @@ def _get_client() -> OpenAI:
 
 @_strip_think_tags
 def generate_summary(text: str) -> str | None:
-    """调用 LLM 生成 200-250 字的导读式摘要"""
     client = _get_client()
     completion = client.chat.completions.create(
         model=config.TEXT_MODEL,
@@ -35,6 +34,6 @@ def generate_summary(text: str) -> str | None:
                 ),
             },
         ],
-        temperature=0.2,
+        reasoning_effort="low",
     )
     return completion.choices[0].message.content

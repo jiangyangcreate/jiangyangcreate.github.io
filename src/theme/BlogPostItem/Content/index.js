@@ -98,12 +98,17 @@ function formatTime(seconds) {
   return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
+const PODCAST_LOAD_RETRIES = 30;
+
 const AiPodcast = ({ pageurl }) => {
   const path = pageurl.replace(/https:\/\/jiangmiemie.com\//, "").replace(/\//g, "_");
   const audioUrl = `/blog/summary/${path}.mp3`;
 
   const audioRef = useRef(null);
   const progressWrapRef = useRef(null);
+  const retryTimerRef = useRef(null);
+  const retriesRef = useRef(0);
+  const readyRef = useRef(false);
   const [available, setAvailable] = useState(null);
   const [playing, setPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -112,7 +117,17 @@ const AiPodcast = ({ pageurl }) => {
   const [previewTime, setPreviewTime] = useState(0);
   const [tooltipLeft, setTooltipLeft] = useState(0);
 
+  useEffect(() => () => {
+    if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+  }, []);
+
   const handleLoaded = useCallback(() => {
+    if (retryTimerRef.current) {
+      clearTimeout(retryTimerRef.current);
+      retryTimerRef.current = null;
+    }
+    retriesRef.current = 0;
+    readyRef.current = true;
     if (audioRef.current) {
       setDuration(audioRef.current.duration);
       setAvailable(true);
@@ -120,7 +135,21 @@ const AiPodcast = ({ pageurl }) => {
   }, []);
 
   const handleError = useCallback(() => {
-    setAvailable(false);
+    const audio = audioRef.current;
+    // 已经拿到时长后，播放途中的断线只停在当前进度，不再拆掉播放器。
+    // code 1 是主动 load() 打断上一次请求，不是这次失败。
+    if (!audio || readyRef.current || audio.error?.code === 1) return;
+    if (retriesRef.current >= PODCAST_LOAD_RETRIES) {
+      setAvailable(false);
+      return;
+    }
+    const attempt = retriesRef.current + 1;
+    retriesRef.current = attempt;
+    if (retryTimerRef.current) clearTimeout(retryTimerRef.current);
+    retryTimerRef.current = setTimeout(() => {
+      retryTimerRef.current = null;
+      audioRef.current?.load();
+    }, 1000 * attempt);
   }, []);
 
   const togglePlay = useCallback(() => {

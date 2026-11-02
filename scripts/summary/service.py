@@ -21,24 +21,11 @@ logger = logging.getLogger(__name__)
 
 
 def url_to_filename(url: str) -> str:
-    """
-    将博客URL转换为文件名
-
-
-    输入：https://jiangmiemie.com/blog/2026/2/28/
-    输出：blog_2026_2_28_.json
-    """
     parsed_url = urlparse(url).path
     return parsed_url.lstrip("/").replace("/", "_") + ".json"
 
 
 def filename_to_url(filename: str) -> str:
-    """
-    将文件名转换为博客URL
-
-    输入：blog_2026_2_28_.json
-    输出：https://jiangmiemie.com/blog/2026/2/28/
-    """
     return config.SITE_URL + "/" + filename.replace("_", "/").replace(".json", "")
 
 
@@ -51,7 +38,6 @@ def fetch_entries() -> list[dict]:
 
 
 def extract_body(page: dict) -> str:
-    """从 RSS 条目中提取正文文本，去掉 AI 生成的头部摘要"""
     raw_html = page["content"][0]["value"]
     parts = raw_html.split(SUMMARY_SEPARATOR)
     body_html = "".join(parts[1:]) if len(parts) > 1 else raw_html
@@ -70,14 +56,6 @@ class BlogResult:
 
 
 class BlogManager:
-    """博客 AI 生成管理器，基于内容哈希检测变更
-
-    对每个内容哈希发生变化的 RSS 条目：
-      1. 通过 LLM 生成文字摘要
-      2. 通过 OpenAI TTS 生成「男 + 女」双人对谈播客
-      3. 持久化到磁盘
-    """
-
     def __init__(self):
         SUMMARY_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -107,7 +85,6 @@ class BlogManager:
     async def _process_entry(
         self, url: str, body_text: str, hash_value: str
     ) -> BlogResult:
-        """为单个变更的博客条目生成摘要 + 播客"""
         try:
             summary = await asyncio.to_thread(generate_summary, body_text)
             podcast_path = await generate_podcast(url, body_text, output_dir=SUMMARY_DIR)
@@ -127,40 +104,25 @@ class BlogManager:
             return BlogResult(url=url, status="error", message=str(e))
 
     async def run(self, hash_only: bool = False) -> list[BlogResult]:
-        """扫描本地构建的 RSS，对变更条目重新生成 AI 信息
-
-        hash_only=True 时只刷新已有 JSON 的 content_hash（不调用模型），
-        对应旧后端的 /blog/update_hash，用于样式/重构类不改变文意的改动。
-        """
-        # 获取最新的 RSS 文章列表（默认来自 build/blog/rss.xml）
         entries = fetch_entries()
         if not entries:
             raise RuntimeError("RSS 中没有任何文章条目，中止执行（避免误删现有摘要文件）。")
-        # 加载本地缓存
         cache = self._load_cache()
-        # 新建活跃文件列表
         active_filenames: set[str] = set()
         results: list[BlogResult] = []
 
         for page in entries:
             url = page["link"].split("#")[0]
-            # 将还在 RSS 中的文章文件名 .json 和 .mp3 加入活跃文件列表
-            # 未加入的会被删除
             active_filenames.add(url_to_filename(url))
             audio_path = self._audio_path(url)
             active_filenames.add(audio_path.name)
-            # 提取文章正文
             body_text = extract_body(page)
-            # 计算文章正文哈希值
             hash_value = compute_hash(body_text)
-            # 获取本地缓存
             cached = cache.get(url)
-            # 正文未变时，文字摘要无需重建；但若已配置 TTS 而 MP3 缺失，
-            # 仍要补生成播客，避免一次临时失败导致音频永远不再重试。
             if cached and cached.get("content_hash") == hash_value:
                 if (
                     not hash_only
-                    and config.TTS_API_KEY
+                    and config.tts_configured()
                     and not audio_path.is_file()
                 ):
                     logger.info("Podcast missing for %s, generating it", url)
@@ -187,7 +149,6 @@ class BlogManager:
                 continue
             if hash_only:
                 if cached:
-                    # 仅刷新旧文的 content_hash，摘要原样保留
                     cached["content_hash"] = hash_value
                     self._save(url, cached)
                     results.append(BlogResult(url=url, status="hash-updated"))
@@ -202,13 +163,6 @@ class BlogManager:
             results.append(result)
 
         if hash_only:
-            # hash-only 模式跳过清理环节，避免误删
             return results
         self._clean_stale(active_filenames)
         return results
-
-
-if __name__ == "__main__":
-    manager = BlogManager()
-    results = asyncio.run(manager.run(hash_only=True))
-    print(results)

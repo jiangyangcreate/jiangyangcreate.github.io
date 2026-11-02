@@ -1,10 +1,3 @@
-"""博客 AI 摘要 / 播客生成入口
-
-用法（在仓库根目录）：
-    make summary   # 为新/变更博文生成摘要 + 播客
-    make hash      # 仅刷新 content_hash，不调用任何模型
-"""
-
 import argparse
 import asyncio
 import logging
