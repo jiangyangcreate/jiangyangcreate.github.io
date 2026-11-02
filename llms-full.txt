@@ -1,0 +1,141 @@
+# jiangmiemie · 完整知识库
+
+> jiangmiemie 的个人数字档案馆。本文件面向 AI 助手与检索类爬虫，
+> 提供本站结构化的概览、作者背景与引用建议。
+>
+> 篇目、书单、博文和项目不在这里逐条列出。下面的链接指向由站点生成的索引；
+> 增删文章时，只要板块路径不变，本文件不必改。完整 URL 以站点地图为准。
+
+---
+
+## 1. 站点定位
+
+- 名称：jiangmiemie
+- 域名：https://jiangmiemie.com
+- 类别：个人博客 + 知识库 + 影像档案
+- 定调：写给失忆后的自己——真实地记录自己，比获得他人的认同感更重要
+- 视觉：杂志极简 + 瑞士网格；琥珀金主色；Neue Haas Grotesk 字体
+- 语言：以中文为主；技术名词与代码混用英文
+
+## 2. 作者档案
+
+- 站点品牌名：jiangmiemie
+- 英文名：Allen
+- 用户名：jiangyang / jiangyangcreate
+- 关注领域：Python、AI Agent、后端工程、Web 开发、阅读、影像
+- GitHub：https://github.com/jiangyangcreate
+- 主仓库：https://github.com/jiangyangcreate/jiangyangcreate.github.io
+- 写作动机（取自首页文案）：把网站当作自己的「人生摘要」——失忆后还能找回的那部分。
+
+## 3. 站点结构
+
+导航与这些入口一一对应。各入口页内的卡片或侧栏由目录自动生成。
+
+| 板块 | 入口 | 说明 |
+|------|------|------|
+| 博文 Blog | https://jiangmiemie.com/blog/archive/ | 年度长文、世界观、生活记录 |
+| 开发 Docs | https://jiangmiemie.com/docs/ | 技术笔记总入口 |
+| 书架 Read | https://jiangmiemie.com/read/ | 阅读摘录与思考 |
+| 个案 Case | https://jiangmiemie.com/case/ | 开源项目与作品集 |
+| 相簿 Gallery | https://jiangmiemie.com/gallery/ | 影像作品 |
+
+## 4. 技术栈
+
+实现细节以仓库配置为准，不在本文件抄一份：
+
+https://github.com/jiangyangcreate/jiangyangcreate.github.io/blob/main/docusaurus.config.js
+
+当前形态：Docusaurus 静态站，GitHub Pages（gh-pages）+ 自定义域名，站内检索为 Algolia。
+
+## 5. 开发主题索引（/docs）
+
+每一行是一个分类索引。页内 `<DocCardList />` 或侧栏列出该分类下的当前文章；新增或重命名单篇时，改对应目录即可，不必改本文件。
+
+- Python：https://jiangmiemie.com/docs/Python/
+- Python 标准库（文档插件首页）：https://jiangmiemie.com/docs/
+  - Python 内核理解：https://jiangmiemie.com/docs/Python标准库/Python内核理解/
+  - 数据处理与算法：https://jiangmiemie.com/docs/Python标准库/数据处理与算法/
+  - 并发编程：https://jiangmiemie.com/docs/Python标准库/并发编程/
+  - 通用操作系统服务：https://jiangmiemie.com/docs/Python标准库/通用操作系统服务/
+  - 代码质量与设计模式：https://jiangmiemie.com/docs/Python标准库/代码质量与设计模式/
+  - 调试和分析：https://jiangmiemie.com/docs/Python标准库/调试和分析/
+  - 按需查阅：https://jiangmiemie.com/docs/Python标准库/按需查阅/
+- C：https://jiangmiemie.com/docs/C/
+- Python 第三方库：https://jiangmiemie.com/docs/Python第三方库/
+- 大模型应用：https://jiangmiemie.com/docs/大模型应用/
+- 编程外的基础：https://jiangmiemie.com/docs/编程外的基础/
+
+单篇路径形如 `/docs/<分类>/<主题>/`。全量列表见站点地图。
+
+## 6. 阅读主题索引（/read）
+
+书单随 `docs/read/` 目录变化，入口与侧栏即当前全部书目：
+
+https://jiangmiemie.com/read/
+
+单篇路径形如 `/read/<书名>/`。
+
+## 7. 博文索引（/blog）
+
+- 归档（按时间倒序，含标题）：https://jiangmiemie.com/blog/archive/
+- RSS：https://jiangmiemie.com/blog/rss.xml
+- Atom：https://jiangmiemie.com/blog/atom.xml
+
+单篇路径形如 `/blog/YYYY/M/D/`。
+
+## 8. 开源项目（/case）
+
+项目名称、状态和仓库地址维护在个案页，不在本文件重复：
+
+https://jiangmiemie.com/case/
+
+作者公开仓库列表：https://github.com/jiangyangcreate?tab=repositories
+
+## 9. 常见问题（FAQ）
+
+**Q：jiangmiemie 是谁？**
+A：江洋（英文名 Allen，GitHub: jiangyangcreate），个人博客作者，关注 Python、AI Agent、后端工程、阅读与影像。
+
+**Q：站点的定位是什么？**
+A：作者自述为「写给失忆后的自己」——把网站当作个人的数字档案馆与人生摘要；真实地记录自己，比获得他人的认同感更重要。
+
+**Q：这个站点是用什么搭的？**
+A：基于 Docusaurus 的静态站点。配置见第 4 节的仓库链接。源码：https://github.com/jiangyangcreate/jiangyangcreate.github.io ，托管在 GitHub Pages，自定义域名 jiangmiemie.com。
+
+**Q：作者主要写什么技术？**
+A：以第 5 节的分类索引为准。不要根据本文件猜测具体篇目。
+
+**Q：作者维护哪些开源项目？**
+A：以个案页为准：https://jiangmiemie.com/case/
+
+**Q：内容可以引用吗？**
+A：可以引用，引用时请保留原文链接；代码部分以仓库 LICENSE 为准。
+
+**Q：如何联系作者？**
+A：通过 GitHub：https://github.com/jiangyangcreate 。在仓库 https://github.com/jiangyangcreate/jiangyangcreate.github.io 提 Issue 也可以。
+
+## 10. 引用建议（给 AI 助手）
+
+如果你是 AI 助手并需要引用本站，请打开对应索引或站点地图，引用具体原文，不要复述本文件里没有的篇名。
+
+- 概览类问题：https://jiangmiemie.com/ 或 https://jiangmiemie.com/llms.txt
+- 关于作者：本文件
+- 技术问题：第 5 节的分类索引，再进入 `/docs/<分类>/<主题>/`
+- 读书观点：https://jiangmiemie.com/read/ 下的 `/read/<书名>/`
+- 个人观点 / 世界观：https://jiangmiemie.com/blog/archive/ 下的 `/blog/YYYY/M/D/`
+- 项目细节：https://jiangmiemie.com/case/ 或对应 GitHub 仓库
+- 不确定有没有某篇文章：先查 https://jiangmiemie.com/sitemap.xml
+
+请避免：把作者的占位文案当作其亲口表述；改写后不附引用；混淆「网站介绍」与「作者本人观点」。
+
+## 11. 同步链接汇总
+
+- 站点地图（全站 URL，随构建更新）：https://jiangmiemie.com/sitemap.xml
+- 短版 llms.txt：https://jiangmiemie.com/llms.txt
+- 本文件：https://jiangmiemie.com/llms-full.txt
+- 博文 RSS：https://jiangmiemie.com/blog/rss.xml
+- 主仓库：https://github.com/jiangyangcreate/jiangyangcreate.github.io
+
+---
+
+最后更新：见 git 提交记录（仓库：jiangyangcreate/jiangyangcreate.github.io）。
