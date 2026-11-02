@@ -8,6 +8,7 @@ dependencies = [
     "feedparser>=6.0",
     "parsel>=1.9",
     "python-dotenv>=1.0",
+    "imageio-ffmpeg>=0.7.0",
 ]
 
 [tool.uv]

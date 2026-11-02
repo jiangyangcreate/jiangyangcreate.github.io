@@ -1,11 +1,11 @@
 """把博客正文生成「男 + 女」双人对谈播客。
 
 流程：
-1. 调用 TEXT_* 文本模型，把正文改写成口语化双人对谈（speaker 取值 male / female）。
-2. 按台词逐条合成语音。TTS_PROVIDER=openai 时走 audio/speech；
-   =grok 时走 xAI /v1/tts，并指定 language=zh。
+1. 调用 TEXT_* 文本模型，把正文改写成 A（提问）/ B（讲解）对谈，再映射为男声 / 女声。
+2. 按台词逐条合成语音。TTS_PROVIDER=fish 时走 Fish Audio /v1/tts（A、B 两个 reference_id）；
+   =openai 时走 audio/speech；=grok 时走 xAI /v1/tts，并指定 language=zh。
 3. 片头音乐（TTS_INTRO_MUSIC）放在最前，句与句之间插入短留白（TTS_GAP_MUSIC）。
-   三段都是 24 kHz / 128 kbps 单声道 mp3，按原始帧顺序拼接。
+   采样率不一致时先转成 24 kHz 单声道 mp3 再拼接。
 
 正文以 input_text 直接传给模型（而非让服务端抓取 URL），
 因此新文章在部署上线前也能生成播客。
@@ -18,10 +18,13 @@ import json
 import logging
 import pathlib
 import re
+import subprocess
+import tempfile
 import time
 from urllib.parse import urlparse
 
 import httpx
+import imageio_ffmpeg
 from openai import OpenAI
 
 import config
@@ -31,15 +34,17 @@ logger = logging.getLogger(__name__)
 MALE = "male"
 FEMALE = "female"
 
-# 台词 JSON 里允许出现的 speaker 写法 -> 统一为 male / female
+# 台词里允许出现的 speaker 写法 -> 统一为 male / female。A 提问，B 讲解。
 _SPEAKER_ALIASES = {
     MALE: MALE,
+    "a": MALE,
     "男": MALE,
     "男声": MALE,
     "男生": MALE,
     "主持人": MALE,
     "host": MALE,
     FEMALE: FEMALE,
+    "b": FEMALE,
     "女": FEMALE,
     "女声": FEMALE,
     "女生": FEMALE,
@@ -48,37 +53,30 @@ _SPEAKER_ALIASES = {
     "co-host": FEMALE,
 }
 
-_DIALOGUE_SYSTEM = (
-    "你是中文播客编导。你写的台词会被直接拿去念，"
-    "所以必须像两个朋友坐下来聊天，而不是在读稿、写摘要或做播音。"
-)
+_DIALOGUE_SYSTEM = "你是中文播客的脚本作者。只输出带 A：/B：标签的对话文本。"
 
-_DIALOGUE_USER = """请把下面的文章改写成一段「男声 + 女声」的双人对谈播客台词。
+_DIALOGUE_USER = """你是中文播客的脚本作者。请把下面的文章改写成两位主持人的对话脚本，语气自然口语，适合朗读。
 
-听感要对齐这种开场（只学口气，不要照抄内容）：
-男：今天咱们想聊的是，一件事看起来大家都在参与，其实背后是谁在赢、谁在亏。
-女：对，这个挺实际的。那咱们直接开始吧。
-男：先把三种情况说清楚。一起把蛋糕做大，是一种；蛋糕就那么大、你多我少，是另一种。
-女：嗯。还有一种是分之前就被抽走一笔，最后大家一起亏。
+说话人标签：每一段发言以"A："或"B："开头。A 负责提问、引导和过渡；B 负责解读讲解。两人轮流发言，不要出现其他角色或名字。
+开场：A 用 2 到 4 句交代本期要聊什么，B 简短附和这些都是大家常遇到或常聊的问题，再由 A 以"那我们就直接开始吧"收尾。不要念标题、日期、标签和链接。
+人称：称原作者为"作者"，转述其观点和经历时用第三人称，不要用"我"代入作者。作者的建议则对听众说"你"，例如"他建议你可以……"。
+按文章章节顺序推进。章节之间由 A 用"我们接下来要聊的是……"过渡，并抛出一个问题引出内容。
+用一问一答推进。B 回答后，A 用"对""没错""原来如此"等短句回应，并给出一句简短评价。
+篇幅由文章内容自然决定，不设固定长度。每个章节只保留最有代表性的数字、案例或专有名词；表格、长列表压缩成一句概括；与主旨关系不大的细节可以省略；链接和网址不念，人名和站名保留。
+代码块不要逐行念，用口语说明它做了什么、得到什么效果，必要时可以根据代码推断运行结果。
+脚注和引用保留其核心信息（人名、年份、结论），放在接近结尾处，作为一个"有意思的延伸"来讲，并回扣前文相关的观点。
+如果文章是叙事或抒情类，不要复述情节，改为解读主题、情绪和象征。
+每个章节讲完，用一句话点出结论。
+结尾由 A 回顾本期要点，感谢收听，以"我们下期再见，拜拜"收尾。
+只输出带标签的对话文本，不加 markdown、标题或舞台提示。
 
-要求：
-1. 输出必须是严格的 JSON 数组，且只输出 JSON，不要代码块、不要前后解释：
-   [{"speaker": "male", "text": "……"}, {"speaker": "female", "text": "……"}]
-2. speaker 只能取 "male"（男声）或 "female"（女声），两人交替。男声先开口点题。
-3. 口气像上面那样：用「咱们」「你」「对」「嗯」「那咱们……」。
-   不要旁白，不要「大家好，欢迎收听本期节目」，不要「首先 / 其次 / 综上所述 / 值得注意的是 / 我们来看一下」。
-4. 把文章讲成对话，不要逐句复述。一位抛出一个具体事实或判断，另一位用短句接住（赞同、追问、补一句人话），再往下走。
-   反应句可以很短，比如「嗯。」「对。」「然后呢？」内容句一般一两句，别写成小段落。
-5. 全部写成口播：不要阿拉伯数字和百分号（21% 写成「百分之二十一」，3.15 写成「三点一五」）。
-   「致某人的信」说成「写给某人的信」。冷僻书名或难读的英文工具名只出现一次，马上用白话解释，另一位用解释接话，不要反复硬念原名。
-6. 全篇 18 到 28 条。信息多就多聊几句，不要为了凑数空转，也不要压成三分钟摘要。
-{extra}
 文章如下：
 {text}"""
 
-_GROK_EXTRA = """
-7. 语音引擎能识别少量语气标记。大约每四五句用一次 [pause] 或 [chuckle]，放在句中或句末，不要每句都加，不要用别的括号标记。
-"""
+_SPEAKER_LINE = re.compile(
+    r"^\s*(?:[-*]\s*)?(?:\*\*|__)?([ABab])(?:\*\*|__)?\s*[:：]\s*(.*?)\s*$",
+    re.M,
+)
 
 # OpenAI gpt-4o-mini-tts 才理会 instructions；tts-1 会忽略，而且中文口音重。
 _OPENAI_INSTRUCTIONS = {
@@ -114,11 +112,9 @@ class PodcastGenerationError(RuntimeError):
 
 
 def _build_dialogue_prompt(text: str, provider: str | None = None) -> str:
-    """将文章插入提示词，且不把 JSON 示例的大括号当作格式化字段。"""
-    if provider is None:
-        provider = config.TTS_PROVIDER
-    extra = _GROK_EXTRA if provider == "grok" else ""
-    return _DIALOGUE_USER.replace("{extra}", extra).replace("{text}", text)
+    """将文章插入提示词。台词规则不随 TTS 提供商变化。"""
+    del provider
+    return _DIALOGUE_USER.replace("{text}", text)
 
 
 def spoken_text(text: str, provider: str | None = None) -> str:
@@ -139,25 +135,24 @@ def _url_to_audio_filename(url: str, ext: str = "mp3") -> str:
 def _normalize_speaker(speaker: str) -> str:
     key = str(speaker).strip().lower()
     if key not in _SPEAKER_ALIASES:
-        raise ValueError(f"无法识别的说话人：{speaker!r}（仅支持 male / female）")
+        raise ValueError(f"无法识别的说话人：{speaker!r}（仅支持 A / B）")
     return _SPEAKER_ALIASES[key]
 
 
-def parse_dialogue(content: str) -> list[dict]:
-    """把模型输出解析成 [{"speaker": "male"|"female", "text": str}, ...]
-
-    容忍 ```json 代码块围栏，以及模型在 JSON 前后附带的无用文字。
-    """
-    raw = content.strip()
-    fence = re.search(r"```(?:json)?\s*(.*?)```", raw, flags=re.S)
+def _strip_fence(raw: str) -> str:
+    fence = re.search(r"```(?:\w+)?\s*(.*?)```", raw, flags=re.S)
     if fence:
-        raw = fence.group(1).strip()
+        return fence.group(1).strip()
+    return raw.strip()
+
+
+def _parse_json_dialogue(raw: str) -> list[dict]:
     start, end = raw.find("["), raw.rfind("]")
-    if start != -1 and end > start:
-        raw = raw[start : end + 1]
-    data = json.loads(raw)
+    if start == -1 or end <= start:
+        raise ValueError(f"对谈台词不是非空数组：{raw[:200]}")
+    data = json.loads(raw[start : end + 1])
     if not isinstance(data, list) or not data:
-        raise ValueError(f"对谈台词不是非空数组：{content[:200]}")
+        raise ValueError(f"对谈台词不是非空数组：{raw[:200]}")
 
     lines: list[dict] = []
     for index, item in enumerate(data):
@@ -169,6 +164,42 @@ def parse_dialogue(content: str) -> list[dict]:
             raise ValueError(f"第 {index} 条台词 text 为空")
         lines.append({"speaker": speaker, "text": text})
     return lines
+
+
+def _parse_labeled_dialogue(raw: str) -> list[dict]:
+    """解析「A：…… / B：……」逐行台词。续行并入上一位说话人。"""
+    lines: list[dict] = []
+    current: dict | None = None
+    for line in raw.splitlines():
+        match = _SPEAKER_LINE.match(line)
+        if match:
+            if current and current["text"]:
+                lines.append(current)
+            current = {
+                "speaker": _normalize_speaker(match.group(1)),
+                "text": match.group(2).strip(),
+            }
+            continue
+        if current is not None and line.strip():
+            extra = line.strip()
+            current["text"] = f"{current['text']} {extra}".strip() if current["text"] else extra
+    if current and current["text"]:
+        lines.append(current)
+    if not lines:
+        raise ValueError(f"对谈台词里没有 A：/B：发言：{raw[:200]}")
+    return lines
+
+
+def parse_dialogue(content: str) -> list[dict]:
+    """把模型输出解析成 [{"speaker": "male"|"female", "text": str}, ...]
+
+    正式格式是 A：/B：逐行台词。A 映射为男声，B 映射为女声。
+    仍兼容旧的 JSON 数组，以及 ``` 代码块围栏。
+    """
+    raw = _strip_fence(content.strip())
+    if _SPEAKER_LINE.search(raw):
+        return _parse_labeled_dialogue(raw)
+    return _parse_json_dialogue(raw)
 
 
 def generate_dialogue(text: str, provider: str | None = None) -> list[dict]:
@@ -189,6 +220,8 @@ def generate_dialogue(text: str, provider: str | None = None) -> list[dict]:
 
 
 def _voice_for(speaker: str) -> str:
+    if config.TTS_PROVIDER == "fish":
+        return config.FISH_VOICE_A if speaker == MALE else config.FISH_VOICE_B
     if config.TTS_PROVIDER == "grok":
         return config.XAI_VOICE_MALE if speaker == MALE else config.XAI_VOICE_FEMALE
     return config.TTS_VOICE_MALE if speaker == MALE else config.TTS_VOICE_FEMALE
@@ -240,8 +273,34 @@ def _synthesize_grok(voice: str, utterance: str) -> bytes:
     return response.content
 
 
+def _synthesize_fish(voice: str, utterance: str) -> bytes:
+    response = httpx.post(
+        config.FISH_TTS_URL,
+        headers={
+            "Authorization": f"Bearer {config.FISH_API_KEY}",
+            "model": config.FISH_MODEL,
+        },
+        json={
+            "text": utterance,
+            "reference_id": voice,
+            "format": "mp3",
+        },
+        timeout=120,
+    )
+    if response.status_code >= 400:
+        raise RuntimeError(f"Fish TTS {response.status_code}: {response.text[:300]}")
+    content_type = response.headers.get("content-type", "")
+    if "json" in content_type and not response.content.startswith((b"\xff", b"ID3")):
+        raise RuntimeError(f"Fish TTS 返回的不是音频：{response.text[:300]}")
+    if not response.content:
+        raise RuntimeError("Fish TTS 返回空音频")
+    return response.content
+
+
 def _synthesize_utterance(client: OpenAI | None, speaker: str, utterance: str) -> bytes:
     voice = _voice_for(speaker)
+    if config.TTS_PROVIDER == "fish":
+        return _synthesize_fish(voice, utterance)
     if config.TTS_PROVIDER == "grok":
         return _synthesize_grok(voice, utterance)
     if client is None:
@@ -263,6 +322,53 @@ def _synthesize_with_retry(
     raise RuntimeError("unreachable")
 
 
+def _write_podcast_mp3(output_path: pathlib.Path, segments: list[bytes]) -> None:
+    """把片头、台词和句间留白转成一条 24 kHz 单声道 mp3。"""
+    temporary = output_path.with_suffix(".writing.mp3")
+    try:
+        with tempfile.TemporaryDirectory(prefix="podcast-") as tmp:
+            root = pathlib.Path(tmp)
+            lines: list[str] = []
+            for index, segment in enumerate(segments):
+                src = root / f"{index}.mp3"
+                src.write_bytes(segment)
+                escaped = str(src).replace("'", r"'\''")
+                lines.append(f"file '{escaped}'")
+            list_path = root / "list.txt"
+            list_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+            result = subprocess.run(
+                [
+                    imageio_ffmpeg.get_ffmpeg_exe(),
+                    "-y",
+                    "-loglevel",
+                    "error",
+                    "-f",
+                    "concat",
+                    "-safe",
+                    "0",
+                    "-i",
+                    str(list_path),
+                    "-ar",
+                    "24000",
+                    "-ac",
+                    "1",
+                    "-c:a",
+                    "libmp3lame",
+                    "-b:a",
+                    "128k",
+                    str(temporary),
+                ],
+                capture_output=True,
+                text=True,
+            )
+            if result.returncode != 0 or not temporary.is_file():
+                detail = (result.stderr or result.stdout or "无输出").strip()
+                raise RuntimeError(f"拼接播客失败：{detail[-500:]}")
+        temporary.replace(output_path)
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def _read_mp3(path: pathlib.Path, label: str) -> bytes:
     """读取一段配套 mp3；文件缺失时跳过（仅告警，不中断）。"""
     if not path.is_file():
@@ -281,7 +387,7 @@ async def generate_podcast(
 ) -> str | None:
     """为博客正文生成「男 + 女」双人对谈播客音频。
 
-    片头、句间留白与各条台词按原始 mp3 帧顺序拼接。
+    片头、句间留白与各条台词写成一条 mp3。
     成功时返回输出文件路径；未配置密钥时返回 None。
     """
     if not config.tts_configured():
@@ -314,7 +420,7 @@ async def generate_podcast(
             segments.append(intro)
 
         client = None
-        if config.TTS_PROVIDER != "grok":
+        if config.TTS_PROVIDER not in {"grok", "fish"}:
             client = await asyncio.to_thread(_get_tts_client)
         speech_count = 0
         for index, line in enumerate(lines, start=1):
@@ -335,9 +441,7 @@ async def generate_podcast(
         if speech_count == 0:
             raise RuntimeError(f"No audio data for {url}")
 
-        with open(output_path, "wb") as f:
-            for segment in segments:
-                f.write(segment)
+        await asyncio.to_thread(_write_podcast_mp3, output_path, segments)
         logger.info(
             "Saved podcast: %s（%d 段，%d 字节）",
             output_path,
